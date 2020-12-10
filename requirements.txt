@@ -1,0 +1,12 @@
+pymediainfo
+click
+termcolor
+ffmpeg-python
+tmdbsimple
+guessit
+torf
+# pyimgbox
+mal-api
+cprint
+qbittorrent-api
+keyboard
