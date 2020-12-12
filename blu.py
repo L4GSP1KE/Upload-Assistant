@@ -26,9 +26,11 @@ from mal import AnimeSearch
 import xmlrpc.client
 import urllib
 import qbittorrentapi
-from subprocess import Popen, PIPE, STDOUT, run
+from subprocess import Popen, PIPE, STDOUT, run, DEVNULL
 import keyboard
-import shutil
+
+base_dir = os.path.abspath(os.path.dirname(__file__))
+os.chdir(base_dir)
 
 config = configparser.ConfigParser()
 config.read('config.ini')
@@ -42,7 +44,7 @@ local_path = config['DEFAULT']['local_path']
 torrent_client = config['DEFAULT']['torrent_client']
 
 
-base_dir = os.getcwd()
+# base_dir = os.getcwd()
 search = tmdb.Search()
 
 
@@ -69,10 +71,13 @@ search = tmdb.Search()
 @click.option('--tag', '-g', help="Group tag")
 @click.option('--desc', '-d', help="Custom description (String)")
 @click.option('--descfile', '-df', help="Custom description (Path to File)", type=click.Path('rb'))
+@click.option('--desclink', '-hb', help="Custom description (Link to hastebin)")
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
-def doTheThing(path, screens, category, type, res, tag, desc, descfile, anon, stream):
+def doTheThing(path, screens, category, type, res, tag, desc, descfile, desclink, anon, stream):
     path = os.path.abspath(path)
+    if descfile != None:
+        descfile = os.path.abspath(descfile)
     isdir = os.path.isdir(path)
     is_disk, videoloc, bdinfo = get_disk(path)
     videopath = get_video(videoloc)
@@ -82,7 +87,6 @@ def doTheThing(path, screens, category, type, res, tag, desc, descfile, anon, st
     #Guess Name
     if is_disk != "":
         filename = guessit(path)['title']
-        print(filename)
     else:
         filename = guessit(ntpath.basename(video))["title"]
     guess = guessit(path)
@@ -106,7 +110,7 @@ def doTheThing(path, screens, category, type, res, tag, desc, descfile, anon, st
     tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id = get_tmdb(filename, cat_id)
 
     #Create description
-    gen_desc(filename, desc, descfile, bdinfo)
+    gen_desc(filename, desc, descfile, desclink, bdinfo, path)
 
     #Generate Screenshots
     screenshots(videopath, filename, screens)
@@ -125,7 +129,7 @@ def doTheThing(path, screens, category, type, res, tag, desc, descfile, anon, st
 
     #Add to client
     if torrent_client == "rtorrent":
-        rtorrent(path, torrent)
+        rtorrent(path, torrent, torrent_path)
     elif torrent_client == "qbit":
         qbittorrent(path, torrent)
 
@@ -176,9 +180,7 @@ def get_video(videoloc):
     if os.path.isdir(videoloc):
         os.chdir(videoloc)
         video = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.m2ts')
-        video = video[0]
-        print(video)
-        
+        video = video[0]        
     else:
         video = videoloc
     return video
@@ -257,6 +259,7 @@ def screenshots(path, filename, screens):
 def upload_screens(filename, screens):
     os.chdir(f"{base_dir}/{filename}")
     i=1
+    description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
     
     #freeimage.host (64MB cap)
     for image in glob.glob("*.png"):
@@ -269,13 +272,13 @@ def upload_screens(filename, screens):
         response = response.json()
         img_url = response['image']['url']
         web_url = response['image']['url_viewer']
-        description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
         description.write(f"[url={web_url}][img=400]{img_url}[/img][/url]")
         if i % 3 == 0:
             description.write("\n")
         print(f"{i}/{screens}")
         i += 1
-        description.close()
+    # description.write("[center][/center]")
+    description.close()
 
 #Get Category ID
 def get_cat(category, video):
@@ -786,10 +789,10 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
         trackers = [announce],
         source = "BLU",
         private = True,
-        exclude_globs= [exclude],
-        include_globs= [include],
-        piece_size= 16777216,
-        created_by="L4G's Upload Assistant")
+        exclude_globs = [exclude],
+        include_globs = [include],
+        piece_size_max = 16777216,
+        created_by="UwU what's this?")
     cprint("Creating .torrent", 'grey', 'on_yellow')
     torrent.generate()
     torrent_path = f"{base_dir}/{filename}/{name}.torrent"
@@ -797,11 +800,18 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
     cprint(".torrent created", 'grey', 'on_green')
     return torrent_path, torrent
 
-def gen_desc(filename, desc, descfile, bdinfo):
+def gen_desc(filename, desc, descfile, desclink, bdinfo, path):
     description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
     description.seek(0)
+    nfo = glob.glob("*.nfo")
     if bdinfo != "":
         description.write(f"[code]{bdinfo}[/code]")
+    if desclink != None:
+        parsed = urllib.parse.urlparse(desclink)
+        raw = parsed._replace(path=f"/raw{parsed.path}")
+        raw = urllib.parse.urlunparse(raw)
+        description.write(requests.get(raw).text)
+        description.write("\n")
     if descfile != None:
         if os.path.isfile(descfile) == True:
             text = open(descfile, 'r').read()
@@ -831,7 +841,7 @@ def stream_optimized(stream_opt):
         stream = 0
     return stream
 
-def rtorrent(path, torrent):
+def rtorrent(path, torrent, torrent_path):
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     isdir = os.path.isdir(path)
     infohash = torrent.infohash
@@ -841,9 +851,12 @@ def rtorrent(path, torrent):
         path = path.replace(os.sep, '/')
     if isdir == False:
         path = os.path.dirname(path)
+    
+    
     rtorrent = xmlrpc.client.Server(rtorrent_url)
     rtorrent.load_raw_verbose(torrent.dump())
     rtorrent.d.directory_base.set(infohash, path)
+    rtorrent.d.resume(infohash)
     rtorrent.d.check_hash(infohash)
     cprint("Rechecking File", 'grey', 'on_yellow')
     while rtorrent.d.is_hash_checked(infohash) == 0:

@@ -13,6 +13,7 @@
   -g, --tag TEXT                    Group tag
   -d, --desc TEXT                   Custom description (String)
   -df, --descfile                   Custom description (Path to file)
+  -hb, --desclink                   Custom description (Link to Hastebin)
   -a, --anon                        Anonymous upload
   -st, --stream                     Stream Optimized Upload
   --help                            Show this message and exit.
