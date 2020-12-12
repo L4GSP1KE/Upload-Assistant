@@ -81,9 +81,10 @@ search = tmdb.Search()
 @click.option('--desc', '-d', help="Custom description (String)")
 @click.option('--descfile', '-df', help="Custom description (Path to File)", type=click.Path('rb'))
 @click.option('--desclink', '-hb', help="Custom description (Link to hastebin)")
+@click.option('--nfo', '-nfo', help="Use nfo from directory as description", is_flag=True)
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
-def doTheThing(path, screens, category, type, res, tag, desc, descfile, desclink, anon, stream):
+def doTheThing(path, screens, category, type, res, tag, desc, descfile, desclink, nfo, anon, stream):
     path = os.path.abspath(path)
     if descfile != None:
         descfile = os.path.abspath(descfile)
@@ -119,7 +120,7 @@ def doTheThing(path, screens, category, type, res, tag, desc, descfile, desclink
     tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id = get_tmdb(filename, cat_id)
 
     #Create description
-    gen_desc(filename, desc, descfile, desclink, bdinfo, path)
+    gen_desc(filename, desc, descfile, desclink, bdinfo, path, nfo)
 
     #Generate Screenshots
     screenshots(videopath, filename, screens)
@@ -810,12 +811,16 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
     cprint(".torrent created", 'grey', 'on_green')
     return torrent_path, torrent
 
-def gen_desc(filename, desc, descfile, desclink, bdinfo, path):
+def gen_desc(filename, desc, descfile, desclink, bdinfo, path, nfo):
     description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
     description.seek(0)
     description.write("[code]")
     if bdinfo != "":
         description.write(bdinfo)
+    if nfo != None:
+        nfo = glob.glob("*.nfo")[0]
+        description.write(open(nfo, 'r').read())
+        description.write("\n")
     if desclink != None:
         parsed = urllib.parse.urlparse(desclink)
         raw = parsed._replace(path=f"/raw{parsed.path}")
