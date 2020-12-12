@@ -880,23 +880,9 @@ def rtorrent(path, torrent_path, torrent):
     if isdir == False:
         path = os.path.dirname(path)
     
-    # fr = Torrent(fr_file)
-    # infohash = torrent.infohash
     
-    # multicall = xmlrpc.client.MultiCall(rtorrent)
-    # multicall.load.verbose(fr_file)
-    # if replaced == True:
-    #     multicall.d.directory_base.set(path)
-    # multicall()
-
     rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
 
-    # rtorrent.load_raw_verbose('', fr_file)
-    # rtorrent.d.resume(infohash)
-    # rtorrent.d.check_hash(infohash)
-    # while rtorrent.d.is_hash_checked(infohash) == 0:
-    #     time.sleep(0.1)
-    # rtorrent.d.start(infohash)
 
 def qbittorrent(path, torrent):
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
