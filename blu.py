@@ -28,6 +28,10 @@ import urllib
 import qbittorrentapi
 from subprocess import Popen, PIPE, STDOUT, run, DEVNULL
 import keyboard
+import bencode
+from pyrobase.parts import Bunch
+import errno
+import hashlib
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 os.chdir(base_dir)
@@ -50,21 +54,26 @@ search = tmdb.Search()
 
 
 #TODO
+
+#FAST RESUME
 #FANRES/TRAILER SUPPORT <- probably not
-#DISK SUPPORT
+#DISK SUPPORT <- maybe???
 #tmdb/imdb id input argument
-#HDR vs DV vs HLG vs whatever else
+#HDR vs DV vs HLG vs whatever else <- hlg done, hdr done, need DV
 #Dual Audio anime, is channel based off default audio track or original lang eg. 5.1 eng but 2.0 jap?
 #Audio formats I may have missed
+#Rework audio to use commercial name
 #Description feature is pretty meh
 #Remove upload screens prompt
+#Replace cprint with something more windows friendly
+#Make less sloppy
 
 
 
 #Do the thingy
 @click.command()
 @click.argument('path',type=click.Path('r'))
-@click.option('--screens', '-s', help="Number of screenshots", default=6)
+@click.option('--screens', '-s', help="Number of screenshots", default=0)
 @click.option('--category', '-c', type=click.Choice(['MOVIE', 'TV'], case_sensitive=False), help="Category")
 @click.option('--type', '-t', type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False), help="Type")
 @click.option('--res', '-r',type=click.Choice(['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'OTHER'], case_sensitive=False), help="Resolution")
@@ -129,7 +138,7 @@ def doTheThing(path, screens, category, type, res, tag, desc, descfile, desclink
 
     #Add to client
     if torrent_client == "rtorrent":
-        rtorrent(path, torrent, torrent_path)
+        rtorrent(path, torrent_path, torrent)
     elif torrent_client == "qbit":
         qbittorrent(path, torrent)
 
@@ -213,7 +222,7 @@ def get_type(video, scene, is_disk):
         type = "DISK"
     else:
         print("Unable to determine type, please input or use -t next time")
-        type = click.prompt("Please enter type", type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False, default="ENCODE"))
+        type = click.prompt("Please enter type", type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False))
     return type
 
 #Export MediaINfo
@@ -277,7 +286,7 @@ def upload_screens(filename, screens):
             description.write("\n")
         print(f"{i}/{screens}")
         i += 1
-    # description.write("[center][/center]")
+    description.write("[center]Created by L4G's Upload Assistant[/center]")
     description.close()
 
 #Get Category ID
@@ -635,7 +644,7 @@ def get_audio(mi, anime):
     elif format == "PCM":
         codec = "LPCM"
     else:
-        cprint(f"CODEC: {format} NOT FOUND", 'grey', 'on_red')
+        cprint(f"CODEC: {format} NOT FOUND, Please report to L4G", 'grey', 'on_red')
         codec = click.prompt("Please input audio codec")
 
     #set audio channels
@@ -791,21 +800,22 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
         private = True,
         exclude_globs = [exclude],
         include_globs = [include],
-        piece_size_max = 16777216,
-        created_by="UwU what's this?")
+        piece_size = 16777216,
+        created_by = "L4G's Upload Assistant")
     cprint("Creating .torrent", 'grey', 'on_yellow')
-    torrent.generate()
+    torrent.generate(callback=torf_cb, interval=5)
     torrent_path = f"{base_dir}/{filename}/{name}.torrent"
     torrent.write(f"{base_dir}/{filename}/{name}.torrent", overwrite=True)
+    torrent.verify_filesize(path)
     cprint(".torrent created", 'grey', 'on_green')
     return torrent_path, torrent
 
 def gen_desc(filename, desc, descfile, desclink, bdinfo, path):
     description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
     description.seek(0)
-    nfo = glob.glob("*.nfo")
+    description.write("[code]")
     if bdinfo != "":
-        description.write(f"[code]{bdinfo}[/code]")
+        description.write(bdinfo)
     if desclink != None:
         parsed = urllib.parse.urlparse(desclink)
         raw = parsed._replace(path=f"/raw{parsed.path}")
@@ -820,6 +830,7 @@ def gen_desc(filename, desc, descfile, desclink, bdinfo, path):
         elif desc != None:
             description.write(desc)
             description.write("\n")
+    description.write("[/code]")
 
 def clean_filename(name):
     invalid = '<>:"/\|?*'
@@ -841,10 +852,27 @@ def stream_optimized(stream_opt):
         stream = 0
     return stream
 
-def rtorrent(path, torrent, torrent_path):
+def rtorrent(path, torrent_path, torrent):
+    rtorrent = xmlrpc.client.Server(rtorrent_url)
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
+    # torrent = Torrent(torrent_path)
+    metainfo = bencode.bread(torrent_path)
+    try:
+        meta = add_fast_resume(metainfo, path, torrent)
+    except EnvironmentError as exc:
+        cprint("Error making fast-resume data (%s)" % (exc,), 'grey', 'on_red')
+        raise
+    
+        
+    new_meta = bencode.bencode(meta)
+    if new_meta != metainfo:
+        fr_file = torrent_path.replace('.torrent', '-resume.torrent')
+        print("Writing %r..." % fr_file)
+        bencode.bwrite(meta, fr_file)
+
+    # pprint.pprint(meta)
+
     isdir = os.path.isdir(path)
-    infohash = torrent.infohash
     #Remote path mount
     if local_path in path:
         path = path.replace(local_path, remote_path)
@@ -852,16 +880,23 @@ def rtorrent(path, torrent, torrent_path):
     if isdir == False:
         path = os.path.dirname(path)
     
+    # fr = Torrent(fr_file)
+    # infohash = torrent.infohash
     
-    rtorrent = xmlrpc.client.Server(rtorrent_url)
-    rtorrent.load_raw_verbose(torrent.dump())
-    rtorrent.d.directory_base.set(infohash, path)
-    rtorrent.d.resume(infohash)
-    rtorrent.d.check_hash(infohash)
-    cprint("Rechecking File", 'grey', 'on_yellow')
-    while rtorrent.d.is_hash_checked(infohash) == 0:
-        time.sleep(0.1)
-    rtorrent.d.start(infohash)
+    # multicall = xmlrpc.client.MultiCall(rtorrent)
+    # multicall.load.verbose(fr_file)
+    # if replaced == True:
+    #     multicall.d.directory_base.set(path)
+    # multicall()
+
+    rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
+
+    # rtorrent.load_raw_verbose('', fr_file)
+    # rtorrent.d.resume(infohash)
+    # rtorrent.d.check_hash(infohash)
+    # while rtorrent.d.is_hash_checked(infohash) == 0:
+    #     time.sleep(0.1)
+    # rtorrent.d.start(infohash)
 
 def qbittorrent(path, torrent):
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
@@ -996,8 +1031,52 @@ def get_bdinfo(path):
     shutil.rmtree(f"{base_dir}/tmp")
     return prettyBDInfo
         
+def add_fast_resume(meta, datapath, torrent):
+    """ Add fast resume data to a metafile dict.
+    """
+    # Get list of files
+    files = meta["info"].get("files", None)
+    single = files is None
+    if single:
+        if os.path.isdir(datapath):
+            datapath = os.path.join(datapath, meta["info"]["name"])
+        files = [Bunch(
+            path=[os.path.abspath(datapath)],
+            length=meta["info"]["length"],
+        )]
 
+    # Prepare resume data
+    resume = meta.setdefault("libtorrent_resume", {})
+    resume["bitfield"] = len(meta["info"]["pieces"]) // 20
+    resume["files"] = []
+    piece_length = meta["info"]["piece length"]
+    offset = 0
 
+    for fileinfo in files:
+        # Get the path into the filesystem
+        filepath = os.sep.join(fileinfo["path"])
+        if not single:
+            filepath = os.path.join(datapath, filepath.strip(os.sep))
+
+        # Check file size
+        if os.path.getsize(filepath) != fileinfo["length"]:
+            raise OSError(errno.EINVAL, "File size mismatch for %r [is %d, expected %d]" % (
+                filepath, os.path.getsize(filepath), fileinfo["length"],
+            ))
+
+        # Add resume data for this file
+        resume["files"].append(dict(
+            priority=1,
+            mtime=int(os.path.getmtime(filepath)),
+            completed=(offset+fileinfo["length"]+piece_length-1) // piece_length
+                     - offset // piece_length,
+        ))
+        offset += fileinfo["length"]
+
+    return meta
+
+def torf_cb(torrent, filepath, pieces_done, pieces_total):
+    print(f'{pieces_done/pieces_total*100:3.0f} % done')
 
 doTheThing()
 

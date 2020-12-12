@@ -10,3 +10,5 @@ mal-api
 cprint
 qbittorrent-api
 keyboard
+bencode.py
+pyrobase
