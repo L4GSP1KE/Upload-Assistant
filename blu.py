@@ -73,7 +73,7 @@ search = tmdb.Search()
 #Do the thingy
 @click.command()
 @click.argument('path',type=click.Path('r'))
-@click.option('--screens', '-s', help="Number of screenshots", default=0)
+@click.option('--screens', '-s', help="Number of screenshots", default=6)
 @click.option('--category', '-c', type=click.Choice(['MOVIE', 'TV'], case_sensitive=False), help="Category")
 @click.option('--type', '-t', type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False), help="Type")
 @click.option('--res', '-r',type=click.Choice(['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'OTHER'], case_sensitive=False), help="Resolution")

@@ -1,7 +1,7 @@
 # BluUpload 
 
 
-**Usage:** `blu.py /downloads/path/etc`
+**Usage:** `python3 blu.py /downloads/path/etc`
 
 ```
 Options:
