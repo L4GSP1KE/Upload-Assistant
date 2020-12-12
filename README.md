@@ -4,19 +4,21 @@
 **Usage:** `blu.py /downloads/path/etc`
 
 ```
-  -s, --screens INTEGER             Number of screenshots
-  -c, --category [MOVIE|TV]         Category
+Options:
+  -s, --screens INTEGER           Number of screenshots
+  -c, --category [MOVIE|TV]       Category
   -t, --type [DISK|REMUX|ENCODE|WEBDL|WEBRIP|HDTV]
-                                    Type
+                                  Type
   -r, --res [2160p|1080p|1080i|720p|576p|576i|480p|480i|8640p|4320p|OTHER]
-                                    Resolution
-  -g, --tag TEXT                    Group tag
-  -d, --desc TEXT                   Custom description (String)
-  -df, --descfile                   Custom description (Path to file)
-  -hb, --desclink                   Custom description (Link to Hastebin)
-  -a, --anon                        Anonymous upload
-  -st, --stream                     Stream Optimized Upload
-  --help                            Show this message and exit.
+                                  Resolution
+  -g, --tag TEXT                  Group tag
+  -d, --desc TEXT                 Custom description (String)
+  -df, --descfile PATH            Custom description (Path to File)
+  -hb, --desclink TEXT            Custom description (Link to hastebin)
+  -nfo, --nfo                     Use nfo from directory as description
+  -a, --anon                      Anonymous upload
+  -st, --stream                   Stream Optimized Upload
+  --help                          Show this message and exit.
   
   ````
   
