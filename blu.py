@@ -67,6 +67,7 @@ search = tmdb.Search()
 #Remove upload screens prompt
 #Replace cprint with something more windows friendly
 #Make less sloppy
+#stream optimized
 
 
 
@@ -287,7 +288,7 @@ def upload_screens(filename, screens):
             description.write("\n")
         print(f"{i}/{screens}")
         i += 1
-    description.write("[center]Created by L4G's Upload Assistant[/center]")
+    description.write("[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
     description.close()
 
 #Get Category ID
@@ -506,7 +507,7 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
         hdr = get_hdr(mi)
         if type_id == 1: #Disk
             region = get_region(path)
-        edition = get_edition(guess, path)
+        edition = get_edition(guess, video)
 
 
         #YAY NAMING FUN
@@ -774,13 +775,22 @@ def get_source(type_id, video, i):
 
     return source
 
-def get_edition(guess, path):
+def get_edition(guess, video):
     try:
         edition = guess['edition']
     except:
         edition = ""
-    if "REPACK" in path:
-        edition = "REPACK"
+    if "open matte" in video.replace('.', ' ').lower():
+        edition = edition + "Open Matte"
+    if "REPACK" in video:
+        edition = edition + " REPACK "
+    try:
+        other = guess['other']
+    except:
+        pass
+    if "3D" in other:
+        edition = edition + " 3D "
+    
     return edition
 
 def create_torrent(name, path, filename, video, isdir, is_disk):
