@@ -787,10 +787,10 @@ def get_edition(guess, video):
     try:
         other = guess['other']
     except:
-        pass
+        other = ""
     if "3D" in other:
         edition = edition + " 3D "
-    
+
     return edition
 
 def create_torrent(name, path, filename, video, isdir, is_disk):
@@ -827,7 +827,7 @@ def gen_desc(filename, desc, descfile, desclink, bdinfo, path, nfo):
     description.write("[code]")
     if bdinfo != "":
         description.write(bdinfo)
-    if nfo != None:
+    if nfo != False:
         nfo = glob.glob("*.nfo")[0]
         description.write(open(nfo, 'r').read())
         description.write("\n")
