@@ -784,12 +784,12 @@ def get_edition(guess, video):
         edition = edition + "Open Matte"
     if "REPACK" in video:
         edition = edition + " REPACK "
-    try:
-        other = guess['other']
-    except:
-        other = ""
-    if "3D" in other:
-        edition = edition + " 3D "
+    # try:
+    #     other = guess['other']
+    # except:
+    #     other = ""
+    # if " 3D " in other:
+    #     edition = edition + " 3D "
 
     return edition
 
