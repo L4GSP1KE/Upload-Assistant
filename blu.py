@@ -1021,7 +1021,14 @@ def get_bdinfo(path):
     if sys.platform.startswith('linux'):
         cprint('Due to needing root for linux to emulate keystrokes, push the BDInfo buttons yourself', 'grey', 'on_red')
         time.sleep(2)
-        p = Popen(['mono', f"{base_dir}/BDInfo/BDInfo.exe", path, save_dir])
+        try:
+            p = Popen(['mono', f"{base_dir}/BDInfo/BDInfo.exe", path, save_dir])
+        except:
+            cprint('mono not found, please paste in bdinfo', 'grey', 'on_red')
+            bdinfo = click.prompt('BDInfo')
+            with open(f"{save_dir}/BDINFO-ManualInput.txt", 'w') as f:
+                f.write(bdinfo)
+                f.close()
     elif sys.platform.startswith('win32'):
         p = Popen([f"{base_dir}/BDInfo/BDInfo.exe", path, save_dir])
         time.sleep(2)
