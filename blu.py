@@ -221,7 +221,7 @@ def get_type(video, scene, is_disk):
     elif any(word in filename for word in [" web ", ".web.", "web-dl"]):
         type = "WEBDL"
     elif "webrip" in filename:
-        type = "WEBRip"
+        type = "WEBRIP"
     elif scene == True:
         type = "ENCODE"
     elif is_disk != "":
