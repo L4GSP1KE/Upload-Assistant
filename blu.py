@@ -48,14 +48,13 @@ local_path = config['DEFAULT']['local_path']
 torrent_client = config['DEFAULT']['torrent_client']
 
 
-# base_dir = os.getcwd()
 search = tmdb.Search()
 
 
 
 #TODO
 
-#FAST RESUME
+#FAST RESUME < qbit only
 #FANRES/TRAILER SUPPORT <- probably not
 #DISK SUPPORT <- maybe???
 #tmdb/imdb id input argument
@@ -224,7 +223,7 @@ def get_type(video, scene, is_disk):
         type = "DISK"
     else:
         print("Unable to determine type, please input or use -t next time")
-        type = click.prompt("Please enter type", type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False))
+        type = click.prompt("Please enter type", type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False), default='ENCODE')
     return type
 
 #Export MediaINfo
@@ -766,10 +765,10 @@ def get_source(type_id, video, i):
                 elif "NTSC" in other:
                     system = "NTSC"
             except:
-                system = click.prompt("Encoding system not found", type=click.Choice("PAL", "NTSC"), case_sensitive=False)
+                system = click.prompt("Encoding system not found", type=click.Choice(["PAL", "NTSC"], case_sensitive=False))
             source = system + " DVD"
     except Exception:
-        prompt = click.prompt("Unable to find source, please choose one", type=click.Choice(["BR", "DVD"], case_sensitive=False))
+        prompt = click.prompt("Unable to find source, please choose one", type=click.Choice(["BR", "DVD"], case_sensitive=False), default="BR")
 
         source = get_source(type_id, prompt, 2)
 
@@ -811,9 +810,9 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
         private = True,
         exclude_globs = [exclude],
         include_globs = [include],
-        piece_size = 16777216,
         created_by = "L4G's Upload Assistant")
     cprint("Creating .torrent", 'grey', 'on_yellow')
+    torrent.piece_size_max = 16777216
     torrent.generate(callback=torf_cb, interval=5)
     torrent_path = f"{base_dir}/{filename}/{name}.torrent"
     torrent.write(f"{base_dir}/{filename}/{name}.torrent", overwrite=True)
