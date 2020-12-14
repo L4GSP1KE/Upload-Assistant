@@ -824,28 +824,34 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
 def gen_desc(filename, desc, descfile, desclink, bdinfo, path, nfo):
     description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
     description.seek(0)
-    description.write("[code]")
     if bdinfo != "":
+        description.write("[code]")
         description.write(bdinfo)
+        description.write("[/code]")
     if nfo != False:
+        description.write("[code]")
         nfo = glob.glob("*.nfo")[0]
         description.write(open(nfo, 'r').read())
+        description.write("[/code]")
         description.write("\n")
     if desclink != None:
+        description.write("[code]")
         parsed = urllib.parse.urlparse(desclink)
         raw = parsed._replace(path=f"/raw{parsed.path}")
         raw = urllib.parse.urlunparse(raw)
         description.write(requests.get(raw).text)
+        description.write("[/code]")
         description.write("\n")
     if descfile != None:
+        description.write("[code]")
         if os.path.isfile(descfile) == True:
             text = open(descfile, 'r').read()
             description.write(text)
-            description.write("\n")
         elif desc != None:
             description.write(desc)
-            description.write("\n")
-    description.write("[/code]")
+        description.write("[/code]")
+        description.write("\n")
+    
 
 def clean_filename(name):
     invalid = '<>:"/\|?*'
