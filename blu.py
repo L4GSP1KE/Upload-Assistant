@@ -871,7 +871,6 @@ def stream_optimized(stream_opt):
 def rtorrent(path, torrent_path, torrent):
     rtorrent = xmlrpc.client.Server(rtorrent_url)
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
-    # torrent = Torrent(torrent_path)
     metainfo = bencode.bread(torrent_path)
     try:
         meta = add_fast_resume(metainfo, path, torrent)
@@ -883,10 +882,9 @@ def rtorrent(path, torrent_path, torrent):
     new_meta = bencode.bencode(meta)
     if new_meta != metainfo:
         fr_file = torrent_path.replace('.torrent', '-resume.torrent')
-        print("Writing %r..." % fr_file)
+        print("Creating fast resume")
         bencode.bwrite(meta, fr_file)
 
-    # pprint.pprint(meta)
 
     isdir = os.path.isdir(path)
     #Remote path mount
@@ -914,8 +912,8 @@ def qbittorrent(path, torrent):
     qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'])
     try:
         qbt_client.auth_log_in()
-    except qbittorrentapi.LoginFailed as e:
-        cprint("INCORRECT LOGIN CREDENTIALS", 'grey', 'on_red')
+    except qbittorrentapi.LoginFailed:
+        cprint("INCORRECT QBIT LOGIN CREDENTIALS", 'grey', 'on_red')
         exit()
     qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, is_paused=True)
     qbt_client.torrents_recheck(torrent_hashes=infohash)
