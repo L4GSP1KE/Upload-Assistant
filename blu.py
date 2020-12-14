@@ -75,6 +75,7 @@ search = tmdb.Search()
 @click.argument('path',type=click.Path('r'))
 @click.option('--screens', '-s', help="Number of screenshots", default=6)
 @click.option('--category', '-c', type=click.Choice(['MOVIE', 'TV'], case_sensitive=False), help="Category")
+@click.option('--uploadscreens', '-us', is_flag=True, help="Skip the upload screens prompt")
 @click.option('--type', '-t', type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False), help="Type")
 @click.option('--res', '-r',type=click.Choice(['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'OTHER'], case_sensitive=False), help="Resolution")
 @click.option('--tag', '-g', help="Group tag")
@@ -84,7 +85,8 @@ search = tmdb.Search()
 @click.option('--nfo', '-nfo', help="Use nfo from directory as description", is_flag=True)
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
-def doTheThing(path, screens, category, type, res, tag, desc, descfile, desclink, nfo, anon, stream):
+@click.option('--region', '-r', help="Disk Region")
+def doTheThing(path, screens, category, uploadscreens, type, res, tag, desc, descfile, desclink, nfo, anon, stream, region):
     path = os.path.abspath(path)
     if descfile != None:
         descfile = os.path.abspath(descfile)
@@ -126,10 +128,12 @@ def doTheThing(path, screens, category, type, res, tag, desc, descfile, desclink
     screenshots(videopath, filename, screens)
 
     #Upload Screenshots
-    if click.confirm("Upload Screens?", default=True):
+    if uploadscreens == True:
+        upload_screens(filename, screens)
+    elif click.confirm("Upload Screens?", default=True):
         upload_screens(filename, screens)
     #Generate name
-    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime)
+    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region)
 
     #Search for existing release
     search_existing(name)
@@ -267,6 +271,7 @@ def screenshots(path, filename, screens):
 
 #Upload images & write description
 def upload_screens(filename, screens):
+    cprint('Uploading Screens', 'grey', 'on_yellow')
     os.chdir(f"{base_dir}/{filename}")
     i=1
     description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
@@ -287,7 +292,7 @@ def upload_screens(filename, screens):
             description.write("\n")
         print(f"{i}/{screens}")
         i += 1
-    description.write("[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
+    description.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
     description.close()
 
 #Get Category ID
@@ -300,7 +305,7 @@ def get_cat(category, video):
     elif category.lower() in ("tv", "episode"):
         category = 2
     else:
-        category = click.prompt("Unable to guess category. Please select one:", type=click.Choice['MOVIE', "TV"], case_sensitive=False)
+        category = click.prompt("Unable to guess category. Please select one:", type=click.Choice(['MOVIE', "TV"], case_sensitive=False))
         get_cat(category, video)
     return category
 
@@ -450,7 +455,7 @@ def get_tmdb(filename, category):
             else:
                 i += 1
                 continue
-        except Exception as e:
+        except Exception:
             filename = click.prompt("Please enter Show/Film name")
             category = click.prompt("Please enter Category", type=click.Choice(['MOVIE', "TV"], case_sensitive=False))
             if category == "MOVIE":
@@ -490,7 +495,7 @@ def get_romaji(tmdb_name):
     return romaji
 
 #Naming
-def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime):
+def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region):
     with open(rf'{base_dir}/{filename}/MediaInfo.json', 'r') as f:
         mi = json.load(f)
         title = tmdb_name
@@ -505,7 +510,7 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
         uhd = get_uhd(type_id, guess)
         hdr = get_hdr(mi)
         if type_id == 1: #Disk
-            region = get_region(path)
+            region = get_region(path, region)
         edition = get_edition(guess, video)
 
 
@@ -967,41 +972,44 @@ def get_largest(videoloc):
     
     return largestFile
 
-def get_region(path):
-    if "USA" in path:
-        region = "USA"
-    elif "FRE" in path:
-        region = "FRE"
-    elif "GBR" in path:
-        region = "GBR"
-    elif "GER" in path:
-        region = "GER"
-    elif "CZE" in path:
-        region = "CZE"
-    elif "EUR" in path:
-        region = "EUR"
-    elif "CAN" in path:
-        region = "CAN"
-    elif "TWN" in path:
-        region = "TWN"
-    elif "AUS" in path:
-        region = "AUS"
-    elif "BRA" in path:
-        region = "BRA"
-    elif "ITA" in path:
-        region = "ITA"
-    elif "ESP" in path:
-        region = "ESP"
-    elif "HKG" in path:
-        region = "HKG"
-    elif "JPN" in path:
-        region = "JPN"
-    elif "NOR" in path:
-        region = "NOR"
-    elif "FRA" in path:
-        region = "FRA"
-    else:
-        region = click.prompt("Enter region, leave blank for unknown", default="")
+def get_region(path, region):
+    if region != None:
+        region = region
+    else: 
+        if "USA" in path:
+            region = "USA"
+        elif "FRE" in path:
+            region = "FRE"
+        elif "GBR" in path:
+            region = "GBR"
+        elif "GER" in path:
+            region = "GER"
+        elif "CZE" in path:
+            region = "CZE"
+        elif "EUR" in path:
+            region = "EUR"
+        elif "CAN" in path:
+            region = "CAN"
+        elif "TWN" in path:
+            region = "TWN"
+        elif "AUS" in path:
+            region = "AUS"
+        elif "BRA" in path:
+            region = "BRA"
+        elif "ITA" in path:
+            region = "ITA"
+        elif "ESP" in path:
+            region = "ESP"
+        elif "HKG" in path:
+            region = "HKG"
+        elif "JPN" in path:
+            region = "JPN"
+        elif "NOR" in path:
+            region = "NOR"
+        elif "FRA" in path:
+            region = "FRA"
+        else:
+            region = click.prompt("Enter region, leave blank for unknown", default="")
     return region
 
 def get_bdinfo(path):
