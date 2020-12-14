@@ -183,7 +183,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         }
         url = f"https://blutopia.xyz/api/torrents/upload?api_token={blu_api}"
         response = requests.post(url=url, files=files, data=data)
-        print(response.json())
+        # print(response)
     
     if click.confirm("Clean up?", default=True):
         shutil.rmtree(f"{base_dir}/{filename}")
