@@ -75,7 +75,7 @@ search = tmdb.Search()
 @click.argument('path',type=click.Path('r'))
 @click.option('--screens', '-s', help="Number of screenshots", default=6)
 @click.option('--category', '-c', type=click.Choice(['MOVIE', 'TV'], case_sensitive=False), help="Category")
-@click.option('--uploadscreens', '-us', is_flag=True, help="Skip the upload screens prompt")
+@click.option('--test', '-test', is_flag=True, help="Used for testing features")
 @click.option('--type', '-t', type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False), help="Type")
 @click.option('--res', '-r',type=click.Choice(['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'OTHER'], case_sensitive=False), help="Resolution")
 @click.option('--tag', '-g', help="Group tag")
@@ -86,7 +86,7 @@ search = tmdb.Search()
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
 @click.option('--region', '-r', help="Disk Region")
-def doTheThing(path, screens, category, uploadscreens, type, res, tag, desc, descfile, desclink, nfo, anon, stream, region):
+def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, desclink, nfo, anon, stream, region):
     path = os.path.abspath(path)
     if descfile != None:
         descfile = os.path.abspath(descfile)
@@ -128,9 +128,10 @@ def doTheThing(path, screens, category, uploadscreens, type, res, tag, desc, des
     screenshots(videopath, filename, screens)
 
     #Upload Screenshots
-    if uploadscreens == True:
-        upload_screens(filename, screens)
-    elif click.confirm("Upload Screens?", default=True):
+    if test == True:
+        if click.confirm("Upload Screens?", default=True):
+            upload_screens(filename, screens)
+    else:
         upload_screens(filename, screens)
     #Generate name
     name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region)

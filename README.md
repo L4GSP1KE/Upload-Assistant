@@ -17,7 +17,7 @@ Options:
   -hb, --desclink TEXT            Custom description (Link to hastebin)
   -nfo, --nfo                     Use nfo from directory as description
   -a, --anon                      Anonymous upload
-  -us, --uploadscreens            Skip the upload screens prompt
+  -test, --test                   Used for testing features
   -st, --stream                   Stream Optimized Upload
   --help                          Show this message and exit.
   -r, --region TEXT               Disk Region
