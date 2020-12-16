@@ -153,6 +153,30 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     stream_opt = stream_optimized(stream)
     
 
+    data = {
+        'name' : name,
+        'description' : desc,
+        'mediainfo' : mi_dump,
+        'category_id' : cat_id,
+        'type_id' : type_id,
+        'resolution_id' : resolution_id,
+        'user_id' : user_id,
+        'tmdb' : tmdb_id,
+        'imdb' : imdb_id,
+        'tvdb' : 0,
+        'mal' : mal_id,
+        'igdb' : 0,
+        'anonymous' : anon,
+        'stream' : stream_opt,
+        'sd' : sd,
+        # 'internal' : 0,
+        # 'featured' : 0,
+        # 'free' : 0,
+        # 'double_up' : 0,
+        # 'sticky' : 0,
+    }
+    # pprint.pprint(data)
+    # print(torrent_path)
     #Upload to BLU
     if click.confirm("Upload to BLU", default=False):
         if is_disk != "":
@@ -183,7 +207,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         }
         url = f"https://blutopia.xyz/api/torrents/upload?api_token={blu_api}"
         response = requests.post(url=url, files=files, data=data)
-        # print(response)
+        # print(response.text)
     
     if click.confirm("Clean up?", default=True):
         shutil.rmtree(f"{base_dir}/{filename}")
@@ -195,7 +219,7 @@ def get_video(videoloc):
     if os.path.isdir(videoloc):
         os.chdir(videoloc)
         video = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.m2ts')
-        video = video[0]        
+        video = sorted(video)[0]        
     else:
         video = videoloc
     return video
@@ -439,10 +463,10 @@ def get_tmdb(filename, category):
                     alt_name = f" AKA {search.results[i]['original_name']}"
 
             if search.results[i]['original_language'] == 'ja' and 16 in search.results[i]['genre_ids']:
-                romaji = get_romaji(tmdb_name)
+                romaji, mal_id = get_romaji(tmdb_name)
                 anime = True
-                mal = AnimeSearch(romaji)
-                mal_id = mal.results[0].mal_id
+                # mal = AnimeSearch(romaji)
+                # mal_id = mal.results[0].mal_id
                 alt_name = f" AKA {romaji}"
             else:
                 mal_id = 0
@@ -473,6 +497,7 @@ def get_romaji(tmdb_name):
         query ($search: String) { 
             Media (search: $search, type: ANIME) { 
                 id
+                idMal
                 title {
                     romaji
                     english
@@ -493,7 +518,8 @@ def get_romaji(tmdb_name):
     response = requests.post(url, json={'query': query, 'variables': variables})
     json = response.json()
     romaji = json['data']['Media']['title']['romaji']
-    return romaji
+    mal_id = json['data']['Media']['idMal']
+    return romaji, mal_id
 
 #Naming
 def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region):
@@ -713,7 +739,7 @@ def get_service(guess, video):
         elif "DSNP" in video:
             service = "DSNP"
         else:
-            service = click.prompt("Enter WEB Source, leave blank for unknown", default="")
+            service = click.prompt("Enter WEB Source (AMZN, NF, DSNP, etc), leave blank for unknown", default="")
     return service
 
 
@@ -876,7 +902,6 @@ def stream_optimized(stream_opt):
 
 def rtorrent(path, torrent_path, torrent):
     rtorrent = xmlrpc.client.Server(rtorrent_url)
-    cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     metainfo = bencode.bread(torrent_path)
     try:
         meta = add_fast_resume(metainfo, path, torrent)
@@ -901,11 +926,11 @@ def rtorrent(path, torrent_path, torrent):
         path = os.path.dirname(path)
     
     
+    cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
 
 
 def qbittorrent(path, torrent):
-    cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     isdir = os.path.isdir(path)
     infohash = torrent.infohash
     #Remote path mount
@@ -915,17 +940,19 @@ def qbittorrent(path, torrent):
     if isdir == False:
         path = os.path.dirname(path)
 
-    qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'])
+    qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'], VERIFY_WEBUI_CERTIFICATE=False)
+    cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     try:
         qbt_client.auth_log_in()
     except qbittorrentapi.LoginFailed:
         cprint("INCORRECT QBIT LOGIN CREDENTIALS", 'grey', 'on_red')
         exit()
+    print(f"PATH:{path}")
     qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, is_paused=True)
     qbt_client.torrents_recheck(torrent_hashes=infohash)
     cprint("Rechecking File", 'grey', 'on_yellow')
     while qbt_client.torrents_info(torrent_hashes=infohash)[0]['completed'] == 0:
-        time.sleep(.1)
+        time.sleep(1)
     qbt_client.torrents_resume(torrent_hashes=infohash)
 
 def search_existing(name):
