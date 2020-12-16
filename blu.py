@@ -41,7 +41,6 @@ config.read('config.ini')
 tmdb.API_KEY = config['DEFAULT']['tmdb_api']
 announce = config['DEFAULT']['announce_url']
 blu_api = config['DEFAULT']['blu_api']
-user_id = config['DEFAULT']['blu_user_id']
 rtorrent_url = config['DEFAULT']['rtorrent_url']
 remote_path = config['DEFAULT']['remote_path']
 local_path = config['DEFAULT']['local_path']
@@ -190,7 +189,6 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
             'category_id' : cat_id,
             'type_id' : type_id,
             'resolution_id' : resolution_id,
-            'user_id' : user_id,
             'tmdb' : tmdb_id,
             'imdb' : imdb_id,
             'tvdb' : 0,
