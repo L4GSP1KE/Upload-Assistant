@@ -41,7 +41,7 @@ config.read('config.ini')
 tmdb.API_KEY = config['DEFAULT']['tmdb_api']
 announce = config['DEFAULT']['announce_url']
 blu_api = config['DEFAULT']['blu_api']
-user_id = config['DEFAULT']['blu_pid']
+user_id = config['DEFAULT']['blu_user_id']
 rtorrent_url = config['DEFAULT']['rtorrent_url']
 remote_path = config['DEFAULT']['remote_path']
 local_path = config['DEFAULT']['local_path']
