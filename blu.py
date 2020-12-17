@@ -201,8 +201,11 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
             # 'double_up' : 0,
             # 'sticky' : 0,
         }
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+        }
         url = f"https://blutopia.xyz/api/torrents/upload?api_token={blu_api}"
-        response = requests.post(url=url, files=files, data=data)
+        response = requests.post(url=url, files=files, data=data, headers=headers)
         # print(response.text)
     
     if click.confirm("Clean up?", default=True):
