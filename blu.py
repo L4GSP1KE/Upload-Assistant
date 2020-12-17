@@ -125,6 +125,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     else:
         #Get resolution
         resolution_id, resolution_name, sd = mi_resolution(bdinfo['video'][0]['res'], guess)
+        mi = ""
 
     #Get ids/name
     tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id = get_tmdb(filename, cat_id)
