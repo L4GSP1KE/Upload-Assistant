@@ -1081,9 +1081,9 @@ def get_bdinfo(path):
         os.mkdir(save_dir)
     if sys.platform.startswith('linux'):
         try:
-            Popen(['mono', f"{base_dir}/BDInfo/BDInfo.exe", path, save_dir])
+            Popen(['mono', f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
         except:
-            cprint('mono not found, please paste in bdinfo', 'grey', 'on_red')
+            cprint('mono not found, please install mono', 'grey', 'on_red')
             
     elif sys.platform.startswith('win32'):
         Popen([f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
@@ -1228,6 +1228,9 @@ def get_audio_v2(mi, anime, bdinfo):
     codec = get_val(format, audio) + get_val(additional, audio_extra)
     extra = get_val(additional, format_extra)
     
+    if codec == "":
+        cprint(f"CODEC: {format} NOT FOUND, Please report to L4G", 'grey', 'on_red')
+        codec = click.prompt("Please input audio codec")
 
 
     if anime == True:
