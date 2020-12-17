@@ -1235,9 +1235,9 @@ def get_audio_v2(mi, anime, bdinfo):
         "ES": "-ES",
     }
     format_extra = {
-        "JOC": "Atmos",
-        "16-ch": "Atmos",
-        "Atmos Audio": "Atmos",
+        "JOC": " Atmos",
+        "16-ch": " Atmos",
+        "Atmos Audio": " Atmos",
     }
 
     codec = get_val(format, audio) + get_val(additional, audio_extra)
@@ -1263,7 +1263,7 @@ def get_audio_v2(mi, anime, bdinfo):
                 dual = "Dual-Audio"
         except:
             pass
-    audio = f"{dual} {codec} {chan} {extra}"
+    audio = f"{dual} {codec} {chan}{extra}"
     return audio
 
 def get_val(input, format_dict):
