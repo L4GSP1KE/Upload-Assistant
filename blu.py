@@ -1166,8 +1166,10 @@ def get_audio_v2(mi, anime, bdinfo):
     #Get formats
     if bdinfo != "": #Disks
         format = bdinfo['video'][0]['codec']
-        additional = bdinfo['video'][0]['atmos_why_you_be_like_this']
-
+        try:
+            additional = bdinfo['video'][0]['atmos_why_you_be_like_this']
+        except:
+            additional = ""
         #Channels
         chan = bdinfo['audio'][0]['channels']
 
