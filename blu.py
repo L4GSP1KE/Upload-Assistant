@@ -115,7 +115,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
 
     if is_disk == "":
         #Export Mediainfo
-        mi_dump = exportInfo(videopath, filename, isdir)
+        mi_dump, mi = exportInfo(videopath, filename, isdir)
 
         #Get resolution
         resolution_id, resolution_name, sd = get_resolution(filename, guess)
@@ -133,7 +133,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo)
     
     #Generate name
-    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo)
+    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi)
 
     #Search for existing release
     search_existing(name)
@@ -273,9 +273,11 @@ def exportInfo(video, filename, isdir):
     export = open(f"{base_dir}/{filename}/MediaInfo.json", 'w')
     export.write(media_info)
     export.close()
+    with open(f'{base_dir}/{filename}/MediaInfo.json', 'r') as f:
+        mi = json.load(f)
     cprint("MediaInfo Exported.", "grey", "on_green")
     
-    return mi_dump
+    return mi_dump, mi
 
 #Generate Screenshots
 def screenshots(path, filename, screens, test):
@@ -530,98 +532,97 @@ def get_romaji(tmdb_name):
     return romaji, mal_id
 
 #Naming
-def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo):
-    with open(rf'{base_dir}/{filename}/MediaInfo.json', 'r') as f:
-        mi = json.load(f)
-        title = tmdb_name
-        alt_title = alt_name
-        year = tmdb_year
-        resolution = resolution_name
-        audio = get_audio_v2(mi, anime, bdinfo)
+def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi):
+    mi = mi
+    title = tmdb_name
+    alt_title = alt_name
+    year = tmdb_year
+    resolution = resolution_name
+    audio = get_audio_v2(mi, anime, bdinfo)
 
 
 
 
-        tag = get_tag(tag, video)
-        source = get_source(type_id, video, 1)
-        uhd = get_uhd(type_id, guess, resolution_name)
-        hdr = get_hdr(mi, bdinfo)
+    tag = get_tag(tag, video)
+    source = get_source(type_id, video, 1)
+    uhd = get_uhd(type_id, guess, resolution_name)
+    hdr = get_hdr(mi, bdinfo)
+    if type_id == 1: #Disk
+        region = get_region(path, region)
+        video_codec = get_video_codec(bdinfo)
+    else:
+        video_codec = mi['media']['track'][1]['Format']
+        video_encode = get_video_encode(mi, type_id, bdinfo)
+    edition = get_edition(guess, video, bdinfo)
+
+
+    #YAY NAMING FUN
+    if cat_id == 1: #MOVIE SPECIFIC
         if type_id == 1: #Disk
-            region = get_region(path, region)
-            video_codec = get_video_codec(bdinfo)
+            name = f"{title} {alt_title} {year} {edition} {resolution} {region} {uhd}{source} {hdr}{video_codec} {audio}{tag}"
+            convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+        elif type_id == 3 and source == "BluRay": #BluRay Remux
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{source} REMUX {hdr}{video_codec} {audio}{tag}" 
+            convention = "Name Year Resolution Source Video-codec Audio-Tag"
+        elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
+            name = f"{title} {alt_title} {year} {edition} {source} REMUX  {audio}{tag}" 
+            convention = "Name Year Encoding_system Format Source Audio-Tag"
+        elif type_id == 12: #Encode
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{source} {audio} {hdr}{video_encode}{tag}"  
+            convention = "Name Year Resolution Source Audio Video-Tag"
+        elif type_id == 4: #WEB-DL
+            service = get_service(guess, video)
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{service} WEB-DL {audio} {hdr}{video_encode}{tag}"
+            convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
+        elif type_id == 5: #WEBRip
+            service = get_service(guess, video)
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{service} WEBRip {audio} {hdr}{video_encode}{tag}"
+            convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
+        elif type_id == 6: #HDTV
+            name = f"{title} {alt_title} {year} {edition} {resolution} HDTV {audio} {video_encode}{tag}"
+            convention = "Name Year Resolution Source Audio Video-Tag"
+    elif cat_id == 2: #TV SPECIFIC
+        try:
+            season = "S" + str(guessit(video)["season"]).zfill(2)
+        except:
+            season = "S" + str(click.prompt("Unable to parse season, please enter season number", type=click.INT, default= 1)).zfill(2)
+        try:
+            episode = "E" + str(guess["episode"]).zfill(2)
+        except:
+            episode = ""
+        if type_id == 1: #Disk
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {region} {uhd}{source} {hdr}{video_codec} {audio}{tag}"
+            convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+        elif type_id == 3 and source == "BluRay": #BluRay Remux
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{source} REMUX {hdr}{video_codec} {audio}{tag}" #SOURCE
+            convention = "Name Year Resolution Source Video-codec Audio-Tag"
+        elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
+            name = f"{title} {alt_title} {season}{episode} {edition} {source} REMUX {audio}{tag}" #SOURCE
+            convention = "Name Year Encoding_system Format Source Audio-Tag"
+        elif type_id == 12: #Encode
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{source} {audio} {hdr}{video_encode}{tag}" #SOURCE
+            convention = "Name Year Resolution Source Audio Video-Tag"
+        elif type_id == 4: #WEB-DL
+            service = get_service(guess, video)
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{service} WEB-DL {audio} {hdr}{video_encode}{tag}"
+            convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
+        elif type_id == 5: #WEBRip
+            service = get_service(guess, video)
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{service} WEBRip {audio} {hdr}{video_encode}{tag}"
+            convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
+        elif type_id == 6: #HDTV
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} HDTV {audio} {video_encode}{tag}"
+            convention = "Name Year Resolution Source Audio Video-Tag"
+
+
+    name = ' '.join(name.split())
+
+    print(f"Convention: {convention}")
+    while True:
+        if click.confirm("Does this look correct? " + name):
+            return name
         else:
-            video_codec = mi['media']['track'][1]['Format']
-            video_encode = get_video_encode(mi, type_id, bdinfo)
-        edition = get_edition(guess, video, bdinfo)
-
-
-        #YAY NAMING FUN
-        if cat_id == 1: #MOVIE SPECIFIC
-            if type_id == 1: #Disk
-                name = f"{title} {alt_title} {year} {edition} {resolution} {region} {uhd}{source} {hdr}{video_codec} {audio}{tag}"
-                convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
-            elif type_id == 3 and source == "BluRay": #BluRay Remux
-                name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{source} REMUX {hdr}{video_codec} {audio}{tag}" 
-                convention = "Name Year Resolution Source Video-codec Audio-Tag"
-            elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {alt_title} {year} {edition} {source} REMUX  {audio}{tag}" 
-                convention = "Name Year Encoding_system Format Source Audio-Tag"
-            elif type_id == 12: #Encode
-                name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{source} {audio} {hdr}{video_encode}{tag}"  
-                convention = "Name Year Resolution Source Audio Video-Tag"
-            elif type_id == 4: #WEB-DL
-                service = get_service(guess, video)
-                name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{service} WEB-DL {audio} {hdr}{video_encode}{tag}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
-            elif type_id == 5: #WEBRip
-                service = get_service(guess, video)
-                name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{service} WEBRip {audio} {hdr}{video_encode}{tag}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
-            elif type_id == 6: #HDTV
-                name = f"{title} {alt_title} {year} {edition} {resolution} HDTV {audio} {video_encode}{tag}"
-                convention = "Name Year Resolution Source Audio Video-Tag"
-        elif cat_id == 2: #TV SPECIFIC
-            try:
-                season = "S" + str(guessit(video)["season"]).zfill(2)
-            except:
-                season = "S" + str(click.prompt("Unable to parse season, please enter season number", type=click.INT, default= 1)).zfill(2)
-            try:
-                episode = "E" + str(guess["episode"]).zfill(2)
-            except:
-                episode = ""
-            if type_id == 1: #Disk
-                name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {region} {uhd}{source} {hdr}{video_codec} {audio}{tag}"
-                convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
-            elif type_id == 3 and source == "BluRay": #BluRay Remux
-                name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{source} REMUX {hdr}{video_codec} {audio}{tag}" #SOURCE
-                convention = "Name Year Resolution Source Video-codec Audio-Tag"
-            elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {alt_title} {season}{episode} {edition} {source} REMUX {audio}{tag}" #SOURCE
-                convention = "Name Year Encoding_system Format Source Audio-Tag"
-            elif type_id == 12: #Encode
-                name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{source} {audio} {hdr}{video_encode}{tag}" #SOURCE
-                convention = "Name Year Resolution Source Audio Video-Tag"
-            elif type_id == 4: #WEB-DL
-                service = get_service(guess, video)
-                name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{service} WEB-DL {audio} {hdr}{video_encode}{tag}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
-            elif type_id == 5: #WEBRip
-                service = get_service(guess, video)
-                name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{service} WEBRip {audio} {hdr}{video_encode}{tag}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
-            elif type_id == 6: #HDTV
-                name = f"{title} {alt_title} {season}{episode} {edition} {resolution} HDTV {audio} {video_encode}{tag}"
-                convention = "Name Year Resolution Source Audio Video-Tag"
-
-
-        name = ' '.join(name.split())
-
-        print(f"Convention: {convention}")
-        while True:
-            if click.confirm("Does this look correct? " + name):
-                return name
-            else:
-                name = click.prompt("Enter correct title")
+            name = click.prompt("Enter correct title")
 
 
 def get_video_encode(mi, type_id, bdinfo):
