@@ -1120,7 +1120,7 @@ def get_bdinfo(path):
         f.write(bd_summary)
         f.close()
     bdinfo = parse_bdinfo(bd_summary)
-    # shutil.rmtree(f"{base_dir}/tmp")
+    shutil.rmtree(f"{base_dir}/tmp")
     return bd_summary, bdinfo
         
 def add_fast_resume(meta, datapath, torrent):
