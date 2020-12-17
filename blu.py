@@ -96,7 +96,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
 
     if bdinfo != "":
         video, scene = is_scene(path)
-        filename = guessit(bdinfo['title'])['title']
+        filename = guessit(bdinfo['label'])['title']
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     else:
         video, scene = is_scene(videopath)
@@ -126,6 +126,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         #Get resolution
         resolution_id, resolution_name, sd = mi_resolution(bdinfo['video'][0]['res'], guess)
         mi = ""
+        mi_dump = None
 
     #Get ids/name
     tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id = get_tmdb(filename, cat_id)
@@ -560,24 +561,24 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
     #YAY NAMING FUN
     if cat_id == 1: #MOVIE SPECIFIC
         if type_id == 1: #Disk
-            name = f"{title} {alt_title} {year} {edition} {resolution} {region} {uhd}{source} {hdr}{video_codec} {audio}{tag}"
+            name = f"{title} {alt_title} {year} {edition} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}{tag}"
             convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
         elif type_id == 3 and source == "BluRay": #BluRay Remux
-            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{source} REMUX {hdr}{video_codec} {audio}{tag}" 
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}{tag}" 
             convention = "Name Year Resolution Source Video-codec Audio-Tag"
         elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
             name = f"{title} {alt_title} {year} {edition} {source} REMUX  {audio}{tag}" 
             convention = "Name Year Encoding_system Format Source Audio-Tag"
         elif type_id == 12: #Encode
-            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{source} {audio} {hdr}{video_encode}{tag}"  
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd} {source} {audio} {hdr} {video_encode}{tag}"  
             convention = "Name Year Resolution Source Audio Video-Tag"
         elif type_id == 4: #WEB-DL
             service = get_service(guess, video)
-            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{service} WEB-DL {audio} {hdr}{video_encode}{tag}"
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}{tag}"
             convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
         elif type_id == 5: #WEBRip
             service = get_service(guess, video)
-            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd}{service} WEBRip {audio} {hdr}{video_encode}{tag}"
+            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}{tag}"
             convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
         elif type_id == 6: #HDTV
             name = f"{title} {alt_title} {year} {edition} {resolution} HDTV {audio} {video_encode}{tag}"
@@ -592,24 +593,24 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
         except:
             episode = ""
         if type_id == 1: #Disk
-            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {region} {uhd}{source} {hdr}{video_codec} {audio}{tag}"
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}{tag}"
             convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
         elif type_id == 3 and source == "BluRay": #BluRay Remux
-            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{source} REMUX {hdr}{video_codec} {audio}{tag}" #SOURCE
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}{tag}" #SOURCE
             convention = "Name Year Resolution Source Video-codec Audio-Tag"
         elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
             name = f"{title} {alt_title} {season}{episode} {edition} {source} REMUX {audio}{tag}" #SOURCE
             convention = "Name Year Encoding_system Format Source Audio-Tag"
         elif type_id == 12: #Encode
-            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{source} {audio} {hdr}{video_encode}{tag}" #SOURCE
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd} {source} {audio} {hdr} {video_encode}{tag}" #SOURCE
             convention = "Name Year Resolution Source Audio Video-Tag"
         elif type_id == 4: #WEB-DL
             service = get_service(guess, video)
-            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{service} WEB-DL {audio} {hdr}{video_encode}{tag}"
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}{tag}"
             convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
         elif type_id == 5: #WEBRip
             service = get_service(guess, video)
-            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd}{service} WEBRip {audio} {hdr}{video_encode}{tag}"
+            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}{tag}"
             convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
         elif type_id == 6: #HDTV
             name = f"{title} {alt_title} {season}{episode} {edition} {resolution} HDTV {audio} {video_encode}{tag}"
@@ -771,12 +772,12 @@ def get_uhd(type_id, guess, resolution_name):
         source = ""
         other = ""
     uhd = ""
-    if resolution_name == "2160p":
-        uhd = "UHD"
     if source == 'Blu-ray' and other == "Ultra HD" or source == "Ultra HD Blu-ray":
         uhd = "UHD"
     elif type_id in (1, 3, 12, 5):
         uhd = ""
+    if resolution_name == "2160p":
+        uhd = "UHD"
 
     return uhd
 
@@ -893,12 +894,14 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
     return torrent_path, torrent
 
 def gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo):
-    description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
+    description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'w', newline="")
     description.seek(0)
     if bd_summary != "":
         description.write("[code]")
         description.write(bd_summary)
         description.write("[/code]")
+        description.write("\n")
+        description.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
     if nfo != False:
         description.write("[code]")
         nfo = glob.glob("*.nfo")[0]
@@ -1106,8 +1109,8 @@ def get_bdinfo(path):
                 result = result2.split("********************", 1)
                 bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
                 f.close()
-        except Exception:
-            # print(e)
+        except Exception as e:
+            print(e)
             time.sleep(5)
             continue
         break
@@ -1198,6 +1201,8 @@ def get_audio_v2(mi, anime, bdinfo):
             chan = f"{int(channels) - 1}.1"
         else:
             chan = f"{channels}.0"
+        
+        print(format, additional, chan)
     
     extra = ""
     dual = ""
@@ -1301,9 +1306,9 @@ def parse_bdinfo(bdinfo_input):
             split1 = l.split(':', 1)[1]
             split2 = split1.split('/')
             n = 0
-            if "atmos" in split2[3].strip():
+            if "Atmos" in split2[2].strip():
                 n = 1
-                fuckatmos = split2[3].strip()
+                fuckatmos = split2[2].strip()
             else:
                 fuckatmos = ""
             bdinfo['audio'].append({
@@ -1322,7 +1327,7 @@ def parse_bdinfo(bdinfo_input):
         elif line.startswith("disc label:"):
             label = l.split(':', 1)[1]
             bdinfo['label'] = label
-    # pprint.pprint(bdinfo)
+    pprint.pprint(bdinfo)
     return bdinfo
 
 def get_video_codec(bdinfo):
