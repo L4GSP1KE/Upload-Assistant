@@ -1109,8 +1109,8 @@ def get_bdinfo(path):
                 result = result2.split("********************", 1)
                 bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
                 f.close()
-        except Exception:
-            # print(e)
+        except Exception as e:
+            print(e)
             time.sleep(5)
             continue
         break
@@ -1261,7 +1261,7 @@ def get_audio_v2(mi, anime, bdinfo):
                 dual = "Dual-Audio"
         except:
             pass
-    audio = f"{dual} {codec} {chan}{extra}"
+    audio = f"{dual} {codec} {chan} {extra}"
     return audio
 
 def get_val(input, format_dict):
