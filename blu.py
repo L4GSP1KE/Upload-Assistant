@@ -97,9 +97,11 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     if bdinfo != "":
         video, scene = is_scene(path)
         filename = guessit(bdinfo['title'])['title']
+        Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     else:
         video, scene = is_scene(videopath)
         filename = guessit(ntpath.basename(video))["title"]
+        Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     guess = guessit(path)
 
     #Get type
@@ -261,7 +263,6 @@ def exportInfo(video, filename, isdir):
     if isdir == False:
         os.chdir(os.path.dirname(video))
     media_info = MediaInfo.parse(os.path.basename(video), output="STRING", full=False)
-    Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     export = open(f"{base_dir}/{filename}/MEDIAINFO-{filename}.txt", 'w', newline="")
     export.write(media_info)
     export.close()
