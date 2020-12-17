@@ -1019,7 +1019,7 @@ def get_disk(base_path, bdinfo_paste):
     bdinfo = ""
     bd_summary = ""
     if bdinfo_paste == True:
-        cprint(" Please paste your BDInfo summary:\n"
+        cprint("Please paste your BDInfo summary:\n"
         "To end recording Press Ctrl+d on Linux/Mac on Crtl+z on Windows", 'grey', 'on_yellow')
         lines = []
         try:
