@@ -81,17 +81,17 @@ search = tmdb.Search()
 @click.option('--desc', '-d', help="Custom description (String)")
 @click.option('--descfile', '-df', help="Custom description (Path to File)", type=click.Path('rb'))
 @click.option('--desclink', '-hb', help="Custom description (Link to hastebin)")
+@click.option('--bdinfo', '-bdinfo', help="Choose to paste BDInfo instead of scan", is_flag=True)
 @click.option('--nfo', '-nfo', help="Use nfo from directory as description", is_flag=True)
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
 @click.option('--region', '-r', help="Disk Region")
-def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, desclink, nfo, anon, stream, region):
+def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, desclink, bdinfo, nfo, anon, stream, region):
     path = os.path.abspath(path)
     if descfile != None:
         descfile = os.path.abspath(descfile)
     isdir = os.path.isdir(path)
-    is_disk, videoloc, bdinfo, bd_summary = get_disk(path)
-    videopath = get_video(videoloc)
+    is_disk, videoloc, bdinfo, bd_summary = get_disk(path, bdinfo)
   
 
     if bdinfo != "":
@@ -99,6 +99,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         filename = guessit(bdinfo['label'])['title']
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     else:
+        videopath = get_video(videoloc) 
         video, scene = is_scene(videopath)
         filename = guessit(ntpath.basename(video))["title"]
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
@@ -1012,20 +1013,34 @@ def search_existing(name):
                 exit()
     cprint("No dupes found", 'grey', 'on_green')
                 
-def get_disk(base_path):
+def get_disk(base_path, bdinfo_paste):
     is_disk = ""
     videoloc = base_path
     bdinfo = ""
     bd_summary = ""
-    for path, directories, files in os.walk(base_path):
-        if "STREAM" in directories:
-            is_disk = "BDMV"
-            videoloc = os.path.join(path, "STREAM", get_largest(os.path.join(path, "STREAM"))) 
-            bd_summary, bdinfo = get_bdinfo(base_path)
-        elif "VIDEO_TS" in directories:
-            is_disk = "DVD"
-            videoloc = directories
-            bd_summary, bdinfo = get_bdinfo(base_path)
+    if bdinfo_paste == True:
+        cprint(" Please paste your BDInfo summary:\n"
+        "To end recording Press Ctrl+d on Linux/Mac on Crtl+z on Windows", 'grey', 'on_yellow')
+        lines = []
+        try:
+            while True:
+                lines.append(input())
+        except EOFError:
+            pass
+        bdinfo_paste = "\n".join(lines)
+        bd_summary = bdinfo_paste
+        bdinfo = parse_bdinfo(bdinfo_paste)
+        is_disk = "BDMV"
+    else:
+        for path, directories, files in os.walk(base_path):
+            if "STREAM" in directories:
+                is_disk = "BDMV"
+                videoloc = os.path.join(path, "STREAM", get_largest(os.path.join(path, "STREAM"))) 
+                bd_summary, bdinfo = get_bdinfo(base_path)
+            elif "VIDEO_TS" in directories:
+                is_disk = "DVD"
+                videoloc = directories
+                bd_summary, bdinfo = get_bdinfo(base_path) #Probably doesnt work
             
     return is_disk, videoloc, bdinfo, bd_summary
 
@@ -1204,7 +1219,6 @@ def get_audio_v2(mi, anime, bdinfo):
         else:
             chan = f"{channels}.0"
         
-        print(format, additional, chan)
     
     extra = ""
     dual = ""
@@ -1332,7 +1346,7 @@ def parse_bdinfo(bdinfo_input):
         elif line.startswith("disc label:"):
             label = l.split(':', 1)[1]
             bdinfo['label'] = label
-    pprint.pprint(bdinfo)
+    # pprint.pprint(bdinfo)
     return bdinfo
 
 def get_video_codec(bdinfo):

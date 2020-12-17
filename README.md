@@ -7,6 +7,7 @@
 Options:
   -s, --screens INTEGER           Number of screenshots
   -c, --category [MOVIE|TV]       Category
+  -test, --test                   Used for testing features
   -t, --type [DISK|REMUX|ENCODE|WEBDL|WEBRIP|HDTV]
                                   Type
   -r, --res [2160p|1080p|1080i|720p|576p|576i|480p|480i|8640p|4320p|OTHER]
@@ -15,12 +16,12 @@ Options:
   -d, --desc TEXT                 Custom description (String)
   -df, --descfile PATH            Custom description (Path to File)
   -hb, --desclink TEXT            Custom description (Link to hastebin)
+  -bdinfo, --bdinfo               Choose BDInfo paste prompt instead of scan
   -nfo, --nfo                     Use nfo from directory as description
   -a, --anon                      Anonymous upload
-  -test, --test                   Used for testing features
   -st, --stream                   Stream Optimized Upload
-  --help                          Show this message and exit.
   -r, --region TEXT               Disk Region
+  --help                          Show this message and exit.
   
   ````
   
