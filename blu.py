@@ -1097,7 +1097,7 @@ def get_bdinfo(path):
             cprint('mono not found, please install mono', 'grey', 'on_red')
             
     elif sys.platform.startswith('win32'):
-        # Popen([f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
+        Popen([f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
         time.sleep(0.1)
     while True:
         try:
@@ -1111,8 +1111,8 @@ def get_bdinfo(path):
                 result = result2.split("********************", 1)
                 bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
                 f.close()
-        except Exception as e:
-            print(e)
+        except Exception:
+            # print(e)
             time.sleep(5)
             continue
         break
