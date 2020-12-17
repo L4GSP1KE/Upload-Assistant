@@ -1323,6 +1323,5 @@ def get_video_codec(bdinfo):
     return codec
 
 
-
 doTheThing()
 
