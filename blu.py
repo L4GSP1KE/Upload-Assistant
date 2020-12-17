@@ -144,6 +144,8 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     torrent_path, torrent = create_torrent(name, path, filename, video, isdir, is_disk)
 
     #Add to client
+    if is_disk != "":
+        path = os.path.dirname(path)
     if torrent_client == "rtorrent":
         rtorrent(path, torrent_path, torrent)
     elif torrent_client == "qbit":
@@ -1095,7 +1097,7 @@ def get_bdinfo(path):
             cprint('mono not found, please install mono', 'grey', 'on_red')
             
     elif sys.platform.startswith('win32'):
-        Popen([f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
+        # Popen([f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
         time.sleep(0.1)
     while True:
         try:
@@ -1118,7 +1120,7 @@ def get_bdinfo(path):
         f.write(bd_summary)
         f.close()
     bdinfo = parse_bdinfo(bd_summary)
-    shutil.rmtree(f"{base_dir}/tmp")
+    # shutil.rmtree(f"{base_dir}/tmp")
     return bd_summary, bdinfo
         
 def add_fast_resume(meta, datapath, torrent):
@@ -1277,6 +1279,9 @@ def parse_bdinfo(bdinfo_input):
     lines = bdinfo_input.splitlines()
     for l in lines:
         line = l.strip().lower()
+        if line.startswith("*"):
+            line = l.replace("*", "").strip().lower()
+            print(line)
         if line.startswith("video:"):
             split1 = l.split(':', 1)[1]
             split2 = split1.split('/')
