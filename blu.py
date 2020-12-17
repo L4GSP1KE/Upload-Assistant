@@ -842,7 +842,10 @@ def get_source(type_id, video, i):
 
 def get_edition(guess, video, bdinfo):
     if bdinfo != "":
-        edition = guessit(bdinfo['label'])['edition']
+        try:
+            edition = guessit(bdinfo['label'])['edition']
+        except:
+            edition = ""
     else:
         try:
             edition = guess['edition']
