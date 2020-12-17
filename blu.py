@@ -1109,8 +1109,8 @@ def get_bdinfo(path):
                 result = result2.split("********************", 1)
                 bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
                 f.close()
-        except Exception as e:
-            print(e)
+        except Exception:
+            # print(e)
             time.sleep(5)
             continue
         break
