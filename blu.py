@@ -90,16 +90,16 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     if descfile != None:
         descfile = os.path.abspath(descfile)
     isdir = os.path.isdir(path)
-    is_disk, videoloc, bdinfo = get_disk(path)
+    is_disk, videoloc, bdinfo, bd_summary = get_disk(path)
     videopath = get_video(videoloc)
+  
 
-    #Is scene
-    video, scene = is_scene(videopath)
-    #Guess Name
-    if is_disk != "":
-        filename = guessit(path)['title']
+    if bdinfo != "":
+        filename = guessit(bdinfo['title'])['title']
+        video, scene = is_scene(path)
     else:
         filename = guessit(ntpath.basename(video))["title"]
+        video, scene = is_scene(videopath)
     guess = guessit(path)
 
     #Get type
@@ -111,29 +111,27 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     #Guess Type ID
     type_id = get_type_id(type)
 
-    #Export Mediainfo
-    mi_dump = exportInfo(videopath, filename, isdir)
+    if is_disk == "":
+        #Export Mediainfo
+        mi_dump = exportInfo(videopath, filename, isdir)
 
-    #Get resolution
-    resolution_id, resolution_name, sd = get_resolution(filename, guess)
+        #Get resolution
+        resolution_id, resolution_name, sd = get_resolution(filename, guess)
+        
+        #Generate Screenshots
+        screenshots(videopath, filename, screens)
+    else:
+        #Get resolution
+        resolution_id, resolution_name, sd = mi_resolution(bdinfo['video'][0]['res'], guess)
 
     #Get ids/name
     tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id = get_tmdb(filename, cat_id)
 
     #Create description
-    gen_desc(filename, desc, descfile, desclink, bdinfo, path, nfo)
-
-    #Generate Screenshots
-    screenshots(videopath, filename, screens)
-
-    #Upload Screenshots
-    if test == True:
-        if click.confirm("Upload Screens?", default=True):
-            upload_screens(filename, screens)
-    else:
-        upload_screens(filename, screens)
+    gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo)
+    
     #Generate name
-    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region)
+    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo)
 
     #Search for existing release
     search_existing(name)
@@ -159,7 +157,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         'category_id' : cat_id,
         'type_id' : type_id,
         'resolution_id' : resolution_id,
-        'user_id' : user_id,
+        # 'user_id' : user_id,
         'tmdb' : tmdb_id,
         'imdb' : imdb_id,
         'tvdb' : 0,
@@ -292,6 +290,13 @@ def screenshots(path, filename, screens):
             )
     cprint("Screens saved.", "grey", "on_green")
 
+    #Upload Screenshots
+    if test == True:
+        if click.confirm("Upload Screens?", default=True):
+            upload_screens(filename, screens)
+    else:
+        upload_screens(filename, screens)
+
 #Upload images & write description
 def upload_screens(filename, screens):
     cprint('Uploading Screens', 'grey', 'on_yellow')
@@ -334,6 +339,7 @@ def get_cat(category, video):
 
 #Get Type ID
 def get_type_id(type):
+    type = type.upper()
     if type == "DISK":
         type_id = 1
     elif type == "REMUX":
@@ -439,6 +445,7 @@ def get_tmdb(filename, category):
                 dt = datetime.strptime(release_date, '%Y-%m-%d')
                 tmdb_year = dt.year
                 tmdb_id = search.results[i]['id']
+                print(search.results)
                 try:
                     imdb_id = tmdb.Movies(tmdb_id).external_ids()['imdb_id']
                 except:
@@ -520,23 +527,29 @@ def get_romaji(tmdb_name):
     return romaji, mal_id
 
 #Naming
-def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region):
+def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo):
     with open(rf'{base_dir}/{filename}/MediaInfo.json', 'r') as f:
         mi = json.load(f)
         title = tmdb_name
         alt_title = alt_name
         year = tmdb_year
         resolution = resolution_name
-        audio = get_audio(mi, anime)
-        video_encode = get_video_encode(mi, type_id)
-        video_codec = mi['media']['track'][1]['Format']
+        audio = get_audio_v2(mi, anime, bdinfo)
+
+
+
+
         tag = get_tag(tag, video)
         source = get_source(type_id, video, 1)
-        uhd = get_uhd(type_id, guess)
-        hdr = get_hdr(mi)
+        uhd = get_uhd(type_id, guess, resolution_name)
+        hdr = get_hdr(mi, bdinfo)
         if type_id == 1: #Disk
             region = get_region(path, region)
-        edition = get_edition(guess, video)
+            video_codec = get_video_codec(bdinfo)
+        else:
+            video_codec = mi['media']['track'][1]['Format']
+            video_encode = get_video_encode(mi, type_id, bdinfo)
+        edition = get_edition(guess, video, bdinfo)
 
 
         #YAY NAMING FUN
@@ -608,11 +621,15 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
                 name = click.prompt("Enter correct title")
 
 
-def get_video_encode(mi, type_id):
+def get_video_encode(mi, type_id, bdinfo):
     video_encode = ""
     codec = ""
-    format = mi['media']['track'][1]['Format']
-    format_profile = mi['media']['track'][1]['Format_Profile']
+    try:
+        format = mi['media']['track'][1]['Format']
+        format_profile = mi['media']['track'][1]['Format_Profile']
+    except:
+        format = bdinfo['video'][0]['codec']
+        format_profile = bdinfo['video'][0]['profile']
     if type_id in (12, 5): #ENCODE or WEBRIP
         if format == 'AVC':
             codec = 'x264'
@@ -741,7 +758,7 @@ def get_service(guess, video):
     return service
 
 
-def get_uhd(type_id, guess):
+def get_uhd(type_id, guess, resolution_name):
     try:
         source = guess['Source']
         other = guess['Other']
@@ -749,6 +766,8 @@ def get_uhd(type_id, guess):
         source = ""
         other = ""
     uhd = ""
+    if resolution_name == "2160p":
+        uhd = "UHD"
     if source == 'Blu-ray' and other == "Ultra HD" or source == "Ultra HD Blu-ray":
         uhd = "UHD"
     elif type_id in (1, 3, 12, 5):
@@ -756,23 +775,35 @@ def get_uhd(type_id, guess):
 
     return uhd
 
-def get_hdr(mi):
-    try:
-        hdr = mi['media']['track'][1]['colour_primaries']
-    except:
-        hdr = ""
-    if hdr in ("BT.2020", "REC.2020"):
-        hdr = "HDR"
-        if mi['media']['track'][1]['Format_Profile'] == "High 10":
+def get_hdr(mi, bdinfo):
+    if bdinfo != "": #Disks
+        hdr = bdinfo['video'][0]['hdr_dv']
+        if "HDR10+" in hdr:
             hdr = "HDR10+"
+        elif hdr == "HDR10":
+            hdr = "HDR"
         try:
-            if "HLG" in mi['media']['track'][1]['transfer_characteristics_Original']:
-                hdr = "HLG"
+            if bdinfo['video'][1]['hdr_dv'] == "Dolby Vision":
+                hdr = hdr + " DV "
         except:
             pass
+    else: 
+        try:
+            hdr = mi['media']['track'][1]['colour_primaries']
+        except:
+            hdr = ""
+        if hdr in ("BT.2020", "REC.2020"):
+            hdr = "HDR"
+            if mi['media']['track'][1]['Format_Profile'] == "High 10":
+                hdr = "HDR10+"
+            try:
+                if "HLG" in mi['media']['track'][1]['transfer_characteristics_Original']:
+                    hdr = "HLG"
+            except:
+                pass
 
-    else:
-        hdr = ""
+        else:
+            hdr = ""
     return hdr
 
 def get_source(type_id, video, i):
@@ -804,11 +835,14 @@ def get_source(type_id, video, i):
 
     return source
 
-def get_edition(guess, video):
-    try:
-        edition = guess['edition']
-    except:
-        edition = ""
+def get_edition(guess, video, bdinfo):
+    if bdinfo != "":
+        edition = guessit(bdinfo['label'])['edition']
+    else:
+        try:
+            edition = guess['edition']
+        except:
+            edition = ""
     if "open matte" in video.replace('.', ' ').lower():
         edition = edition + "Open Matte"
     if "REPACK" in video:
@@ -850,12 +884,12 @@ def create_torrent(name, path, filename, video, isdir, is_disk):
     cprint(".torrent created", 'grey', 'on_green')
     return torrent_path, torrent
 
-def gen_desc(filename, desc, descfile, desclink, bdinfo, path, nfo):
+def gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo):
     description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
     description.seek(0)
-    if bdinfo != "":
+    if bd_summary != "":
         description.write("[code]")
-        description.write(bdinfo)
+        description.write(bd_summary)
         description.write("[/code]")
     if nfo != False:
         description.write("[code]")
@@ -938,7 +972,7 @@ def qbittorrent(path, torrent):
     if isdir == False:
         path = os.path.dirname(path)
 
-    qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'], VERIFY_WEBUI_CERTIFICATE=False)
+    qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'], use_auto_torrent_management=False, VERIFY_WEBUI_CERTIFICATE=False)
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     try:
         qbt_client.auth_log_in()
@@ -974,13 +1008,13 @@ def get_disk(base_path):
         if "STREAM" in directories:
             is_disk = "BDMV"
             videoloc = os.path.join(path, "STREAM", get_largest(os.path.join(path, "STREAM"))) 
-            bdinfo = get_bdinfo(base_path)
+            bd_summary, bdinfo = get_bdinfo(base_path)
         elif "VIDEO_TS" in directories:
             is_disk = "DVD"
             videoloc = directories
-            bdinfo = get_bdinfo(base_path)
+            bd_summary, bdinfo = get_bdinfo(base_path)
             
-    return is_disk, videoloc, bdinfo
+    return is_disk, videoloc, bdinfo, bd_summary
 
 def get_largest(videoloc):
     os.chdir(videoloc)
@@ -1044,33 +1078,37 @@ def get_bdinfo(path):
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
     if sys.platform.startswith('linux'):
-        cprint('Due to needing root for linux to emulate keystrokes, push the BDInfo buttons yourself', 'grey', 'on_red')
-        time.sleep(2)
         try:
-            p = Popen(['mono', f"{base_dir}/BDInfo/BDInfo.exe", path, save_dir])
+            Popen(['mono', f"{base_dir}/BDInfo/BDInfo.exe", path, save_dir])
         except:
             cprint('mono not found, please paste in bdinfo', 'grey', 'on_red')
-            bdinfo = click.prompt('BDInfo')
-            with open(f"{save_dir}/BDINFO-ManualInput.txt", 'w') as f:
-                f.write(bdinfo)
-                f.close()
+            
     elif sys.platform.startswith('win32'):
-        p = Popen([f"{base_dir}/BDInfo/BDInfo.exe", path, save_dir])
-        time.sleep(2)
-        output, err = p.communicate(input=[keyboard.send(['1', 'enter']), keyboard.send(['q', 'enter'])])
-    for file in os.listdir(save_dir):
-        if file.startswith("BDINFO"):
-            bdinfo_text = save_dir + "/" + file
-    with open(bdinfo_text, 'r') as f:
-        text = f.read()
-        result = text.split("QUICK SUMMARY:", 1)
-        prettyBDInfo = f"QUICK SUMMARY:{result[1]}".rstrip("\n")
-        f.close()
+        Popen([f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
+        time.sleep(0.1)
+    while True:
+        try:
+            for file in os.listdir(save_dir):
+                if file.startswith("BDINFO"):
+                    bdinfo_text = save_dir + "/" + file
+            with open(bdinfo_text, 'r') as f:
+                text = f.read()
+                result = text.split("QUICK SUMMARY:", 2)
+                result2 = result[1].rstrip("\n")
+                result = result2.split("********************", 1)
+                bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
+                f.close()
+        except Exception:
+            # print(e)
+            time.sleep(5)
+            continue
+        break
     with open(f"{save_dir}/BDINFO.txt", 'w') as f:
-        f.write(prettyBDInfo)
+        f.write(bd_summary)
         f.close()
+    bdinfo = parse_bdinfo(bd_summary)
     shutil.rmtree(f"{base_dir}/tmp")
-    return prettyBDInfo
+    return bd_summary, bdinfo
         
 def add_fast_resume(meta, datapath, torrent):
     """ Add fast resume data to a metafile dict.
@@ -1118,6 +1156,168 @@ def add_fast_resume(meta, datapath, torrent):
 
 def torf_cb(torrent, filepath, pieces_done, pieces_total):
     print(f'{pieces_done/pieces_total*100:3.0f} % done')
+
+def get_audio_v2(mi, anime, bdinfo):
+    #Get formats
+    if bdinfo != "": #Disks
+        format = bdinfo['video'][0]['codec']
+        additional = bdinfo['video'][0]['atmos_why_you_be_like_this']
+
+        #Channels
+        chan = bdinfo['audio'][0]['channels']
+
+
+    else: 
+        format = mi['media']['track'][2]['Format']
+        try:
+            additional = mi['media']['track'][2]['Format_AdditionalFeatures']
+            # format = f"{format} {additional}"
+        except:
+            additional = ""
+
+        #Channels
+        channels = mi['media']['track'][2]['Channels']
+        try:
+            channel_layout = mi['media']['track'][2]['ChannelLayout']
+        except:
+            channel_layout = mi['media']['track'][2]['ChannelLayout_Original']
+        if "LFE" in channel_layout:
+            chan = f"{int(channels) - 1}.1"
+        else:
+            chan = f"{channels}.0"
+    
+    extra = ""
+    dual = ""
+    
+    #Convert commercial name to naming conventions
+    audio = {
+        "DTS": "DTS",
+        "AAC": "AAC",
+        "AAC LC": "AAC",
+        "AC-3": "DD",
+        "E-AC-3": "DD+",
+        "MLP FBA": "TrueHD",
+        "FLAC": "FLAC",
+        "Opus": "OPUS",
+        "Vorbis": "VORBIS",
+        "PCM": "LPCM",
+        #BDINFO AUDIOS
+        "LPCM Audio": "LPCM",
+        "Dolby Digital Audio" : "DD",
+        "Dolby Digital Plus Audio": "DD+",
+        "Dolby TrueHD": "TrueHD",
+        "DTS-HD Master Audio" : "DTS-HD MA",
+        "DTS-HD High-Res Audio": "DTS-HD HRA",
+    }
+    audio_extra = {
+        "XLL": "-HD MA",
+        "XLL X": ":X",
+        "ES": "-ES",
+    }
+    format_extra = {
+        "JOC": "Atmos",
+        "16-ch": "Atmos",
+        "Atmos Audio": "Atmos",
+    }
+
+    codec = get_val(format, audio) + get_val(additional, audio_extra)
+    extra = get_val(additional, format_extra)
+    
+
+
+    if anime == True:
+        eng, jap = False, False
+        try:
+            for t in mi['media']['track']:
+                if t['@type'] != "Audio":
+                    pass
+                else: 
+                    if t['Language'] == "en":
+                        eng = True
+                    if t['Language'] == "ja":
+                        jap = True
+            if eng and jap == True:
+                dual = "Dual-Audio"
+        except:
+            pass
+    audio = f"{dual} {codec} {chan}{extra}"
+    return audio
+
+def get_val(input, format_dict):
+    for key, value in format_dict.items():
+         if input == key:
+             return value
+    return ""
+
+def parse_bdinfo(bdinfo_input):
+    bdinfo = dict()
+    bdinfo['video'] = list()
+    bdinfo['audio'] = list()
+    lines = bdinfo_input.splitlines()
+    for l in lines:
+        line = l.strip().lower()
+        if line.startswith("video:"):
+            split1 = l.split(':', 1)[1]
+            split2 = split1.split('/')
+            try:
+                bit_depth = split2[6].strip()
+                hdr_dv = split2[7].strip()
+                color = split2[8].strip()
+            except:
+                bit_depth = ""
+                hdr_dv = ""
+                color = ""
+            bdinfo['video'].append({
+                'codec': split2[0].strip(), 
+                'bitrate': split2[1].strip(), 
+                'res': split2[2].strip(), 
+                'fps': split2[3].strip(), 
+                'aspect_ratio' : split2[4].strip(),
+                'profile': split2[5].strip(),
+                'bit_depth' : bit_depth,
+                'hdr_dv' : hdr_dv, 
+                'color' : color,
+                })
+        elif line.startswith("audio:"):
+            if "(" in l:
+                l = l.split("(")[0]
+            l = l.strip()
+            split1 = l.split(':', 1)[1]
+            split2 = split1.split('/')
+            n = 0
+            if "atmos" in split2[3].strip():
+                n = 1
+                fuckatmos = split2[3].strip()
+            else:
+                fuckatmos = ""
+            bdinfo['audio'].append({
+                'language' : split2[0].strip(), 
+                'codec' : split2[1].strip(), 
+                'channels' : split2[n+2].strip(), 
+                'sample_rate' : split2[n+3].strip(), 
+                'bitrate' : split2[n+4].strip(), 
+                'bit_depth' : split2[n+5].strip(),
+                'atmos_why_you_be_like_this': fuckatmos,
+                })
+        elif line.startswith("disc title:"):
+            title = l.split(':', 1)[1]
+            # print(f"TITLE: {title}")
+            bdinfo['title'] = title
+        elif line.startswith("disc label:"):
+            label = l.split(':', 1)[1]
+            bdinfo['label'] = label
+    # pprint.pprint(bdinfo)
+    return bdinfo
+
+def get_video_codec(bdinfo):
+    codecs = {
+        "MPEG-4 AVC Video" : "AVC",
+        "MPEG-H HEVC Video" : "HEVC",
+    }
+    codec = get_val(bdinfo['video'][0]['codec'], codecs)
+    return codec
+
+
 
 doTheThing()
 
