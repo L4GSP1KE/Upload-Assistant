@@ -95,11 +95,11 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
   
 
     if bdinfo != "":
-        filename = guessit(bdinfo['title'])['title']
         video, scene = is_scene(path)
+        filename = guessit(bdinfo['title'])['title']
     else:
-        filename = guessit(ntpath.basename(video))["title"]
         video, scene = is_scene(videopath)
+        filename = guessit(ntpath.basename(video))["title"]
     guess = guessit(path)
 
     #Get type
@@ -119,7 +119,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         resolution_id, resolution_name, sd = get_resolution(filename, guess)
         
         #Generate Screenshots
-        screenshots(videopath, filename, screens)
+        screenshots(videopath, filename, screens, test)
     else:
         #Get resolution
         resolution_id, resolution_name, sd = mi_resolution(bdinfo['video'][0]['res'], guess)
@@ -274,7 +274,7 @@ def exportInfo(video, filename, isdir):
     return mi_dump
 
 #Generate Screenshots
-def screenshots(path, filename, screens):
+def screenshots(path, filename, screens, test):
     cprint("Saving Screens...", "grey", "on_yellow")
     with open(f"{base_dir}/{filename}/MediaInfo.json") as f:
         mi = json.load(f)
@@ -445,7 +445,6 @@ def get_tmdb(filename, category):
                 dt = datetime.strptime(release_date, '%Y-%m-%d')
                 tmdb_year = dt.year
                 tmdb_id = search.results[i]['id']
-                print(search.results)
                 try:
                     imdb_id = tmdb.Movies(tmdb_id).external_ids()['imdb_id']
                 except:
@@ -964,7 +963,7 @@ def rtorrent(path, torrent_path, torrent):
 
 def qbittorrent(path, torrent):
     isdir = os.path.isdir(path)
-    infohash = torrent.infohash
+    # infohash = torrent.infohash
     #Remote path mount
     if local_path in path:
         path = path.replace(local_path, remote_path)
@@ -972,20 +971,19 @@ def qbittorrent(path, torrent):
     if isdir == False:
         path = os.path.dirname(path)
 
-    qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'], use_auto_torrent_management=False, VERIFY_WEBUI_CERTIFICATE=False)
+    qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'])
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     try:
         qbt_client.auth_log_in()
     except qbittorrentapi.LoginFailed:
         cprint("INCORRECT QBIT LOGIN CREDENTIALS", 'grey', 'on_red')
         exit()
-    print(f"PATH:{path}")
-    qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, is_paused=True)
-    qbt_client.torrents_recheck(torrent_hashes=infohash)
-    cprint("Rechecking File", 'grey', 'on_yellow')
-    while qbt_client.torrents_info(torrent_hashes=infohash)[0]['completed'] == 0:
-        time.sleep(1)
-    qbt_client.torrents_resume(torrent_hashes=infohash)
+    qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True)
+    # qbt_client.torrents_recheck(torrent_hashes=infohash)
+    # cprint("Rechecking File", 'grey', 'on_yellow')
+    # while qbt_client.torrents_info(torrent_hashes=infohash)[0]['completed'] == 0:
+    #     time.sleep(1)
+    # qbt_client.torrents_resume(torrent_hashes=infohash)
 
 def search_existing(name):
     cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
@@ -1004,6 +1002,7 @@ def get_disk(base_path):
     is_disk = ""
     videoloc = base_path
     bdinfo = ""
+    bd_summary = ""
     for path, directories, files in os.walk(base_path):
         if "STREAM" in directories:
             is_disk = "BDMV"
@@ -1180,7 +1179,10 @@ def get_audio_v2(mi, anime, bdinfo):
         try:
             channel_layout = mi['media']['track'][2]['ChannelLayout']
         except:
-            channel_layout = mi['media']['track'][2]['ChannelLayout_Original']
+            try:
+                channel_layout = mi['media']['track'][2]['ChannelLayout_Original']
+            except:
+                channel_layout = ""
         if "LFE" in channel_layout:
             chan = f"{int(channels) - 1}.1"
         else:
