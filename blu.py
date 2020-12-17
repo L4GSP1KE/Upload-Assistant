@@ -1165,9 +1165,9 @@ def torf_cb(torrent, filepath, pieces_done, pieces_total):
 def get_audio_v2(mi, anime, bdinfo):
     #Get formats
     if bdinfo != "": #Disks
-        format = bdinfo['video'][0]['codec']
+        format = bdinfo['audio'][0]['codec']
         try:
-            additional = bdinfo['video'][0]['atmos_why_you_be_like_this']
+            additional = bdinfo['audio'][0]['atmos_why_you_be_like_this']
         except:
             additional = ""
         #Channels
