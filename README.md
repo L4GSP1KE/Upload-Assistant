@@ -16,8 +16,9 @@ Options:
   -d, --desc TEXT                 Custom description (String)
   -df, --descfile PATH            Custom description (Path to File)
   -hb, --desclink TEXT            Custom description (Link to hastebin)
-  -bdinfo, --bdinfo               Choose BDInfo paste prompt instead of scan
+  -bdinfo, --bdinfo               Choose to paste BDInfo instead of scan
   -nfo, --nfo                     Use nfo from directory as description
+  -k, --keywords TEXT             Add keywords e.g. "keyword1, keyword2, etc"
   -a, --anon                      Anonymous upload
   -st, --stream                   Stream Optimized Upload
   -r, --region TEXT               Disk Region
