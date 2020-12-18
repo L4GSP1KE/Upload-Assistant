@@ -56,17 +56,15 @@ torrent_client = config['DEFAULT']['torrent_client']
 
 #FAST RESUME < qbit only
 #FANRES/TRAILER SUPPORT <- probably not
-#DISK SUPPORT <- maybe???
+#DISK SUPPORT <- done. probably
 #tmdb/imdb id input argument
 #HDR vs DV vs HLG vs whatever else <- hlg done, hdr done, need DV
 #Dual Audio anime, is channel based off default audio track or original lang eg. 5.1 eng but 2.0 jap?
 #Audio formats I may have missed
-#Rework audio to use commercial name
 #Description feature is pretty meh
-#Remove upload screens prompt
 #Replace cprint with something more windows friendly
 #Make less sloppy
-#stream optimized
+#detect stream optimized
 
 
 
@@ -794,7 +792,8 @@ def get_uhd(type_id, guess, resolution_name):
         uhd = "UHD"
     elif type_id in (1, 3, 12, 5):
         uhd = ""
-    if resolution_name == "2160p":
+        
+    if type_id in (1, 3, 12) and resolution_name == "2160p":
         uhd = "UHD"
 
     return uhd
@@ -1057,7 +1056,7 @@ def get_disk(base_path, bdinfo_paste):
     bdinfo = ""
     bd_summary = ""
     if bdinfo_paste == True:
-        cprint("Please paste your BDInfo summary:\n"
+        cprint("Please paste your BDInfo summary (Quick Summary ONLY):\n"
         "To end recording Press Ctrl+d on Linux/Mac on Crtl+z on Windows", 'grey', 'on_yellow')
         lines = []
         try:
@@ -1142,6 +1141,9 @@ def get_bdinfo(path):
     cprint("Getting BDInfo", 'grey', 'on_yellow')
     save_dir = f"{base_dir}/tmp"
     if not os.path.exists(save_dir):
+        os.mkdir(save_dir)
+    else:
+        shutil.rmtree(f"{base_dir}/tmp")
         os.mkdir(save_dir)
     if sys.platform.startswith('linux'):
         try:
