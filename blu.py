@@ -32,6 +32,7 @@ import bencode
 from pyrobase.parts import Bunch
 import errno
 import hashlib
+from deluge_client import DelugeRPCClient, LocalDelugeRPCClient
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 os.chdir(base_dir)
@@ -151,6 +152,8 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         rtorrent(path, torrent_path, torrent)
     elif torrent_client == "qbit":
         qbittorrent(path, torrent)
+    elif torrent_client == "deluge":
+        deluge(path, torrent_path, torrent)
 
 
     anon = is_anon(anon)
@@ -972,7 +975,7 @@ def rtorrent(path, torrent_path, torrent):
     if isdir == False:
         path = os.path.dirname(path)
     
-    
+    print(path)
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
     rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
 
@@ -1001,6 +1004,25 @@ def qbittorrent(path, torrent):
     #     time.sleep(1)
     # qbt_client.torrents_resume(torrent_hashes=infohash)
 
+def deluge(path, torrent_path, torrent):
+    # client = DelugeRPCClient(config['DEFAULT']['deluge_url'], int(config['DEFAULT']['deluge_port']), config['DEFAULT']['deluge_user'], config['DEFAULT']['deluge_pass'])
+    client = LocalDelugeRPCClient()
+    client.connect()
+    if client.connected == True:    
+        isdir = os.path.isdir(path)
+        #Remote path mount
+        if local_path in path:
+            path = path.replace(local_path, remote_path)
+            path = path.replace(os.sep, '/')
+        if isdir == False:
+            path = os.path.dirname(path)
+
+        client.call('core.add_torrent_file', torrent_path, base64.b64encode(torrent.dump()), {'download_location' : path, 'seed_mode' : True})
+
+    else:
+        cprint("Unable to connect to deluge", 'grey', 'on_red')
+
+
 def search_existing(name):
     cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
     url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(name)}&api_token={blu_api}"
@@ -1011,8 +1033,12 @@ def search_existing(name):
         difference = SequenceMatcher(None, name, result).ratio()
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
-                exit()
-    cprint("No dupes found", 'grey', 'on_green')
+                if click.confirm("Would you like to change the name and upload anyways?"):
+                    name = name + "CHANGEME"
+                else:
+                    exit()
+    cprint("No dupes found", 'grey', 'on_green')   
+    return name
                 
 def get_disk(base_path, bdinfo_paste):
     is_disk = ""

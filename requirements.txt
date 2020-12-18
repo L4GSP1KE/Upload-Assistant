@@ -12,3 +12,4 @@ qbittorrent-api
 keyboard
 bencode.py
 pyrobase
+deluge-client
