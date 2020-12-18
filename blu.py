@@ -96,7 +96,10 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
 
     if bdinfo != "":
         video, scene = is_scene(path)
-        filename = guessit(bdinfo['label'])['title']
+        try:
+            filename = guessit(bdinfo['title'])['title']
+        except:
+            filename = guessit(bdinfo['label'])['title']
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     else:
         videopath = get_video(videoloc) 
