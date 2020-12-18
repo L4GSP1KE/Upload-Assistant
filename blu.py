@@ -48,7 +48,7 @@ local_path = config['DEFAULT']['local_path']
 torrent_client = config['DEFAULT']['torrent_client']
 
 
-search = tmdb.Search()
+
 
 
 
@@ -84,10 +84,11 @@ search = tmdb.Search()
 @click.option('--desclink', '-hb', help="Custom description (Link to hastebin)")
 @click.option('--bdinfo', '-bdinfo', help="Choose to paste BDInfo instead of scan", is_flag=True)
 @click.option('--nfo', '-nfo', help="Use nfo from directory as description", is_flag=True)
+@click.option('--keywords', '-k', help='Add keywords e.g. "keyword1, keyword2, etc"')
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
 @click.option('--region', '-r', help="Disk Region")
-def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, desclink, bdinfo, nfo, anon, stream, region):
+def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, desclink, bdinfo, nfo, keywords, anon, stream, region):
     path = os.path.abspath(path)
     if descfile != None:
         descfile = os.path.abspath(descfile)
@@ -131,7 +132,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         mi_dump = None
 
     #Get ids/name
-    tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id = get_tmdb(filename, cat_id)
+    tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id, keywords = get_tmdb(filename, cat_id, keywords)
 
     #Create description
     gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo)
@@ -205,6 +206,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
             'anonymous' : anon,
             'stream' : stream_opt,
             'sd' : sd,
+            'keywords' : keywords,
             # 'internal' : 0,
             # 'featured' : 0,
             # 'free' : 0,
@@ -216,7 +218,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         }
         url = f"https://blutopia.xyz/api/torrents/upload?api_token={blu_api}"
         response = requests.post(url=url, files=files, data=data, headers=headers)
-        # print(response.text)
+        print(response.json())
     
     if click.confirm("Clean up?", default=True):
         shutil.rmtree(f"{base_dir}/{filename}")
@@ -446,8 +448,9 @@ def get_resolution(filename, guess):
 def closest(lst, K):
     return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
 #Get TMDB Name/ID/year
-def get_tmdb(filename, category):
+def get_tmdb(filename, category, keywords):
     i = 0
+    search = tmdb.Search()
     while True:
         alt_name = ""
         anime = False
@@ -466,6 +469,7 @@ def get_tmdb(filename, category):
                     imdb_id = 0
                 if 'original_title' in search.results[i]:
                     alt_name = f" AKA {search.results[i]['original_title']}"
+                tmdb_keywords = get_keywords(tmdb.Movies(tmdb_id))
 
             elif category == 2: #TV
                 search.tv(query=filename)
@@ -480,6 +484,7 @@ def get_tmdb(filename, category):
                     imdb_id = 0
                 if 'original_name' in search.results[i]:
                     alt_name = f" AKA {search.results[i]['original_name']}"
+                tmdb_keywords = get_keywords(tmdb.TV(tmdb_id))
 
             if search.results[i]['original_language'] == 'ja' and 16 in search.results[i]['genre_ids']:
                 romaji, mal_id = get_romaji(tmdb_name)
@@ -508,8 +513,13 @@ def get_tmdb(filename, category):
                 category = 2
             continue
         break
-    imdb_id = int(imdb_id.replace('tt', ''))
-    return tmdb_id, tmdb_name, tmdb_year, category, alt_name, imdb_id, anime, mal_id
+    if keywords == None:
+        keywords = tmdb_keywords
+    else:
+        keywords = keywords + ', ' + tmdb_keywords
+    if imdb_id != None:
+        imdb_id = int(imdb_id.replace('tt', ''))
+    return tmdb_id, tmdb_name, tmdb_year, category, alt_name, imdb_id, anime, mal_id, keywords
 
 def get_romaji(tmdb_name):
     query = '''
@@ -1281,8 +1291,8 @@ def get_audio_v2(mi, anime, bdinfo):
         "Atmos Audio": " Atmos",
     }
 
-    codec = get_val(format, audio) + get_val(additional, audio_extra)
-    extra = get_val(additional, format_extra)
+    codec = audio.get(format, "") + audio_extra.get(additional, "")
+    extra = format_extra.get(additional, "")
     
     if codec == "":
         cprint(f"CODEC: {format} NOT FOUND, Please report to L4G", 'grey', 'on_red')
@@ -1307,11 +1317,6 @@ def get_audio_v2(mi, anime, bdinfo):
     audio = f"{dual} {codec} {chan}{extra}"
     return audio
 
-def get_val(input, format_dict):
-    for key, value in format_dict.items():
-         if input == key:
-             return value
-    return ""
 
 def parse_bdinfo(bdinfo_input):
     bdinfo = dict()
@@ -1381,8 +1386,21 @@ def get_video_codec(bdinfo):
         "MPEG-4 AVC Video" : "AVC",
         "MPEG-H HEVC Video" : "HEVC",
     }
-    codec = get_val(bdinfo['video'][0]['codec'], codecs)
+    codec = codecs.get(bdinfo['video'][0]['codec'], "")
     return codec
+
+def get_keywords(tmdb_info):
+    if tmdb_info is not None:
+        tmdb_keywords = tmdb_info.keywords()
+        if tmdb_keywords.get('keywords') is not None:
+            keywords=[f"{keyword['name'].replace(',',' ')}" for keyword in tmdb_keywords.get('keywords')]
+        elif tmdb_keywords.get('results') is not None:
+            keywords=[f"{keyword['name'].replace(',',' ')}" for keyword in tmdb_keywords.get('results')]
+        return(', '.join(keywords))
+    else:
+        return ''
+
+
 
 
 doTheThing()
