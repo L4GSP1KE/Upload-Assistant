@@ -33,6 +33,7 @@ from pyrobase.parts import Bunch
 import errno
 import hashlib
 from deluge_client import DelugeRPCClient, LocalDelugeRPCClient
+import traceback
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 os.chdir(base_dir)
@@ -59,7 +60,7 @@ torrent_client = config['DEFAULT']['torrent_client']
 #DISK SUPPORT <- done. probably
 #tmdb/imdb id input argument
 #HDR vs DV vs HLG vs whatever else <- hlg done, hdr done, need DV
-#Dual Audio anime, is channel based off default audio track or original lang eg. 5.1 eng but 2.0 jap?
+#mkv 3d
 #Audio formats I may have missed
 #Description feature is pretty meh
 #Replace cprint with something more windows friendly
@@ -97,9 +98,9 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     if bdinfo != "":
         video, scene = is_scene(path)
         try:
-            filename = guessit(bdinfo['title'])['title']
-        except:
             filename = guessit(bdinfo['label'])['title']
+        except:
+            filename = guessit(bdinfo['title'])['title']
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     else:
         videopath = get_video(videoloc) 
@@ -454,9 +455,6 @@ def get_tmdb(filename, category, keywords):
     i = 0
     search = tmdb.Search()
     while True:
-        alt_name = ""
-        anime = False
-        mal_id = 0
         try:
             if category == 1: #MOVIE
                 search.movie(query=filename)
@@ -472,6 +470,7 @@ def get_tmdb(filename, category, keywords):
                 if 'original_title' in search.results[i]:
                     alt_name = f" AKA {search.results[i]['original_title']}"
                 tmdb_keywords = get_keywords(tmdb.Movies(tmdb_id))
+                mal_id, alt_name, anime = get_anime(search, i)
 
             elif category == 2: #TV
                 search.tv(query=filename)
@@ -487,32 +486,26 @@ def get_tmdb(filename, category, keywords):
                 if 'original_name' in search.results[i]:
                     alt_name = f" AKA {search.results[i]['original_name']}"
                 tmdb_keywords = get_keywords(tmdb.TV(tmdb_id))
-
-            if search.results[i]['original_language'] == 'ja' and 16 in search.results[i]['genre_ids']:
-                romaji, mal_id = get_romaji(tmdb_name)
-                anime = True
-                # mal = AnimeSearch(romaji)
-                # mal_id = mal.results[0].mal_id
-                alt_name = f" AKA {romaji}"
-            else:
-                mal_id = 0
-
+                mal_id, alt_name, anime = get_anime(search, i)
 
             difference = SequenceMatcher(None, tmdb_name, alt_name[5:]).ratio()
             if difference >= 0.6:
                 alt_name = ""
+            
             if click.confirm(f"Is {tmdb_name}{alt_name} ({tmdb_year}) correct?", default=True):
                 pass
             else:
                 i += 1
                 continue
-        except Exception:
+        except:
+            # print(traceback.format_exc())
             filename = click.prompt("Please enter Show/Film name")
             category = click.prompt("Please enter Category", type=click.Choice(['MOVIE', "TV"], case_sensitive=False))
-            if category == "MOVIE":
+            if category.upper() == "MOVIE":
                 category = 1
-            elif category == "TV":
+            elif category.upper() == "TV":
                 category = 2
+            i=0
             continue
         break
     if keywords == None:
@@ -563,7 +556,7 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
 
 
 
-
+    three_d = is_3d(mi, bdinfo)
     tag = get_tag(tag, video)
     source = get_source(type_id, video, 1)
     uhd = get_uhd(type_id, guess, resolution_name)
@@ -580,10 +573,10 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
     #YAY NAMING FUN
     if cat_id == 1: #MOVIE SPECIFIC
         if type_id == 1: #Disk
-            name = f"{title} {alt_title} {year} {edition} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}{tag}"
+            name = f"{title} {alt_title} {year} {edition} {three_d} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}{tag}"
             convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
         elif type_id == 3 and source == "BluRay": #BluRay Remux
-            name = f"{title} {alt_title} {year} {edition} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}{tag}" 
+            name = f"{title} {alt_title} {year} {edition} {three_d} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}{tag}" 
             convention = "Name Year Resolution Source Video-codec Audio-Tag"
         elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
             name = f"{title} {alt_title} {year} {edition} {source} REMUX  {audio}{tag}" 
@@ -612,10 +605,10 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
         except:
             episode = ""
         if type_id == 1: #Disk
-            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}{tag}"
+            name = f"{title} {alt_title} {season}{episode} {edition} {three_d} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}{tag}"
             convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
         elif type_id == 3 and source == "BluRay": #BluRay Remux
-            name = f"{title} {alt_title} {season}{episode} {edition} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}{tag}" #SOURCE
+            name = f"{title} {alt_title} {season}{episode} {edition} {three_d} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}{tag}" #SOURCE
             convention = "Name Year Resolution Source Video-codec Audio-Tag"
         elif type_id == 3 and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
             name = f"{title} {alt_title} {season}{episode} {edition} {source} REMUX {audio}{tag}" #SOURCE
@@ -1067,6 +1060,7 @@ def get_disk(base_path, bdinfo_paste):
                 lines.append(input())
         except EOFError:
             pass
+        cprint("Parsing BDInfo Summary", 'grey', 'on_yellow')
         bdinfo_paste = "\n".join(lines)
         bd_summary = bdinfo_paste
         bdinfo = parse_bdinfo(bdinfo_paste)
@@ -1336,11 +1330,19 @@ def parse_bdinfo(bdinfo_input):
             print(line)
         if line.startswith("video:"):
             split1 = l.split(':', 1)[1]
-            split2 = split1.split('/')
+            split2 = split1.split('/', 12)
+            while len(split2) != 9:
+                split2.append("")
+            n=0
+            if "Eye" in split2[2].strip():
+                n = 1
+                three_dim = split2[2].strip()
+            else:
+                three_dim = ""
             try:
-                bit_depth = split2[6].strip()
-                hdr_dv = split2[7].strip()
-                color = split2[8].strip()
+                bit_depth = split2[n+6].strip()
+                hdr_dv = split2[n+7].strip()
+                color = split2[n+8].strip()
             except:
                 bit_depth = ""
                 hdr_dv = ""
@@ -1348,13 +1350,14 @@ def parse_bdinfo(bdinfo_input):
             bdinfo['video'].append({
                 'codec': split2[0].strip(), 
                 'bitrate': split2[1].strip(), 
-                'res': split2[2].strip(), 
-                'fps': split2[3].strip(), 
-                'aspect_ratio' : split2[4].strip(),
-                'profile': split2[5].strip(),
+                'res': split2[n+2].strip(), 
+                'fps': split2[n+3].strip(), 
+                'aspect_ratio' : split2[n+4].strip(),
+                'profile': split2[n+5].strip(),
                 'bit_depth' : bit_depth,
                 'hdr_dv' : hdr_dv, 
                 'color' : color,
+                '3d' : three_dim,
                 })
         elif line.startswith("audio:"):
             if "(" in l:
@@ -1406,7 +1409,25 @@ def get_keywords(tmdb_info):
     else:
         return ''
 
+def is_3d(mi, bdinfo):
+    if bdinfo != "":
+        if bdinfo['video'][0]['3d'] != "":
+            return "3D"
+    else:
+        return ""
 
+def get_anime(search, i):
+    alt_name = ""
+    anime = False
+    if search.results[i]['original_language'] == 'ja' and 16 in search.results[i]['genre_ids']:
+        romaji, mal_id = get_romaji(tmdb_name)
+        anime = True
+        # mal = AnimeSearch(romaji)
+        # mal_id = mal.results[0].mal_id
+        alt_name = f" AKA {romaji}"
+    else:
+        mal_id = 0
+    return mal_id, alt_name, anime
 
 
 doTheThing()
