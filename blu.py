@@ -331,6 +331,7 @@ def upload_screens(filename, screens):
             description.write("\n")
         print(f"{i}/{screens}")
         i += 1
+    description.write("\n")
     description.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
     description.close()
 
