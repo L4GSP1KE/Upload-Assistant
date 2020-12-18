@@ -143,7 +143,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi)
 
     #Search for existing release
-    search_existing(name)
+    name = search_existing(name)
     
     #Create torrent
     torrent_path, torrent = create_torrent(name, path, filename, video, isdir, is_disk)
