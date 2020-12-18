@@ -7,7 +7,7 @@
 Options:
   -s, --screens INTEGER           Number of screenshots
   -c, --category [MOVIE|TV]       Category
-  -test, --test                   Used for testing features
+  --debug                         Used for testing features
   -t, --type [DISK|REMUX|ENCODE|WEBDL|WEBRIP|HDTV]
                                   Type
   -r, --res [2160p|1080p|1080i|720p|576p|576i|480p|480i|8640p|4320p|OTHER]

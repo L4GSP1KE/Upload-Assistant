@@ -75,7 +75,7 @@ torrent_client = config['DEFAULT']['torrent_client']
 @click.argument('path',type=click.Path('r'))
 @click.option('--screens', '-s', help="Number of screenshots", default=6)
 @click.option('--category', '-c', type=click.Choice(['MOVIE', 'TV'], case_sensitive=False), help="Category")
-@click.option('--test', '-test', is_flag=True, help="Used for testing features")
+@click.option('--debug', is_flag=True, help="Used for testing features")
 @click.option('--type', '-t', type=click.Choice(['DISK', 'REMUX', 'ENCODE', 'WEBDL', 'WEBRIP', 'HDTV'], case_sensitive=False), help="Type")
 @click.option('--res', '-r',type=click.Choice(['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'OTHER'], case_sensitive=False), help="Resolution")
 @click.option('--tag', '-g', help="Group tag")
@@ -116,6 +116,8 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     #Guess Type ID
     type_id = get_type_id(type)
 
+    gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo)
+
     if is_disk == "":
         #Export Mediainfo
         mi_dump, mi = exportInfo(videopath, filename, isdir)
@@ -135,7 +137,6 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
     tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id, keywords = get_tmdb(filename, cat_id, keywords)
 
     #Create description
-    gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo)
     
     #Generate name
     name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi)
