@@ -88,7 +88,7 @@ torrent_client = config['DEFAULT']['torrent_client']
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
 @click.option('--region', '-r', help="Disk Region")
-def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, desclink, bdinfo, nfo, keywords, anon, stream, region):
+def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, desclink, bdinfo, nfo, keywords, anon, stream, region):
     path = os.path.abspath(path)
     if descfile != None:
         descfile = os.path.abspath(descfile)
@@ -126,7 +126,7 @@ def doTheThing(path, screens, category, test, type, res, tag, desc, descfile, de
         resolution_id, resolution_name, sd = get_resolution(filename, guess)
         
         #Generate Screenshots
-        screenshots(videopath, filename, screens, test)
+        screenshots(videopath, filename, screens, debug)
     else:
         #Get resolution
         resolution_id, resolution_name, sd = mi_resolution(bdinfo['video'][0]['res'], guess)
@@ -291,7 +291,7 @@ def exportInfo(video, filename, isdir):
     return mi_dump, mi
 
 #Generate Screenshots
-def screenshots(path, filename, screens, test):
+def screenshots(path, filename, screens, debug):
     cprint("Saving Screens...", "grey", "on_yellow")
     with open(f"{base_dir}/{filename}/MediaInfo.json") as f:
         mi = json.load(f)
@@ -308,7 +308,7 @@ def screenshots(path, filename, screens, test):
     cprint("Screens saved.", "grey", "on_green")
 
     #Upload Screenshots
-    if test == True:
+    if debug == True:
         if click.confirm("Upload Screens?", default=True):
             upload_screens(filename, screens)
     else:
