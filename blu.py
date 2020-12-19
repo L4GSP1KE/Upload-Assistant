@@ -472,7 +472,7 @@ def get_resolution(filename, guess):
         mi = json.load(f)
         width = mi['media']['track'][1]['Width']
         height = mi['media']['track'][1]['Height']
-        if mi['media']['track']['FrameRate_Mode'] == "CFR"
+        if mi['media']['track'][1]['FrameRate_Mode'] == "CFR":
             framerate = mi['media']['track'][1]['FrameRate']
         else:
             framerate = ""
