@@ -1085,7 +1085,7 @@ def search_existing(name):
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
-                    appendages = ["CHANGEME", "UwU what's this", "(> . <)", "REPLACEMENT"]
+                    appendages = ["CHANGEME", "UwU what's this", "(> _ <)", "REPLACEMENT", "(^-^)/"]
                     name = f"{name} {random.choice(appendages)}"
                 else:
                     exit()
