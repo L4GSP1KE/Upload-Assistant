@@ -34,6 +34,7 @@ import errno
 import hashlib
 from deluge_client import DelugeRPCClient, LocalDelugeRPCClient
 import traceback
+from PIL import Image
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 os.chdir(base_dir)
@@ -47,7 +48,8 @@ rtorrent_url = config['DEFAULT']['rtorrent_url']
 remote_path = config['DEFAULT']['remote_path']
 local_path = config['DEFAULT']['local_path']
 torrent_client = config['DEFAULT']['torrent_client']
-
+img_host = config['DEFAULT']['img_host']
+img_api = config['DEFAULT']['img_api']
 
 
 
@@ -221,7 +223,10 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
         }
         url = f"https://blutopia.xyz/api/torrents/upload?api_token={blu_api}"
         response = requests.post(url=url, files=files, data=data, headers=headers)
-        print(response.json())
+        try:
+            print(response.json())
+        except:
+            pass
     
     if click.confirm("Clean up?", default=True):
         shutil.rmtree(f"{base_dir}/{filename}")
@@ -299,14 +304,24 @@ def screenshots(path, filename, screens, debug):
         mi = json.load(f)
         length = mi['media']['track'][1]['Duration']
         length = round(float(length))
-        for i in range(screens):
+        # for i in range(screens):
+        i = 0
+        while i != screens:
+            image = f"{base_dir}/{filename}/{filename}-{i}.png"
             (
                 ffmpeg
                 .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                .output(f"{base_dir}/{filename}/{filename}-{i}.png", vframes=1)
+                .output(image, vframes=1)
                 .overwrite_output()
                 .run()
             )
+            print(os.path.getsize(image))
+            if os.path.getsize(image) <= 31500000 and img_host == "imgbb":
+                i += 1
+            else:
+                cprint("Image too large, retaking", 'grey', 'on_red')
+                time.sleep(1)
+                
     cprint("Screens saved.", "grey", "on_green")
 
     #Upload Screenshots
@@ -323,22 +338,51 @@ def upload_screens(filename, screens):
     i=1
     description = open(f"{base_dir}/{filename}/DESCRIPTION.txt", 'a', newline="")
     
-    #freeimage.host (64MB cap)
-    for image in glob.glob("*.png"):
-        url = "https://api.imgbb.com/1/upload"
+        
+    for image in glob.glob("*.png"):        
         data = {
-            'key': config['DEFAULT']['img_api'],
+            'key': img_api,
             'image': base64.b64encode(open(image, "rb").read())
         }
-        response = requests.post(url, data = data)
-        response = response.json()
-        img_url = response['data']['url']
-        web_url = response['data']['url_viewer']
+        if img_host == "imgbb":
+            url = "https://api.imgbb.com/1/upload"
+            response = requests.post(url, data = data).json()
+            img_url = response['data']['url']
+            web_url = response['data']['url_viewer']
+        elif img_host == "freeimage.host":
+            url = "https://freeimage.host/api/1/upload"
+            response = requests.post(url, data = data).json()
+            img_url = response['image']['url']
+            web_url = response['image']['url_viewer']
+        elif img_host == "pstorage.space":
+            url = "https://pstorage.space/api/1/upload"
+            data = {
+                'key' : img_api,
+                'source' : base64.b64encode(open(image, "rb").read()),
+                'filename' : image
+            }
+            response = requests.post(url, data = data).json()
+            print(response)
+            img_url = response['url']
+            web_url = response['url_viewer']
+        elif img_host == "gifyu":
+            url = "https://gifyu.com/api/1/upload/"
+            data = {
+                'key' : "9aa9c4dedd20aeb9a63e41676e061820",
+                'image': base64.b64encode(open(image, "rb").read())
+            }
+            response = requests.post(url, data = data)
+            print(response)
+        else:
+            cprint("Please choose a supported image host in your config", 'grey', 'on_red')
+            exit()
+        print(response)
         description.write(f"[url={web_url}][img=400]{img_url}[/img][/url]")
         if i % 3 == 0:
             description.write("\n")
         print(f"{i}/{screens}")
         i += 1
+        time.sleep(1)
     description.write("\n")
     description.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
     description.close()
@@ -1040,7 +1084,8 @@ def search_existing(name):
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
-                    name = name + "CHANGEME"
+                    appendages = ["CHANGEME", ""]
+                    name = f"{name} {random.choice(appendages)}"
                 else:
                     exit()
     cprint("No dupes found", 'grey', 'on_green')   
