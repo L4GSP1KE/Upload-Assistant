@@ -325,15 +325,15 @@ def upload_screens(filename, screens):
     
     #freeimage.host (64MB cap)
     for image in glob.glob("*.png"):
-        url = "https://freeimage.host/api/1/upload"
+        url = "https://api.imgbb.com/1/upload"
         data = {
-            'key': "6d207e02198a847aa98d0a2a901485a5",
+            'key': config['DEFAULT']['img_api'],
             'image': base64.b64encode(open(image, "rb").read())
         }
         response = requests.post(url, data = data)
         response = response.json()
-        img_url = response['image']['url']
-        web_url = response['image']['url_viewer']
+        img_url = response['data']['url']
+        web_url = response['data']['url_viewer']
         description.write(f"[url={web_url}][img=400]{img_url}[/img][/url]")
         if i % 3 == 0:
             description.write("\n")
