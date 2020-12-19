@@ -226,7 +226,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
         try:
             print(response.json())
         except:
-            pass
+            print("It may have uploaded, go check")
     
     if click.confirm("Clean up?", default=True):
         shutil.rmtree(f"{base_dir}/{filename}")
