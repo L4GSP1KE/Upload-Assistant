@@ -316,7 +316,7 @@ def screenshots(path, filename, screens, debug):
                 .run()
             )
             print(os.path.getsize(image))
-            if os.path.getsize(image) <= 31500000 and img_host == "imgbb":
+            if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
                 i += 1
             else:
                 cprint("Image too large, retaking", 'grey', 'on_red')
@@ -472,7 +472,10 @@ def get_resolution(filename, guess):
         mi = json.load(f)
         width = mi['media']['track'][1]['Width']
         height = mi['media']['track'][1]['Height']
-        framerate = mi['media']['track'][1]['FrameRate']
+        if mi['media']['track']['FrameRate_Mode'] == "CFR"
+            framerate = mi['media']['track'][1]['FrameRate']
+        else:
+            framerate = ""
         try:
             scan = mi['media']['track'][1]['ScanType']
         except:
@@ -913,6 +916,13 @@ def get_edition(guess, video, bdinfo):
         edition = edition + "Open Matte"
     if "REPACK" in video:
         edition = edition + " REPACK "
+    if "PROPER" in video:
+        edition = edition + " PROPER "
+    
+    bad = [internal, limited, retail]
+
+    if edition.lower() in bad:
+        edition = ""
     # try:
     #     other = guess['other']
     # except:
@@ -1144,39 +1154,26 @@ def get_region(path, region):
     if region != None:
         region = region
     else: 
-        if "USA" in path:
-            region = "USA"
-        elif "FRE" in path:
-            region = "FRE"
-        elif "GBR" in path:
-            region = "GBR"
-        elif "GER" in path:
-            region = "GER"
-        elif "CZE" in path:
-            region = "CZE"
-        elif "EUR" in path:
-            region = "EUR"
-        elif "CAN" in path:
-            region = "CAN"
-        elif "TWN" in path:
-            region = "TWN"
-        elif "AUS" in path:
-            region = "AUS"
-        elif "BRA" in path:
-            region = "BRA"
-        elif "ITA" in path:
-            region = "ITA"
-        elif "ESP" in path:
-            region = "ESP"
-        elif "HKG" in path:
-            region = "HKG"
-        elif "JPN" in path:
-            region = "JPN"
-        elif "NOR" in path:
-            region = "NOR"
-        elif "FRA" in path:
-            region = "FRA"
-        else:
+        regions = {
+        "USA" : "USA",
+        "FRE" : "FRE",
+        "GBR" : "GBR",
+        "GER" : "GER",
+        "CZE" : "CZE",
+        "EUR" : "EUR",
+        "CAN" : "CAN",
+        "TWN" : "TWN",
+        "AUS" : "AUS",
+        "BRA" : "BRA",
+        "ITA" : "ITA",
+        "ESP" : "ESP",
+        "HKG" : "HKG",
+        "JPN" : "JPN",
+        "NOR" : "NOR",
+        "FRA" : "FRA",
+        }
+        region = regions.get(region, "")
+        if region == "":
             region = click.prompt("Enter region, leave blank for unknown", default="")
     return region
 
