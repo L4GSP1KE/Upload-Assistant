@@ -1055,8 +1055,8 @@ def qbittorrent(path, torrent):
     # qbt_client.torrents_resume(torrent_hashes=infohash)
 
 def deluge(path, torrent_path, torrent):
-    # client = DelugeRPCClient(config['DEFAULT']['deluge_url'], int(config['DEFAULT']['deluge_port']), config['DEFAULT']['deluge_user'], config['DEFAULT']['deluge_pass'])
-    client = LocalDelugeRPCClient()
+    client = DelugeRPCClient(config['DEFAULT']['deluge_url'], int(config['DEFAULT']['deluge_port']), config['DEFAULT']['deluge_user'], config['DEFAULT']['deluge_pass'])
+    # client = LocalDelugeRPCClient()
     client.connect()
     if client.connected == True:    
         isdir = os.path.isdir(path)
