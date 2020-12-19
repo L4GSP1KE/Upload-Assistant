@@ -1058,7 +1058,8 @@ def deluge(path, torrent_path, torrent):
     client = DelugeRPCClient(config['DEFAULT']['deluge_url'], int(config['DEFAULT']['deluge_port']), config['DEFAULT']['deluge_user'], config['DEFAULT']['deluge_pass'])
     # client = LocalDelugeRPCClient()
     client.connect()
-    if client.connected == True:    
+    if client.connected == True:
+        print("Deluge connected")    
         isdir = os.path.isdir(path)
         #Remote path mount
         if local_path in path:
@@ -1084,7 +1085,7 @@ def search_existing(name):
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
-                    appendages = ["CHANGEME", ""]
+                    appendages = ["CHANGEME", "UwU what's this", "(> . <)", "REPLACEMENT"]
                     name = f"{name} {random.choice(appendages)}"
                 else:
                     exit()
