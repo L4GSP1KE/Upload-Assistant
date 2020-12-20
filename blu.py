@@ -362,7 +362,7 @@ def upload_screens(filename, screens):
                 'filename' : image
             }
             response = requests.post(url, data = data).json()
-            print(response)
+            # print(response)
             img_url = response['url']
             web_url = response['url_viewer']
         elif img_host == "gifyu":
@@ -919,7 +919,7 @@ def get_edition(guess, video, bdinfo):
     if "PROPER" in video:
         edition = edition + " PROPER "
     
-    bad = [internal, limited, retail]
+    bad = ['internal', 'limited', 'retail']
 
     if edition.lower() in bad:
         edition = ""
