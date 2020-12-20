@@ -560,7 +560,7 @@ def get_tmdb(filename, category, keywords):
     else:
         keywords = keywords + ', ' + tmdb_keywords
     if imdb_id != None:
-        imdb_id = int(imdb_id.replace('tt', ''))
+        imdb_id = imdb_id.replace('tt', '')
     return tmdb_id, tmdb_name, tmdb_year, category, alt_name, imdb_id, anime, mal_id, keywords
 
 def get_romaji(tmdb_name):
@@ -1316,12 +1316,13 @@ def get_audio_v2(mi, anime, bdinfo):
         "Vorbis": "VORBIS",
         "PCM": "LPCM",
         #BDINFO AUDIOS
-        "LPCM Audio": "LPCM",
+        "LPCM Audio" : "LPCM",
         "Dolby Digital Audio" : "DD",
-        "Dolby Digital Plus Audio": "DD+",
-        "Dolby TrueHD": "TrueHD",
+        "Dolby Digital Plus Audio" : "DD+",
+        "Dolby TrueHD" : "TrueHD",
+        "DTS Audio" : "DTS", 
         "DTS-HD Master Audio" : "DTS-HD MA",
-        "DTS-HD High-Res Audio": "DTS-HD HRA",
+        "DTS-HD High-Res Audio" : "DTS-HD HRA",
     }
     audio_extra = {
         "XLL": "-HD MA",
