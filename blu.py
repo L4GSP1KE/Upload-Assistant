@@ -561,6 +561,9 @@ def get_tmdb(filename, category, keywords):
         keywords = keywords + ', ' + tmdb_keywords
     if imdb_id != None:
         imdb_id = imdb_id.replace('tt', '')
+    elif imdb_id == None or imdb_id == "":
+        imdb_id = 0
+    print(f"IMDB: {imdb_id}")
     return tmdb_id, tmdb_name, tmdb_year, category, alt_name, imdb_id, anime, mal_id, keywords
 
 def get_romaji(tmdb_name):
