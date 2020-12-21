@@ -1102,7 +1102,7 @@ def search_existing(name):
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
-                    appendages = ["CHANGEME", "(⌐■_■)", "(> _ <)", "REPLACEMENT", "(^-^)/", "\(^O^)/"]
+                    appendages = ["(¬‿¬)", "(⌐■_■)", "(> _ <)", "REPLACEMENT", "(^-^)/", "\(^O^)/", "☜(ﾟヮﾟ☜)"]
                     name = f"{name} {random.choice(appendages)}"
                 else:
                     exit()
@@ -1182,6 +1182,8 @@ def get_region(path, region):
         region = regions.get(region, "")
         if region == "":
             region = click.prompt("Enter region, leave blank for unknown", default="")
+        if region == None:
+            region = ""
     return region
 
 def get_bdinfo(path):
