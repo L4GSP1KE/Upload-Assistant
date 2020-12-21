@@ -13,3 +13,4 @@ keyboard
 bencode.py
 pyrobase
 deluge-client
+Pillow
