@@ -152,13 +152,16 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     torrent_path, torrent = create_torrent(name, path, filename, video, isdir, is_disk)
 
     #Add to client
-    if is_disk != "":
-        path = os.path.dirname(path)
+    
     if torrent_client == "rtorrent":
-        rtorrent(path, torrent_path, torrent)
+        rtorrent(path, torrent_path, torrent, is_disk)
     elif torrent_client == "qbit":
+        if is_disk != "":
+            path = os.path.dirname(path)
         qbittorrent(path, torrent)
     elif torrent_client == "deluge":
+        if is_disk != "":
+            path = os.path.dirname(path)
         deluge(path, torrent_path, torrent)
 
 
@@ -372,11 +375,9 @@ def upload_screens(filename, screens):
                 'image': base64.b64encode(open(image, "rb").read())
             }
             response = requests.post(url, data = data)
-            print(response)
         else:
             cprint("Please choose a supported image host in your config", 'grey', 'on_red')
             exit()
-        print(response)
         description.write(f"[url={web_url}][img=400]{img_url}[/img][/url]")
         if i % 3 == 0:
             description.write("\n")
@@ -1013,7 +1014,7 @@ def stream_optimized(stream_opt):
         stream = 0
     return stream
 
-def rtorrent(path, torrent_path, torrent):
+def rtorrent(path, torrent_path, torrent, is_disk):
     rtorrent = xmlrpc.client.Server(rtorrent_url)
     metainfo = bencode.bread(torrent_path)
     try:
@@ -1031,6 +1032,8 @@ def rtorrent(path, torrent_path, torrent):
 
 
     isdir = os.path.isdir(path)
+    if is_disk != "":
+        path = os.path.dirname(path)
     #Remote path mount
     if local_path in path:
         path = path.replace(local_path, remote_path)
