@@ -1078,7 +1078,8 @@ def deluge(path, torrent_path, torrent):
         if local_path in path:
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
-        if isdir == False:
+        # if isdir == False:
+        else:
             path = os.path.dirname(path)
 
         client.call('core.add_torrent_file', torrent_path, base64.b64encode(torrent.dump()), {'download_location' : path, 'seed_mode' : True})
@@ -1098,7 +1099,7 @@ def search_existing(name):
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
-                    appendages = ["CHANGEME", "UwU what's this", "(> _ <)", "REPLACEMENT", "(^-^)/", "\(^O^)/"]
+                    appendages = ["CHANGEME", "(⌐■_■)", "(> _ <)", "REPLACEMENT", "(^-^)/", "\(^O^)/"]
                     name = f"{name} {random.choice(appendages)}"
                 else:
                     exit()
