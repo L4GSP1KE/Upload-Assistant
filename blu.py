@@ -1053,8 +1053,8 @@ def qbittorrent(path, torrent):
     if local_path in path:
         path = path.replace(local_path, remote_path)
         path = path.replace(os.sep, '/')
-    # if isdir == False:
-    else:
+    if isdir == False:
+    # else:
         path = os.path.dirname(path)
 
     qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'])
