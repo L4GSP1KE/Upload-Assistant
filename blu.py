@@ -1104,7 +1104,7 @@ def search_existing(name):
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
                     appendages = [
-                        "(¬‿¬)", "(⌐■_■)", "(> _ <)", "REPLACEMENT", "(^-^)/", "\(^O^)/", "☜(ﾟヮﾟ☜)", ."( .-. )",
+                        "(¬‿¬)", "(⌐■_■)", "(> _ <)", "REPLACEMENT", "(^-^)/", "\(^O^)/", "☜(ﾟヮﾟ☜)", "( .-. )",
                         "( .o.)",  "( `·´ )",  "( ° ͜ ʖ °)",  "( ͡° ͜ʖ ͡°)",  "( ⚆ _ ⚆ )",  "( ︶︿︶)",  "( ﾟヮﾟ)",  
                         "(\\/)(°,,,°)(\\/)",  "(¬_¬)",  "(¬º-°)¬",  "(¬‿¬)",  "(°ロ°)☝",  "(´・ω・)っ",  "(ó ì_í)",
                         "(ʘᗩʘ')",  "(ʘ‿ʘ)",  "(̿▀̿ ̿Ĺ̯̿̿▀̿ ̿)̄",  "(͡° ͜ʖ ͡°)",  "(ಠ_ಠ)",  "(ಠ‿ಠ)",  "(ಠ⌣ಠ)",  "(ಥ_ಥ)",  "(ಥ﹏ಥ)",  "(ง ͠° ͟ل͜ ͡°)ง",  "(ง ͡ʘ ͜ʖ ͡ʘ)ง",
@@ -1126,7 +1126,7 @@ def search_existing(name):
                         "@( ◕ x ◕ )@" , "ᕙ( ~ . ~ )ᕗ" , "┌( •́ ਊ •̀ )┐" , "〳 •́ ﹏ •̀ 〵" , "c( ⁰ 〰 ⁰ )੭" , "ლ ( ◕  ᗜ  ◕ ) ლ" , "(つ•̀ᴥ•́)つ*:･ﾟ✧",
                         "ʕ⊙ᴥ⊙ʔ" , "(⊙ᗜ⊙)" , "╰(◕ᗜ◕)╯" , "░ ∗ ◕ ں ◕ ∗ ░" , "(^ ◕ᴥ◕ ^)" , "(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧" , "ʕ༼◕  ౪  ◕✿༽ʔ", "(⊹つ•۝•⊹)つ",  
                         ]        
-              name = f"{name} {random.choice(appendages)}"
+                    name = f"{name} {random.choice(appendages)}"
                 else:
                     exit()
     cprint("No dupes found", 'grey', 'on_green')   
