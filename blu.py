@@ -864,8 +864,11 @@ def get_hdr(mi, bdinfo):
             hdr = ""
         if hdr in ("BT.2020", "REC.2020"):
             hdr = "HDR"
-            if mi['media']['track'][1]['Format_Profile'] == "High 10":
-                hdr = "HDR10+"
+            try:
+                if "HDR10+" in mi['media']['track'][1]['HDR_Format_Compatibility']:
+                    hdr = "HDR10+"
+            except:
+                pass
             try:
                 if "HLG" in mi['media']['track'][1]['transfer_characteristics_Original']:
                     hdr = "HLG"
