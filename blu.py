@@ -936,7 +936,8 @@ def get_edition(guess, video, bdinfo):
     #     other = ""
     # if " 3D " in other:
     #     edition = edition + " 3D "
-
+    if edition == "None" or edition == None:
+        edition = ""
     return edition
 
 def create_torrent(name, path, filename, video, isdir, is_disk):
