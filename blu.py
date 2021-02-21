@@ -316,9 +316,11 @@ def screenshots(path, filename, screens, debug):
                 .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
                 .output(image, vframes=1)
                 .overwrite_output()
+                .global_args('-loglevel', 'quiet')
                 .run()
             )
-            print(os.path.getsize(image))
+            # print(os.path.getsize(image))
+            print(f'{i+1}/{screens}')
             if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
                 i += 1
             else:
