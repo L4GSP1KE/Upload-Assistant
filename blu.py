@@ -284,17 +284,17 @@ def exportInfo(video, filename, isdir):
     if isdir == False:
         os.chdir(os.path.dirname(video))
     media_info = MediaInfo.parse(os.path.basename(video), output="STRING", full=False)
-    export = open(f"{base_dir}/{filename}/MEDIAINFO-{filename}.txt", 'w', newline="")
+    export = open(f"{base_dir}/{filename}/MEDIAINFO-{filename}.txt", 'w', newline="", encoding='utf-8')
     export.write(media_info)
     export.close()
     mi_dump = media_info
 
     #MediaInfo to JSON
     media_info = MediaInfo.parse(video, output="JSON")
-    export = open(f"{base_dir}/{filename}/MediaInfo.json", 'w')
+    export = open(f"{base_dir}/{filename}/MediaInfo.json", 'w', encoding='utf-8')
     export.write(media_info)
     export.close()
-    with open(f'{base_dir}/{filename}/MediaInfo.json', 'r') as f:
+    with open(f'{base_dir}/{filename}/MediaInfo.json', 'r', encoding='utf-8') as f:
         mi = json.load(f)
     cprint("MediaInfo Exported.", "grey", "on_green")
     
@@ -322,7 +322,7 @@ def screenshots(path, filename, screens, debug):
             if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
                 i += 1
             else:
-                cprint("Image too large, retaking", 'grey', 'on_red')
+                cprint("Image too large for imgbb, retaking", 'grey', 'on_red')
                 time.sleep(1)
                 
     cprint("Screens saved.", "grey", "on_green")
@@ -365,7 +365,6 @@ def upload_screens(filename, screens):
                 'filename' : image
             }
             response = requests.post(url, data = data).json()
-            # print(response)
             img_url = response['url']
             web_url = response['url_viewer']
         elif img_host == "gifyu":
@@ -846,6 +845,7 @@ def get_uhd(type_id, guess, resolution_name):
     return uhd
 
 def get_hdr(mi, bdinfo):
+    hdr = ""
     if bdinfo != "": #Disks
         hdr = bdinfo['video'][0]['hdr_dv']
         if "HDR10+" in hdr:
@@ -861,7 +861,7 @@ def get_hdr(mi, bdinfo):
         try:
             hdr = mi['media']['track'][1]['colour_primaries']
         except:
-            hdr = ""
+            pass
         if hdr in ("BT.2020", "REC.2020"):
             hdr = "HDR"
             try:
@@ -876,7 +876,12 @@ def get_hdr(mi, bdinfo):
                 pass
 
         else:
-            hdr = ""
+            try:
+                print(mi['media']['track'][1]['HDR_Format'])
+                if "Dolby Vision" in mi['media']['track'][1]['HDR_Format']:
+                    hdr = "DV"
+            except:
+                pass
     return hdr
 
 def get_source(type_id, video, i):
