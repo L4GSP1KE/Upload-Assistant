@@ -863,8 +863,8 @@ def get_uhd(type_id, guess, resolution_name):
 def get_hdr(mi, bdinfo):
     hdr = ""
     if bdinfo != "": #Disks
-        hdr = bdinfo['video'][0]['hdr_dv']
-        if "HDR10+" in hdr:
+        hdr_mi = bdinfo['video'][0]['hdr_dv']
+        if "HDR10+" in hdr_mi:
             hdr = "HDR10+"
         elif hdr == "HDR10":
             hdr = "HDR"
@@ -875,10 +875,10 @@ def get_hdr(mi, bdinfo):
             pass
     else: 
         try:
-            hdr = mi['media']['track'][1]['colour_primaries']
+            hdr_mi = mi['media']['track'][1]['colour_primaries']
         except:
             pass
-        if hdr in ("BT.2020", "REC.2020"):
+        if hdr_mi in ("BT.2020", "REC.2020"):
             hdr = "HDR"
             try:
                 if "HDR10+" in mi['media']['track'][1]['HDR_Format_Compatibility']:
