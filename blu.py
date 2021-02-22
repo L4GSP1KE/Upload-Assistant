@@ -61,7 +61,6 @@ img_api = config['DEFAULT']['img_api']
 #FANRES/TRAILER SUPPORT <- probably not
 #DISK SUPPORT <- done. probably
 #tmdb/imdb id input argument
-#HDR vs DV vs HLG vs whatever else <- hlg done, hdr done, need DV
 #mkv 3d
 #Audio formats I may have missed
 #Description feature is pretty meh
@@ -84,8 +83,8 @@ img_api = config['DEFAULT']['img_api']
 @click.option('--descfile', '-df', help="Custom description (Path to File)", type=click.Path('rb'))
 @click.option('--desclink', '-hb', help="Custom description (Link to hastebin)")
 @click.option('--bdinfo', '-bdinfo', help="Choose to paste BDInfo instead of scan", is_flag=True)
-@click.option('--nfo', '-nfo', help="Use nfo from directory as description", is_flag=True)
-@click.option('--keywords', '-k', help='Add keywords e.g. "keyword1, keyword2, etc"')
+@click.option('--nfo', '-nfo', help="Use nfo from directord1y as description", is_flag=True)
+@click.option('--keywords', '-k', help='Add keywords e.g. "keywor, keyword2, etc"')
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
 @click.option('--region', '-r', help="Disk Region")
@@ -101,15 +100,31 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
         video, scene = is_scene(path)
         try:
             filename = guessit(bdinfo['label'])['title']
+            try:
+                search_year = guessit(bdinfo['label'])['year']
+            except:
+                search_year = ""
         except:
             filename = guessit(bdinfo['title'])['title']
+            try:
+                search_year = guessit(bdinfo['title'])['year']
+            except:
+                search_year = ""
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     else:
         videopath = get_video(videoloc) 
         video, scene = is_scene(videopath)
         filename = guessit(ntpath.basename(video))["title"]
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
+        try:
+            search_year = guessit(video)['year']
+        except:
+            search_year = ""
+        
     guess = guessit(path)
+
+    #Get year (if exists)
+    print(search_year)
 
     #Get type
     type = get_type(video, scene, is_disk)
@@ -138,7 +153,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
         mi_dump = None
 
     #Get ids/name
-    tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id, keywords = get_tmdb(filename, cat_id, keywords)
+    tmdb_id, tmdb_name, tmdb_year, cat_id, alt_name, imdb_id, anime, mal_id, keywords = get_tmdb(filename, cat_id, keywords, search_year)
 
     #Create description
     
@@ -176,7 +191,6 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
         'category_id' : cat_id,
         'type_id' : type_id,
         'resolution_id' : resolution_id,
-        # 'user_id' : user_id,
         'tmdb' : tmdb_id,
         'imdb' : imdb_id,
         'tvdb' : 0,
@@ -500,13 +514,13 @@ def get_resolution(filename, guess):
 def closest(lst, K):
     return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
 #Get TMDB Name/ID/year
-def get_tmdb(filename, category, keywords):
+def get_tmdb(filename, category, keywords, search_year):
     i = 0
     search = tmdb.Search()
     while True:
         try:
             if category == 1: #MOVIE
-                search.movie(query=filename)
+                search.movie(query=filename, year=search_year)
                 tmdb_name = search.results[i]['title']
                 release_date = search.results[i]['release_date']
                 dt = datetime.strptime(release_date, '%Y-%m-%d')
