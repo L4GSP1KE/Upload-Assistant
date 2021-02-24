@@ -625,7 +625,7 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
     three_d = is_3d(mi, bdinfo)
     tag = get_tag(tag, video)
     source = get_source(type_id, video, 1)
-    uhd = get_uhd(type_id, guess, resolution_name)
+    uhd = get_uhd(type_id, guess, resolution_name, path)
     hdr = get_hdr(mi, bdinfo)
     if type_id == 1: #Disk
         region = get_region(path, region)
@@ -842,7 +842,7 @@ def get_service(guess, video):
     return service
 
 
-def get_uhd(type_id, guess, resolution_name):
+def get_uhd(type_id, guess, resolution_name, path):
     try:
         source = guess['Source']
         other = guess['Other']
@@ -851,6 +851,8 @@ def get_uhd(type_id, guess, resolution_name):
         other = ""
     uhd = ""
     if source == 'Blu-ray' and other == "Ultra HD" or source == "Ultra HD Blu-ray":
+        uhd = "UHD"
+    elif "UHD" in path:
         uhd = "UHD"
     elif type_id in (1, 3, 12, 5):
         uhd = ""
