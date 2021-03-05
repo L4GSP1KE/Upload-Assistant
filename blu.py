@@ -533,7 +533,7 @@ def get_tmdb(filename, category, keywords, search_year):
                 if 'original_title' in search.results[i]:
                     alt_name = f" AKA {search.results[i]['original_title']}"
                 tmdb_keywords = get_keywords(tmdb.Movies(tmdb_id))
-                mal_id, alt_name, anime = get_anime(search, i)
+                mal_id, alt_name, anime = get_anime(search, i, tmdb_name)
 
             elif category == 2: #TV
                 search.tv(query=filename)
@@ -549,7 +549,7 @@ def get_tmdb(filename, category, keywords, search_year):
                 if 'original_name' in search.results[i]:
                     alt_name = f" AKA {search.results[i]['original_name']}"
                 tmdb_keywords = get_keywords(tmdb.TV(tmdb_id))
-                mal_id, alt_name, anime = get_anime(search, i)
+                mal_id, alt_name, anime = get_anime(search, i, tmdb_name)
 
             difference = SequenceMatcher(None, tmdb_name, alt_name[5:]).ratio()
             if difference >= 0.6:
@@ -1519,7 +1519,7 @@ def is_3d(mi, bdinfo):
     else:
         return ""
 
-def get_anime(search, i):
+def get_anime(search, i,tmdb_name):
     alt_name = ""
     anime = False
     if search.results[i]['original_language'] == 'ja' and 16 in search.results[i]['genre_ids']:
