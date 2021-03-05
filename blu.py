@@ -450,7 +450,7 @@ def mi_resolution(resolution, guess):
         resolution_name = "720p"
     elif resolution in ("576p" ,  "720x576p"):
         resolution_id = 6
-        resolution_name = "576o"
+        resolution_name = "576p"
     elif resolution in ("576i" ,  "720x576i"):
         resolution_id = 7
         resolution_name = "576i"
