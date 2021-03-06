@@ -127,7 +127,8 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     print(search_year)
 
     #Get type
-    type = get_type(video, scene, is_disk)
+    if type == "":
+        type = get_type(video, scene, is_disk)
 
     #Guess Category ID
     cat_id = get_cat(category, video)
@@ -905,7 +906,10 @@ def get_hdr(mi, bdinfo):
 def get_source(type_id, video, i):
     try:
         if i == 1:
-            source = guessit(video)['source']
+            try:
+                source = guessit(video)['source']
+            except:
+                source = video
         else:
             source = video
 
@@ -925,6 +929,7 @@ def get_source(type_id, video, i):
                 system = click.prompt("Encoding system not found", type=click.Choice(["PAL", "NTSC"], case_sensitive=False))
             source = system + " DVD"
     except Exception:
+        print(traceback.format_exc())
         prompt = click.prompt("Unable to find source, please choose one", type=click.Choice(["BR", "DVD"], case_sensitive=False), default="BR")
 
         source = get_source(type_id, prompt, 2)
