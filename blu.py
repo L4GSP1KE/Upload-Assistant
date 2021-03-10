@@ -124,10 +124,11 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     guess = guessit(path)
 
     #Get year (if exists)
-    print(search_year)
+    # print(search_year)
 
+    print(type)
     #Get type
-    if type == "":
+    if type == None:
         type = get_type(video, scene, is_disk)
 
     #Guess Category ID
@@ -268,11 +269,15 @@ def is_scene(video):
     base = os.path.splitext(base)[0]
     base = urllib.parse.quote(base)
     url = f"https://www.srrdb.com/api/search/r:{base}"
-    response = requests.get(url)
-    response = response.json()
-    if response['resultsCount'] != "0":
-        video = f"{response['results'][0]['release']}.mkv"
-        scene = True
+    try:
+        response = requests.get(url)
+        response = response.json()
+        if response['resultsCount'] != "0":
+            video = f"{response['results'][0]['release']}.mkv"
+            scene = True
+    except:
+        video = video
+        scene = False
     return video, scene
 #Get type
 def get_type(video, scene, is_disk):
