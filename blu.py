@@ -126,7 +126,6 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     #Get year (if exists)
     # print(search_year)
 
-    print(type)
     #Get type
     if type == None:
         type = get_type(video, scene, is_disk)
