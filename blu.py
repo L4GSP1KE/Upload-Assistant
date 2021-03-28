@@ -511,8 +511,8 @@ def get_resolution(filename, guess):
             scan = "p"
         else:
             scan = "i"
-        width_list = [3840, 1920, 1280, 720, 15360, 7680]
-        height_list = [2160, 1080, 720, 576, 480, 8640, 4320]
+        width_list = [3840, 1920, 1280, 720, 15360, 7680, 0]
+        height_list = [2160, 1080, 720, 576, 480, 8640, 4320, 0]
         width = closest(width_list, int(width))
         height = closest(height_list, int(height))
         res = f"{width}x{height}{scan}"
