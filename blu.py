@@ -491,8 +491,12 @@ def mi_resolution(resolution, guess):
 def get_resolution(filename, guess):
     with open(f'{base_dir}/{filename}/MediaInfo.json', 'r') as f:
         mi = json.load(f)
-        width = mi['media']['track'][1]['Width']
-        height = mi['media']['track'][1]['Height']
+        try:
+            width = mi['media']['track'][1]['Width']
+            height = mi['media']['track'][1]['Height']
+        except:
+            width = 0
+            height = 0
         if mi['media']['track'][1]['FrameRate_Mode'] == "CFR":
             framerate = mi['media']['track'][1]['FrameRate']
         else:
