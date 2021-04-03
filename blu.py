@@ -856,6 +856,8 @@ def get_service(guess, video):
             service = "DSNP"
         elif "ATVP" in video:
             service = "ATVP"
+        elif "ALL4" in video:
+            service = "ALL4"
         else:
             service = click.prompt("Enter WEB Source (AMZN, NF, DSNP, etc), leave blank for unknown", default="")
     return service
