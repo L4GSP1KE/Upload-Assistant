@@ -112,7 +112,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
                 search_year = ""
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
     else:
-        videopath = get_video(videoloc) 
+        videopath, filelist = get_video(videoloc) 
         video, scene = is_scene(videopath)
         filename = guessit(ntpath.basename(video))["title"]
         Path(f"{base_dir}/{filename}").mkdir(parents=True, exist_ok=True)
@@ -159,7 +159,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     #Create description
     
     #Generate name
-    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi)
+    name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi, filelist)
 
     #Search for existing release
     name = search_existing(name)
@@ -253,13 +253,15 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
 
 #Get first video
 def get_video(videoloc):
+    filelist = []
     if os.path.isdir(videoloc):
         os.chdir(videoloc)
-        video = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.m2ts')
-        video = sorted(video)[0]        
+        filelist = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.m2ts')
+        video = sorted(filelist)[0]        
     else:
-        video = videoloc
-    return video
+        video= videoloc
+        filelist.append(videoloc)
+    return video, filelist
 
 #Check if scene
 def is_scene(video):
@@ -621,7 +623,7 @@ def get_romaji(tmdb_name):
     return romaji, mal_id
 
 #Naming
-def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi):
+def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi, filelist):
     mi = mi
     title = tmdb_name
     alt_title = alt_name
@@ -676,14 +678,19 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
         except:
             season = "S" + str(click.prompt("Unable to parse season, please enter season number", type=click.INT, default= 1)).zfill(2)
         try:
-            episodes = guessit(video)['episode']
-            if type(episodes) == list:
-                episode = ""
-                for item in guessit(video)["episode"]:
-                    ep = (str(item).zfill(2))
-                    episode += f"E{ep}"
+            episodes = ""
+            print(len(filelist))
+            if len(filelist) == 1:
+                episodes = guessit(video)['episode']
+                if type(episodes) == list:
+                    episode = ""
+                    for item in guessit(video)["episode"]:
+                        ep = (str(item).zfill(2))
+                        episode += f"E{ep}"
+                else:
+                    episode = "E" + str(episodes).zfill(2)
             else:
-                episode = "E" + str(guessit(video)["episode"]).zfill(2)
+                episode = ""
         except:
             print(traceback.format_exc())
             episode = ""
