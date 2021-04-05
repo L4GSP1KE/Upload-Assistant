@@ -1157,7 +1157,8 @@ def search_existing(name):
     response = response.json()
     for each in response['data']:
         result = [each][0]['attributes']['name']
-        difference = SequenceMatcher(None, name, result).ratio()
+        # difference = SequenceMatcher(None, name, result).ratio()
+        difference = 2
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
