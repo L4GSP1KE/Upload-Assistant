@@ -679,7 +679,6 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
             season = "S" + str(click.prompt("Unable to parse season, please enter season number", type=click.INT, default= 1)).zfill(2)
         try:
             episodes = ""
-            print(len(filelist))
             if len(filelist) == 1:
                 episodes = guessit(video)['episode']
                 if type(episodes) == list:
@@ -692,7 +691,7 @@ def get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, t
             else:
                 episode = ""
         except:
-            print(traceback.format_exc())
+            # print(traceback.format_exc())
             episode = ""
         if type_id == 1: #Disk
             name = f"{title} {alt_title} {season}{episode} {edition} {three_d} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}{tag}"
