@@ -88,7 +88,8 @@ img_api = config['DEFAULT']['img_api']
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
 @click.option('--region', '-r', help="Disk Region")
-def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, desclink, bdinfo, nfo, keywords, anon, stream, region):
+@click.option('--dupe', '-st', help="Ths release is a duplicate", is_flag=True)
+def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, desclink, bdinfo, nfo, keywords, anon, stream, region, dupe):
     path = os.path.abspath(path)
     if descfile != None:
         descfile = os.path.abspath(descfile)
@@ -162,7 +163,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     name = get_name(path, video, tmdb_name, alt_name, guess, resolution_name, cat_id, type_id, tmdb_year, filename, tag, anime, region, bdinfo, mi, filelist)
 
     #Search for existing release
-    name = search_existing(name)
+    name = search_existing(name, dupe)
     
     #Create torrent
     torrent_path, torrent = create_torrent(name, path, filename, video, isdir, is_disk)
@@ -1150,15 +1151,17 @@ def deluge(path, torrent_path, torrent):
         cprint("Unable to connect to deluge", 'grey', 'on_red')
 
 
-def search_existing(name):
+def search_existing(name, dupe):
     cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
     url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(name)}&api_token={blu_api}"
     response = requests.get(url=url)
     response = response.json()
     for each in response['data']:
         result = [each][0]['attributes']['name']
-        # difference = SequenceMatcher(None, name, result).ratio()
-        difference = 2
+        if dupe == True:
+            difference = 0
+        else:
+            difference = SequenceMatcher(None, name, result).ratio()
         if difference >= 0.1:
             if click.confirm(f"{result} already exists, is this a dupe?", default=False):
                 if click.confirm("Would you like to change the name and upload anyways?"):
