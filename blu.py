@@ -858,6 +858,8 @@ def get_service(guess, video):
             service = "NF"
         elif service == 'Hulu':
             service = "HULU"
+        elif service == "HBO Max":
+            service = "HMAX"
     except:
         if "HMAX" in video:
             service = "HMAX"
