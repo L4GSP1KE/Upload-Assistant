@@ -877,10 +877,10 @@ def get_tag(tag, video):
         except:
             tag = click.prompt("Tag not found, please enter tag or leave blank for no tag", default="")
             tag = f"-{tag}"
-    elif tag == "-":
-        tag = ""
     else:
         tag = f"-{tag}"
+    if tag == "-":
+        tag = ""
     return tag
 
 
