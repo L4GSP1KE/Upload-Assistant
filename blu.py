@@ -364,7 +364,6 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
     cprint("Saving Screens...", "grey", "on_yellow")
     length = bdinfo['length']
     length = secs = sum(int(x) * 60 ** i for i, x in enumerate(reversed(length.split(':'))))
-    cprint(length, 'yellow')
     # for i in range(screens):
     i = 0
     while i != screens:
@@ -375,7 +374,7 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
             .output(image, vframes=1)
             .overwrite_output()
             .global_args('-loglevel', 'quiet', "-playlist", f"{bdinfo['playlist']}", )
-            .run()
+            .run(quiet=True)
         )
         # print(os.path.getsize(image))
         print(f'{i+1}/{screens}')
@@ -963,7 +962,7 @@ def get_hdr(mi, bdinfo):
 
         else:
             try:
-                print(mi['media']['track'][1]['HDR_Format'])
+                # print(mi['media']['track'][1]['HDR_Format'])
                 if "Dolby Vision" in mi['media']['track'][1]['HDR_Format']:
                     hdr = "DV"
             except:
