@@ -152,6 +152,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
         screenshots(videopath, filename, screens, debug)
     else:
         #Get resolution
+        disk_screenshots(video, filename, screens, debug, bdinfo)
         resolution_id, resolution_name, sd = mi_resolution(bdinfo['video'][0]['res'], guess)
         mi = ""
         mi_dump = None
@@ -352,13 +353,46 @@ def screenshots(path, filename, screens, debug):
                 time.sleep(1)
                 
     cprint("Screens saved.", "grey", "on_green")
-
     #Upload Screenshots
     if debug == True:
         if click.confirm("Upload Screens?", default=True):
             upload_screens(filename, screens)
     else:
         upload_screens(filename, screens)
+
+def disk_screenshots(path, filename, screens, debug, bdinfo):
+    cprint("Saving Screens...", "grey", "on_yellow")
+    length = bdinfo['length']
+    length = secs = sum(int(x) * 60 ** i for i, x in enumerate(reversed(length.split(':'))))
+    cprint(length, 'yellow')
+    # for i in range(screens):
+    i = 0
+    while i != screens:
+        image = f"{base_dir}/{filename}/{filename}-{i}.png"
+        (
+            ffmpeg
+            .input(f"bluray:{path}", ss=random.randint(round(length/5) , round(length - length/5)), skip_frame='nokey')
+            .output(image, vframes=1)
+            .overwrite_output()
+            .global_args('-loglevel', 'quiet', "-playlist", f"{bdinfo['playlist']}", )
+            .run()
+        )
+        # print(os.path.getsize(image))
+        print(f'{i+1}/{screens}')
+        if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
+            i += 1
+        else:
+            cprint("Image too large for imgbb, retaking", 'grey', 'on_red')
+            time.sleep(1)
+            
+    cprint("Screens saved.", "grey", "on_green")
+    #Upload Screenshots
+    if debug == True:
+        if click.confirm("Upload Screens?", default=True):
+            upload_screens(filename, screens)
+    else:
+        upload_screens(filename, screens)
+
 
 #Upload images & write description
 def upload_screens(filename, screens):
@@ -1037,7 +1071,6 @@ def gen_desc(filename, desc, descfile, desclink, bd_summary, path, nfo):
         description.write(bd_summary)
         description.write("[/code]")
         description.write("\n")
-        description.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
     if nfo != False:
         description.write("[code]")
         nfo = glob.glob("*.nfo")[0]
@@ -1476,6 +1509,12 @@ def parse_bdinfo(bdinfo_input):
         if line.startswith("*"):
             line = l.replace("*", "").strip().lower()
             print(line)
+        if line.startswith("playlist:"):
+            playlist = l.split(':', 1)[1]
+            bdinfo['playlist'] = playlist.split('.',1)[0].strip()
+        if line.startswith("length:"):
+            length = l.split(':', 1)[1]
+            bdinfo['length'] = length.split('.',1)[0].strip()
         if line.startswith("video:"):
             split1 = l.split(':', 1)[1]
             split2 = split1.split('/', 12)
@@ -1535,7 +1574,7 @@ def parse_bdinfo(bdinfo_input):
         elif line.startswith("disc label:"):
             label = l.split(':', 1)[1]
             bdinfo['label'] = label
-    # pprint.pprint(bdinfo)
+    pprint.pprint(bdinfo)
     return bdinfo
 
 def get_video_codec(bdinfo):
