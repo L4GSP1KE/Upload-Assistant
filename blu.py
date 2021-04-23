@@ -176,8 +176,8 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
     if torrent_client == "rtorrent":
         rtorrent(path, torrent_path, torrent, is_disk)
     elif torrent_client == "qbit":
-        if is_disk != "":
-            path = os.path.dirname(path)
+        # if is_disk != "":
+        #     path = os.path.dirname(path)
         qbittorrent(path, torrent)
     elif torrent_client == "deluge":
         if is_disk != "":
@@ -1144,7 +1144,7 @@ def rtorrent(path, torrent_path, torrent, is_disk):
 
 
 def qbittorrent(path, torrent):
-    isdir = os.path.isdir(path)
+    # isdir = os.path.isdir(path)
     # infohash = torrent.infohash
     #Remote path mount
     if local_path in path:
@@ -1153,6 +1153,7 @@ def qbittorrent(path, torrent):
     # if isdir == False:
     # # else:
     path = os.path.dirname(path)
+    cprint(path, 'yellow')
 
     qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'])
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
@@ -1573,7 +1574,7 @@ def parse_bdinfo(bdinfo_input):
         elif line.startswith("disc label:"):
             label = l.split(':', 1)[1]
             bdinfo['label'] = label
-    pprint.pprint(bdinfo)
+    # pprint.pprint(bdinfo)
     return bdinfo
 
 def get_video_codec(bdinfo):
