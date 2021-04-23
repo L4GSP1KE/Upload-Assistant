@@ -1153,7 +1153,7 @@ def qbittorrent(path, torrent):
     # if isdir == False:
     # # else:
     path = os.path.dirname(path)
-    cprint(path, 'yellow')
+    # cprint(path, 'yellow')
 
     qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'])
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
