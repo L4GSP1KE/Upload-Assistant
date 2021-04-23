@@ -99,6 +99,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
 
     if bdinfo != "":
         video, scene = is_scene(path)
+        filelist = []
         try:
             filename = guessit(bdinfo['label'])['title']
             try:
@@ -1116,9 +1117,9 @@ def qbittorrent(path, torrent):
     if local_path in path:
         path = path.replace(local_path, remote_path)
         path = path.replace(os.sep, '/')
-    if isdir == False:
-    # else:
-        path = os.path.dirname(path)
+    # if isdir == False:
+    # # else:
+    path = os.path.dirname(path)
 
     qbt_client = qbittorrentapi.Client(host=config['DEFAULT']['qbit_url'], port=config['DEFAULT']['qbit_port'], username=config['DEFAULT']['qbit_user'], password=config['DEFAULT']['qbit_pass'])
     cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
