@@ -3,6 +3,7 @@ import sys
 import configparser
 from pathlib import Path
 from datetime import datetime
+from click.termui import edit
 from pymediainfo import MediaInfo
 import click
 from termcolor import colored, cprint
@@ -996,8 +997,8 @@ def get_edition(guess, video, bdinfo):
     #     other = ""
     # if " 3D " in other:
     #     edition = edition + " 3D "
-    if edition == "None" or edition == None:
-        edition = ""
+    # if edition == "None" or edition == None:
+    #     edition = ""
     return edition
 
 def create_torrent(name, path, filename, video, isdir, is_disk):
@@ -1560,6 +1561,8 @@ def is_3d(mi, bdinfo):
     if bdinfo != "":
         if bdinfo['video'][0]['3d'] != "":
             return "3D"
+        else:
+            return ""
     else:
         return ""
 
