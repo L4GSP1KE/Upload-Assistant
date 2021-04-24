@@ -342,7 +342,7 @@ def screenshots(path, filename, screens, debug):
                 .output(image, vframes=1)
                 .overwrite_output()
                 .global_args('-loglevel', 'quiet')
-                .run()
+                .run(cmd="bin/ffmpeg", quiet=True)
             )
             # print(os.path.getsize(image))
             print(f'{i+1}/{screens}')
@@ -374,7 +374,7 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
             .output(image, vframes=1)
             .overwrite_output()
             .global_args('-loglevel', 'quiet', "-playlist", f"{bdinfo['playlist']}", )
-            .run(quiet=True)
+            .run(cmd="bin/ffmpeg", quiet=True)
         )
         # print(os.path.getsize(image))
         print(f'{i+1}/{screens}')
@@ -583,7 +583,7 @@ def get_tmdb(filename, category, keywords, search_year):
                 mal_id, alt_name, anime = get_anime(search, i, tmdb_name)
 
             elif category == 2: #TV
-                search.tv(query=filename)
+                search.tv(query=filename, year=search_year)
                 tmdb_name = search.results[i]['name']
                 air_date = search.results[i]['first_air_date']
                 dt = datetime.strptime(air_date, '%Y-%m-%d')
@@ -1324,12 +1324,12 @@ def get_bdinfo(path):
         os.mkdir(save_dir)
     if sys.platform.startswith('linux'):
         try:
-            Popen(['mono', f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
+            Popen(['mono', f"{base_dir}/bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
         except:
             cprint('mono not found, please install mono', 'grey', 'on_red')
             
     elif sys.platform.startswith('win32'):
-        Popen([f"{base_dir}/BDInfo/BDInfo.exe", "-w", path, save_dir])
+        Popen([f"{base_dir}/bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
         time.sleep(0.1)
     while True:
         try:
