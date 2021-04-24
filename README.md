@@ -29,11 +29,11 @@ Options:
   
   ## Setup:
    - **REQUIRES AT LEAST PYTHON 3.6 AND PIP3**
-   - Clone the repo to your system `git clone https://github.com/L4GSP1KE/BluUpload.git'
+   - Clone the repo to your system `git clone https://github.com/L4GSP1KE/BluUpload.git`
    - Rename `example_config.ini` to `config.ini`
    - Edit `config.ini` to use your information
       - tmdb_api (v3) key can be obtained from https://developers.themoviedb.org/3/getting-started/introduction
    - Install necessary python modules `pip3 install -r requirements.txt`
    I think thats it, probably
 
-   
+
