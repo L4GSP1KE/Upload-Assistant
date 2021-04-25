@@ -335,7 +335,7 @@ def screenshots(path, filename, screens, debug):
         # for i in range(screens):
         i = 0
         while i != screens:
-            image = f"{base_dir}/{filename}/{filename}-{i}.png"
+            image = Path(f"{base_dir}/{filename}/{filename}-{i}.png")
             (
                 ffmpeg
                 .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
@@ -369,7 +369,7 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
     # for i in range(screens):
     i = 0
     while i != screens:
-        image = f"{base_dir}/{filename}/{filename}-{i}.png"
+        image = Path(f"{base_dir}/{filename}/{filename}-{i}.png")
         (
             ffmpeg
             .input(f"bluray:{path}", ss=random.randint(round(length/5) , round(length - length/5)), skip_frame='nokey')
