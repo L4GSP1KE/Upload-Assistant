@@ -414,13 +414,19 @@ def upload_screens(filename, screens):
         if img_host == "imgbb":
             url = "https://api.imgbb.com/1/upload"
             response = requests.post(url, data = data).json()
-            img_url = response['data']['url']
-            web_url = response['data']['url_viewer']
+            try:
+                img_url = response['data']['url']
+                web_url = response['data']['url_viewer']
+            except:
+                pprint(response)
         elif img_host == "freeimage.host":
             url = "https://freeimage.host/api/1/upload"
             response = requests.post(url, data = data).json()
-            img_url = response['image']['url']
-            web_url = response['image']['url_viewer']
+            try:
+                img_url = response['image']['url']
+                web_url = response['image']['url_viewer']
+            except:
+                pprint(response)
         elif img_host == "pstorage.space":
             url = "https://pstorage.space/api/1/upload"
             data = {
@@ -429,8 +435,11 @@ def upload_screens(filename, screens):
                 'filename' : image
             }
             response = requests.post(url, data = data).json()
-            img_url = response['url']
-            web_url = response['url_viewer']
+            try:
+                img_url = response['url']
+                web_url = response['url_viewer']
+            except:
+                pprint(response)
         # elif img_host == "gifyu":
         #     url = "https://gifyu.com/api/1/upload/"
         #     data = {
