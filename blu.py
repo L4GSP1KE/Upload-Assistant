@@ -348,6 +348,8 @@ def screenshots(path, filename, screens, debug):
             print(f'{i+1}/{screens}')
             if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
                 i += 1
+            elif img_host != "imgbb":
+                i += 1
             else:
                 cprint("Image too large for imgbb, retaking", 'grey', 'on_red')
                 time.sleep(1)
@@ -379,6 +381,8 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
         # print(os.path.getsize(image))
         print(f'{i+1}/{screens}')
         if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
+            i += 1
+        elif img_host != "imgbb":
             i += 1
         else:
             cprint("Image too large for imgbb, retaking", 'grey', 'on_red')
@@ -426,13 +430,14 @@ def upload_screens(filename, screens):
             response = requests.post(url, data = data).json()
             img_url = response['url']
             web_url = response['url_viewer']
-        elif img_host == "gifyu":
-            url = "https://gifyu.com/api/1/upload/"
-            data = {
-                'key' : "9aa9c4dedd20aeb9a63e41676e061820",
-                'image': base64.b64encode(open(image, "rb").read())
-            }
-            response = requests.post(url, data = data)
+        # elif img_host == "gifyu":
+        #     url = "https://gifyu.com/api/1/upload/"
+        #     data = {
+        #         'key' : "9aa9c4dedd20aeb9a63e41676e061820",
+        #         'image': base64.b64encode(open(image, "rb").read())
+        #     }
+        #     response = requests.post(url, data = data).json()
+        #     pprint(response)
         else:
             cprint("Please choose a supported image host in your config", 'grey', 'on_red')
             exit()
