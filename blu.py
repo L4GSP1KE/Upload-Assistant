@@ -335,7 +335,7 @@ def screenshots(path, filename, screens, debug):
         # for i in range(screens):
         i = 0
         while i != screens:
-            image = Path(f"{base_dir}/{filename}/{filename}-{i}.png")
+            image = f"{base_dir}/{filename}/{filename}-{i}.png"
             (
                 ffmpeg
                 .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
@@ -346,7 +346,8 @@ def screenshots(path, filename, screens, debug):
             )
             # print(os.path.getsize(image))
             print(f'{i+1}/{screens}')
-            if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
+            print(Path(image))
+            if os.path.getsize(Path(image)) <= 31000000 and img_host == "imgbb":
                 i += 1
             elif img_host != "imgbb":
                 i += 1
@@ -369,7 +370,7 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
     # for i in range(screens):
     i = 0
     while i != screens:
-        image = Path(f"{base_dir}/{filename}/{filename}-{i}.png")
+        image = f"{base_dir}/{filename}/{filename}-{i}.png"
         (
             ffmpeg
             .input(f"bluray:{path}", ss=random.randint(round(length/5) , round(length - length/5)), skip_frame='nokey')
@@ -380,7 +381,7 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
         )
         # print(os.path.getsize(image))
         print(f'{i+1}/{screens}')
-        if os.path.getsize(image) <= 31000000 and img_host == "imgbb":
+        if os.path.getsize(Path(image)) <= 31000000 and img_host == "imgbb":
             i += 1
         elif img_host != "imgbb":
             i += 1
