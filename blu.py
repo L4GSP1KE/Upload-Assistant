@@ -84,8 +84,8 @@ img_api = config['DEFAULT']['img_api']
 @click.option('--descfile', '-df', help="Custom description (Path to File)", type=click.Path('rb'))
 @click.option('--desclink', '-hb', help="Custom description (Link to hastebin)")
 @click.option('--bdinfo', '-bdinfo', help="Choose to paste BDInfo instead of scan", is_flag=True)
-@click.option('--nfo', '-nfo', help="Use nfo from directord1y as description", is_flag=True)
-@click.option('--keywords', '-k', help='Add keywords e.g. "keywor, keyword2, etc"')
+@click.option('--nfo', '-nfo', help="Use nfo from directory as description", is_flag=True)
+@click.option('--keywords', '-k', help='Add keywords e.g. "keyword, keyword2, etc"')
 @click.option('--anon', '-a', help="Anonymous upload", is_flag=True)
 @click.option('--stream', '-st', help="Stream Optimized Upload", is_flag=True)
 @click.option('--region', '-r', help="Disk Region")
@@ -1471,7 +1471,8 @@ def get_audio_v2(mi, anime, bdinfo):
         "LPCM Audio" : "LPCM",
         "Dolby Digital Audio" : "DD",
         "Dolby Digital Plus Audio" : "DD+",
-        "Dolby TrueHD" : "TrueHD",
+        # "Dolby TrueHD" : "TrueHD",
+        "Dolby TrueHD Audio" : "TrueHD",
         "DTS Audio" : "DTS", 
         "DTS-HD Master Audio" : "DTS-HD MA",
         "DTS-HD High-Res Audio" : "DTS-HD HRA",
