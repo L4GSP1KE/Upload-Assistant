@@ -35,7 +35,8 @@ import errno
 import hashlib
 from deluge_client import DelugeRPCClient, LocalDelugeRPCClient
 import traceback
-from PIL import Image
+from pprint import pprint
+# from PIL import Image
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 os.chdir(base_dir)
@@ -440,6 +441,25 @@ def upload_screens(filename, screens):
                 web_url = response['url_viewer']
             except:
                 pprint(response)
+        elif img_host == "ptpimg":
+            try:
+                payload = {'format': 'json', 'api_key': img_api} # API key is obtained from inspecting element on the upload page. 
+                # payload = {'api_key': img_api} # API key is obtained from inspecting element on the upload page. 
+                files = [('file-upload[0]', open(image, 'rb'))] 
+                headers = { 'referer': 'https://ptpimg.me/index.php'} 
+                # ptpimg_response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files) 
+                ptpimg_response = requests.request("POST", "https://ptpimg.me/upload.php", headers=headers, data=payload, files=files) 
+                # Then that returns either some error or a json response. 
+                ptpimg_response = ptpimg_response.json()
+                # pprint(ptpimg_response)
+                ptpimg_code = ptpimg_response[0]['code'] 
+                ptpimg_ext = ptpimg_response[0]['ext'] 
+                img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+            except:
+                # print(traceback.format_exc())
+                cprint("PTPimg down?", 'grey', 'on_red')
+                pass
         # elif img_host == "gifyu":
         #     url = "https://gifyu.com/api/1/upload/"
         #     data = {
