@@ -22,7 +22,6 @@ from torf import Torrent
 from difflib import SequenceMatcher
 import shutil
 # import pyimgbox
-import pprint
 from mal import AnimeSearch
 import xmlrpc.client
 import urllib
@@ -211,7 +210,7 @@ def doTheThing(path, screens, category, debug, type, res, tag, desc, descfile, d
         # 'double_up' : 0,
         # 'sticky' : 0,
     }
-    # pprint.pprint(data)
+    # pprint(data)
     # print(torrent_path)
     #Upload to BLU
     if click.confirm("Upload to BLU", default=False):
@@ -1610,7 +1609,7 @@ def parse_bdinfo(bdinfo_input):
         elif line.startswith("disc label:"):
             label = l.split(':', 1)[1]
             bdinfo['label'] = label
-    # pprint.pprint(bdinfo)
+    # pprint(bdinfo)
     return bdinfo
 
 def get_video_codec(bdinfo):
