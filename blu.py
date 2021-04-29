@@ -349,10 +349,17 @@ def screenshots(path, filename, screens, debug):
             print(Path(image))
             if os.path.getsize(Path(image)) <= 31000000 and img_host == "imgbb":
                 i += 1
-            elif img_host != "imgbb":
+            elif os.path.getsize(Path(image)) <= 20000000 and img_host == "pstorage.space":
+                i += 1
+            elif os.path.getsize(Path(image)) <= 10000:
+                cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                time.sleep(1)
+            elif img_host == "ptpimg":
+                i += 1
+            elif img_host == "freeimage.host":
                 i += 1
             else:
-                cprint("Image too large for imgbb, retaking", 'grey', 'on_red')
+                cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                 time.sleep(1)
                 
     cprint("Screens saved.", "grey", "on_green")
@@ -368,12 +375,19 @@ def disk_screenshots(path, filename, screens, debug, bdinfo):
     length = bdinfo['length']
     length = secs = sum(int(x) * 60 ** i for i, x in enumerate(reversed(length.split(':'))))
     # for i in range(screens):
+    # pprint(bdinfo)
+    if "VC-1" in bdinfo['video'][0]['codec']:
+        is_vc1 = 'nokey'
+        # print("VC-1")
+    else:
+        is_vc1 = 'none'
+        
     i = 0
     while i != screens:
         image = f"{base_dir}/{filename}/{filename}-{i}.png"
         (
             ffmpeg
-            .input(f"bluray:{path}", ss=random.randint(round(length/5) , round(length - length/5)), skip_frame='nokey')
+            .input(f"bluray:{path}", ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=is_vc1)
             .output(image, vframes=1)
             .overwrite_output()
             .global_args('-loglevel', 'quiet', "-playlist", f"{bdinfo['playlist']}", )
