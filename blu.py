@@ -346,7 +346,7 @@ def screenshots(path, filename, screens, debug):
             )
             # print(os.path.getsize(image))
             print(f'{i+1}/{screens}')
-            print(Path(image))
+            # print(Path(image))
             if os.path.getsize(Path(image)) <= 31000000 and img_host == "imgbb":
                 i += 1
             elif os.path.getsize(Path(image)) <= 20000000 and img_host == "pstorage.space":
