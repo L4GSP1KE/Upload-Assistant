@@ -1,4 +1,4 @@
-config.ini
+data/config.json
 *.mkv
 .vscode/
-*/
+__pycache__/

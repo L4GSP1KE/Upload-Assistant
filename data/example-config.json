@@ -1,0 +1,96 @@
+{
+    "DEFAULT" : {
+        "tmdb_api" : "tmdb_api key",
+
+        "imgbb_api" : "imgbb api key",
+        "pstorage_api" : "pstorage.space api key",
+        "freeimage_api" : "freeimage.host api key",
+        "ptpimg_api" : "ptpimg api key",
+
+        "img_host_1": "imgbb",
+        "img_host_2": "freeimage.host",
+        "img_host_3": "ptpimg",
+        "img_host_4": "pstorage",
+
+        "screens" : "6",
+
+
+
+        "blu_api" : "blu api key",
+        "blu_announce" : "https://blutopia.xyz/announce/",
+
+        "bhd_api" : "",
+        "bhd_announce" : "",
+
+        "default_torrent_client" : "Client1"
+
+
+    },
+
+
+    "TORRENT_CLIENTS" : {
+        "Client1" : {
+            "torrent_client" : "qbit",
+            "qbit_url" : "http://127.0.0.1",
+            "qbit_port" : "8080",
+            "qbit_user" : "username",
+            "qbit_pass" : "password",
+
+            "local_path" : "/LocalPath",
+            "remote_path" : "/RemotePath"
+        },
+        "qbit_sample" : {
+            "torrent_client" : "qbit",
+            "qbit_url" : "http://127.0.0.1",
+            "qbit_port" : "8080",
+            "qbit_user" : "username",
+            "qbit_pass" : "password",
+
+            "local_path" : "/LocalPath",
+            "remote_path" : "/RemotePath"
+        },
+
+        "rtorrent_sample" : {
+            "torrent_client" : "rtorrent",
+            "rtorrent_url" : "https://user:password@server.host.tld:443/username/rutorrent/plugins/httprpc/action.php",
+
+            "local_path" : "/LocalPath",
+            "remote_path" : "/RemotePath"
+
+        },
+        "deluge_sample" : {
+            "torrent_client" : "deluge",
+            "deluge_url" : "localhost",
+            "deluge_port" : "8080",
+            "deluge_user" : "username",
+            "deluge_password" : "password",
+
+            "local_path" : "/LocalPath",
+            "remote_path" : "/RemotePath"
+        }
+
+    },
+
+
+
+
+
+
+
+    "DISCORD" :{
+        "discord_bot_token" : "discord bot token",
+        "discord_bot_description" : "L4G's Upload Assistant",
+        "discord_channel_id" : "discord channel id for use",
+        "admin_id" : "your discord user id",
+        "command_prefix" : ".",
+
+        "search_dir" : "Path/to/downloads/folder/   this is used for search",
+
+        "discord_emojis" : {
+                "BLU": "💙",
+                "BHD": "🎉",
+                "UPLOAD" : "✅",
+                "CANCEL" : "🚫"
+        }
+    }
+}

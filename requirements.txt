@@ -1,16 +1,14 @@
-pymediainfo
+discord.py
 click
-termcolor
-ffmpeg-python
-tmdbsimple
-guessit
 torf
-# pyimgbox
-mal-api
-cprint
+termcolor
+shortuuid
+guessit
+ffmpeg-python
+pymediainfo
+tmdbsimple
+anitopy
+cli-ui
 qbittorrent-api
-keyboard
-bencode.py
-pyrobase
 deluge-client
-Pillow
+pyrobase
