@@ -82,7 +82,7 @@ async def do_the_thing(path, args, base_dir):
 
 
 def get_confirmation(meta):
-    print()
+    print(f"Prep material saved to {meta['base_dir']}/tmp/{meta['uuid']}")
     print()
     cli_ui.info_section(cli_ui.yellow, "Database Info")
     cli_ui.info(f"Title: {meta['title']} ({meta['year']})")
