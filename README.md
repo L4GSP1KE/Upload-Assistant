@@ -47,7 +47,7 @@ Options:
 
   ## Setup:
    - **REQUIRES AT LEAST PYTHON 3.6 AND PIP3**
-   - Clone the repo to your system `git clone https://github.com/L4GSP1KE/Upload`
+   - Clone the repo to your system `git clone https://github.com/L4GSP1KE/Upload-Assistant.git`
    - Copy and Rename `data/example-config.json` to `data/config.json`
    - Edit `config.json` to use your information (more detailed information in the wiki(coming soon))
       - tmdb_api (v3) key can be obtained from https://developers.themoviedb.org/3/getting-started/introduction
