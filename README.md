@@ -2,45 +2,7 @@
 
 
 
-```
-Options:
-  -h, --help              show this help message and exit
 
-  -s, --screens           Number of screenshots
-
-  -c, --category          Category [MOVIE, TV, FANRES]
-
-  -t, --type              Type [DISC, REMUX, ENCODE, WEBDL, WEBRIP, HDTV]
-
-  -res, --resolution      Resolution [2160p, 1080p, 1080i, 720p, 576p, 576i, 480p, 480i, 8640p, 4320p, OTHER]
-
-  -tmdb, --tmdb           TMDb ID
-
-  -g, --tag               Group Tag
-
-  -serv, --service        Streaming Service
-
-  -edition, --edition     Edition
-
-  -d, --desc              Custom Description (string)
-
-  -nfo, --n               Use .nfo in directory for description
-
-  -k, --keywords          Add comma seperated keywords e.g. 'keyword, keyword2, etc'
-
-  -reg, --region          Region for discs
-
-  -a, --ano               Upload anonymously
-
-  -st, --st               Stream Optimized Upload
-
-  -debug, --debug         Debug Mode
-
-  -client, --client       Override default torrent client
-
-  -tk, --trackers         Override default torrent client
-
-  ````
   
 
 ## **Setup:**
@@ -81,3 +43,46 @@ Options:
       - This is `!search` for directories. Use this for things like season packs/discs/etc.
   - `!args`:
       - This returns a message containing all usable arguments
+
+## Args:
+```
+Options:
+  -h, --help              show this help message and exit
+
+  -s, --screens           Number of screenshots
+
+  -c, --category          Category [MOVIE, TV, FANRES]
+
+  -t, --type              Type [DISC, REMUX, ENCODE, WEBDL, WEBRIP, HDTV]
+
+  -res, --resolution      Resolution [2160p, 1080p, 1080i, 720p, 576p, 576i, 480p, 480i, 8640p, 4320p, OTHER]
+
+  -tmdb, --tmdb           TMDb ID
+
+  -g, --tag               Group Tag
+
+  -serv, --service        Streaming Service
+
+  -edition, --edition     Edition
+
+  -d, --desc              Custom Description (string)
+
+  -nfo, --n               Use .nfo in directory for description
+
+  -k, --keywords          Add comma seperated keywords e.g. 'keyword, keyword2, etc'
+
+  -reg, --region          Region for discs
+
+  -a, --ano               Upload anonymously
+
+  -st, --st               Stream Optimized Upload
+
+  -debug, --debug         Debug Mode
+
+  -client, --client       Override default torrent client
+
+  -tk, --trackers         Override default torrent client
+
+  ````
+  
+  Feel free to pester me if you need help/want features/etc.
