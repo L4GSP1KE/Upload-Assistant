@@ -12,3 +12,4 @@ cli-ui
 qbittorrent-api
 deluge-client
 pyrobase
+requests
