@@ -64,7 +64,7 @@ async def do_the_thing(path, args, base_dir):
         meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
         confirm = get_confirmation(meta)
     
-    trackers = ['BLU', 'BHD']
+    trackers = ['BLU']
     for tracker in trackers:
         if tracker == "BLU":
             if cli_ui.ask_yes_no("Upload to BLU?", default=False):
