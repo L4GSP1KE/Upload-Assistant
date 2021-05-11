@@ -149,7 +149,7 @@ class Clients():
 
 
 
-    def add_fast_resume(meta, datapath, torrent):
+    def add_fast_resume(self, meta, datapath, torrent):
         """ Add fast resume data to a metafile dict.
         """
         # Get list of files
