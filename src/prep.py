@@ -139,6 +139,7 @@ class Prep():
 
         if meta.get('tag', None) == None:
             meta['tag'] = self.get_tag(video, meta)
+        meta = await self.get_season_episode(video, meta)
         meta = await self.tag_override(meta)
 
         meta['video'] = video
@@ -157,7 +158,6 @@ class Prep():
             meta['video_encode'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
             meta['edition'] = self.get_edition(guessit(self.path), video, bdinfo)
-        meta = await self.get_season_episode(video, meta)
 
         
         
@@ -1335,6 +1335,7 @@ class Prep():
             romaji, mal_id, eng_title = self.get_romaji(guessit(parsed['anime_title'])['title']) 
             meta = await self.get_tmdb_id(eng_title, meta['search_year'], meta)
             meta = await self.tmdb_other_meta(meta)
+            meta['tag'] = parsed.get('release_group', "")
             try:
                 if len(filelist) == 1:
                     episodes = parsed['episode_number']
