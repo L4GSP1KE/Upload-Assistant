@@ -1,6 +1,16 @@
 # L4G's Upload Assistant
 
+A simple tool to take the work out of uploading. Now with a Discord Bot interface for people who don't like command line!
 
+## What It Does:
+  - Generates and Parses MediaInfo/BDInfo.
+  - Generates and Uploads screenshots.
+  - Obtains TMDb/IMDb/MAL identifiers.
+  - Generates custom .torrents without useless top level folders/nfos.
+  - Generates proper name for your sites.
+  - Uploads via API
+  - Adds to your client, seeding instantly
+  - ALL WITH MINIMAL INPUT!
 
 
   
