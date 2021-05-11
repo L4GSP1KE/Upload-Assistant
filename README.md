@@ -66,6 +66,7 @@ Options:
 
 ## **Discord Bot Usage:** 
   **To start the bot** `python3 bot.py`
+  I recommend running this in screen
   
   **Commands:**
   - `!upload "/path/to/file" --args`: 
