@@ -79,4 +79,4 @@ Options:
   - `!search dir [search terms]`:
       - This is `!search` for directories. Use this for things like season packs/discs/etc.
   - `!args`:
-          * This returns a message containing all usable arguments
+      - This returns a message containing all usable arguments
