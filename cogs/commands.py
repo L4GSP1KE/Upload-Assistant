@@ -43,6 +43,9 @@ class Commands(commands.Cog):
         f"""
         Upload: for a list of arguments do {config['DISCORD']['command_prefix']}args
         """
+        if ctx.channel.id != int(config['DISCORD']['discord_channel_id']):
+            return
+
         if path == None:
             await ctx.send("Missing Path")
             return
@@ -124,6 +127,8 @@ class Commands(commands.Cog):
         """
         Edit uuid w/ args
         """
+        if ctx.channel.id != int(config['DISCORD']['discord_channel_id']):
+            return
         if uuid == None:
             await ctx.send("Missing ID, please try again using the ID in the footer")
         parser = Args(config)
@@ -152,6 +157,8 @@ class Commands(commands.Cog):
         """
         Search for a file to upload
         """
+        if ctx.channel.id != int(config['DISCORD']['discord_channel_id']):
+            return
         search = Search(config=config)
         if args == None:
             await ctx.send("Missing search term(s)")
@@ -194,6 +201,8 @@ class Commands(commands.Cog):
         """
         Search for a directory to upload
         """
+        if ctx.channel.id != int(config['DISCORD']['discord_channel_id']):
+            return
         search = Search(config=config)
         if args == None:
             await ctx.send("Missing search term(s)")
