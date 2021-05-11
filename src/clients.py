@@ -93,9 +93,10 @@ class Clients():
         if isdir == False:
             path = os.path.dirname(path)
         
-        print(path)
-        cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
-        rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
+        # print(path)
+        cprint("Adding and starting torrent", 'grey', 'on_yellow')
+        add = rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
+        print(add)
         return
 
 
