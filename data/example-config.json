@@ -67,7 +67,9 @@
 
             "local_path" : "/LocalPath",
             "remote_path" : "/RemotePath"
-        }
+        },
+
+        "placeholder" : "This is placeholder text, just leave it here"
 
     },
 
@@ -80,9 +82,9 @@
     "DISCORD" :{
         "discord_bot_token" : "discord bot token",
         "discord_bot_description" : "L4G's Upload Assistant",
+        "command_prefix" : ".",
         "discord_channel_id" : "discord channel id for use",
         "admin_id" : "your discord user id",
-        "command_prefix" : ".",
 
         "search_dir" : "Path/to/downloads/folder/   this is used for search",
 
