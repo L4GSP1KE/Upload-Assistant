@@ -362,6 +362,7 @@ class Commands(commands.Cog):
                     await channel.send(f"Uploaded `{meta['name']}`to BLU")
             if "BHD" in tracker_list:
                 await channel.send("Uploading to BHD (coming soon:tm:)")
+            return
     
     
     
@@ -371,8 +372,8 @@ class Commands(commands.Cog):
             meta['upload'] = True   
             return meta
         else:
-            dupe_text = "\n•".join(dupes)
-            dupe_text = f"```{dupe_text}```"
+            dupe_text = "\n\n•".join(dupes)
+            dupe_text = f"```•{dupe_text}```"
             embed = discord.Embed(title="Are these dupes?", description=dupe_text, color=0xff0000)
             embed.set_footer(text=f"{emojis['CANCEL']} to abort upload | {emojis['UPLOAD']} to upload anyways") 
             message = await channel.send(embed=embed)

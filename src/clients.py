@@ -96,6 +96,7 @@ class Clients():
         print(path)
         cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
         rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
+        return
 
 
     async def qbittorrent(self, path, torrent, local_path, remote_path, client, tracker):
@@ -149,25 +150,25 @@ class Clients():
 
 
 
-    def add_fast_resume(self, meta, datapath, torrent):
+    def add_fast_resume(self, metainfo, datapath, torrent):
         """ Add fast resume data to a metafile dict.
         """
         # Get list of files
-        files = meta["info"].get("files", None)
+        files = metainfo["info"].get("files", None)
         single = files is None
         if single:
             if os.path.isdir(datapath):
-                datapath = os.path.join(datapath, meta["info"]["name"])
+                datapath = os.path.join(datapath, metainfo["info"]["name"])
             files = [Bunch(
                 path=[os.path.abspath(datapath)],
-                length=meta["info"]["length"],
+                length=metainfo["info"]["length"],
             )]
 
         # Prepare resume data
-        resume = meta.setdefault("libtorrent_resume", {})
-        resume["bitfield"] = len(meta["info"]["pieces"]) // 20
+        resume = metainfo.setdefault("libtorrent_resume", {})
+        resume["bitfield"] = len(metainfo["info"]["pieces"]) // 20
         resume["files"] = []
-        piece_length = meta["info"]["piece length"]
+        piece_length = metainfo["info"]["piece length"]
         offset = 0
 
         for fileinfo in files:
@@ -191,4 +192,4 @@ class Clients():
             ))
             offset += fileinfo["length"]
 
-        return meta
+        return metainfo

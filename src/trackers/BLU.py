@@ -143,7 +143,7 @@ class Blu():
         response = response.json()
         for each in response['data']:
             result = [each][0]['attributes']['name']
-            print(result)
+            # print(result)
             difference = SequenceMatcher(None, meta['clean_name'], result).ratio()
             if difference >= 0.05:
                 dupes.append(result)
