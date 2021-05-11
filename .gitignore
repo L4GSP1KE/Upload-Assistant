@@ -2,3 +2,4 @@ data/config.json
 *.mkv
 .vscode/
 __pycache__/
+tmp/*

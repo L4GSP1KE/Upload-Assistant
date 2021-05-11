@@ -1138,7 +1138,7 @@ class Prep():
                     img_url = response['data']['url']
                     web_url = response['data']['url_viewer']
                 except:
-                    self.upload_screens(meta, self.screens, img_host_num + 1, screens - i)
+                    self.upload_screens(meta, screens - i , img_host_num + 1, i)
             elif img_host == "freeimage.host":
                 url = "https://freeimage.host/api/1/upload"
                 data = {
@@ -1153,7 +1153,7 @@ class Prep():
                     img_url = response['image']['url']
                     web_url = response['image']['url_viewer']
                 except:
-                    self.upload_screens(meta, self.screens, img_host_num + 1, screens - i)
+                    self.upload_screens(meta, screens - i, img_host_num + 1, i)
             elif img_host == "pstorage.space":
                 url = "https://pstorage.space/api/1/upload"
                 data = {
@@ -1166,7 +1166,7 @@ class Prep():
                     img_url = response['url']
                     web_url = response['url_viewer']
                 except:
-                    self.upload_screens(meta, self.screens, img_host_num + 1, screens - i)
+                    self.upload_screens(meta, screens - i, img_host_num + 1, i)
             elif img_host == "ptpimg":
                 # data = {
                 #     'format': 'json',
@@ -1182,15 +1182,16 @@ class Prep():
                 url = "https://ptpimg.me/upload.php"
 
                 # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
-                response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files, timeout=8).json()
+                response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
                 try:
+                    response = response.json()
                     ptpimg_code = response[0]['code'] 
                     ptpimg_ext = response[0]['ext'] 
                     img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                     web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                 except:
                     # print(traceback.format_exc())
-                    self.upload_screens(meta, self.screens, img_host_num + 1, screens - i)
+                    self.upload_screens(meta, screens - i, img_host_num + 1, i)
                     cprint("PTPimg down?", 'grey', 'on_red')
                     pass
             else:
