@@ -70,17 +70,17 @@ class Clients():
         rtorrent = xmlrpc.client.Server(client['rtorrent_url'])
         metainfo = bencode.bread(torrent_path)
         try:
-            meta = self.add_fast_resume(metainfo, path, torrent)
+            fast_resume = self.add_fast_resume(metainfo, path, torrent)
         except EnvironmentError as exc:
             cprint("Error making fast-resume data (%s)" % (exc,), 'grey', 'on_red')
             raise
         
             
-        new_meta = bencode.bencode(meta)
+        new_meta = bencode.bencode(fast_resume)
         if new_meta != metainfo:
             fr_file = torrent_path.replace('.torrent', '-resume.torrent')
             print("Creating fast resume")
-            bencode.bwrite(meta, fr_file)
+            bencode.bwrite(fast_resume, fr_file)
 
 
         isdir = os.path.isdir(path)
