@@ -96,7 +96,7 @@ class Clients():
         # print(path)
         cprint("Adding and starting torrent", 'grey', 'on_yellow')
         rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
-        print(torrent.infohash)
+        # print(torrent.infohash)
         return
 
 
