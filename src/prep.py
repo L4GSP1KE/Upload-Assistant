@@ -1310,7 +1310,10 @@ class Prep():
             try:
                 season = "S" + str(guessit(video)["season"]).zfill(2)
             except:
-                season = "S01"
+                try:
+                    season = guessit(video)['date']
+                except:
+                    season = "S01"
             try:
                 episodes = ""
                 if len(filelist) == 1:
