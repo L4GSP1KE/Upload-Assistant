@@ -34,14 +34,14 @@ Options:
 
   -st, --st               Stream Optimized Upload
 
-  -debug, -               Debug Mode
+  -debug, --debug         Debug Mode
 
   -client, --client       Override default torrent client
 
   -tk, --trackers         Override default torrent client
 
   ````
-  **CLI Usage:** `python3 uplad.py /downloads/path/to/content`
+  **CLI Usage:** `python3 upload.py /downloads/path/to/content`
 
   **Discord Bot Usage:** `python3 bot.py`
 
@@ -54,6 +54,9 @@ Options:
       - image host api keys can be obtained from their respective sites
       - discord bot token can be obtained from https://discord.com/developers/
    - Install necessary python modules `pip3 install -r requirements.txt`
-   I think thats it, probably
-   Feel free to contact me if you need help
+   
+
+   **Additional Resources are found in the [wiki](https://github.com/L4GSP1KE/Upload-Assistant/wiki)**
+   
+   Feel free to contact me if you need help, I'm not that hard to find.
 
