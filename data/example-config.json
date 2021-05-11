@@ -82,7 +82,7 @@
     "DISCORD" :{
         "discord_bot_token" : "discord bot token",
         "discord_bot_description" : "L4G's Upload Assistant",
-        "command_prefix" : ".",
+        "command_prefix" : "!",
         "discord_channel_id" : "discord channel id for use",
         "admin_id" : "your discord user id",
 
