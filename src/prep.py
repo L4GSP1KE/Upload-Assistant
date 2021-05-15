@@ -28,6 +28,7 @@ import anitopy
 import traceback
 from subprocess import Popen
 import cli_ui
+from pprint import pprint
 
 
 
@@ -642,8 +643,14 @@ class Prep():
     
     async def tmdb_other_meta(self, meta):
         if meta['tmdb'] == "0":
-            return meta
-        elif meta['category'] == "MOVIE":
+            try:
+                title = guessit(meta['path'])['title'].lower()
+                title = title.split('aka')[0]
+                meta = await self.get_tmdb_id(title, meta['search_year'], meta)
+            except:
+                print("Unable to find tmdb entry")
+                return meta
+        if meta['category'] == "MOVIE":
             movie = tmdb.Movies(meta['tmdb'])
             response = movie.info()
             meta['title'] = response['title']
@@ -655,7 +662,7 @@ class Prep():
             
             meta['aka'] = f" AKA {response['original_title']}"
             meta['keywords'] = self.get_keywords(movie)
-            meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta['title'])
+            meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response['poster_path']
             meta['overview'] = response['overview']
         elif meta['category'] == "TV":
@@ -671,7 +678,7 @@ class Prep():
             
             meta['aka'] = f" AKA {response['original_name']}"
             meta['keywords'] = self.get_keywords(tv)
-            meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta['title'])
+            meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response['poster_path']
             meta['overview'] = response['overview']
         meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
@@ -696,8 +703,12 @@ class Prep():
         else:
             return ''
 
-    def get_anime(self, response ,tmdb_name):
-        alt_name = ""
+    def get_anime(self, response ,meta):
+        tmdb_name = meta['title']
+        if meta.get('aka', "") == "":
+            alt_name = ""
+        else:
+            alt_name = meta['aka']
         anime = False
         animation = False
         for each in response['genres']:
@@ -860,7 +871,7 @@ class Prep():
             return ""
 
     def get_tag(self, video, meta):
-        if meta['anime'] == False:
+        if meta.get('anime', False) == False:
             try:
                 tag = guessit(video)['release_group']
                 tag = f"-{tag}"
