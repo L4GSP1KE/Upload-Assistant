@@ -166,7 +166,7 @@ class Commands(commands.Cog):
         files_total = await search.searchFile(args)
         files = "\n\n• ".join(files_total)
         if not files_total:
-            embed = discord.embed(description="No files found")
+            embed = discord.Embed(description="No files found")
         elif len(files_total) >= 2:
             embed = discord.Embed(title=f"File search results for: `{args}`", color=0x00ff40, description=f"```• {files}```")
             embed.add_field(name="What Now?", value=f"Please be more specific or use `{config['DISCORD']['command_prefix']}search dir` to find a directory")
@@ -210,7 +210,7 @@ class Commands(commands.Cog):
         folders_total = await search.searchFolder(args)
         folders = "\n\n• ".join(folders_total)
         if not folders_total:
-            embed = discord.embed(description="No files found")
+            embed = discord.Embed(description="No files found")
         elif len(folders_total) >= 2:
             embed = discord.Embed(title=f"Directory search results for: `{args}`", color=0x00ff40, description=f"```• {folders}```")
             embed.add_field(name="What Now?", value=f"Please be more specific or use `{config['DISCORD']['command_prefix']}search dir` to find a directory")

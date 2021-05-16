@@ -883,7 +883,7 @@ class Prep():
             tag = f"-{tag}"
         if tag == "-":
             tag = ""
-        if tag.lower() in ["nogroup"]:
+        if tag[1:].lower() in ["nogroup"]:
             tag = ""
         return tag
 
