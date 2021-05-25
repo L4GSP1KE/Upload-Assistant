@@ -25,6 +25,7 @@ from termcolor import colored, cprint
 import base64
 import time
 import anitopy
+import shutil
 import traceback
 from subprocess import Popen
 import cli_ui
@@ -1348,7 +1349,8 @@ class Prep():
             romaji, mal_id, eng_title = self.get_romaji(guessit(parsed['anime_title'])['title']) 
             meta = await self.get_tmdb_id(eng_title, meta['search_year'], meta)
             meta = await self.tmdb_other_meta(meta)
-            meta['tag'] = parsed.get('release_group', "")
+            tag = parsed.get('release_group', "")
+            meta['tag'] = f"-{tag}"
             try:
                 if len(filelist) == 1:
                     episodes = parsed['episode_number']
@@ -1505,3 +1507,18 @@ class Prep():
                         meta[key] = value.get(key)
                 # print(f"Tag: {meta['tag']} | Key: {key} | Value: {meta[key]}")
         return meta
+    
+
+    async def package(self, meta):
+        archive = f"{meta['base_dir']}/tmp/{meta['title']}"
+        shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
+        files = {
+            "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
+        try:
+            response = requests.post("https://uguu.se/upload.php", files=files).json()
+            print(response)
+            url = response['files'][0]['url']
+            return url
+        except:
+            return False
+        return 

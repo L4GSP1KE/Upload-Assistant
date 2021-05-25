@@ -55,6 +55,7 @@ class Search():
                         folders_total.append(root+'\\'+name)
                     else:
                         folders_total.append(root+'/'+name)
+        
         return folders_total
 
     async def file_search(self, name, name_words):

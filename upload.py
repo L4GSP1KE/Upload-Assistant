@@ -73,6 +73,7 @@ async def do_the_thing(path, args, base_dir):
                 dupes = await blu.search_existing(meta)
                 meta = dupe_check(dupes, meta)
                 if meta['upload'] == True:
+                    print(meta['debug'])
                     await blu.upload(meta)
                     await client.add_to_client(meta, "BLU")
         if tracker == "BHD":
@@ -82,6 +83,8 @@ async def do_the_thing(path, args, base_dir):
 
 
 def get_confirmation(meta):
+    if meta['debug'] == True:
+        cprint("DEBUG: True", 'grey', 'on_red')
     print(f"Prep material saved to {meta['base_dir']}/tmp/{meta['uuid']}")
     print()
     cli_ui.info_section(cli_ui.yellow, "Database Info")

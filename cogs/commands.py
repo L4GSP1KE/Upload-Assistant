@@ -164,6 +164,9 @@ class Commands(commands.Cog):
             await ctx.send("Missing search term(s)")
             return
         files_total = await search.searchFile(args)
+        if files_total == []:
+            await ctx.send("Nothing Found")
+            return
         files = "\n\n• ".join(files_total)
         if not files_total:
             embed = discord.Embed(description="No files found")
@@ -208,6 +211,9 @@ class Commands(commands.Cog):
             await ctx.send("Missing search term(s)")
             return
         folders_total = await search.searchFolder(args)
+        if folders_total == []:
+            await ctx.send("Nothing Found")
+            return
         folders = "\n\n• ".join(folders_total)
         if not folders_total:
             embed = discord.Embed(description="No files found")
@@ -296,6 +302,8 @@ class Commands(commands.Cog):
         await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['BHD'])
         await asyncio.sleep(0.3)
+        await message.add_reaction(config['DISCORD']['discord_emojis']['MANUAL'])
+        await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['CANCEL'])
         await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['UPLOAD'])
@@ -315,7 +323,9 @@ class Commands(commands.Cog):
                     if str(reaction.emoji) == config['DISCORD']['discord_emojis']['CANCEL']:
                         if meta['embed_msg_id']:
                             pass
-                        raise NotImplementedError
+                        raise CancelException
+                    if str(reaction.emoji) == config['DISCORD']['discord_emojis']['MANUAL']:
+                        raise ManualException
         try:
             await self.bot.wait_for("reaction_add", timeout=43200, check=check)
         except asyncio.TimeoutError:
@@ -326,12 +336,16 @@ class Commands(commands.Cog):
             except:
                 print("timeout after edit")
                 pass
-        except NotImplementedError:
+        except CancelException:
             await channel.send(f"{meta['title']} cancelled")
             return
-            # await message.delete()
-        # except commands.errors.CommandInvokeError:
-        #     return
+        except ManualException:
+            archive_url = await prep.package(meta)
+            if archive_url == False:
+                await channel.send(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}.tar`")
+            else:
+                await channel.send(f"Files can be found at {archive_url} or `tmp/{meta['title']}.tar`")
+            return
         else:
             
             #Check which are selected and upload to them
@@ -360,6 +374,7 @@ class Commands(commands.Cog):
                     await blu.upload(meta)
                     await client.add_to_client(meta, "BLU")
                     await channel.send(f"Uploaded `{meta['name']}`to BLU")
+                    return
             if "BHD" in tracker_list:
                 await channel.send("Uploading to BHD (coming soon:tm:)")
             return
@@ -389,7 +404,7 @@ class Commands(commands.Cog):
                         if str(reaction.emoji) == emojis['CANCEL']:
                             if meta['embed_msg_id']:
                                 pass
-                            raise NotImplementedError
+                            raise CancelException
 
             try:
                 await self.bot.wait_for("reaction_add", timeout=600, check=check)
@@ -399,7 +414,7 @@ class Commands(commands.Cog):
                     meta['upload'] = False
                 except:
                     return
-            except NotImplementedError:
+            except CancelException:
                 await channel.send(f"{meta['title']} cancelled")
                 meta['upload'] = False
             else:
@@ -414,3 +429,13 @@ class Commands(commands.Cog):
 
 def setup(bot):
     bot.add_cog(Commands(bot))
+
+
+
+
+
+class CancelException(Exception):
+    pass
+
+class ManualException(Exception):
+    pass
