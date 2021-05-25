@@ -64,6 +64,7 @@ class Blu():
         }
         url = f"https://blutopia.xyz/api/torrents/upload?api_token={self.config['DEFAULT']['blu_api']}"
         
+        print(meta['debug'])
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
             open_torrent.close()
@@ -114,6 +115,7 @@ class Blu():
             '480p': '8', 
             '480i': '9'
             }.get(resolution, '10')
+        return resolution_id
 
 
 
@@ -128,7 +130,6 @@ class Blu():
         
     async def inflate_ego(self, meta):
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a') as desc:
-            desc.write("\n")
             desc.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
 
