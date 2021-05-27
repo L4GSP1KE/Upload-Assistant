@@ -648,8 +648,10 @@ class Prep():
                 title = guessit(meta['path'])['title'].lower()
                 title = title.split('aka')[0]
                 meta = await self.get_tmdb_id(title, meta['search_year'], meta)
+                if meta['tmdb'] == "0":
+                    meta = await self.get_tmdb_id(title, "", meta)
             except:
-                print("Unable to find tmdb entry")
+                cprint("Unable to find tmdb entry", 'grey', 'on_red')
                 return meta
         if meta['category'] == "MOVIE":
             movie = tmdb.Movies(meta['tmdb'])
