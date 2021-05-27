@@ -73,7 +73,6 @@ async def do_the_thing(path, args, base_dir):
                 dupes = await blu.search_existing(meta)
                 meta = dupe_check(dupes, meta)
                 if meta['upload'] == True:
-                    print(meta['debug'])
                     await blu.upload(meta)
                     await client.add_to_client(meta, "BLU")
         if tracker == "BHD":

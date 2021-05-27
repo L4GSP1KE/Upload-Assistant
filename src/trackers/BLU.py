@@ -64,7 +64,6 @@ class Blu():
         }
         url = f"https://blutopia.xyz/api/torrents/upload?api_token={self.config['DEFAULT']['blu_api']}"
         
-        print(meta['debug'])
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
             open_torrent.close()
