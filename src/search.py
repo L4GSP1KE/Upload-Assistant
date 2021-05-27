@@ -22,14 +22,15 @@ class Search():
         words = filename.split()
         for root, dirs, files in os.walk(self.config['DISCORD']['search_dir'], topdown=False):
             for name in files:
-                l_name = name.lower()
-                os_info = platform.platform()
-                if await self.file_search(l_name, words):
-                    file_found = True
-                    if('Windows' in os_info):
-                        files_total.append(root+'\\'+name)
-                    else:
-                        files_total.append(root+'/'+name)
+                if not name.endswith('.nfo'):
+                    l_name = name.lower()
+                    os_info = platform.platform()
+                    if await self.file_search(l_name, words):
+                        file_found = True
+                        if('Windows' in os_info):
+                            files_total.append(root+'\\'+name)
+                        else:
+                            files_total.append(root+'/'+name)
         return files_total
 
     async def searchFolder(self, foldername):
