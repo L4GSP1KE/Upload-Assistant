@@ -101,17 +101,14 @@ class Clients():
 
 
     async def qbittorrent(self, path, torrent, local_path, remote_path, client, tracker):
-        # isdir = os.path.isdir(path)
+        isdir = os.path.isdir(path)
         # infohash = torrent.infohash
         #Remote path mount
         if local_path in path:
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
-        # if isdir == False:
-        # # else:
-        path = os.path.dirname(path)
-        # cprint(path, 'yellow')
-
+        if isdir == False:
+            path = os.path.dirname(path)
         qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'])
         cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
         try:
