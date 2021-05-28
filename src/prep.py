@@ -874,16 +874,11 @@ class Prep():
             return ""
 
     def get_tag(self, video, meta):
-        if meta.get('anime', False) == False:
-            try:
-                tag = guessit(video)['release_group']
-                tag = f"-{tag}"
-            except:
-                tag = ""
-        else:
-            parsed = anitopy.parse(Path(video).name)
-            tag = parsed.get('release_group', "")
+        try:
+            tag = guessit(video)['release_group']
             tag = f"-{tag}"
+        except:
+            tag = ""
         if tag == "-":
             tag = ""
         if tag[1:].lower() in ["nogroup"]:
