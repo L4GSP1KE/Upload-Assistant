@@ -1352,7 +1352,8 @@ class Prep():
             meta = await self.get_tmdb_id(eng_title, meta['search_year'], meta)
             meta = await self.tmdb_other_meta(meta)
             tag = parsed.get('release_group', "")
-            meta['tag'] = f"-{tag}"
+            if tag != "":
+                meta['tag'] = f"-{tag}"
             try:
                 if len(filelist) == 1:
                     episodes = parsed['episode_number']
