@@ -1363,6 +1363,8 @@ class Prep():
                             episode += f"E{ep}"
                     else:
                         episode = f"E{episodes.zfill(2)}"
+                else:
+                    episode = ""
             except:
                 episode = ""
             try:
