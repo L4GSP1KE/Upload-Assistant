@@ -91,6 +91,7 @@
         "discord_emojis" : {
                 "BLU": "💙",
                 "BHD": "🎉",
+                "MANUAL" : "📩",
                 "UPLOAD" : "✅",
                 "CANCEL" : "🚫"
         }
