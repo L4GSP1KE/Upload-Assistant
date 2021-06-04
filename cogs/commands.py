@@ -57,7 +57,7 @@ class Commands(commands.Cog):
             meta['path'] = path
             meta, help = parser.parse(args, meta)
             # await ctx.message.delete()
-            prep = Prep(path=path, screens=meta['screens'], config=config)
+            prep = Prep(path=path, screens=meta['screens'], img_host=meta['img_host'], config=config)
             await ctx.send(f"Preparing to upload: `{path}`")
             meta = await prep.gather_prep(meta=meta)
             # await ctx.send(file=discord.File(f"{base_dir}/tmp/{folder_id}/Mediainfo.json"))
@@ -140,7 +140,7 @@ class Commands(commands.Cog):
         except FileNotFoundError:
             await ctx.send("ID not found, please try again using the ID in the footer")
             return
-        prep = Prep(path=Path(meta['path']), screens=meta['screens'], config=config) 
+        prep = Prep(path=Path(meta['path']), screens=meta['screens'], img_host=meta['img_host'], config=config) 
         meta, help = parser.parse(args, meta)
         msg = await ctx.fetch_message(meta['embed_msg_id'])
         await msg.delete()
@@ -253,7 +253,7 @@ class Commands(commands.Cog):
     
     
     async def send_embed_and_upload(self,ctx,meta):
-        prep = Prep(path=Path(meta['path']), screens=meta['screens'], config=config)
+        prep = Prep(path=Path(meta['path']), screens=meta['screens'], img_host=meta['img_host'], config=config)
         meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
         #Upload Screens
         # await prep.upload_screens(meta, meta['screens'], 1, i=1)

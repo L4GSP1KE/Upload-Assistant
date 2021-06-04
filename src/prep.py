@@ -44,11 +44,11 @@ class Prep():
         Database Identifiers (TMDB/IMDB/MAL/etc)
         Create Name
     """
-    def __init__(self, path, screens, config):
+    def __init__(self, path, screens, img_host, config):
         self.path = path
         self.screens = screens
         self.config = config
-        self.img_host = config['DEFAULT']['img_host_1']
+        self.img_host = img_host
         tmdb.API_KEY = config['DEFAULT']['tmdb_api']
 
 

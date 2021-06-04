@@ -32,6 +32,7 @@ class Args():
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
         parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str)
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
+        parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'freeimage.host', 'pstorage'])
         # parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
         # parser.add_argument('-hb', '--desclink', nargs='*', required=False, help="Custom Description (link to hastebin)")
         parser.add_argument('-nfo', '--nfo', action='store_true', required=False, help="Use .nfo in directory for description")
