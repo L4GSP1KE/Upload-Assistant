@@ -1137,6 +1137,7 @@ class Prep():
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
         if img_host != self.img_host:
             img_host = self.img_host
+            i -= 1
            
         description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
         description.write('[center]')
