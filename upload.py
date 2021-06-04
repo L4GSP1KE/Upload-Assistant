@@ -11,6 +11,7 @@ import asyncio
 import os
 import sys
 import multiprocessing
+import logging
 from glob import glob
 import cli_ui
 from pprint import pprint
@@ -42,6 +43,7 @@ async def do_the_thing(path, args, base_dir):
     if os.path.exists(path):
             meta['path'] = path
             meta, help = parser.parse(args, meta)
+    
     prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
     meta = await prep.gather_prep(meta=meta) 
     meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)

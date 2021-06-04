@@ -27,6 +27,7 @@ import time
 import anitopy
 import shutil
 import traceback
+import logging
 from subprocess import Popen
 import cli_ui
 from pprint import pprint
@@ -62,6 +63,8 @@ class Prep():
         if not os.path.exists(f"{base_dir}/tmp/{folder_id}"):
             Path(f"{base_dir}/tmp/{folder_id}").mkdir(parents=True, exist_ok=True)
 
+        if meta['debug']:
+            cprint(f"ID: {meta['uuid']}", 'cyan')
 
         is_disc, videoloc, bdinfo, bd_summary = await self.get_disc(self.path, folder_id, base_dir)
         

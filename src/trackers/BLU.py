@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-import discord
-import asyncio
+# import discord
+# import asyncio
 from click import decorators
 from torf import Torrent
 import requests
 from difflib import SequenceMatcher
 from termcolor import cprint
 import urllib
+from pprint import pprint
 
 # from pprint import pprint
 
@@ -76,7 +77,9 @@ class Blu():
                 # pprint(data)
                 print(response.json())
                 return 
-        
+        else:
+            cprint(f"Request Data:", 'cyan')
+            pprint(data)
 
 
 

@@ -41,11 +41,11 @@ class Clients():
         elif torrent_client == "qbit":
         # if is_disk != "":
         #     path = os.path.dirname(path)
-            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client, tracker)
+            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client, tracker, meta)
         elif torrent_client == "deluge":
             if meta['type'] == "DISC":
                 path = os.path.dirname(meta['path'])
-            self.deluge(meta['path'], torrent_path, torrent, local_path, remote_path, client)
+            self.deluge(meta['path'], torrent_path, torrent, local_path, remote_path, client, meta)
         pass
         
    
@@ -97,10 +97,12 @@ class Clients():
         cprint("Adding and starting torrent", 'grey', 'on_yellow')
         rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
         # print(torrent.infohash)
+        if meta['debug']:
+            cprint(f"Path: {path}", 'cyan')
         return
 
 
-    async def qbittorrent(self, path, torrent, local_path, remote_path, client, tracker):
+    async def qbittorrent(self, path, torrent, local_path, remote_path, client, tracker, meta):
         isdir = os.path.isdir(path)
         # infohash = torrent.infohash
         #Remote path mount
@@ -118,6 +120,8 @@ class Clients():
             exit()
         qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True, tags=tracker)
         qbt_client.torrents_resume(torrent.infohash)
+        if meta['debug']:
+            cprint(f"Path: {path}", 'cyan')
         # qbt_client.torrents_recheck(torrent_hashes=infohash)
         # cprint("Rechecking File", 'grey', 'on_yellow')
         # while qbt_client.torrents_info(torrent_hashes=infohash)[0]['completed'] == 0:
@@ -125,7 +129,7 @@ class Clients():
         # qbt_client.torrents_resume(torrent_hashes=infohash)
 
 
-    def deluge(self, path, torrent_path, torrent, local_path, remote_path, client):
+    def deluge(self, path, torrent_path, torrent, local_path, remote_path, client, meta):
         client = DelugeRPCClient(client['deluge_url'], int(client['deluge_port']), client['deluge_user'], client['deluge_pass'])
         # client = LocalDelugeRPCClient()
         client.connect()
@@ -141,7 +145,8 @@ class Clients():
                 path = os.path.dirname(path)
 
             client.call('core.add_torrent_file', torrent_path, base64.b64encode(torrent.dump()), {'download_location' : path, 'seed_mode' : True})
-
+            if meta['debug']:
+                cprint(f"Path: {path}", 'cyan')
         else:
             cprint("Unable to connect to deluge", 'grey', 'on_red')
 

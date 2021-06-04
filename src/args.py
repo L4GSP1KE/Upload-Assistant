@@ -3,6 +3,7 @@ import argparse
 import click
 from pprint import pprint
 import time
+from termcolor import cprint
 
 
 class Args():
@@ -67,7 +68,6 @@ class Args():
             # if key == 'help' and value == True:
             #     parser.print_help()
         help = parser
-        # pprint(meta)
         return meta, help
 
 
