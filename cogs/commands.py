@@ -377,7 +377,7 @@ class Commands(commands.Cog):
                     return
             if "BHD" in tracker_list:
                 await channel.send("Uploading to BHD (coming soon:tm:)")
-            return
+            return None
     
     
     
