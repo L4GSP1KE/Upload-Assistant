@@ -43,7 +43,7 @@ class Args():
         parser.add_argument('-st', '--stream', action='store_true', required=False, help="Stream Optimized Upload")
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode")
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Override default torrent client")
-        parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Override default torrent client")
+        parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
         
         args = parser.parse_args(input)
         args = vars(args)
