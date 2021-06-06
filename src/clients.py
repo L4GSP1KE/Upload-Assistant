@@ -10,6 +10,7 @@ import base64
 from pyrobase.parts import Bunch
 import errno
 import asyncio
+import shutil
 
 from termcolor import cprint
 
@@ -48,6 +49,8 @@ class Clients():
             if meta['type'] == "DISC":
                 path = os.path.dirname(meta['path'])
             self.deluge(meta['path'], torrent_path, torrent, local_path, remote_path, client, meta)
+        elif torrent_client.lower() == "watch":
+            shutil.copy(torrent_path, client['watch_folder'])
         pass
    
         

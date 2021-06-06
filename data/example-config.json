@@ -69,6 +69,10 @@
             "local_path" : "/LocalPath",
             "remote_path" : "/RemotePath"
         },
+        "watch_sample" : {
+            "torrent_client" : "watch",
+            "watch_folder" : "/Path/To/Watch/Folder"
+        },
 
         "placeholder" : "This is placeholder text, just leave it here"
 
