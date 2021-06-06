@@ -73,9 +73,9 @@ class Blu():
                 print(response.json())
                 return 
             except:
-                print("It may have uploaded, go check")
-                # pprint(data)
-                print(response.json())
+                cprint("It may have uploaded, go check")
+                cprint(f"Request Data:", 'cyan')
+                pprint(data)
                 return 
         else:
             cprint(f"Request Data:", 'cyan')
