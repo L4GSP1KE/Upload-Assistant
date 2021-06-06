@@ -170,10 +170,11 @@ class Prep():
         
         
         #WORK ON THIS
-        if meta.get('stream', False) == False:
-            meta['stream'] = self.stream_optimized(meta['stream'])
-        if meta.get('anon', False) == False:
-            meta['anon'] = self.is_anon(meta['anon'])
+        meta.get('stream', False) == False
+        meta['stream'] = self.stream_optimized(meta['stream'])
+        meta.get('anon', False) == False
+        meta['anon'] = self.is_anon(meta['anon'])
+            
         
         
         await self.gen_desc(meta, bd_summary)
