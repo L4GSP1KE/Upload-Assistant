@@ -43,7 +43,8 @@ async def do_the_thing(path, args, base_dir):
     if os.path.exists(path):
             meta['path'] = path
             meta, help = parser.parse(args, meta)
-    
+    if meta['imghost'] == None:
+        meta['imghost'] = config['DEFAULT']['img_host_1']
     prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
     meta = await prep.gather_prep(meta=meta) 
     meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)

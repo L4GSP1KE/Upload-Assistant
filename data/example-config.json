@@ -12,6 +12,7 @@
         "img_host_3": "ptpimg",
         "img_host_4": "pstorage",
 
+        "anon" : "False",
         "screens" : "6",
 
 

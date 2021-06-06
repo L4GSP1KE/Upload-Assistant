@@ -33,21 +33,22 @@ class Clients():
             default_torrent_client = meta['client']
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_client = client['torrent_client']
+        if torrent_client.lower() == "none":
+            return
         local_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['local_path']
         remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['remote_path']
 
-        if torrent_client == "rtorrent":
+        if torrent_client.lower() == "rtorrent":
             self.rtorrent(meta['path'], torrent_path, torrent, meta, local_path, remote_path, client)
         elif torrent_client == "qbit":
         # if is_disk != "":
         #     path = os.path.dirname(path)
             await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client, tracker, meta)
-        elif torrent_client == "deluge":
+        elif torrent_client.lower() == "deluge":
             if meta['type'] == "DISC":
                 path = os.path.dirname(meta['path'])
             self.deluge(meta['path'], torrent_path, torrent, local_path, remote_path, client, meta)
         pass
-        
    
         
 

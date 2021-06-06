@@ -170,9 +170,9 @@ class Prep():
         
         
         #WORK ON THIS
-        meta.get('stream', False) == False
+        meta.get('stream', False)
         meta['stream'] = self.stream_optimized(meta['stream'])
-        meta.get('anon', False) == False
+        meta.get('anon', False)
         meta['anon'] = self.is_anon(meta['anon'])
             
         
@@ -1437,12 +1437,16 @@ class Prep():
             stream = 0
         return stream
 
-    def is_anon(self, anon):
-        if anon == True:
-            anon = 1
+    def is_anon(self, anon_in):
+        anon = self.config['DEFAULT']['anon']
+        if anon.lower() == "true":
+            anon_in = True
+        if anon_in == True:
+            anon_out = 1
         else:
-            anon = 0
-        return anon
+            anon_out = 0
+        cprint(anon_out, 'magenta')
+        return anon_out
 
     async def upload_image(self, session, url, data, headers, files):
         if headers == None and files == None:
