@@ -1445,7 +1445,6 @@ class Prep():
             anon_out = 1
         else:
             anon_out = 0
-        cprint(anon_out, 'magenta')
         return anon_out
 
     async def upload_image(self, session, url, data, headers, files):
