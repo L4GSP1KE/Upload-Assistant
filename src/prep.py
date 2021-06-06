@@ -1387,7 +1387,8 @@ class Prep():
                     url = "http://thexem.de/map/single"
                     response = requests.post(url, data=data).json()
                     season = f"S{str(response['data']['anidb']['season']).zfill(2)}"
-                    episode = f"E{str(response['data']['anidb']['episode']).zfill(2)}"
+                    if len(filelist) == 1:
+                        episode = f"E{str(response['data']['anidb']['episode']).zfill(2)}"
                 except:
                     # print(f"{meta['title']} does not exist on thexem")
                     season = "S01"
@@ -1398,7 +1399,6 @@ class Prep():
                 version = ""
             episode = episode + version
 
-        
         meta['season'] = season
         meta['episode'] = episode
         return meta
