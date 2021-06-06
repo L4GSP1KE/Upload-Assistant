@@ -243,7 +243,8 @@ class Commands(commands.Cog):
                 await channel.send(f"Search: `{args}`timed out")
             else:
                 await self.upload(ctx, folders_total[0])
-        await ctx.send(folders_total)
+        # await ctx.send(folders_total)
+        return
     
     
     
