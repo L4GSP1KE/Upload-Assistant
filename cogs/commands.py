@@ -56,6 +56,8 @@ class Commands(commands.Cog):
         if os.path.exists(path):
             meta['path'] = path
             meta, help = parser.parse(args, meta)
+            if meta['imghost'] == None:
+                meta['imghost'] = config['DEFAULT']['img_host_1']
             # await ctx.message.delete()
             prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
             await ctx.send(f"Preparing to upload: `{path}`")
