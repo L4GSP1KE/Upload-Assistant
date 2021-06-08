@@ -1358,7 +1358,8 @@ class Prep():
             parsed = anitopy.parse(Path(video).name)
             romaji, mal_id, eng_title, seasonYear = self.get_romaji(guessit(parsed['anime_title'])['title'])
             if meta.get('tmdb_manual', None) == None:
-                meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], str(seasonYear), meta)
+                year = parsed.get('anime_year', str(seasonYear))
+                meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta)
             meta = await self.tmdb_other_meta(meta)
             tag = parsed.get('release_group', "")
             if tag != "":
