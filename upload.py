@@ -98,6 +98,11 @@ def get_confirmation(meta):
     cli_ui.info(f"IMDb: {meta['imdb_id']}")
     cli_ui.info(f"TVDb: {meta['tvdb_id']}")
     print()
+    if meta['tag'] == "":
+            tag = ""
+    else:
+        tag = f" / {meta['tag'][1:]}"
+    cli_ui.info(f"{meta['resolution']} / {meta['type']}{tag}")
     print()
     cli_ui.info_section(cli_ui.yellow, "Is this correct?")
     cli_ui.info(f"Name: {meta['name']}")
