@@ -736,6 +736,8 @@ class Prep():
         return mal_id, alt_name, anime
 
     def get_romaji(self, tmdb_name):
+        tmdb_name = tmdb_name.replace('-', "")
+        tmdb_name = ' '.join(tmdb_name.split())
         query = '''
             query ($search: String) { 
                 Media (search: $search, type: ANIME) { 
@@ -757,7 +759,6 @@ class Prep():
         }
 
         url = 'https://graphql.anilist.co'
-
         # Make the HTTP Api request
         response = requests.post(url, json={'query': query, 'variables': variables})
         json = response.json()
