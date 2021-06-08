@@ -641,7 +641,7 @@ class Prep():
             if meta['category'] == "MOVIE":
                 search.movie(query=filename, year=search_year)
             elif meta['category'] == "TV":
-                search.tv(query=filename, year=search_year)
+                search.tv(query=filename, first_air_date_year=search_year)
             meta['tmdb'] = search.results[0]['id']
         
         except:
@@ -671,7 +671,8 @@ class Prep():
             
             meta['aka'] = f" AKA {response['original_title']}"
             meta['keywords'] = self.get_keywords(movie)
-            meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
+            if meta.get('anime', False) == False:
+                meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response['poster_path']
             meta['overview'] = response['overview']
         elif meta['category'] == "TV":
@@ -724,11 +725,12 @@ class Prep():
             if each['id'] == 16:
                 animation = True
         if response['original_language'] == 'ja' and animation == True:
-            romaji, mal_id, eng_title = self.get_romaji(tmdb_name)
+            romaji, mal_id, eng_title, season_year = self.get_romaji(tmdb_name)
+            alt_name = f" AKA {romaji}"
+            
             anime = True
             # mal = AnimeSearch(romaji)
             # mal_id = mal.results[0].mal_id
-            alt_name = f" AKA {romaji}"
         else:
             mal_id = 0
         return mal_id, alt_name, anime
@@ -744,6 +746,7 @@ class Prep():
                         english
                         native
                     }
+                    seasonYear
                 }
             }
         '''
@@ -761,7 +764,8 @@ class Prep():
         romaji = json['data']['Media']['title']['romaji']
         mal_id = json['data']['Media']['idMal']
         eng_title = json['data']['Media']['title']['english']
-        return romaji, mal_id, eng_title
+        season_year = json['data']['Media']['seasonYear']
+        return romaji, mal_id, eng_title, season_year
 
 
 
@@ -1352,9 +1356,9 @@ class Prep():
                 episode = ""
         else:
             parsed = anitopy.parse(Path(video).name)
-            romaji, mal_id, eng_title = self.get_romaji(guessit(parsed['anime_title'])['title'])
+            romaji, mal_id, eng_title, seasonYear = self.get_romaji(guessit(parsed['anime_title'])['title'])
             if meta.get('tmdb_manual', None) == None:
-                meta = await self.get_tmdb_id(eng_title, meta['search_year'], meta)
+                meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], str(seasonYear), meta)
             meta = await self.tmdb_other_meta(meta)
             tag = parsed.get('release_group', "")
             if tag != "":
