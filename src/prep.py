@@ -154,7 +154,7 @@ class Prep():
         meta['video'] = video
         meta['audio'] = self.get_audio_v2(mi, meta['anime'], bdinfo)
         meta['3D'] = self.is_3d(mi, bdinfo)
-        meta['source'], meta['type'] = self.get_source(meta['type'], video)
+        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'])
         if meta.get('service', None) == None:
             meta['service'] = self.get_service(video)
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
@@ -902,12 +902,15 @@ class Prep():
         return tag
 
 
-    def get_source(self, type, video):
+    def get_source(self, type, video, path):
         try:
             try:
                 source = guessit(video)['source']
             except:
-                source = ""
+                try:
+                    source = guessit(path['source'])
+                except:
+                    source = "BluRay"
             
             if source in ("Blu-ray", "Ultra HD Blu-ray", "BluRay", "BR"):
                 if type == "DISC":
