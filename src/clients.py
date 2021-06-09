@@ -32,10 +32,13 @@ class Clients():
             default_torrent_client = self.config['DEFAULT']['default_torrent_client']
         else:
             default_torrent_client = meta['client']
+        if meta.get('client', None).lower() == 'none':
+            return
+        if self.config['TORRENT_CLIENTS'][default_torrent_client].lower() == "none":
+            return 
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_client = client['torrent_client']
-        if torrent_client.lower() == "none":
-            return
+        
         local_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['local_path']
         remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['remote_path']
 
