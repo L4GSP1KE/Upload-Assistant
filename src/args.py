@@ -42,6 +42,7 @@ class Args():
         parser.add_argument('-a', '--anon', action='store_true', required=False, help="Upload anonymously")
         parser.add_argument('-st', '--stream', action='store_true', required=False, help="Stream Optimized Upload")
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode")
+        parser.add_argument('-nh', '--nohash', action='store_true', required=False, help="Don't hash .torrent")
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Override default torrent client")
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
         
