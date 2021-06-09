@@ -166,7 +166,7 @@ class Prep():
             meta['video_codec'] = mi['media']['track'][1]['Format']
             meta['video_encode'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
-            meta['edition'] = self.get_edition(guessit(self.path), video, bdinfo)
+            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), video, bdinfo)
 
         
         
@@ -254,6 +254,7 @@ class Prep():
                 with open(bdinfo_text, 'r') as f:
                     text = f.read()
                     result = text.split("QUICK SUMMARY:", 2)
+                    files = result[0].split("FILES:", 2)[1].split("CHAPTERS:", 2)[0].split("-------------")
                     result2 = result[1].rstrip("\n")
                     result = result2.split("********************", 1)
                     bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
@@ -266,15 +267,16 @@ class Prep():
         with open(f"{save_dir}/BDINFO.txt", 'w') as f:
             f.write(bd_summary)
             f.close()
-        bdinfo = self.parse_bdinfo(bd_summary)
+        bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
         # shutil.rmtree(f"{base_dir}/tmp")
         return bd_summary, bdinfo
             
 
-    def parse_bdinfo(self, bdinfo_input):
+    def parse_bdinfo(self, bdinfo_input, files, path):
         bdinfo = dict()
         bdinfo['video'] = list()
         bdinfo['audio'] = list()
+        bdinfo['path'] = path
         lines = bdinfo_input.splitlines()
         for l in lines:
             line = l.strip().lower()
@@ -347,6 +349,22 @@ class Prep():
                 label = l.split(':', 1)[1]
                 bdinfo['label'] = label
         # pprint(bdinfo)
+        files = files.splitlines()
+        bdinfo['files'] = []
+        for line in files:
+            try:
+                stripped = line.split()
+                m2ts = {}
+                bd_file = stripped[0]
+                time_in = stripped[1]
+                bd_length = stripped[2]
+                bd_size = stripped[3]
+                bd_bitrate = stripped[4]
+                m2ts['file'] = bd_file
+                m2ts['length'] = bd_length
+                bdinfo['files'].append(m2ts)
+            except:
+                pass
         return bdinfo
 
 
@@ -523,25 +541,36 @@ class Prep():
 
     def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir):
         cprint("Saving Screens...", "grey", "on_yellow")
-        length = bdinfo['length']
-        length = secs = sum(int(x) * 60 ** i for i, x in enumerate(reversed(length.split(':'))))
+        #Get longest m2ts
+        length = 0 
+        for each in bdinfo['files']:
+            int_length = sum(int(float(x)) * 60 ** i for i, x in enumerate(reversed(each['length'].split(':'))))
+            if int_length > length:
+                length = int_length
+                for root, dirs, files in os.walk(bdinfo['path']):
+                    for name in files:
+                        if name.lower() == each['file'].lower():
+                            file = f"{root}/{name}"
+                            
+        
+        # length = sum(int(x) * 60 ** i for i, x in enumerate(reversed(length.split(':'))))
         # for i in range(screens):
         # pprint(bdinfo)
         if "VC-1" in bdinfo['video'][0]['codec']:
-            is_vc1 = 'nokey'
+            keyframe = 'nokey'
             # print("VC-1")
         else:
-            is_vc1 = 'none'
+            keyframe = 'none'
             
         i = 0
         while i != self.screens:
             image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
             (
                 ffmpeg
-                .input(f"bluray:{path}", ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=is_vc1)
+                .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
                 .output(image, vframes=1)
                 .overwrite_output()
-                .global_args('-loglevel', 'quiet', "-playlist", f"{bdinfo['playlist']}", )
+                .global_args('-loglevel', 'quiet')
                 .run(quiet=True)
             )
             # print(os.path.getsize(image))
@@ -1066,6 +1095,7 @@ class Prep():
 
 
     def get_edition(self, guess, video, bdinfo):
+        repack = ""
         if bdinfo != None:
             try:
                 edition = guessit(bdinfo['label'])['edition']
@@ -1079,9 +1109,11 @@ class Prep():
         if "open matte" in video.replace('.', ' ').lower():
             edition = edition + "Open Matte"
         if "REPACK" in video:
-            edition = edition + " REPACK "
+            edition = ""
+            repack = "REPACK"
         if "PROPER" in video:
-            edition = edition + " PROPER "
+            edition = ""
+            repack = "PROPER"
         
         bad = ['internal', 'limited', 'retail']
 
@@ -1095,7 +1127,7 @@ class Prep():
         #     edition = edition + " 3D "
         # if edition == None or edition == None:
         #     edition = ""
-        return edition
+        return edition, repack
 
 
 
@@ -1262,7 +1294,7 @@ class Prep():
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
-
+        repack = meta.get('repack', "")
         three_d = meta.get('3D', "")
         tag = meta.get('tag', "")
         source = meta.get('source', "")
@@ -1283,47 +1315,47 @@ class Prep():
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
             if type == "DISC": #Disk
-                name = f"{title} {alt_title} {year} {three_d} {resolution} {edition} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                name = f"{title} {alt_title} {year} {three_d} {repack} {resolution} {edition} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                 convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} {alt_title} {year} {three_d} {resolution} {edition} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
+                name = f"{title} {alt_title} {year} {three_d} {repack} {resolution} {edition} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
                 convention = "Name Year Resolution Source Video-codec Audio-Tag"
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {alt_title} {year} {source} REMUX  {audio}" 
+                name = f"{title} {alt_title} {year} {repack} {source} REMUX  {audio}" 
                 convention = "Name Year Encoding_system Format Source Audio-Tag"
             elif type == "ENCODE": #Encode
-                name = f"{title} {alt_title} {year} {resolution} {edition} {uhd} {source} {audio} {hdr} {video_encode}"  
+                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} {uhd} {source} {audio} {hdr} {video_encode}"  
                 convention = "Name Year Resolution Source Audio Video-Tag"
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {alt_title} {year} {resolution} {edition} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {alt_title} {year} {resolution} {edition} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
             elif type == "HDTV": #HDTV
-                name = f"{title} {alt_title} {year} {resolution} {edition} HDTV {audio} {video_encode}"
+                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} HDTV {audio} {video_encode}"
                 convention = "Name Year Resolution Source Audio Video-Tag"
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
-                name = f"{title} {alt_title} {season}{episode} {three_d} {resolution} {edition} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                name = f"{title} {alt_title} {season}{episode} {three_d} {repack} {resolution} {edition} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                 convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} {alt_title} {season}{episode} {three_d} {resolution} {edition} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {alt_title} {season}{episode} {three_d} {repack} {resolution} {edition} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 convention = "Name Year Resolution Source Video-codec Audio-Tag"
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {alt_title} {season}{episode} {source} REMUX {audio}" #SOURCE
+                name = f"{title} {alt_title} {season}{episode} {repack} {source} REMUX {audio}" #SOURCE
                 convention = "Name Year Encoding_system Format Source Audio-Tag"
             elif type == "ENCODE": #Encode
-                name = f"{title} {alt_title} {season}{episode} {resolution} {edition} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
+                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
                 convention = "Name Year Resolution Source Audio Video-Tag"
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {alt_title} {season}{episode} {resolution} {edition} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {alt_title} {season}{episode} {resolution} {edition} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
             elif type == "HDTV": #HDTV
-                name = f"{title} {alt_title} {season}{episode} {resolution} {edition} HDTV {audio} {video_encode}"
+                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} HDTV {audio} {video_encode}"
                 convention = "Name Year Resolution Source Audio Video-Tag"
 
 

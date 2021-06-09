@@ -54,7 +54,8 @@ async def do_the_thing(path, args, base_dir):
         meta['uploaded_screens'] = True
 
     if len(glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) == 0:
-        prep.create_torrent(meta, Path(meta['path']))
+        if meta['nohash'] == False:
+            prep.create_torrent(meta, Path(meta['path']))
            
 
     confirm = get_confirmation(meta)
