@@ -651,9 +651,6 @@ class Prep():
         return meta
     
     async def tmdb_other_meta(self, meta):
-        if meta['debug']:
-            cprint("tmdb_other_meta:", 'cyan')
-            pprint(meta)
         if meta['tmdb'] == "0":
             try:
                 title = guessit(meta['path'])['title'].lower()
@@ -1279,6 +1276,9 @@ class Prep():
             video_encode = meta.get('video_encode', "")
         edition = meta.get('edition', "")
 
+        if meta['debug']:
+            cprint("get_name meta:", 'cyan')
+            pprint(meta)
 
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
