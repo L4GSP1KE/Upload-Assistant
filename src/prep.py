@@ -135,7 +135,9 @@ class Prep():
         if meta.get('type', None) == None:
             meta['type'] = self.get_type(video, scene, is_disc)
         if meta.get('category', None) == None:
-            meta['category'] = self.get_cat(video) 
+            meta['category'] = self.get_cat(video)
+        else:
+            meta['category'] = meta['category'].upper()
 
         
         if meta.get('tmdb', None) == None:
@@ -649,6 +651,9 @@ class Prep():
         return meta
     
     async def tmdb_other_meta(self, meta):
+        if meta['debug']:
+            cprint("tmdb_other_meta:", 'cyan')
+            pprint(meta)
         if meta['tmdb'] == "0":
             try:
                 title = guessit(meta['path'])['title'].lower()
