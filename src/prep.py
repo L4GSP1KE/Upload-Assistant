@@ -452,56 +452,32 @@ class Prep():
             height = self.closest(height_list, int(height))
             res = f"{width}x{height}{scan}"
             resolution = self.mi_resolution(res, guess)
-
         return resolution
 
     def closest(self, lst, K):
         return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
 
-    def mi_resolution(self, resolution, guess):
-        if resolution in ("2160p", "3840x2160p"):
-            # resolution_id = 1
-            resolution = "2160p"
-        elif resolution in ("1080p", "1920x1080p"):
-            # resolution_id = 2
-            resolution = "1080p"
-        elif resolution in ("1080i" ,  "1920x1080i"):
-            # resolution_id = 3
-            resolution = "1080i"
-        elif resolution in ("720p" ,  "1280x720p"):
-            # resolution_id = 5
-            resolution = "720p"
-        elif resolution in ("576p" ,  "720x576p"):
-            # resolution_id = 6
-            resolution = "576p"
-        elif resolution in ("576i" ,  "720x576i"):
-            # resolution_id = 7
-            resolution = "576i"
-        elif resolution in ("480p" ,  "720x480p"):
-            # resolution_id = 8
-            resolution = "480p"
-        elif resolution in ("480i" ,  "720x480p"):
-            # resolution_id = 9
-            resolution = "480i"
-        elif resolution in ("8640p" ,  "15360x8640p"):
-            # resolution_id = 10
-            resolution = "8640p"
-        elif resolution in ("4320p" ,  "7680x4320p"):
-            # resolution_id = 11
-            resolution = "4320p"
-        elif resolution == "OTHER":
-            # resolution_id = 10
-            resolution = "OTHER"
-        else:
-            # try: 
+    def mi_resolution(self, res, guess):
+        res_map = {
+            "3840x2160p" : "2160p", "2160p" : "2160p",
+            "1920x1080p" : "1080p", "1080p" : "1080p",
+            "1920x1080i" : "1080i", "1080i" : "1080i", 
+            "1280x720p" : "720p", "720p" : "720p",
+            "720x576p" : "576p", "576p" : "576p",
+            "720x576i" : "576i", "576i" : "576i",
+            "720x480p" :  "480p", "480p" : "480p",
+            "720x480i" : "480i", "480i" : "480i",
+            "15360x8640p" : "8640p", "8640p" : "8640p",
+            "7680x4320p" : "4320p", "4320p" : "4320p",
+            "OTHER" : "OTHER"}
+        resolution = res_map.get(res, None)
+        if resolution == None:     
             resolution = guess['screen_size']
-            resolution= self.mi_resolution(resolution, guess)
-            # except:
-            #     resolution = click.prompt('Unable to parse resolution. Please select one:', type=click.Choice(['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'OTHER'], case_sensitive=False))
-            #     resolution, sd = mi_resolution(resolution, guess)
-        #is sd
-               
+            resolution = self.mi_resolution(resolution, guess)
+        
         return resolution
+           
+               
 
     def is_sd(self, resolution):
         if resolution in ("OTHER", "480i", "480p", "576i", "576p"):
