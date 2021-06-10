@@ -66,10 +66,10 @@ class Prep():
         if meta['debug']:
             cprint(f"ID: {meta['uuid']}", 'cyan')
 
-        is_disc, videoloc, bdinfo, bd_summary = await self.get_disc(self.path, folder_id, base_dir)
+        meta['is_disc'], videoloc, bdinfo, bd_summary = await self.get_disc(self.path, folder_id, base_dir)
         
         # If BD:
-        if bdinfo != None:
+        if meta['is_disc'] == "BDMV":
             video, scene = self.is_scene(self.path)
             meta['filelist'] = []
 
@@ -99,8 +99,10 @@ class Prep():
 
             mi = None
             mi_dump = None
-
-        #If NOT BD
+        #IF DVD
+        elif meta['is_disc'] == "DVD":
+            cprint('DVD Support coming eventually', 'grey', 'on_red')
+        #If NOT BD/VD
         else:
             videopath, meta['filelist'] = self.get_video(videoloc) 
 
@@ -133,7 +135,7 @@ class Prep():
         
         
         if meta.get('type', None) == None:
-            meta['type'] = self.get_type(video, scene, is_disc)
+            meta['type'] = self.get_type(video, scene, meta['is_disc'])
         if meta.get('category', None) == None:
             meta['category'] = self.get_cat(video)
         else:
@@ -1200,6 +1202,7 @@ class Prep():
                     img_url = response['data']['url']
                     web_url = response['data']['url_viewer']
                 except:
+                    cprint("imgbb failed, trying next image host", 'yellow')
                     self.upload_screens(meta, screens - i , img_host_num + 1, i)
             elif img_host == "freeimage.host":
                 url = "https://freeimage.host/api/1/upload"
@@ -1215,6 +1218,7 @@ class Prep():
                     img_url = response['image']['url']
                     web_url = response['image']['url_viewer']
                 except:
+                    cprint("freeimage.host failed, trying next image host", 'yellow')
                     self.upload_screens(meta, screens - i, img_host_num + 1, i)
             elif img_host == "pstorage.space":
                 url = "https://pstorage.space/api/1/upload"
@@ -1228,6 +1232,7 @@ class Prep():
                     img_url = response['url']
                     web_url = response['url_viewer']
                 except:
+                    cprint("pstorage.space failed, trying next image host", 'yellow')
                     self.upload_screens(meta, screens - i, img_host_num + 1, i)
             elif img_host == "ptpimg":
                 # data = {
@@ -1253,9 +1258,8 @@ class Prep():
                     web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                 except:
                     # print(traceback.format_exc())
+                    cprint("ptpimg failed, trying next image host", 'yellow')
                     self.upload_screens(meta, screens - i, img_host_num + 1, i)
-                    cprint("PTPimg down?", 'grey', 'on_red')
-                    pass
             else:
                 cprint("Please choose a supported image host in your config", 'grey', 'on_red')
                 exit()
