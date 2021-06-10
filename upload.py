@@ -56,6 +56,8 @@ async def do_the_thing(path, args, base_dir):
     if len(glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) == 0:
         if meta['nohash'] == False:
             prep.create_torrent(meta, Path(meta['path']))
+        else:
+            meta['client'] = "none"
            
 
     confirm = get_confirmation(meta)
