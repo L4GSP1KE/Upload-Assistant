@@ -27,7 +27,6 @@ import time
 import anitopy
 import shutil
 import traceback
-import logging
 from subprocess import Popen
 import cli_ui
 from pprint import pprint
@@ -424,7 +423,7 @@ class Prep():
     """
 
     def get_resolution(self, guess, folder_id, base_dir):
-        with open(f'{base_dir}/tmp/{folder_id}/MediaInfo.json', 'r') as f:
+        with open(f'{base_dir}/tmp/{folder_id}/MediaInfo.json', 'r', encoding='utf-8') as f:
             mi = json.load(f)
             try:
                 width = mi['media']['track'][1]['Width']
@@ -574,7 +573,7 @@ class Prep():
 
     def screenshots(self, path, filename, folder_id, base_dir):
         cprint("Saving Screens...", "grey", "on_yellow")
-        with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json") as f:
+        with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
             length = mi['media']['track'][1]['Duration']
             length = round(float(length))
