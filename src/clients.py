@@ -32,7 +32,7 @@ class Clients():
             default_torrent_client = self.config['DEFAULT']['default_torrent_client']
         else:
             default_torrent_client = meta['client']
-        if meta.get('client', None).lower() == 'none':
+        if meta.get('client', None) == 'none':
             return
         if self.config['TORRENT_CLIENTS'][default_torrent_client].lower() == "none":
             return 
