@@ -1432,12 +1432,29 @@ class Prep():
     def get_service(self, video):
         service = ""
         services = [
-            'AMZN', 'NF', 'HULU', 'HMAX',
-            'DSNP', 'ATVP', 'ALL4', 'PCOK',
-            'iT', 'VUDU', 'iP', 'CBS', 'ESPN',
-            'STAN', 'STARZ', 'NBC', 'PCOK',
-            'PMNP', 'VIMEO'
+            '9NOW', 'AE', 'AUBC', 'AMBC', 'AS', 'AJAZ', 
+            'ALL4', 'AMZN', 'AMC', 'ATK', 'ANPL', 'ANLB', 
+            'AOL', 'ATVP', 'ARD', 'iP', 'BKPL', 'BOOM', 
+            'CORE', 'BCORE', 'BRAV', 'CMOR', 'CNLP', 'CN', 
+            'CBC', 'CBS', 'CHGD', 'CMAX', 'CNBC', 'CC', 'CCGC', 
+            'COOK', 'CMT', 'CRKL', 'CRIT', 'CR', 'CSPN', 'CTV', 
+            'CUR', 'CW', 'CWS', 'DAZN', 'DSKI', 'DCU', 'DHF', 'DEST', 
+            'DDY', 'DTV', 'DISC', 'DSNY', 'DSNP', 'DIY', 'DOCC', 'DPLY', 
+            'DRPO', 'ETV', 'ETTV', 'EPIX', 'ESPN', 'ESQ', 'FAM', 'FJR', 
+            'FOOD', 'FOX', 'FPT', 'FTV', 'FREE', 'FUNI', 'FYI', 'GLBL', 
+            'GLOB', 'GO90', 'PLAY', 'HLMK', 'HBO', 'HMAX', 'HGTV', 'HIDI', 
+            'HIST', 'HS', 'HULU', 'TOU', 'IFC', 'ID', 'iT', 'ITV', 'KNPY', 
+            'KAYO', 'KNOW', 'LIFE', 'LN', 'MNBC', 'MTOD', 'MTV', 'NATG', 'NBA', 
+            'NBC', 'NF', 'NFLN', 'NFL', 'GC', 'NICK', 'NRK', 'PMNT', 'PMNP', 
+            'PCOK', 'PLUZ', 'PBS', 'PBSK', 'PSN', 'POGO', 'PA', 'PUHU', 'QIBI', 
+            'RKTN', 'RSTR', 'RTE', 'SBS', 'SESO', 'SHMI', 'SHO', 'SPIK', 'SNET', 
+            'SPRT', 'STAN', 'STARZ', 'STZ', 'SVT', 'SWER', 'SYFY', 'TBS', 'TEN', 
+            'TFOU', 'TIMV', 'TLC', 'TRVL', 'TUBI', 'TV3', 'TV4', 'TVL', 'VH1', 
+            'VICE', 'VMEO', 'UFC', 'UKTV', 'UNIV', 'USAN', 'VLCT', 'VIAP', 
+            'VIMEO', 'VRV', 'VUDU', 'WNET', 'WME', 'WWEN', 'XBOX', 
+            'YHOO', 'YT', 'RED', 'ZDF'
             ]
+
         video_name = video.replace('.', ' ')
         for each in services:
             if (' ' + each.lower() + ' ') in (' ' + video_name.lower() + ' '):
