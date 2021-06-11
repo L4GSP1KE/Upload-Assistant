@@ -1430,27 +1430,18 @@ class Prep():
 
 
     def get_service(self, video):
-        try:
-            service = guessit(video)['streaming_service']
-            if service == 'Amazon Prime':
-                service = "AMZN"
-            elif service == 'Netflix':
-                service = "NF"
-            elif service == 'Hulu':
-                service = "HULU"
-            elif service == "HBO Max":
-                service = "HMAX"
-        except:
-            if "HMAX" in video:
-                service = "HMAX"
-            elif "DSNP" in video:
-                service = "DSNP"
-            elif "ATVP" in video:
-                service = "ATVP"
-            elif "ALL4" in video:
-                service = "ALL4"
-            else:
-                service = ""
+        service = ""
+        services = [
+            'AMZN', 'NF', 'HULU', 'HMAX',
+            'DSNP', 'ATVP', 'ALL4', 'PCOK',
+            'iT', 'VUDU', 'iP', 'CBS', 'ESPN',
+            'STAN', 'STARZ', 'NBC', 'PCOK',
+            'PMNP', 'VIMEO'
+            ]
+        video_name = video.replace('.', ' ')
+        for each in services:
+            if (' ' + each.lower() + ' ') in (' ' + video_name.lower() + ' '):
+                service = each
         return service
 
 
