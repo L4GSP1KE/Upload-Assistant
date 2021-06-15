@@ -33,8 +33,10 @@ class Blu():
 
         if meta['bdinfo'] != None:
             mi_dump = None
+            bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BDINFO.txt", 'r', encoding='utf-8').read()
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
+            bd_dump = None
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': open_torrent}
@@ -42,6 +44,7 @@ class Blu():
             'name' : meta['name'],
             'description' : desc,
             'mediainfo' : mi_dump,
+            'bdinfo' : bd_dump, 
             'category_id' : cat_id,
             'type_id' : type_id,
             'resolution_id' : resolution_id,
