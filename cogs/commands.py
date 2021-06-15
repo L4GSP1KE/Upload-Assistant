@@ -262,19 +262,26 @@ class Commands(commands.Cog):
         # await prep.upload_screens(meta, meta['screens'], 1, i=1)
         
         if meta.get('uploaded_screens', False) == False:
-            u = multiprocessing.Process(target = prep.upload_screens, args=(meta, meta['screens'], 1, 1))
+            return_dict = multiprocessing.Manager().dict()
+            u = multiprocessing.Process(target = prep.upload_screens, args=(meta, meta['screens'], 1, 1, return_dict))
             u.start()
             while u.is_alive() == True:
                 await asyncio.sleep(3)
+            meta['image_list'] = return_dict['image_list']
+            if meta['debug']:
+                cprint(meta['image_list'], 'cyan')
             meta['uploaded_screens'] = True
 
         #Create base .torrent
         
         if len(glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) == 0:
-            p = multiprocessing.Process(target = prep.create_torrent, args=(meta, Path(meta['path'])))
-            p.start()
-            while p.is_alive() == True:
-                await asyncio.sleep(5)
+            if meta['nohash'] == False:
+                p = multiprocessing.Process(target = prep.create_torrent, args=(meta, Path(meta['path'])))
+                p.start()
+                while p.is_alive() == True:
+                    await asyncio.sleep(5)
+            else:
+                meta['client'] = 'none'
 
 
         #Format for embed

@@ -49,9 +49,12 @@ async def do_the_thing(path, args, base_dir):
     meta = await prep.gather_prep(meta=meta) 
     meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
 
-    if meta.get('uploaded_screens', False) == False:
-        prep.upload_screens(meta, meta['screens'], 1, 1)
-        meta['uploaded_screens'] = True
+    if meta.get('image_list', False) == False:
+        return_dict = {}
+        meta['image_list'] = prep.upload_screens(meta, meta['screens'], 1, 1, return_dict)
+        if meta['debug']:
+            pprint(meta['image_list'])
+        # meta['uploaded_screens'] = True
 
     if len(glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) == 0:
         if meta['nohash'] == False:
