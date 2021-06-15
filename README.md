@@ -38,7 +38,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
 
   **Creating an alias allows for easier use:**
   
-  `alias upload="python3 ~/path/to/upload.py` turns the above command into `upload /downloads/path/to/content`
+  `alias upload="python3 ~/path/to/Upload-Assistant/upload.py"` turns the above command into `upload /downloads/path/to/content`
 
 ## **Discord Bot Usage:** 
   **To start the bot** `python3 bot.py`
