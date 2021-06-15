@@ -180,7 +180,7 @@ class Prep():
             
         
         
-        await self.gen_desc(meta, bd_summary)
+        meta = await self.gen_desc(meta)
         # pprint(meta)
         return meta
 
@@ -1123,7 +1123,7 @@ class Prep():
         if meta['bdinfo'] != None:
             include, exclude = "", ""
         else:
-            exclude = ["*.*"] 
+            exclude = ["*.*", "sample.mkv"] 
             include = ["*.mkv", "*.mp4"]
         torrent = Torrent(path,
             # trackers = [announce],
@@ -1154,7 +1154,7 @@ class Prep():
     """
     Upload Screenshots
     """
-    def upload_screens(self, meta, screens, img_host_num, i):
+    def upload_screens(self, meta, screens, img_host_num, i, return_dict):
         cprint('Uploading Screens', 'grey', 'on_yellow')
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
@@ -1164,8 +1164,8 @@ class Prep():
            
         description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
         description.write('[center]')
-        for image in glob.glob("*.png"):
-            tasks = []        
+        image_list = []
+        for image in glob.glob("*.png"):        
             if img_host == "imgbb":
                 url = "https://api.imgbb.com/1/upload"
                 data = {
@@ -1244,6 +1244,10 @@ class Prep():
             
             # description.write(f"[url={web_url}][img]https://images.weserv.nl/?url={img_url}&w=350[/img][/url]")
             description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
+            image_dict = {}
+            image_dict['web_url'] = web_url
+            image_dict['img_url'] = img_url
+            image_list.append(image_dict)
             if i % 3 == 0:
                 description.write("\n")
             cli_ui.info_count(i-1, screens, "Uploaded")
@@ -1253,7 +1257,8 @@ class Prep():
         description.write("\n")
             
         description.close()
-
+        return_dict['image_list'] = image_list
+        return image_list
 
 
 
@@ -1294,47 +1299,47 @@ class Prep():
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
             if type == "DISC": #Disk
-                name = f"{title} {alt_title} {year} {three_d} {repack} {resolution} {edition} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                 convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} {alt_title} {year} {three_d} {repack} {resolution} {edition} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
+                name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
                 convention = "Name Year Resolution Source Video-codec Audio-Tag"
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {alt_title} {year} {repack} {source} REMUX  {audio}" 
+                name = f"{title} {alt_title} {year} {edition} {repack} {source} REMUX  {audio}" 
                 convention = "Name Year Encoding_system Format Source Audio-Tag"
             elif type == "ENCODE": #Encode
-                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} {uhd} {source} {audio} {hdr} {video_encode}"  
+                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}"  
                 convention = "Name Year Resolution Source Audio Video-Tag"
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
             elif type == "HDTV": #HDTV
-                name = f"{title} {alt_title} {year} {repack} {resolution} {edition} HDTV {audio} {video_encode}"
+                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
                 convention = "Name Year Resolution Source Audio Video-Tag"
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
-                name = f"{title} {alt_title} {season}{episode} {three_d} {repack} {resolution} {edition} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                name = f"{title} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                 convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} {alt_title} {season}{episode} {three_d} {repack} {resolution} {edition} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 convention = "Name Year Resolution Source Video-codec Audio-Tag"
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {alt_title} {season}{episode} {repack} {source} REMUX {audio}" #SOURCE
+                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {source} REMUX {audio}" #SOURCE
                 convention = "Name Year Encoding_system Format Source Audio-Tag"
             elif type == "ENCODE": #Encode
-                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
+                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
                 convention = "Name Year Resolution Source Audio Video-Tag"
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
             elif type == "HDTV": #HDTV
-                name = f"{title} {alt_title} {season}{episode} {repack} {resolution} {edition} HDTV {audio} {video_encode}"
+                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
                 convention = "Name Year Resolution Source Audio Video-Tag"
 
 
@@ -1506,20 +1511,17 @@ class Prep():
         return name
 
     
-    async def gen_desc(self, meta, bd_summary):
+    async def gen_desc(self, meta):
         description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="")
         description.seek(0)
-        if bd_summary != None:
-            description.write("[code]")
-            description.write(bd_summary)
-            description.write("[/code]")
-            description.write("\n")
+        meta['description'] = []
         if meta['nfo'] != False:
             description.write("[code]")
             nfo = glob.glob("*.nfo")[0]
             description.write(open(nfo, 'r').read())
             description.write("[/code]")
             description.write("\n")
+            meta['description'].append(open(nfo, 'r').read())
         # if desclink != None:
         #     parsed = urllib.parse.urlparse(desclink)
         #     raw = parsed._replace(path=f"/raw{parsed.path}")
@@ -1534,7 +1536,9 @@ class Prep():
             description.write(meta['desc'])
             description.write("\n")
             description.write("\n")
-
+            meta['description'].append(meta['desc'])
+        return meta
+        
     async def tag_override(self, meta):
         with open(f"{meta['base_dir']}/data/tags.json", 'r', encoding="utf-8") as f:
             tags = json.load(f)
