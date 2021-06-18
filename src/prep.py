@@ -1321,25 +1321,25 @@ class Prep():
                 convention = "Name Year Resolution Source Audio Video-Tag"
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
-                name = f"{title} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                 convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 convention = "Name Year Resolution Source Video-codec Audio-Tag"
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {source} REMUX {audio}" #SOURCE
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {source} REMUX {audio}" #SOURCE
                 convention = "Name Year Encoding_system Format Source Audio-Tag"
             elif type == "ENCODE": #Encode
-                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
                 convention = "Name Year Resolution Source Audio Video-Tag"
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
             elif type == "HDTV": #HDTV
-                name = f"{title} {alt_title} {season}{episode} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
                 convention = "Name Year Resolution Source Audio Video-Tag"
 
 
