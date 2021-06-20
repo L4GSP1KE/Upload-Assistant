@@ -19,7 +19,6 @@ class Args():
    
     # @click.option('--debug', is_flag=True, help="Used for testing features")
     # @click.option('--bdinfo', '-bdinfo', help="Choose to paste BDInfo instead of scan", is_flag=True)
-    # @click.option('--dupe', '-st', help="Ths release is a duplicate", is_flag=True)
     def parse(self, args, meta):
         input = args
         parser = argparse.ArgumentParser()
@@ -41,10 +40,12 @@ class Args():
         parser.add_argument('-reg', '--region', nargs='*', required=False, help="Region for discs")
         parser.add_argument('-a', '--anon', action='store_true', required=False, help="Upload anonymously")
         parser.add_argument('-st', '--stream', action='store_true', required=False, help="Stream Optimized Upload")
+        parser.add_argument('-dupe', '--dupe', action='store_true', required=False, help="Pass if you know this is a dupe")
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode")
         parser.add_argument('-nh', '--nohash', action='store_true', required=False, help="Don't hash .torrent")
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Override default torrent client")
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
+        parser.add_argument('-ua', '--unattended', action='store_true', required=False, help=argparse.SUPPRESS)
         
         args = parser.parse_args(input)
         args = vars(args)

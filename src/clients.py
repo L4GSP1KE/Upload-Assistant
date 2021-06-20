@@ -127,8 +127,8 @@ class Clients():
             exit()
         qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True, tags=tracker)
         qbt_client.torrents_resume(torrent.infohash)
-        if meta['debug']:
-            cprint(f"Path: {path}", 'cyan')
+        
+        print(f"Added to: {path}")
         # qbt_client.torrents_recheck(torrent_hashes=infohash)
         # cprint("Rechecking File", 'grey', 'on_yellow')
         # while qbt_client.torrents_info(torrent_hashes=infohash)[0]['completed'] == 0:

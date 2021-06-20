@@ -43,6 +43,8 @@ async def do_the_thing(path, args, base_dir):
     if os.path.exists(path):
             meta['path'] = path
             meta, help = parser.parse(args, meta)
+    else:
+        cprint("Path does not exist", 'grey', 'on_red')
     if meta['imghost'] == None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
     prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
@@ -62,8 +64,7 @@ async def do_the_thing(path, args, base_dir):
         else:
             meta['client'] = "none"
            
-
-    confirm = get_confirmation(meta)
+    confirm = get_confirmation(meta)  
     while confirm == False:
         # help.print_help()
         args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv)")
@@ -76,7 +77,11 @@ async def do_the_thing(path, args, base_dir):
     trackers = ['BLU']
     for tracker in trackers:
         if tracker == "BLU":
-            if cli_ui.ask_yes_no("Upload to BLU?", default=False):
+            if meta['unattended']:
+                upload_to_blu = True
+            else:
+                upload_to_blu = cli_ui.ask_yes_no("Upload to BLU?", default=meta['unattended'])
+            if upload_to_blu:
                 print("Uploading to BLU")
                 blu = Blu(config=config)
                 dupes = await blu.search_existing(meta)
@@ -110,9 +115,13 @@ def get_confirmation(meta):
         tag = f" / {meta['tag'][1:]}"
     cli_ui.info(f"{meta['resolution']} / {meta['type']}{tag}")
     print()
-    cli_ui.info_section(cli_ui.yellow, "Is this correct?")
-    cli_ui.info(f"Name: {meta['name']}")
-    confirm = cli_ui.ask_yes_no("Correct?", default=False)
+    if meta.get('unattended', False) == False:
+        cli_ui.info_section(cli_ui.yellow, "Is this correct?")
+        cli_ui.info(f"Name: {meta['name']}")
+        confirm = cli_ui.ask_yes_no("Correct?", default=False)
+    else:
+        cli_ui.info(f"Name: {meta['name']}")
+        confirm = True
     return confirm
 
 def dupe_check(dupes, meta):
@@ -120,12 +129,18 @@ def dupe_check(dupes, meta):
             cprint("No dupes found", 'grey', 'on_green')
             meta['upload'] = True   
             return meta
-    else:
+    else:    
         dupe_text = "\n•".join(dupes)
-        dupe_text = f"```{dupe_text}```"
+        cli_ui.info(dupe_text)
+
+        if meta['unattended']:
+            if meta.get('dupe', False) == False:
+                cprint("Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --dupe", 'grey', 'on_red')
+                exit()
+            else:
+                cprint("Found potential dupes. -dupe/--dupe was passed. Uploading anyways", 'grey', 'on_yellow')
         print()
         cli_ui.info_section(cli_ui.yellow, "Are these dupes?")
-        cli_ui.info(dupe_text)
         print()
         upload = cli_ui.ask_yes_no("Upload Anyways?", default=False)
 
