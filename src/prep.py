@@ -964,6 +964,7 @@ class Prep():
 
     def get_hdr(self, mi, bdinfo):
         hdr = ""
+        dv = ""
         if bdinfo != None: #Disks
             hdr_mi = bdinfo['video'][0]['hdr_dv']
             if "HDR10+" in hdr_mi:
@@ -972,7 +973,7 @@ class Prep():
                 hdr = "HDR"
             try:
                 if bdinfo['video'][1]['hdr_dv'] == "Dolby Vision":
-                    hdr = hdr + " DV "
+                    dv = "DV"
             except:
                 pass
         else: 
@@ -981,10 +982,10 @@ class Prep():
                 if hdr_mi in ("BT.2020", "REC.2020"):
                     hdr = "HDR"
                     try:
-                        if "HDR10+" in mi['media']['track'][1]['HDR_Format_Compatibility']:
+                        if "HDR10+" in mi['media']['track'][1]['HDR_Format_String']:
                             hdr = "HDR10+"
                     except:
-                        pass
+                        hdr = "PQ10"
                     try:
                         if "HLG" in mi['media']['track'][1]['transfer_characteristics_Original']:
                             hdr = "HLG"
@@ -993,13 +994,14 @@ class Prep():
             except:
                 pass
 
-            else:
-                try:
-                    # print(mi['media']['track'][1]['HDR_Format'])
-                    if "Dolby Vision" in mi['media']['track'][1]['HDR_Format']:
-                        hdr = "DV"
-                except:
-                    pass
+            try:
+                # print(mi['media']['track'][1]['HDR_Format'])
+                if "Dolby Vision" in mi['media']['track'][1]['HDR_Format']:
+                    dv = "DV"
+            except:
+                pass
+
+        hdr = f"{dv} {hdr}"
         return hdr
 
     def get_region(self, path, region):
