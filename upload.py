@@ -72,6 +72,13 @@ async def do_the_thing(path, args, base_dir):
         else:
             meta['client'] = "none"
            
+    if meta.get('manual', False):
+        url = await prep.package(meta)
+        if url == False:
+            cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}.tar`", 'grey', 'on_yellow')
+        else:
+            cprint(f"Files can be found at {url} or `tmp/{meta['title']}.tar`", 'grey', 'on_green')
+        exit()
     confirm = get_confirmation(meta)  
     while confirm == False:
         # help.print_help()

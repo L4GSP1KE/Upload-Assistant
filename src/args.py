@@ -42,6 +42,7 @@ class Args():
         parser.add_argument('-st', '--stream', action='store_true', required=False, help="Stream Optimized Upload")
         parser.add_argument('-dupe', '--dupe', action='store_true', required=False, help="Pass if you know this is a dupe")
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode")
+        parser.add_argument('-m', '--manual', action='store_true', required=False, help="Manual Mode. Returns link to ddl screens/base.torrent")
         parser.add_argument('-nh', '--nohash', action='store_true', required=False, help="Don't hash .torrent")
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Override default torrent client")
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
