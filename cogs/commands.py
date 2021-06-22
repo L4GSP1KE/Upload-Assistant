@@ -58,11 +58,10 @@ class Commands(commands.Cog):
             meta, help = parser.parse(args, meta)
             if meta['imghost'] == None:
                 meta['imghost'] = config['DEFAULT']['img_host_1']
-            if not meta['unattended']:
-                ua = config['DEFAULT'].get('auto_mode', False)
-                if str(ua).lower() == "true":
-                    meta['unattended'] = True
-            # await ctx.message.delete()
+            # if not meta['unattended']:
+            #     ua = config['DEFAULT'].get('auto_mode', False)
+            #     if str(ua).lower() == "true":
+            #         meta['unattended'] = True
             prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
             await ctx.send(f"Preparing to upload: `{path}`")
             meta = await prep.gather_prep(meta=meta)
