@@ -1568,7 +1568,8 @@ class Prep():
             "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
         try:
             response = requests.post("https://uguu.se/upload.php", files=files).json()
-            print(response)
+            if meta['debug']:
+                cprint(response, 'cyan')
             url = response['files'][0]['url']
             return url
         except:
