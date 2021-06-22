@@ -1464,7 +1464,7 @@ class Prep():
 
         video_name = video.replace('.', ' ')
         for each in services:
-            if (' ' + each.lower() + ' ') in (' ' + video_name.lower() + ' '):
+            if (' ' + each + ' ') in (' ' + video_name + ' '):
                 service = each
         return service
 
