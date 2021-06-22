@@ -47,6 +47,14 @@ async def do_the_thing(path, args, base_dir):
         cprint("Path does not exist", 'grey', 'on_red')
     if meta['imghost'] == None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
+    if not meta['unattended']:
+        ua = config['DEFAULT'].get('auto_mode', False)
+        if str(ua).lower() == "true":
+            meta['unattended'] = True
+            cprint("Running in Auto Mode", 'yellow')
+    
+    
+    
     prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
     meta = await prep.gather_prep(meta=meta) 
     meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
