@@ -70,19 +70,18 @@ class Blu():
         
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
-            open_torrent.close()
             try:
                 # pprint(data)
                 print(response.json())
-                return 
             except:
                 cprint("It may have uploaded, go check")
-                cprint(f"Request Data:", 'cyan')
-                pprint(data)
+                # cprint(f"Request Data:", 'cyan')
+                # pprint(data)
                 return 
         else:
             cprint(f"Request Data:", 'cyan')
             pprint(data)
+        open_torrent.close()
 
 
 
