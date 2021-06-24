@@ -287,6 +287,11 @@ class Prep():
             if line.startswith("playlist:"):
                 playlist = l.split(':', 1)[1]
                 bdinfo['playlist'] = playlist.split('.',1)[0].strip()
+            if line.startswith("disc size:"):
+                size = l.split(':', 1)[1]
+                size = size.split('bytes', 1)[0].replace(',','')
+                size = size/float(1<<30)
+                bdinfo['size'] = size
             if line.startswith("length:"):
                 length = l.split(':', 1)[1]
                 bdinfo['length'] = length.split('.',1)[0].strip()
@@ -1356,83 +1361,95 @@ class Prep():
 
 
     async def get_season_episode(self, video, meta):
-        filelist = meta['filelist']
-        if meta['anime'] == False:
-            try:
-                season = "S" + str(guessit(video)["season"]).zfill(2)
-            except:
+        if meta['category'] == 'TV':
+            filelist = meta['filelist']
+            meta['tv_pack'] = 0
+            if meta['anime'] == False:
                 try:
-                    season = guessit(video)['date']
+                    season = "S" + str(guessit(video)["season"]).zfill(2)
                 except:
-                    season = "S01"
-            try:
-                episodes = ""
-                if len(filelist) == 1:
-                    episodes = guessit(video)['episode']
-                    if type(episodes) == list:
-                        episode = ""
-                        for item in guessit(video)["episode"]:
-                            ep = (str(item).zfill(2))
-                            episode += f"E{ep}"
-                    else:
-                        episode = "E" + str(episodes).zfill(2)
-                else:
-                    episode = ""
-            except:
-                # print(traceback.format_exc())
-                episode = ""
-        else:
-            parsed = anitopy.parse(Path(video).name)
-            romaji, mal_id, eng_title, seasonYear = self.get_romaji(guessit(parsed['anime_title'])['title'])
-            if meta.get('tmdb_manual', None) == None:
-                year = parsed.get('anime_year', str(seasonYear))
-                meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta)
-            meta = await self.tmdb_other_meta(meta)
-            tag = parsed.get('release_group', "")
-            if tag != "":
-                meta['tag'] = f"-{tag}"
-            try:
-                if len(filelist) == 1:
-                    episodes = parsed['episode_number']
-                    if type(episodes) == list:
-                        episode = ""
-                        for item in episodes:
-                            ep = (str(item).zfill(2))
-                            episode += f"E{ep}"
-                    else:
-                        episode = f"E{episodes.zfill(2)}"
-                else:
-                    episode = ""
-            except:
-                episode = ""
-            try:
-                season = parsed['anime_season']
-                season = f"S{season.zfill(2)}"
-            except:
+                    try:
+                        season = guessit(video)['date']
+                    except:
+                        season = "S01"
                 try:
-                    data = {
-                        'id' : str(meta['tvdb_id']),
-                        'origin' : 'tvdb',
-                        'absolute' : str(parsed['episode_number']),
-                        'destination' : 'anidb'
-                    }
-                    url = "http://thexem.de/map/single"
-                    response = requests.post(url, data=data).json()
-                    season = f"S{str(response['data']['anidb']['season']).zfill(2)}"
+                    episodes = ""
                     if len(filelist) == 1:
-                        episode = f"E{str(response['data']['anidb']['episode']).zfill(2)}"
+                        episodes = guessit(video)['episode']
+                        if type(episodes) == list:
+                            episode = ""
+                            for item in guessit(video)["episode"]:
+                                ep = (str(item).zfill(2))
+                                episode += f"E{ep}"
+                        else:
+                            episode = "E" + str(episodes).zfill(2)
+                    else:
+                        episode = ""
+                        meta['tv_pack'] = 1
                 except:
-                    # print(f"{meta['title']} does not exist on thexem")
-                    season = "S01"
-            try:
-                version = parsed['release_version']
-                version = f"v{version}"
-            except:
-                version = ""
-            episode = episode + version
-
-        meta['season'] = season
-        meta['episode'] = episode
+                    # print(traceback.format_exc())
+                    episode = ""
+                    meta['tv_pack'] = 1
+            else:
+                parsed = anitopy.parse(Path(video).name)
+                romaji, mal_id, eng_title, seasonYear = self.get_romaji(guessit(parsed['anime_title'])['title'])
+                if meta.get('tmdb_manual', None) == None:
+                    year = parsed.get('anime_year', str(seasonYear))
+                    meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta)
+                meta = await self.tmdb_other_meta(meta)
+                tag = parsed.get('release_group', "")
+                if tag != "":
+                    meta['tag'] = f"-{tag}"
+                try:
+                    if len(filelist) == 1:
+                        episodes = parsed['episode_number']
+                        if type(episodes) == list:
+                            episode = ""
+                            for item in episodes:
+                                ep = (str(item).zfill(2))
+                                episode += f"E{ep}"
+                        else:
+                            episode = f"E{episodes.zfill(2)}"
+                    else:
+                        episode = ""
+                        meta['tv_pack'] = 1
+                except:
+                    episode = ""
+                    meta['tv_pack'] = 1
+                try:
+                    season = parsed['anime_season']
+                    season = f"S{season.zfill(2)}"
+                except:
+                    try:
+                        data = {
+                            'id' : str(meta['tvdb_id']),
+                            'origin' : 'tvdb',
+                            'absolute' : str(parsed['episode_number']),
+                            'destination' : 'anidb'
+                        }
+                        url = "http://thexem.de/map/single"
+                        response = requests.post(url, data=data).json()
+                        season = f"S{str(response['data']['anidb']['season']).zfill(2)}"
+                        if len(filelist) == 1:
+                            episode = f"E{str(response['data']['anidb']['episode']).zfill(2)}"
+                    except:
+                        # print(f"{meta['title']} does not exist on thexem")
+                        season = "S01"
+                try:
+                    version = parsed['release_version']
+                    version = f"v{version}"
+                except:
+                    version = ""
+                episode = episode + version
+            pprint(meta)
+            if meta.get('manual_season', None) == None:
+                meta['season'] = season
+            else:
+                meta['season'] = f"S{meta['manual_season'].zfill(2)}"
+            if meta.get('manual_episode', None) == None:
+                meta['episode'] = episode
+            else:
+                meta['episode'] = f"E{meta['manual_episode'].zfill(2)}"
         return meta
 
 

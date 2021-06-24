@@ -31,6 +31,8 @@ class Args():
         parser.add_argument('-g', '--tag', nargs='*', required=False, help="Group Tag", type=str)
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
         parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str)
+        parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
+        parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
         parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'freeimage.host', 'pstorage'])
         # parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
@@ -62,6 +64,10 @@ class Args():
                         meta[key] = f"-{meta[key]}"
                     elif key == 'screens':
                         meta[key] = int(meta[key])
+                    elif key == 'season':
+                        meta['manual_season'] = meta[key]
+                    elif key == 'episode':
+                        meta['manual_episode'] = meta[key]
                 else:
                     meta[key] = value
             else:
