@@ -86,10 +86,11 @@ class Prep():
                     meta['search_year'] = ""
             
             # await self.disc_screenshots(video, filename, bdinfo, folder_id, base_dir)
-            ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, folder_id, base_dir))
-            ds.start()
-            while ds.is_alive() == True:
-                await asyncio.sleep(3)
+            if meta.get('edit', False) == False:
+                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, folder_id, base_dir))
+                ds.start()
+                while ds.is_alive() == True:
+                    await asyncio.sleep(3)
 
             if meta.get('resolution', None) == None:
                 meta['resolution'] = self.mi_resolution(bdinfo['video'][0]['res'], guessit(video))
@@ -114,8 +115,11 @@ class Prep():
             except:
                 meta['search_year'] = ""
             
-
-            mi_dump, mi = self.exportInfo(videopath, filename, meta['isdir'], folder_id, base_dir)
+            if meta.get('edit', False) == False:
+                mi_dump, mi = self.exportInfo(videopath, filename, meta['isdir'], folder_id, base_dir)
+                meta['mediainfo'] = mi
+            else:
+                mi = meta['mediainfo']
 
             if meta.get('resolution', None) == None:
                 meta['resolution'] = self.get_resolution(guessit(video), folder_id, base_dir)
@@ -123,10 +127,11 @@ class Prep():
             meta['sd'] = self.is_sd(meta['resolution'])
 
             # await self.screenshots(videopath, filename, folder_id, base_dir)
-            s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, folder_id, base_dir))
-            s.start()
-            while s.is_alive() == True:
-                await asyncio.sleep(3)
+            if meta.get('edit', False) == False:
+                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, folder_id, base_dir))
+                s.start()
+                while s.is_alive() == True:
+                    await asyncio.sleep(3)
         
         
 
@@ -1441,7 +1446,6 @@ class Prep():
                 except:
                     version = ""
                 episode = episode + version
-            pprint(meta)
             if meta.get('manual_season', None) == None:
                 meta['season'] = season
             else:

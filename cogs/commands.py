@@ -149,8 +149,9 @@ class Commands(commands.Cog):
         meta, help = parser.parse(args, meta)
         msg = await ctx.fetch_message(meta['embed_msg_id'])
         await msg.delete()
-        meta = await prep.tmdb_other_meta(meta)
-        await self.send_embed_and_upload(ctx, meta)
+        meta['edit'] = True
+        meta = await prep.gather_prep(meta=meta) 
+        meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
 
 
 

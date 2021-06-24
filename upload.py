@@ -86,7 +86,9 @@ async def do_the_thing(path, args, base_dir):
         args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv)")
 
         meta, help = parser.parse(args.split(), meta)
-        meta = await prep.tmdb_other_meta(meta)
+        # meta = await prep.tmdb_other_meta(meta)
+        meta['edit'] = True
+        meta = await prep.gather_prep(meta=meta) 
         meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
         confirm = get_confirmation(meta)
     
