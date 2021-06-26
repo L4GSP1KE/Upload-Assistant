@@ -12,11 +12,20 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - Adds to your client, seeding instantly
   - ALL WITH MINIMAL INPUT!
 
+  - Currently works with .mkv/.mp4/Single Blu-rays
+
+
+
+## Coming Soon:
+  - Multiple BDs
+  - DVD Support
+
 
   
 
 ## **Setup:**
    - **REQUIRES AT LEAST PYTHON 3.6 AND PIP3**
+   - Also REQUIRES [mono](https://www.mono-project.com/) on linux systems for BDInfo
    - Clone the repo to your system `git clone https://github.com/L4GSP1KE/Upload-Assistant.git`
    - Copy and Rename `data/example-config.json` to `data/config.json`
    - Edit `config.json` to use your information (more detailed information in the wiki(coming soon))
