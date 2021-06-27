@@ -13,3 +13,4 @@ qbittorrent-api
 deluge-client
 pyrobase
 requests
+imdbpy

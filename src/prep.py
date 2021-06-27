@@ -3,6 +3,7 @@
 import multiprocessing
 import os
 from os.path import basename
+from re import L
 import sys
 import shortuuid
 import asyncio
@@ -26,6 +27,7 @@ import base64
 import time
 import anitopy
 import shutil
+from imdb import IMDb
 import traceback
 from subprocess import Popen
 import cli_ui
@@ -687,7 +689,8 @@ class Prep():
             meta['imdb_id'] = external.get('imdb_id', "0")
             meta['tvdb_id'] = external.get('tvdb_id', '0')
             
-            meta['aka'] = f" AKA {response['original_title']}"
+            # meta['aka'] = f" AKA {response['original_title']}"
+            meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
             meta['keywords'] = self.get_keywords(movie)
             if meta.get('anime', False) == False:
                 meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
@@ -704,7 +707,8 @@ class Prep():
             meta['tvdb_id'] = external.get('tvdb_id', '0')
 
             
-            meta['aka'] = f" AKA {response['original_name']}"
+            # meta['aka'] = f" AKA {response['original_name']}"
+            meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
             meta['keywords'] = self.get_keywords(tv)
             meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response['poster_path']
@@ -1596,3 +1600,12 @@ class Prep():
         except:
             return False
         return 
+
+    async def get_imdb_aka(self, imdb_id):
+        ia = IMDb()
+        result = ia.get_movie(imdb_id.replace('tt', ''))
+                
+        aka = result.get('original title', result.get('localized title', ""))
+        if aka != "":
+            aka = f" AKA {aka}"
+        return aka
