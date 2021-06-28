@@ -1377,11 +1377,19 @@ class Prep():
             meta['tv_pack'] = 0
             if meta['anime'] == False:
                 try:
-                    if guessit(video)["season"] == guessit(video)["year"]:
+                    pprint(guessit(video))
+                    try:
+                        guess_year = guessit(video)['year']
+                    except:
+                        guess_year = ""
+                    if guessit(video)["season"] == guess_year:
                         if f"s{guessit(video)['season']}" in video.lower():
                             season = "S" + str(guessit(video)["season"]).zfill(2)
                         else:
                             season = "S01"
+                    else:
+                        season = "S" + str(guessit(video)["season"]).zfill(2)
+
                 except:
                     try:
                         season = guessit(video)['date']
