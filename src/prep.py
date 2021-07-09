@@ -67,7 +67,7 @@ class Prep():
         if meta['debug']:
             cprint(f"ID: {meta['uuid']}", 'cyan')
 
-        meta['is_disc'], videoloc, bdinfo, bd_summary = await self.get_disc(self.path, folder_id, base_dir)
+        meta['is_disc'], videoloc, bdinfo, meta['discs'] = await self.get_disc(meta)
         
         # If BD:
         if meta['is_disc'] == "BDMV":
@@ -75,15 +75,15 @@ class Prep():
             meta['filelist'] = []
 
             try:
-                filename = guessit(bdinfo['label'])['title']
-                try:
-                    meta['search_year'] = guessit(bdinfo['label'])['year']
-                except:
-                    meta['search_year'] = ""
-            except:
                 filename = guessit(bdinfo['title'])['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
+                except:
+                    meta['search_year'] = ""
+            except:
+                filename = guessit(bdinfo['label'])['title']
+                try:
+                    meta['search_year'] = guessit(bdinfo['label'])['year']
                 except:
                     meta['search_year'] = ""
             
@@ -209,75 +209,98 @@ class Prep():
     """
     Determine if disc and if so, get bdinfo
     """
-    async def get_disc(self, base_path, folder_id, base_dir):
+    async def get_disc(self, meta):
         is_disc = None
-        videoloc = base_path
+        videoloc = meta['path']
         bdinfo = None
         bd_summary = None
-        for path, directories, files in os.walk(base_path):
-            if "STREAM" in directories:
-                is_disc = "BDMV"
-                # videoloc = os.path.join(path, "STREAM", get_largest(os.path.join(path, "STREAM"))) 
-                bd_summary, bdinfo = await self.get_bdinfo(base_path, folder_id, base_dir)
-            elif "VIDEO_TS" in directories:
-                is_disc = "DVD"
-                videoloc = directories
-                bd_summary, bdinfo = await self.get_bdinfo(base_path, folder_id, base_dir) #Probably doesnt work
-            
-        return is_disc, videoloc, bdinfo, bd_summary
+        discs = []
+        for path, directories, files in os.walk(meta['path']):
+            for each in directories:
+                if each.upper() == "BDMV": #BDMVs
+                    is_disc = "BDMV"
+                    disc = {
+                        'path' : f"{path}/{each}",
+                        'name' : os.path.basename(path),
+                        'type' : 'BDMV',
+                        'summary' : "",
+                        'bdinfo' : ""
+                    }
+                    discs.append(disc)
+                    discs, bdinfo = await self.get_bdinfo(discs, meta['uuid'], meta['base_dir'])
+                elif each == "VIDEO_TS": #DVDs
+                    is_disc = "DVD"
+                    disc = {
+                        'path' : f"{path}/{each}",
+                        'name' : os.path.basename(path),
+                        'type' : 'DVD',
+                        "vob_mi" : "",
+                        "ifo_mi" : ""
+                    }
+                    discs.append(disc)   
+        return is_disc, videoloc, bdinfo, discs
 
 
     """
     Get and parse bdinfo
     """
-    async def get_bdinfo(self, path, folder_id, base_dir):
-        cprint("Getting BDInfo", 'grey', 'on_yellow')
+    async def get_bdinfo(self, discs, folder_id, base_dir):
         save_dir = f"{base_dir}/tmp/{folder_id}"
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
-        bdinfo_text = None
-        
-        for file in os.listdir(save_dir):
-            if file.startswith("BDINFO"):
-                bdinfo_text = save_dir + "/" + file
-        if bdinfo_text == None:
-            if sys.platform.startswith('linux'):
-                try:
-                    # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                    proc = await asyncio.create_subprocess_exec('mono', "bin/BDInfo/BDInfo.exe", '-w', path, save_dir)
+        for i in range(len(discs)):
+            bdinfo_text = None
+            path = os.path.abspath(discs[i]['path'])
+            for file in os.listdir(save_dir):
+                if file == f"BD_SUMMARY_{str(i).zfill(2)}.txt":
+                    bdinfo_text = save_dir + "/" + file
+            if bdinfo_text == None:
+                if sys.platform.startswith('linux'):
+                    try:
+                        # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
+                        cprint(f"Scanning {path}", 'grey', 'on_yellow')
+                        proc = await asyncio.create_subprocess_exec('mono', "bin/BDInfo/BDInfo.exe", '-w', path, save_dir)
+                        await proc.wait()
+                    except:
+                        cprint('mono not found, please install mono', 'grey', 'on_red')
+
+                elif sys.platform.startswith('win32'):
+                    # await asyncio.subprocess.Process(["bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
+                    cprint(f"Scanning {path}", 'grey', 'on_yellow')
+                    proc = await asyncio.create_subprocess_exec("bin/BDInfo/BDInfo.exe", "-w", path, save_dir)
                     await proc.wait()
-                except:
-                    cprint('mono not found, please install mono', 'grey', 'on_red')
-                    
-            elif sys.platform.startswith('win32'):
-                # await asyncio.subprocess.Process(["bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                proc = await asyncio.create_subprocess_exec("bin/BDInfo/BDInfo.exe", "-w", path, save_dir)
-                await proc.wait()
-                await asyncio.sleep(1)
-        while True:
-            try:
-                for file in os.listdir(save_dir):
-                    if file.startswith("BDINFO"):
-                        bdinfo_text = save_dir + "/" + file
-                with open(bdinfo_text, 'r') as f:
-                    text = f.read()
-                    result = text.split("QUICK SUMMARY:", 2)
-                    files = result[0].split("FILES:", 2)[1].split("CHAPTERS:", 2)[0].split("-------------")
-                    result2 = result[1].rstrip("\n")
-                    result = result2.split("********************", 1)
-                    bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
+                    await asyncio.sleep(1)
+                while True:
+                    try:
+                        for file in os.listdir(save_dir):
+                            if file.startswith(f"BDINFO"):
+                                bdinfo_text = save_dir + "/" + file
+                        with open(bdinfo_text, 'r') as f:
+                            text = f.read()
+                            result = text.split("QUICK SUMMARY:", 2)
+                            files = result[0].split("FILES:", 2)[1].split("CHAPTERS:", 2)[0].split("-------------")
+                            result2 = result[1].rstrip("\n")
+                            result = result2.split("********************", 1)
+                            bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
+                            f.close()
+                        os.remove(bdinfo_text)
+                    except Exception:
+                        # print(e)
+                        await asyncio.sleep(5)
+                        continue
+                    break
+                with open(f"{save_dir}/BD_SUMMARY_{str(i).zfill(2)}.txt", 'w') as f:
+                    f.write(bd_summary)
                     f.close()
-            except Exception:
-                # print(e)
-                await asyncio.sleep(5)
-                continue
-            break
-        with open(f"{save_dir}/BDINFO.txt", 'w') as f:
-            f.write(bd_summary)
-            f.close()
-        bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
-        # shutil.rmtree(f"{base_dir}/tmp")
-        return bd_summary, bdinfo
+                
+                bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
+        
+                discs[i]['summary'] = bd_summary
+                discs[i]['bdinfo'] = bdinfo
+            # shutil.rmtree(f"{base_dir}/tmp")
+        
+        return discs, discs[0]['bdinfo']
+        
             
 
     def parse_bdinfo(self, bdinfo_input, files, path):
@@ -297,7 +320,7 @@ class Prep():
             if line.startswith("disc size:"):
                 size = l.split(':', 1)[1]
                 size = size.split('bytes', 1)[0].replace(',','')
-                size = size/float(1<<30)
+                size = float(size)/float(1<<30)
                 bdinfo['size'] = size
             if line.startswith("length:"):
                 length = l.split(':', 1)[1]
@@ -673,7 +696,7 @@ class Prep():
             try:
                 title = guessit(meta['path'])['title'].lower()
                 title = title.split('aka')[0]
-                meta = await self.get_tmdb_id(title, meta['search_year'], meta)
+                meta = await self.get_tmdb_id(guessit(title)['title'], meta['search_year'], meta)
                 if meta['tmdb'] == "0":
                     meta = await self.get_tmdb_id(title, "", meta)
             except:
@@ -687,7 +710,11 @@ class Prep():
             
             external = movie.external_ids()
             meta['imdb_id'] = external.get('imdb_id', "0")
+            if meta['imdb_id'] == "":
+                meta['imdb_id'] = '0'
             meta['tvdb_id'] = external.get('tvdb_id', '0')
+            if meta['tvdb_id'] == "":
+                meta['tvdb_id'] = '0'
             
             # meta['aka'] = f" AKA {response['original_title']}"
             meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
@@ -704,7 +731,11 @@ class Prep():
             
             external = tv.external_ids()
             meta['imdb_id'] = external.get('imdb_id', "0")
+            if meta['imdb_id'] == "":
+                meta['imdb_id'] = '0'
             meta['tvdb_id'] = external.get('tvdb_id', '0')
+            if meta['tvdb_id'] == "":
+                meta['tvdb_id'] = '0'
 
             
             # meta['aka'] = f" AKA {response['original_name']}"
@@ -1377,7 +1408,6 @@ class Prep():
             meta['tv_pack'] = 0
             if meta['anime'] == False:
                 try:
-                    pprint(guessit(video))
                     try:
                         guess_year = guessit(video)['year']
                     except:
@@ -1553,31 +1583,40 @@ class Prep():
 
     
     async def gen_desc(self, meta):
+        desclink = meta.get('desclink', None)
+        descfile = meta.get('descfile', None)
         description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="")
         description.seek(0)
-        meta['description'] = []
+        if meta.get('discs', None) != None:
+            discs = meta['discs']
+            if len(discs) >= 2:
+                for each in discs[1:]:
+                    if each['type'] == "BDMV":
+                        description.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
+                        description.write("\n")
+                    if each['type'] == "DVD":
+                        #DVD Descriptions
+                        pass
         if meta['nfo'] != False:
             description.write("[code]")
             nfo = glob.glob("*.nfo")[0]
             description.write(open(nfo, 'r').read())
             description.write("[/code]")
             description.write("\n")
-            meta['description'].append(open(nfo, 'r').read())
-        # if desclink != None:
-        #     parsed = urllib.parse.urlparse(desclink)
-        #     raw = parsed._replace(path=f"/raw{parsed.path}")
-        #     raw = urllib.parse.urlunparse(raw)
-        #     description.write(requests.get(raw).text)
-        #     description.write("\n")
-        # if descfile != None:
-        #     if os.path.isfile(descfile) == True:
-        #         text = open(descfile, 'r').read()
-        #         description.write(text)
+        if desclink != None:
+            parsed = urllib.parse.urlparse(desclink)
+            raw = parsed._replace(path=f"/raw{parsed.path}")
+            raw = urllib.parse.urlunparse(raw)
+            description.write(requests.get(raw).text)
+            description.write("\n")
+        if descfile != None:
+            if os.path.isfile(descfile) == True:
+                text = open(descfile, 'r').read()
+                description.write(text)
         if meta['desc'] != None:
             description.write(meta['desc'])
             description.write("\n")
             description.write("\n")
-            meta['description'].append(meta['desc'])
         return meta
         
     async def tag_override(self, meta):
@@ -1616,6 +1655,8 @@ class Prep():
         return 
 
     async def get_imdb_aka(self, imdb_id):
+        if imdb_id == "0":
+            return ""
         ia = IMDb()
         result = ia.get_movie(imdb_id.replace('tt', ''))
                 
