@@ -131,7 +131,12 @@ def get_confirmation(meta):
             tag = ""
     else:
         tag = f" / {meta['tag'][1:]}"
-    cli_ui.info(f"{meta['resolution']} / {meta['type']}{tag}")
+    if meta['is_disc'] == "DVD":
+        res = meta['source']
+    else:
+        res = meta['resolution']
+
+    cli_ui.info(f"{res} / {meta['type']}{tag}")
     print()
     if meta.get('unattended', False) == False:
         cli_ui.info_section(cli_ui.yellow, "Is this correct?")

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+from math import exp
+from src.discparse import DiscParse
 import multiprocessing
 import os
 from os.path import basename
@@ -32,6 +33,7 @@ import traceback
 from subprocess import Popen
 import cli_ui
 from pprint import pprint
+import itertools
 
 
 
@@ -103,7 +105,24 @@ class Prep():
             mi_dump = None
         #IF DVD
         elif meta['is_disc'] == "DVD":
-            cprint('DVD Support coming eventually', 'grey', 'on_red')
+            video, scene = self.is_scene(self.path)
+            meta['filelist'] = []
+            filename = guessit(meta['discs'][0]['path'])['title']
+            try:
+                meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
+            except:
+                meta['search_year'] = ""
+
+            if meta.get('edit', False) == False:
+                mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", False, meta['uuid'], meta['base_dir'], export_text=False)
+            #screenshots
+            if meta.get('edit', False) == False:
+                ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, meta['discs']))
+                ds.start()
+                while ds.is_alive() == True:
+                    await asyncio.sleep(3)
+            #NTSC/PAL
+            meta['dvd_size'] = await self.get_dvd_size(meta['discs'])
         #If NOT BD/VD
         else:
             videopath, meta['filelist'] = self.get_video(videoloc) 
@@ -118,7 +137,7 @@ class Prep():
                 meta['search_year'] = ""
             
             if meta.get('edit', False) == False:
-                mi_dump, mi = self.exportInfo(videopath, filename, meta['isdir'], folder_id, base_dir)
+                mi = self.exportInfo(videopath, meta['isdir'], folder_id, base_dir, export_text=True)
                 meta['mediainfo'] = mi
             else:
                 mi = meta['mediainfo']
@@ -149,7 +168,7 @@ class Prep():
 
         
         if meta.get('tmdb', None) == None:
-            meta = await self.get_tmdb_id(filename, meta['search_year'], meta)
+            meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'])
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
         meta = await self.tmdb_other_meta(meta)
@@ -162,12 +181,12 @@ class Prep():
         meta['video'] = video
         meta['audio'] = self.get_audio_v2(mi, meta['anime'], bdinfo)
         meta['3D'] = self.is_3d(mi, bdinfo)
-        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'])
+        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi)
         if meta.get('service', None) == None:
             meta['service'] = self.get_service(video)
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
         meta['hdr'] = self.get_hdr(mi, bdinfo)
-        if meta.get('type', None) == "DISC": #Disk
+        if meta.get('is_disc', None) == "BDMV": #Blu-ray Specific
             meta['region'] = self.get_region(self.path, region=None)
             meta['video_codec'] = self.get_video_codec(bdinfo)
         else:
@@ -194,18 +213,6 @@ class Prep():
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     """
     Determine if disc and if so, get bdinfo
     """
@@ -215,6 +222,7 @@ class Prep():
         bdinfo = None
         bd_summary = None
         discs = []
+        parse = DiscParse()
         for path, directories, files in os.walk(meta['path']):
             for each in directories:
                 if each.upper() == "BDMV": #BDMVs
@@ -227,183 +235,29 @@ class Prep():
                         'bdinfo' : ""
                     }
                     discs.append(disc)
-                    discs, bdinfo = await self.get_bdinfo(discs, meta['uuid'], meta['base_dir'])
                 elif each == "VIDEO_TS": #DVDs
                     is_disc = "DVD"
                     disc = {
                         'path' : f"{path}/{each}",
                         'name' : os.path.basename(path),
                         'type' : 'DVD',
-                        "vob_mi" : "",
-                        "ifo_mi" : ""
+                        'vob_mi' : '',
+                        'ifo_mi' : '',
+                        'main_set' : [],
+                        'size' : ""
                     }
-                    discs.append(disc)   
+                    discs.append(disc)
+        if is_disc == "BDMV":
+            discs, bdinfo = await parse.get_bdinfo(discs, meta['uuid'], meta['base_dir'])
+        elif is_disc == "DVD":
+            discs = await parse.get_dvdinfo(discs)
+            export = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
+            export.write(discs[0]['ifo_mi'])
+            export.close()
         return is_disc, videoloc, bdinfo, discs
 
 
-    """
-    Get and parse bdinfo
-    """
-    async def get_bdinfo(self, discs, folder_id, base_dir):
-        save_dir = f"{base_dir}/tmp/{folder_id}"
-        if not os.path.exists(save_dir):
-            os.mkdir(save_dir)
-        for i in range(len(discs)):
-            bdinfo_text = None
-            path = os.path.abspath(discs[i]['path'])
-            for file in os.listdir(save_dir):
-                if file == f"BD_SUMMARY_{str(i).zfill(2)}.txt":
-                    bdinfo_text = save_dir + "/" + file
-            if bdinfo_text == None:
-                if sys.platform.startswith('linux'):
-                    try:
-                        # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                        cprint(f"Scanning {path}", 'grey', 'on_yellow')
-                        proc = await asyncio.create_subprocess_exec('mono', "bin/BDInfo/BDInfo.exe", '-w', path, save_dir)
-                        await proc.wait()
-                    except:
-                        cprint('mono not found, please install mono', 'grey', 'on_red')
-
-                elif sys.platform.startswith('win32'):
-                    # await asyncio.subprocess.Process(["bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                    cprint(f"Scanning {path}", 'grey', 'on_yellow')
-                    proc = await asyncio.create_subprocess_exec("bin/BDInfo/BDInfo.exe", "-w", path, save_dir)
-                    await proc.wait()
-                    await asyncio.sleep(1)
-                while True:
-                    try:
-                        for file in os.listdir(save_dir):
-                            if file.startswith(f"BDINFO"):
-                                bdinfo_text = save_dir + "/" + file
-                        with open(bdinfo_text, 'r') as f:
-                            text = f.read()
-                            result = text.split("QUICK SUMMARY:", 2)
-                            files = result[0].split("FILES:", 2)[1].split("CHAPTERS:", 2)[0].split("-------------")
-                            result2 = result[1].rstrip("\n")
-                            result = result2.split("********************", 1)
-                            bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
-                            f.close()
-                        os.remove(bdinfo_text)
-                    except Exception:
-                        # print(e)
-                        await asyncio.sleep(5)
-                        continue
-                    break
-                with open(f"{save_dir}/BD_SUMMARY_{str(i).zfill(2)}.txt", 'w') as f:
-                    f.write(bd_summary)
-                    f.close()
-                
-                bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
-        
-                discs[i]['summary'] = bd_summary
-                discs[i]['bdinfo'] = bdinfo
-            # shutil.rmtree(f"{base_dir}/tmp")
-        
-        return discs, discs[0]['bdinfo']
-        
-            
-
-    def parse_bdinfo(self, bdinfo_input, files, path):
-        bdinfo = dict()
-        bdinfo['video'] = list()
-        bdinfo['audio'] = list()
-        bdinfo['path'] = path
-        lines = bdinfo_input.splitlines()
-        for l in lines:
-            line = l.strip().lower()
-            if line.startswith("*"):
-                line = l.replace("*", "").strip().lower()
-                # print(line)
-            if line.startswith("playlist:"):
-                playlist = l.split(':', 1)[1]
-                bdinfo['playlist'] = playlist.split('.',1)[0].strip()
-            if line.startswith("disc size:"):
-                size = l.split(':', 1)[1]
-                size = size.split('bytes', 1)[0].replace(',','')
-                size = float(size)/float(1<<30)
-                bdinfo['size'] = size
-            if line.startswith("length:"):
-                length = l.split(':', 1)[1]
-                bdinfo['length'] = length.split('.',1)[0].strip()
-            if line.startswith("video:"):
-                split1 = l.split(':', 1)[1]
-                split2 = split1.split('/', 12)
-                while len(split2) != 9:
-                    split2.append("")
-                n=0
-                if "Eye" in split2[2].strip():
-                    n = 1
-                    three_dim = split2[2].strip()
-                else:
-                    three_dim = ""
-                try:
-                    bit_depth = split2[n+6].strip()
-                    hdr_dv = split2[n+7].strip()
-                    color = split2[n+8].strip()
-                except:
-                    bit_depth = ""
-                    hdr_dv = ""
-                    color = ""
-                bdinfo['video'].append({
-                    'codec': split2[0].strip(), 
-                    'bitrate': split2[1].strip(), 
-                    'res': split2[n+2].strip(), 
-                    'fps': split2[n+3].strip(), 
-                    'aspect_ratio' : split2[n+4].strip(),
-                    'profile': split2[n+5].strip(),
-                    'bit_depth' : bit_depth,
-                    'hdr_dv' : hdr_dv, 
-                    'color' : color,
-                    '3d' : three_dim,
-                    })
-            elif line.startswith("audio:"):
-                if "(" in l:
-                    l = l.split("(")[0]
-                l = l.strip()
-                split1 = l.split(':', 1)[1]
-                split2 = split1.split('/')
-                n = 0
-                if "Atmos" in split2[2].strip():
-                    n = 1
-                    fuckatmos = split2[2].strip()
-                else:
-                    fuckatmos = ""
-                bdinfo['audio'].append({
-                    'language' : split2[0].strip(), 
-                    'codec' : split2[1].strip(), 
-                    'channels' : split2[n+2].strip(), 
-                    'sample_rate' : split2[n+3].strip(), 
-                    'bitrate' : split2[n+4].strip(), 
-                    'bit_depth' : split2[n+5].strip(),
-                    'atmos_why_you_be_like_this': fuckatmos,
-                    })
-            elif line.startswith("disc title:"):
-                title = l.split(':', 1)[1]
-                # print(f"TITLE: {title}")
-                bdinfo['title'] = title
-            elif line.startswith("disc label:"):
-                label = l.split(':', 1)[1]
-                bdinfo['label'] = label
-        # pprint(bdinfo)
-        files = files.splitlines()
-        bdinfo['files'] = []
-        for line in files:
-            try:
-                stripped = line.split()
-                m2ts = {}
-                bd_file = stripped[0]
-                time_in = stripped[1]
-                bd_length = stripped[2]
-                bd_size = stripped[3]
-                bd_bitrate = stripped[4]
-                m2ts['file'] = bd_file
-                m2ts['length'] = bd_length
-                bdinfo['files'].append(m2ts)
-            except:
-                pass
-        return bdinfo
-
-
+   
 
     """
     Get video files
@@ -428,16 +282,17 @@ class Prep():
     """
     Get and parse mediainfo
     """
-    def exportInfo(self, video, filename, isdir, folder_id, base_dir):
+    def exportInfo(self, video, isdir, folder_id, base_dir, export_text):
         cprint("Exporting MediaInfo...", "grey", "on_yellow")
-        #MediaInfo to text
-        if isdir == False:
-            os.chdir(os.path.dirname(video))
-        media_info = MediaInfo.parse(os.path.basename(video), output="STRING", full=False)
-        export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
-        export.write(media_info)
-        export.close()
-        mi_dump = media_info
+        if export_text:
+            #MediaInfo to text
+            if isdir == False:
+                os.chdir(os.path.dirname(video))
+            media_info = MediaInfo.parse(os.path.basename(video), output="STRING", full=False)
+            export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
+            export.write(media_info)
+            export.close()
+            mi_dump = media_info
 
         #MediaInfo to JSON
         media_info = MediaInfo.parse(video, output="JSON")
@@ -448,7 +303,7 @@ class Prep():
             mi = json.load(f)
         cprint("MediaInfo Exported.", "grey", "on_green")
         
-        return mi_dump, mi
+        return mi
 
 
 
@@ -604,6 +459,52 @@ class Prep():
                 time.sleep(1)
                 
         
+    def dvd_screenshots(self, meta, discs):
+        cprint("Saving Screens...", "grey", "on_yellow")
+        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO")
+        for track in ifo_mi.tracks:
+            if track.track_type == "Video":
+                length = track.duration
+                dar = track.display_aspect_ratio
+                width = track.width
+                height = track.height
+        
+        length = round(float(length))
+        main_set = meta['discs'][0]['main_set']
+        n = 0        
+        i = 0
+
+        while i != self.screens:
+            if n >= self.screens:
+                n -= self.screens
+            image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][0]['name']}-{i}.png"
+            (
+                ffmpeg
+                .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=random.randint(round(length/5) , round(length - length/5)))
+                .filter('scale', width, height)
+                .output(image, vframes=1)
+                .overwrite_output()
+                .global_args('-loglevel', 'quiet')
+                .run(quiet=True)
+            )
+            # print(os.path.getsize(image))
+            # print(f'{i+1}/{self.screens}')
+            cli_ui.info_count(i, self.screens, "Screens Saved")
+            # print(Path(image))
+            if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                i += 1
+            elif os.path.getsize(Path(image)) <= 20000000 and self.img_host == "pstorage.space":
+                i += 1
+            elif os.path.getsize(Path(image)) <= 10000:
+                cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
+                time.sleep(1)
+            elif self.img_host == "ptpimg":
+                i += 1
+            elif self.img_host == "freeimage.host":
+                i += 1
+            else:
+                cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                time.sleep(1)
 
 
     def screenshots(self, path, filename, folder_id, base_dir):
@@ -678,17 +579,22 @@ class Prep():
         return category
 
 
-    async def get_tmdb_id(self, filename, search_year, meta):
+    async def get_tmdb_id(self, filename, search_year, meta, category):
         search = tmdb.Search()
         try:
-            if meta['category'] == "MOVIE":
+            if category == "MOVIE":
                 search.movie(query=filename, year=search_year)
-            elif meta['category'] == "TV":
+            elif category == "TV":
                 search.tv(query=filename, first_air_date_year=search_year)
             meta['tmdb'] = search.results[0]['id']
-        
-        except:
-            meta['tmdb'] = "0"
+            meta['category'] = category
+        except IndexError:
+            # meta['tmdb'] = "0"
+            if category == "MOVIE":
+                category = "TV"
+            else:
+                category = "MOVIE"
+            await self.get_tmdb_id(filename, search_year, meta, category)
         return meta
     
     async def tmdb_other_meta(self, meta):
@@ -698,7 +604,7 @@ class Prep():
                 title = title.split('aka')[0]
                 meta = await self.get_tmdb_id(guessit(title)['title'], meta['search_year'], meta)
                 if meta['tmdb'] == "0":
-                    meta = await self.get_tmdb_id(title, "", meta)
+                    meta = await self.get_tmdb_id(title, "", meta, meta['category'])
             except:
                 cprint("Unable to find tmdb entry", 'grey', 'on_red')
                 return meta
@@ -952,7 +858,7 @@ class Prep():
         return tag
 
 
-    def get_source(self, type, video, path):
+    def get_source(self, type, video, path, mi):
         try:
             try:
                 source = guessit(video)['source']
@@ -969,15 +875,18 @@ class Prep():
                     source = "BluRay"
             elif source in ("DVD", "dvd"):
                 try:
-                    other = guessit(video)['other']
-                    if "PAL" in other:
-                        system = "PAL"
-                    elif "NTSC" in other:
-                        system = "NTSC"
+                   system = mi['media']['track'][1]['Standard']
                 except:
-                    system = ""
-                    # system = click.prompt("Encoding system not found", type=click.Choice(["PAL", "NTSC"], case_sensitive=False))
-                source = system + " DVD"
+                    try:
+                        other = guessit(video)['other']
+                        if "PAL" in other:
+                            system = "PAL"
+                        elif "NTSC" in other:
+                            system = "NTSC"
+                    except:
+                        system = ""
+                        # system = click.prompt("Encoding system not found", type=click.Choice(["PAL", "NTSC"], case_sensitive=False))
+                    source = system
             elif source in ("Web"):
                 if type == "ENCODE":
                     type = "WEBRIP"
@@ -1333,9 +1242,12 @@ class Prep():
         source = meta.get('source', "")
         uhd = meta.get('uhd', "")
         hdr = meta.get('hdr', "")
-        if type == "DISC": #Disk
-            region = meta.get('region', "")
+        if meta.get('is_disc', "") == "BDMV": #Disk
             video_codec = meta.get('video_codec', "")
+            region = meta.get('region', "")
+        elif meta.get('is_disc', "") == "DVD":
+            region = meta.get('region', "")
+            dvd_size = meta.get('dvd_size', "")
         else:
             video_codec = meta.get('video_codec', "")
             video_encode = meta.get('video_encode', "")
@@ -1348,8 +1260,12 @@ class Prep():
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
             if type == "DISC": #Disk
-                name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
-                convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+                if meta['is_disc'] == 'BDMV':
+                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                    convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+                elif meta['is_disc'] == 'DVD':
+                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {source} {dvd_size} {audio}"
+                    convention = ""
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
                 convention = "Name Year Resolution Source Video-codec Audio-Tag"
@@ -1370,8 +1286,12 @@ class Prep():
                 convention = "Name Year Resolution Source Audio Video-Tag"
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
-                convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+                if meta['is_disc'] == 'BDMV':
+                    name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                    convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+                if meta['is_disc'] == 'DVD':
+                    name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
+                    convention = ""
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 convention = "Name Year Resolution Source Video-codec Audio-Tag"
@@ -1448,7 +1368,7 @@ class Prep():
                 romaji, mal_id, eng_title, seasonYear = self.get_romaji(guessit(parsed['anime_title'])['title'])
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
-                    meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta)
+                    meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
                 meta = await self.tmdb_other_meta(meta)
                 tag = parsed.get('release_group', "")
                 if tag != "":
@@ -1502,6 +1422,9 @@ class Prep():
                 meta['episode'] = episode
             else:
                 meta['episode'] = f"E{meta['manual_episode'].zfill(2)}"
+            
+            if " COMPLETE " in Path(video).name.replace('.', ' '):
+                meta['season'] = "COMPLETE"
         return meta
 
 
@@ -1589,14 +1512,17 @@ class Prep():
         description.seek(0)
         if meta.get('discs', None) != None:
             discs = meta['discs']
+            if meta['discs'][0]['type'] == "DVD":
+                description.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
             if len(discs) >= 2:
                 for each in discs[1:]:
                     if each['type'] == "BDMV":
                         description.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
                         description.write("\n")
                     if each['type'] == "DVD":
-                        #DVD Descriptions
-                        pass
+                        description.write(f"{each['name']}:\n")
+                        description.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
+                        description.write("\n")
         if meta['nfo'] != False:
             description.write("[code]")
             nfo = glob.glob("*.nfo")[0]
@@ -1664,3 +1590,18 @@ class Prep():
         if aka != "":
             aka = f" AKA {aka}"
         return aka
+
+    async def get_dvd_size(self, discs):
+        sizes = []
+        dvd_sizes = []
+        for each in discs:
+            sizes.append(each['size'])
+        grouped_sizes = [list(i) for j, i in itertools.groupby(sorted(sizes))]
+        for each in grouped_sizes:
+            if len(each) > 1:
+                dvd_sizes.append(f"{len(each)}x{each[0]}")
+        dvd_sizes.sort()
+        compact = " ".join(dvd_sizes)
+        return compact
+    
+
