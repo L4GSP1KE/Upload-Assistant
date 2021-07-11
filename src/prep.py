@@ -470,7 +470,8 @@ class Prep():
                 height = track.height
         
         length = round(float(length))
-        main_set = meta['discs'][0]['main_set']
+        if len(meta['discs'][0]['main_set']) >= 3:
+            main_set = meta['discs'][0]['main_set'][1:-1]
         n = 0        
         i = 0
 
