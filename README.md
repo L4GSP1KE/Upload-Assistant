@@ -12,20 +12,19 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - Adds to your client, seeding instantly
   - ALL WITH MINIMAL INPUT!
 
-  - Currently works with .mkv/.mp4/Single Blu-rays
+  - Currently works with .mkv/.mp4/Blu-ray/DVD
 
 
 
 ## Coming Soon:
-  - Multiple BDs
-  - DVD Support
+  - HDDVD
 
 
   
 
 ## **Setup:**
    - **REQUIRES AT LEAST PYTHON 3.6 AND PIP3**
-   - Also REQUIRES [mono](https://www.mono-project.com/) on linux systems for BDInfo
+   - REQUIRES [mono](https://www.mono-project.com/) on linux systems for BDInfo
    - Clone the repo to your system `git clone https://github.com/L4GSP1KE/Upload-Assistant.git`
    - Copy and Rename `data/example-config.json` to `data/config.json`
    - Edit `config.json` to use your information (more detailed information in the wiki(coming soon))
@@ -67,45 +66,5 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - `!args`:
       - This returns a message containing all usable arguments
 
-## Args:
-```
-Options:
-  -h, --help              show this help message and exit
-
-  -s, --screens           Number of screenshots
-
-  -c, --category          Category [MOVIE, TV, FANRES]
-
-  -t, --type              Type [DISC, REMUX, ENCODE, WEBDL, WEBRIP, HDTV]
-
-  -res, --resolution      Resolution [2160p, 1080p, 1080i, 720p, 576p, 576i, 480p, 480i, 8640p, 4320p, OTHER]
-
-  -tmdb, --tmdb           TMDb ID
-
-  -g, --tag               Group Tag
-
-  -serv, --service        Streaming Service
-
-  -edition, --edition     Edition
-
-  -d, --desc              Custom Description (string)
-
-  -nfo, --n               Use .nfo in directory for description
-
-  -k, --keywords          Add comma seperated keywords e.g. 'keyword, keyword2, etc'
-
-  -reg, --region          Region for discs
-
-  -a, --ano               Upload anonymously
-
-  -st, --st               Stream Optimized Upload
-
-  -debug, --debug         Debug Mode
-
-  -client, --client       Override default torrent client
-
-  -tk, --trackers         Override default torrent client
-
-  ````
   
   Feel free to pester me if you need help/want features/etc.
