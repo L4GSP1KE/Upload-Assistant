@@ -301,21 +301,32 @@ class Commands(commands.Cog):
             tvdb = ""
         else:
             tvdb = f" / [TVDb](https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series)"
-
+        if meta['is_disc'] == "DVD":
+            res = meta['source']
+        else:
+            res = meta['resolution']
 
         embed=discord.Embed(title=f"Upload: {meta['title']}", url=f"https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}", description=meta['overview'], color=0x0080ff, timestamp=datetime.utcnow())
         embed.add_field(name="Links", value=f"[TMDb](https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}){imdb}{tvdb}")
-        embed.add_field(name=f"{meta['resolution']} / {meta['type']}{tag}", value=f"```{meta['name']}```", inline=False)
+        embed.add_field(name=f"{res} / {meta['type']}{tag}", value=f"```{meta['name']}```", inline=False)
         # embed.add_field(name=meta['type'], value=meta['resolution'], inline=True)
         embed.set_thumbnail(url=f"https://image.tmdb.org/t/p/original{meta['poster']}")
         embed.set_footer(text=meta['uuid'])
         embed.set_author(name="L4G's Upload Assistant", url="https://github.com/L4GSP1KE/BluUpload", icon_url="https://images2.imgbox.com/6e/da/dXfdgNYs_o.png")
         message = await ctx.send(embed=embed)
         channel = message.channel
-        await message.add_reaction(config['DISCORD']['discord_emojis']['BLU'])
-        await asyncio.sleep(0.3)
-        await message.add_reaction(config['DISCORD']['discord_emojis']['BHD'])
-        await asyncio.sleep(0.3)
+
+        if meta.get('trackers', None) != None:
+            trackers = meta['trackers']
+        else:
+            trackers = config['TRACKERS']['default_trackers']
+        trackers = trackers.split(',')
+        if "BLU" in trackers:
+            await message.add_reaction(config['DISCORD']['discord_emojis']['BLU'])
+            await asyncio.sleep(0.3)
+        if "BHD" in trackers:
+            await message.add_reaction(config['DISCORD']['discord_emojis']['BHD'])
+            await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['MANUAL'])
         await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['CANCEL'])
