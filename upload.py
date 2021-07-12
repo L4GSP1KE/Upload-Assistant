@@ -98,7 +98,6 @@ async def do_the_thing(path, args, base_dir):
     else:
         trackers = config['TRACKERS']['default_trackers']
     trackers = trackers.split(',')
-    cprint(trackers, 'magenta')
     for tracker in trackers:
         tracker = tracker.replace(" ", "")
         if tracker == "BLU":
