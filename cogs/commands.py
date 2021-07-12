@@ -3,7 +3,9 @@ from src.prep import Prep
 from src.args import Args
 from src.clients import Clients
 from src.search import Search
-from src.trackers.BLU import Blu
+from src.trackers.BLU import BLU
+from src.trackers.BHD import BHD
+
 import discord
 from discord.ext import commands
 import os
@@ -392,7 +394,7 @@ class Commands(commands.Cog):
 
             client = Clients(config=config)
             if "BLU" in tracker_list:
-                blu = Blu(config=config)
+                blu = BLU(config=config)
                 dupes = await blu.search_existing(meta)
                 meta = await self.dupe_embed(dupes, meta, tracker_emojis, channel)
                 if meta['upload'] == True:
@@ -401,7 +403,14 @@ class Commands(commands.Cog):
                     await channel.send(f"Uploaded `{meta['name']}`to BLU")
                     return
             if "BHD" in tracker_list:
-                await channel.send("Uploading to BHD (coming soon:tm:)")
+                bhd = BHD(config=config)
+                dupes = await bhd.search_existing(meta)
+                meta = await self.dupe_embed(dupes, meta, tracker_emojis, channel)
+                if meta['upload'] == True:
+                    await bhd.upload(meta)
+                    await client.add_to_client(meta, "BHD")
+                    await channel.send(f"Uploaded `{meta['name']}`to BHD")
+                    return
             return None
     
     
