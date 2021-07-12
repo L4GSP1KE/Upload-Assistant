@@ -1511,9 +1511,10 @@ class Prep():
         descfile = meta.get('descfile', None)
         description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="")
         description.seek(0)
-        if meta.get('discs', None) != None:
+        if meta.get('discs', []) != []:
             discs = meta['discs']
-            if meta['discs'][0]['type'] == "DVD":
+            cprint(discs, 'magenta')
+            if discs[0]['type'] == "DVD":
                 description.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
             if len(discs) >= 2:
                 for each in discs[1:]:
