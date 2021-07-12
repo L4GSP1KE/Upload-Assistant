@@ -11,7 +11,7 @@ from pprint import pprint
 
 # from pprint import pprint
 
-class Blu():
+class BLU():
     """
     Edit for Tracker:
         Edit BASE.torrent with announce and source
@@ -33,7 +33,7 @@ class Blu():
 
         if meta['bdinfo'] != None:
             mi_dump = None
-            bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BDINFO.txt", 'r', encoding='utf-8').read()
+            bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
             bd_dump = None
@@ -66,7 +66,7 @@ class Blu():
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
-        url = f"https://blutopia.xyz/api/torrents/upload?api_token={self.config['DEFAULT']['blu_api']}"
+        url = f"https://blutopia.xyz/api/torrents/upload?api_token={self.config['TRACKERS']['BLU']['api_key']}"
         
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
@@ -126,7 +126,7 @@ class Blu():
 
     async def edit_torrent(self, meta):
         blu_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        blu_torrent.metainfo['announce'] = self.config['DEFAULT']['blu_announce']
+        blu_torrent.metainfo['announce'] = self.config['TRACKERS']['BLU']['announce_url']
         blu_torrent.metainfo['info']['source'] = "BLU"
         blu_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
         Torrent.copy(blu_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent")
@@ -143,7 +143,7 @@ class Blu():
     async def search_existing(self, meta):
         dupes = []
         cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
-        url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(meta['clean_name'])}&api_token={self.config['DEFAULT']['blu_api']}"
+        url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(meta['clean_name'])}&api_token={self.config['TRACKERS']['BLU']['api_key']}"
         response = requests.get(url=url)
         response = response.json()
         for each in response['data']:

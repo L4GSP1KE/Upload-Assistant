@@ -46,6 +46,7 @@ class Args():
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode")
         parser.add_argument('-m', '--manual', action='store_true', required=False, help="Manual Mode. Returns link to ddl screens/base.torrent")
         parser.add_argument('-nh', '--nohash', action='store_true', required=False, help="Don't hash .torrent")
+        parser.add_argument('-dr', '--draft', action='store_true', required=False, help="Send to drafts (BHD)")
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Override default torrent client")
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
         parser.add_argument('-ua', '--unattended', action='store_true', required=False, help=argparse.SUPPRESS)

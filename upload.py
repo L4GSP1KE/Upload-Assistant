@@ -2,7 +2,8 @@ from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
 from src.search import Search
-from src.trackers.BLU import Blu
+from src.trackers.BLU import BLU
+from src.trackers.BHD import BHD
 
 import json
 from termcolor import cprint
@@ -92,7 +93,11 @@ async def do_the_thing(path, args, base_dir):
         meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
         confirm = get_confirmation(meta)
     
-    trackers = ['BLU']
+    if meta.get('trackers', None) != None:
+        trackers = meta['trackers']
+    else:
+        trackers = config['TRACKERS']['default_trackers']
+    trackers = trackers.split(',')
     for tracker in trackers:
         if tracker == "BLU":
             if meta['unattended']:
@@ -101,7 +106,7 @@ async def do_the_thing(path, args, base_dir):
                 upload_to_blu = cli_ui.ask_yes_no("Upload to BLU?", default=meta['unattended'])
             if upload_to_blu:
                 print("Uploading to BLU")
-                blu = Blu(config=config)
+                blu = BLU(config=config)
                 dupes = await blu.search_existing(meta)
                 meta = dupe_check(dupes, meta)
                 if meta['upload'] == True:
@@ -109,7 +114,18 @@ async def do_the_thing(path, args, base_dir):
                     await client.add_to_client(meta, "BLU")
         if tracker == "BHD":
             if cli_ui.ask_yes_no("Upload to BHD?", default=False):
-                print("BHD support coming soon")
+                if meta['unattended']:
+                    upload_to_bhd = True
+                else:
+                    upload_to_bhd = cli_ui.ask_yes_no("Upload to BHD?", default=meta['unattended'])
+                if upload_to_bhd:
+                    print("Uploading to BHD")
+                    bhd = BHD(config=config)
+                    dupes = await bhd.search_existing(meta)
+                    meta = dupe_check(dupes, meta)
+                    if meta['upload'] == True:
+                        await bhd.upload(meta)
+                        await client.add_to_client(meta, "BHD")
 
 
 
@@ -153,7 +169,7 @@ def dupe_check(dupes, meta):
             meta['upload'] = True   
             return meta
     else:    
-        dupe_text = "\n•".join(dupes)
+        dupe_text = "\n".join(dupes)
         cli_ui.info(dupe_text)
 
         if meta['unattended']:

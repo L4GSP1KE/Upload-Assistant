@@ -17,15 +17,22 @@
 
 
 
-        "blu_api" : "blu api key",
-        "blu_announce" : "https://blutopia.xyz/announce/customannounceurl",
-
-        "bhd_api" : "",
-        "bhd_announce" : "",
-
         "default_torrent_client" : "Client1"
 
 
+    },
+
+    "TRACKERS" : {
+        "default_trackers" : "BLU, BHD",
+        "BLU" : {
+            "api_key" : "BLU api key",
+            "announce_url" : "https://blutopia.xyz/announce/customannounceurl"
+        },
+        "BHD" : {
+            "api_key" : "BHD api key",
+            "announce_url" : "https://beyond-hd.me/announce/customannounceurl",
+            "draft_default" : "True"
+        }
     },
 
 
