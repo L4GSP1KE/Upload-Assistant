@@ -560,8 +560,10 @@ class Prep():
             type = "WEBDL"
         elif "webrip" in filename:
             type = "WEBRIP"
-        elif scene == True:
-            type = "ENCODE"
+        # elif scene == True:
+            # type = "ENCODE"
+        elif "hdtv" in filename:
+            type = "HDTV"
         elif is_disc != None:
             type = "DISC"
         else:
@@ -1269,13 +1271,13 @@ class Prep():
                     potential_missing = ['edition']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
-                potential_missing = ['edition']
+                potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
                 name = f"{title} {alt_title} {year} {edition} {repack} {source} REMUX  {audio}" 
-                potential_missing = ['edition']
+                potential_missing = ['edition', 'description']
             elif type == "ENCODE": #Encode
                 name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}"  
-                potential_missing = ['edition']
+                potential_missing = ['edition', 'description']
             elif type == "WEBDL": #WEB-DL
                 name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
@@ -1295,13 +1297,13 @@ class Prep():
                     potential_missing = ['edition']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
-                potential_missing = ['edition']
+                potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {source} REMUX {audio}" #SOURCE
-                potential_missing = ['edition']
+                potential_missing = ['edition', 'description']
             elif type == "ENCODE": #Encode
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
-                potential_missing = ['edition']
+                potential_missing = ['edition', 'description']
             elif type == "WEBDL": #WEB-DL
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']

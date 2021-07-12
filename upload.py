@@ -197,11 +197,18 @@ def dupe_check(dupes, meta):
         return meta
 
 def get_missing(meta):
+    info_notes = {
+        'edition' : 'Special Edition/Release',
+        'description' : "Please include Remux/Encode Notes if possible (either here or edit your upload)",
+        'service' : "WEB Service e.g.(AMZN, NF)",
+        'region' : "Disc Region",
+    }
+
     if len(meta['potential_missing']) > 0:
         cli_ui.info_section(cli_ui.yellow, "Potentially missing information:")
         for each in meta['potential_missing']:
             if meta.get(each, '').replace(' ', '') == "": 
-                cli_ui.info(f"--{each}")
+                cli_ui.info(f"--{each} | {info_notes.get(each)}")
     print()
     return
 
