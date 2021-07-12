@@ -153,7 +153,7 @@ class Commands(commands.Cog):
         await msg.delete()
         meta['edit'] = True
         meta = await prep.gather_prep(meta=meta) 
-        meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
+        meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
 
 
 
@@ -263,7 +263,7 @@ class Commands(commands.Cog):
     
     async def send_embed_and_upload(self,ctx,meta):
         prep = Prep(path=Path(meta['path']), screens=meta['screens'], img_host=meta['imghost'], config=config)
-        meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
+        meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         #Upload Screens
         # await prep.upload_screens(meta, meta['screens'], 1, i=1)
         
@@ -307,10 +307,13 @@ class Commands(commands.Cog):
             res = meta['source']
         else:
             res = meta['resolution']
+        missing = await self.get_missing(meta)
+
 
         embed=discord.Embed(title=f"Upload: {meta['title']}", url=f"https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}", description=meta['overview'], color=0x0080ff, timestamp=datetime.utcnow())
         embed.add_field(name="Links", value=f"[TMDb](https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}){imdb}{tvdb}")
         embed.add_field(name=f"{res} / {meta['type']}{tag}", value=f"```{meta['name']}```", inline=False)
+        embed.add_field(name=f"POTENTIALLY MISSING INFORMATION:", value="\n\n".join(missing), inline=False)
         # embed.add_field(name=meta['type'], value=meta['resolution'], inline=True)
         embed.set_thumbnail(url=f"https://image.tmdb.org/t/p/original{meta['poster']}")
         embed.set_footer(text=meta['uuid'])
@@ -459,7 +462,13 @@ class Commands(commands.Cog):
 
         return meta
 
-
+    async def get_missing(self, meta):
+        missing = []
+        if len(meta['potential_missing']) > 0:
+            for each in meta['potential_missing']:
+                if meta.get(each, '').replace(' ', '') == "": 
+                    missing.append(f"--{each}")
+        return missing
 
 def setup(bot):
     bot.add_cog(Commands(bot))

@@ -1263,54 +1263,54 @@ class Prep():
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
                     name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
-                    convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+                    potential_missing = ['edition', 'region']
                 elif meta['is_disc'] == 'DVD':
-                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {source} {dvd_size} {audio}"
-                    convention = ""
+                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {dvd_size} {audio}"
+                    potential_missing = ['edition']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
-                convention = "Name Year Resolution Source Video-codec Audio-Tag"
+                potential_missing = ['edition']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
                 name = f"{title} {alt_title} {year} {edition} {repack} {source} REMUX  {audio}" 
-                convention = "Name Year Encoding_system Format Source Audio-Tag"
+                potential_missing = ['edition']
             elif type == "ENCODE": #Encode
                 name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}"  
-                convention = "Name Year Resolution Source Audio Video-Tag"
+                potential_missing = ['edition']
             elif type == "WEBDL": #WEB-DL
                 name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
+                potential_missing = ['edition', 'service']
             elif type == "WEBRIP": #WEBRip
                 name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-codec-Tag"
+                potential_missing = ['edition', 'service']
             elif type == "HDTV": #HDTV
                 name = f"{title} {alt_title} {year} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
-                convention = "Name Year Resolution Source Audio Video-Tag"
+                potential_missing = []
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
                     name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
-                    convention = "Name Year Resolution Region Source Video-codec Audio-Tag"
+                    potential_missing = ['edition', 'region']
                 if meta['is_disc'] == 'DVD':
                     name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
-                    convention = ""
+                    potential_missing = ['edition']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
-                convention = "Name Year Resolution Source Video-codec Audio-Tag"
+                potential_missing = ['edition']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {source} REMUX {audio}" #SOURCE
-                convention = "Name Year Encoding_system Format Source Audio-Tag"
+                potential_missing = ['edition']
             elif type == "ENCODE": #Encode
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
-                convention = "Name Year Resolution Source Audio Video-Tag"
+                potential_missing = ['edition']
             elif type == "WEBDL": #WEB-DL
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
+                potential_missing = ['edition', 'service']
             elif type == "WEBRIP": #WEBRip
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
-                convention = "Name Year Resolution Source Rip-type Audio Video-Tag"
+                potential_missing = ['edition', 'service']
             elif type == "HDTV": #HDTV
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
-                convention = "Name Year Resolution Source Audio Video-Tag"
+                potential_missing = []
 
 
     
@@ -1318,7 +1318,7 @@ class Prep():
         name_notag = name
         name = name_notag + tag
         clean_name = self.clean_filename(name)
-        return name_notag, name, clean_name
+        return name_notag, name, clean_name, potential_missing
 
 
 
@@ -1607,3 +1607,4 @@ class Prep():
         return compact
     
 
+    

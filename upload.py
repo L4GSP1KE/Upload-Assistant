@@ -35,7 +35,7 @@ if path in ['-h', '--help']:
     meta, help = parser.parse("", dict())
     help.print_help()
     exit()
-
+cli_ui.setup(color='always', title="L4G's Upload Assistant")
 
 async def do_the_thing(path, args, base_dir):
     meta = dict()
@@ -58,7 +58,7 @@ async def do_the_thing(path, args, base_dir):
     
     prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
     meta = await prep.gather_prep(meta=meta) 
-    meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
+    meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
 
     if meta.get('image_list', False) == False:
         return_dict = {}
@@ -90,7 +90,7 @@ async def do_the_thing(path, args, base_dir):
         # meta = await prep.tmdb_other_meta(meta)
         meta['edit'] = True
         meta = await prep.gather_prep(meta=meta) 
-        meta['name_notag'], meta['name'], meta['clean_name'] = await prep.get_name(meta)
+        meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         confirm = get_confirmation(meta)
     
     if meta.get('trackers', None) != None:
@@ -140,6 +140,7 @@ def get_confirmation(meta):
     print()
     cli_ui.info(f"Overview: {meta['overview']}")
     print()
+    cli_ui.info(f"Category: {meta['category']}")
     cli_ui.info(f"TMDb: {meta['tmdb']}")
     cli_ui.info(f"IMDb: {meta['imdb_id']}")
     cli_ui.info(f"TVDb: {meta['tvdb_id']}")
@@ -156,6 +157,7 @@ def get_confirmation(meta):
     cli_ui.info(f"{res} / {meta['type']}{tag}")
     print()
     if meta.get('unattended', False) == False:
+        get_missing(meta)
         cli_ui.info_section(cli_ui.yellow, "Is this correct?")
         cli_ui.info(f"Name: {meta['name']}")
         confirm = cli_ui.ask_yes_no("Correct?", default=False)
@@ -180,7 +182,7 @@ def dupe_check(dupes, meta):
             else:
                 cprint("Found potential dupes. -dupe/--dupe was passed. Uploading anyways", 'grey', 'on_yellow')
         print()
-        cli_ui.info_section(cli_ui.yellow, "Are these dupes?")
+        cli_ui.info_section(cli_ui.bold, "Are these dupes?")
         print()
         upload = cli_ui.ask_yes_no("Upload Anyways?", default=False)
 
@@ -194,7 +196,14 @@ def dupe_check(dupes, meta):
 
         return meta
 
-
+def get_missing(meta):
+    if len(meta['potential_missing']) > 0:
+        cli_ui.info_section(cli_ui.yellow, "Potentially missing information:")
+        for each in meta['potential_missing']:
+            if meta.get(each, '').replace(' ', '') == "": 
+                cli_ui.info(f"--{each}")
+    print()
+    return
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
