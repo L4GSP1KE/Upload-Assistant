@@ -114,14 +114,19 @@ async def do_the_thing(path, args, base_dir):
                     await blu.upload(meta)
                     await client.add_to_client(meta, "BLU")
         if tracker == "BHD":
-            if cli_ui.ask_yes_no("Upload to BHD?", default=False):
+            bhd = BHD(config=config)
+            draft_int = bhd.get_live(meta)
+            if draft_int == 0:
+                draft = "Draft"
+            else:
+                draft = "Live"
+            if cli_ui.ask_yes_no(f"Upload to BHD? ({draft})", default=False):
                 if meta['unattended']:
                     upload_to_bhd = True
                 else:
                     upload_to_bhd = cli_ui.ask_yes_no("Upload to BHD?", default=meta['unattended'])
                 if upload_to_bhd:
                     print("Uploading to BHD")
-                    bhd = BHD(config=config)
                     dupes = await bhd.search_existing(meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
