@@ -100,7 +100,7 @@ async def do_the_thing(path, args, base_dir):
     trackers = trackers.split(',')
     for tracker in trackers:
         tracker = tracker.replace(" ", "")
-        if tracker == "BLU":
+        if tracker.upper() == "BLU":
             if meta['unattended']:
                 upload_to_blu = True
             else:
@@ -113,7 +113,7 @@ async def do_the_thing(path, args, base_dir):
                 if meta['upload'] == True:
                     await blu.upload(meta)
                     await client.add_to_client(meta, "BLU")
-        if tracker == "BHD":
+        if tracker.upper() == "BHD":
             bhd = BHD(config=config)
             draft_int = bhd.get_live(meta)
             if draft_int == 0:
