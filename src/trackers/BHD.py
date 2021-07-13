@@ -38,7 +38,7 @@ class BHD():
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8')
             
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        desc = desc.replace("img=350", "img=350x350")
+        desc = desc.replace("img=350", "img=300x300")
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", 'rb')
         files = {
             'file': open_torrent,
