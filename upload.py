@@ -116,7 +116,7 @@ async def do_the_thing(path, args, base_dir):
                     await client.add_to_client(meta, "BLU")
         if tracker.upper() == "BHD":
             bhd = BHD(config=config)
-            draft_int = bhd.get_live(meta)
+            draft_int = await bhd.get_live(meta)
             if draft_int == 0:
                 draft = "Draft"
             else:
