@@ -97,7 +97,8 @@ async def do_the_thing(path, args, base_dir):
         trackers = meta['trackers']
     else:
         trackers = config['TRACKERS']['default_trackers']
-    trackers = trackers.split(',')
+    if "," in trackers:
+        trackers = trackers.split(',')
     for tracker in trackers:
         tracker = tracker.replace(" ", "")
         if tracker.upper() == "BLU":
