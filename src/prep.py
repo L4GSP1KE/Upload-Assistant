@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 from math import exp
+
+import imdb
 from src.discparse import DiscParse
 import multiprocessing
 import os
@@ -166,9 +168,11 @@ class Prep():
         else:
             meta['category'] = meta['category'].upper()
 
-        
-        if meta.get('tmdb', None) == None:
+               
+        if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'])
+        elif meta.get('imdb', None) != None:
+            meta = await self.get_tmdb_from_imdb(meta, filename)
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
         meta = await self.tmdb_other_meta(meta)
@@ -581,6 +585,23 @@ class Prep():
             category = "MOVIE"
         return category
 
+    async def get_tmdb_from_imdb(self, meta, filename):
+        imdb_id = meta['imdb']
+        if str(imdb_id)[:2].lower() != "tt":
+            imdb_id = f"tt{imdb_id}"
+        find = tmdb.Find(id=imdb_id)
+        info = find.info(external_source="imdb_id")
+        if len(info['movie_results']) >= 1:
+            meta['category'] = "MOVIE"
+            meta['tmdb'] = meta['tmdb_manual'] = info['movie_results'][0]['id']
+        elif len(info['tv_results']) >= 1:
+            meta['category'] = "TV"
+            meta['tmdb'] = meta['tmdb_manual'] = info['tv_results'][0]['id']
+        else:
+            cprint("TMDb was unable to find anything with that IMDb, searching TMDb normally", 'grey', 'on_yellow')
+            meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'])
+        await asyncio.sleep(3)
+        return meta
 
     async def get_tmdb_id(self, filename, search_year, meta, category):
         search = tmdb.Search()
