@@ -121,18 +121,17 @@ async def do_the_thing(path, args, base_dir):
                 draft = "Draft"
             else:
                 draft = "Live"
-            if cli_ui.ask_yes_no(f"Upload to BHD? ({draft})", default=False):
-                if meta['unattended']:
-                    upload_to_bhd = True
-                else:
-                    upload_to_bhd = cli_ui.ask_yes_no("Upload to BHD?", default=meta['unattended'])
-                if upload_to_bhd:
-                    print("Uploading to BHD")
-                    dupes = await bhd.search_existing(meta)
-                    meta = dupe_check(dupes, meta)
-                    if meta['upload'] == True:
-                        await bhd.upload(meta)
-                        await client.add_to_client(meta, "BHD")
+            if meta['unattended']:
+                upload_to_bhd = True
+            else:
+                upload_to_bhd = cli_ui.ask_yes_no(f"Upload to BHD? ({draft})", default=meta['unattended'])
+            if upload_to_bhd:
+                print("Uploading to BHD")
+                dupes = await bhd.search_existing(meta)
+                meta = dupe_check(dupes, meta)
+                if meta['upload'] == True:
+                    await bhd.upload(meta)
+                    await client.add_to_client(meta, "BHD")
 
 
 
