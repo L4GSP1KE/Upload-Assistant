@@ -1591,7 +1591,7 @@ class Prep():
     
 
     async def package(self, meta):
-        archive = f"{meta['base_dir']}/tmp/{meta['title']}"
+        archive = f"{meta['base_dir']}/tmp/{meta['title']}-{meta['uuid']}"
         shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
         files = {
             "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}

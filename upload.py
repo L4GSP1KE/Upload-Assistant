@@ -73,13 +73,27 @@ async def do_the_thing(path, args, base_dir):
         else:
             meta['client'] = "none"
            
-    if meta.get('manual', False):  
+    if meta.get('trackers', None) != None:
+        trackers = meta['trackers']
+    else:
+        trackers = config['TRACKERS']['default_trackers']
+    if "," in trackers:
+        trackers = trackers.split(',')
+    if meta.get('manual', False):
+        for tracker in trackers:
+            tracker = tracker.replace(" ", "")
+            if tracker.upper() == "BLU":
+                blu = BLU(config=config) 
+                await blu.edit_desc(meta)
+            if tracker.upper() == "BHD":
+                bhd = BHD(config=config)
+                await bhd.edit_desc(meta)       
         url = await prep.package(meta)
         if url == False:
-            cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}.tar`", 'grey', 'on_yellow')
+            cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}-{meta['uuid']}.tar", 'grey', 'on_yellow')
         else:
             cprint(meta['name'], 'grey', 'on_green')
-            cprint(f"Files can be found at {url} or `tmp/{meta['title']}.tar`", 'grey', 'on_green')
+            cprint(f"Files can be found at {url} or `tmp/{meta['title']}-{meta['uuid']}.tar`", 'grey', 'on_green')
         exit()
     confirm = get_confirmation(meta)  
     while confirm == False:
@@ -93,12 +107,12 @@ async def do_the_thing(path, args, base_dir):
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         confirm = get_confirmation(meta)
     
-    if meta.get('trackers', None) != None:
-        trackers = meta['trackers']
-    else:
-        trackers = config['TRACKERS']['default_trackers']
-    if "," in trackers:
-        trackers = trackers.split(',')
+    # if meta.get('trackers', None) != None:
+    #     trackers = meta['trackers']
+    # else:
+    #     trackers = config['TRACKERS']['default_trackers']
+    # if "," in trackers:
+    #     trackers = trackers.split(',')
     for tracker in trackers:
         tracker = tracker.replace(" ", "")
         if tracker.upper() == "BLU":

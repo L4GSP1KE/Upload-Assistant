@@ -29,7 +29,7 @@ class BHD():
         source_id = await self.get_source(meta['source'])
         type_id = await self.get_type(meta)
         draft = await self.get_live(meta)
-        await self.inflate_ego(meta)
+        desc = await self.edit_desc(meta)
 
 
         if meta['bdinfo'] != None:
@@ -37,8 +37,7 @@ class BHD():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8')
             
-        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        desc = desc.replace("img=350", "img=300x300")
+        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'r').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", 'rb')
         files = {
             'file': open_torrent,
@@ -154,11 +153,14 @@ class BHD():
         Torrent.copy(bhd_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent")
         return 
         
-    async def inflate_ego(self, meta):
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a') as desc:
-            desc.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
+    async def edit_desc(self, meta):
+        base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
+        base = base.replace("img=350", "img=300x300")
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'a') as desc:
+            desc.write(base)
+            desc.write("\n[center][url=Forum Post Coming Soon]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
-
+        return
    
 
 
