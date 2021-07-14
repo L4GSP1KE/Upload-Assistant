@@ -1144,8 +1144,8 @@ class Prep():
             img_host = self.img_host
             i -= 1
            
-        description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
-        description.write('[center]')
+        # description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
+        # description.write('[center]')
         image_list = []
         for image in glob.glob("*.png"):        
             if img_host == "imgbb":
@@ -1192,14 +1192,9 @@ class Prep():
                     cprint("pstorage.space failed, trying next image host", 'yellow')
                     self.upload_screens(meta, screens - i, img_host_num + 1, i)
             elif img_host == "ptpimg":
-                # data = {
-                #     'format': 'json',
-                #     'api_key': self.config['DEFAULT']['ptpimg_api'],
-                #     'file-upload' : open(image, 'rb')
-                #     } # API key is obtained from inspecting element on the upload page. 
                 payload = {
                     'format' : 'json',
-                    'api_key' : self.config['DEFAULT']['ptpimg_api']
+                    'api_key' : self.config['DEFAULT']['ptpimg_api'] # API key is obtained from inspecting element on the upload page. 
                 }
                 files = [('file-upload[0]', open(image, 'rb'))] 
                 headers = { 'referer': 'https://ptpimg.me/index.php'} 
@@ -1224,21 +1219,20 @@ class Prep():
 
         
             
-            # description.write(f"[url={web_url}][img]https://images.weserv.nl/?url={img_url}&w=350[/img][/url]")
-            description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
+            # description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
+            # if i % 3 == 0:
+            #     description.write("\n")
             image_dict = {}
             image_dict['web_url'] = web_url
             image_dict['img_url'] = img_url
             image_list.append(image_dict)
-            if i % 3 == 0:
-                description.write("\n")
             cli_ui.info_count(i-1, screens, "Uploaded")
             i += 1
             time.sleep(0.5)
-        description.write("[/center]")
-        description.write("\n")
+        # description.write("[/center]")
+        # description.write("\n")
             
-        description.close()
+        # description.close()
         return_dict['image_list'] = image_list
         return image_list
 

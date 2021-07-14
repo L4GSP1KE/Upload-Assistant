@@ -162,9 +162,18 @@ class BHD():
         
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        base = base.replace("img=350", "img=300x300")
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'a') as desc:
             desc.write(base)
+            images = meta['image_list']
+            if len(images) > 0: 
+                desc.write("[center]")
+                for each in range(len(images)):
+                    web_url = images[each]['web_url']
+                    img_url = images[each]['img_url']
+                    desc.write(f"[url={web_url}][img=350x350]{img_url}[/img][/url]")
+                    if (each + 1) % 2 == 0:
+                        desc.write("\n")
+                desc.write("[\center]")
             # desc.write("\n[center][url=Forum Post Coming Soon]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
         return
