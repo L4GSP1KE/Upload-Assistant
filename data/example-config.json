@@ -81,7 +81,7 @@
             "watch_folder" : "/Path/To/Watch/Folder"
         },
 
-        "placeholder" : "This is placeholder text, just leave it here"
+        "placeholder" : "This is placeholder text to prevent missing/extra commas"
 
     },
 
