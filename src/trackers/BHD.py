@@ -165,7 +165,7 @@ class BHD():
         base = base.replace("img=350", "img=300x300")
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'a') as desc:
             desc.write(base)
-            desc.write("\n[center][url=Forum Post Coming Soon]Created by L4G's Upload Assistant[/url][/center]")
+            # desc.write("\n[center][url=Forum Post Coming Soon]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
         return
    
