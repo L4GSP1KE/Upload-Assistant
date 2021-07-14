@@ -30,7 +30,8 @@ class BHD():
         type_id = await self.get_type(meta)
         draft = await self.get_live(meta)
         desc = await self.edit_desc(meta)
-
+        custom, edition = await self.get_edition(meta)
+        tags = await self.get_tags(meta)
 
         if meta['bdinfo'] != None:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8')
@@ -66,6 +67,12 @@ class BHD():
             data['special'] = 1
         if meta.get('region', "") != "":
             data['region'] = meta['region']
+        if custom == True:
+            data['custom_edition'] = edition
+        elif edition != "":
+            data['edition'] = edition
+        if len(tags) > 0:
+            data['tags'] = ','.join(tags)
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
@@ -198,3 +205,33 @@ class BHD():
         if meta['draft']:
             draft_int = 0
         return draft_int
+
+    async def get_edition(self, meta):
+        custom = False
+        editions = ['collector', 'cirector', 'extended', 'limited', 'special', 'theatrical', 'uncut', 'unrated']
+        for each in editions:
+            if each in meta.get('edition'):
+                edition = each
+            elif meta.get(edition, "") == "":
+                edition = ""
+            else:
+                edition = meta.get('edition')
+                custom = True 
+        return custom, edition
+
+    async def get_tags(self, meta):
+        tags = []
+        if meta['type'] == "WEBRIP":
+            tags.append("WEBRip")
+        if meta['type'] == "WEBDL":
+            tags.append("WEBDL")
+        if meta.get('3D') == "3D":
+            tags.append('3D')
+        if "Dual-Audio" in meta.get('audio', ""):
+            tags.append('DualAudio')
+            tags.append('EnglishDub')
+        if "Open Matte" in meta.get('edition', ""):
+            tags.append("OpenMatte")
+        if meta.get('scene', False) == True:
+            tags.append("Scene")
+        return tags

@@ -75,7 +75,7 @@ class Prep():
         
         # If BD:
         if meta['is_disc'] == "BDMV":
-            video, scene = self.is_scene(self.path)
+            video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
 
             try:
@@ -107,7 +107,7 @@ class Prep():
             mi_dump = None
         #IF DVD
         elif meta['is_disc'] == "DVD":
-            video, scene = self.is_scene(self.path)
+            video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
             filename = guessit(meta['discs'][0]['path'])['title']
             try:
@@ -129,7 +129,7 @@ class Prep():
         else:
             videopath, meta['filelist'] = self.get_video(videoloc) 
 
-            video, scene = self.is_scene(videopath)
+            video, meta['scene'] = self.is_scene(videopath)
 
             filename = guessit(ntpath.basename(video))["title"]
 
@@ -162,7 +162,7 @@ class Prep():
         
         
         if meta.get('type', None) == None:
-            meta['type'] = self.get_type(video, scene, meta['is_disc'])
+            meta['type'] = self.get_type(video, meta['scene'], meta['is_disc'])
         if meta.get('category', None) == None:
             meta['category'] = self.get_cat(video)
         else:
