@@ -29,7 +29,7 @@ class BHD():
         source_id = await self.get_source(meta['source'])
         type_id = await self.get_type(meta)
         draft = await self.get_live(meta)
-        desc = await self.edit_desc(meta)
+        await self.edit_desc(meta)
         custom, edition = await self.get_edition(meta)
         tags = await self.get_tags(meta)
 
