@@ -14,3 +14,5 @@ deluge-client
 pyrobase
 requests
 imdbpy
+pyimgbox
+nest_asyncio

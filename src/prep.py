@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from math import exp
-
+import nest_asyncio
 import imdb
 from src.discparse import DiscParse
 import multiprocessing
@@ -19,6 +19,7 @@ import random
 import json
 import glob
 import requests
+import pyimgbox
 from pymediainfo import MediaInfo
 import tmdbsimple as tmdb
 from datetime import datetime
@@ -54,7 +55,7 @@ class Prep():
         self.path = path
         self.screens = screens
         self.config = config
-        self.img_host = img_host
+        self.img_host = img_host.lower()
         tmdb.API_KEY = config['DEFAULT']['tmdb_api']
 
 
@@ -451,6 +452,8 @@ class Prep():
                 i += 1
             elif os.path.getsize(Path(image)) <= 20000000 and self.img_host == "pstorage.space":
                 i += 1
+            elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                i += 1
             elif os.path.getsize(Path(image)) <= 10000:
                 cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                 time.sleep(1)
@@ -500,6 +503,8 @@ class Prep():
                 i += 1
             elif os.path.getsize(Path(image)) <= 20000000 and self.img_host == "pstorage.space":
                 i += 1
+            elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                i += 1
             elif os.path.getsize(Path(image)) <= 10000:
                 cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
                 time.sleep(1)
@@ -537,6 +542,8 @@ class Prep():
                 if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                     i += 1
                 elif os.path.getsize(Path(image)) <= 20000000 and self.img_host == "pstorage.space":
+                    i += 1
+                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                     i += 1
                 elif os.path.getsize(Path(image)) <= 10000:
                     cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
@@ -1147,74 +1154,81 @@ class Prep():
         # description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
         # description.write('[center]')
         image_list = []
-        for image in glob.glob("*.png"):        
-            if img_host == "imgbb":
-                url = "https://api.imgbb.com/1/upload"
-                data = {
-                    'key': self.config['DEFAULT']['imgbb_api'],
-                    'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
-                }
-                response = requests.post(url, data = data).json()
-                try:
-                    img_url = response['data']['url']
-                    web_url = response['data']['url_viewer']
-                except:
-                    cprint("imgbb failed, trying next image host", 'yellow')
-                    self.upload_screens(meta, screens - i , img_host_num + 1, i)
-            elif img_host == "freeimage.host":
-                url = "https://freeimage.host/api/1/upload"
-                data = {
-                    'key': '6d207e02198a847aa98d0a2a901485a5',
-                    'action' : 'upload',
-                    'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
-                }
-                headers = {'content-type' : 'image/png'}
-                files= {open(image, 'rb')}
-                response = requests.post(url, data = data).json()
-                try:
-                    img_url = response['image']['url']
-                    web_url = response['image']['url_viewer']
-                except:
-                    cprint("freeimage.host failed, trying next image host", 'yellow')
-                    self.upload_screens(meta, screens - i, img_host_num + 1, i)
-            elif img_host == "pstorage.space":
-                url = "https://pstorage.space/api/1/upload"
-                data = {
-                    'key' : self.config['DEFAULT']['pstorage_api'],
-                    'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
-                    'filename' : image
-                }
-                response = requests.post(url, data = data).json()
-                try:
-                    img_url = response['url']
-                    web_url = response['url_viewer']
-                except:
-                    cprint("pstorage.space failed, trying next image host", 'yellow')
-                    self.upload_screens(meta, screens - i, img_host_num + 1, i)
-            elif img_host == "ptpimg":
-                payload = {
-                    'format' : 'json',
-                    'api_key' : self.config['DEFAULT']['ptpimg_api'] # API key is obtained from inspecting element on the upload page. 
-                }
-                files = [('file-upload[0]', open(image, 'rb'))] 
-                headers = { 'referer': 'https://ptpimg.me/index.php'} 
-                url = "https://ptpimg.me/upload.php"
+        image_glob = glob.glob("*.png")
+        if img_host == 'imgbox':
+            nest_asyncio.apply()
+            image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))
+            cprint(image_list, 'magenta')
+            time.sleep(5)                
+        else:
+            for image in image_glob:        
+                if img_host == "imgbb":
+                    url = "https://api.imgbb.com/1/upload"
+                    data = {
+                        'key': self.config['DEFAULT']['imgbb_api'],
+                        'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
+                    }
+                    response = requests.post(url, data = data).json()
+                    try:
+                        img_url = response['data']['url']
+                        web_url = response['data']['url_viewer']
+                    except:
+                        cprint("imgbb failed, trying next image host", 'yellow')
+                        self.upload_screens(meta, screens - i , img_host_num + 1, i)
+                elif img_host == "freeimage.host":
+                    url = "https://freeimage.host/api/1/upload"
+                    data = {
+                        'key': '6d207e02198a847aa98d0a2a901485a5',
+                        'action' : 'upload',
+                        'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
+                    }
+                    headers = {'content-type' : 'image/png'}
+                    files= {open(image, 'rb')}
+                    response = requests.post(url, data = data).json()
+                    try:
+                        img_url = response['image']['url']
+                        web_url = response['image']['url_viewer']
+                    except:
+                        cprint("freeimage.host failed, trying next image host", 'yellow')
+                        self.upload_screens(meta, screens - i, img_host_num + 1, i)
+                elif img_host == "pstorage.space":
+                    url = "https://pstorage.space/api/1/upload"
+                    data = {
+                        'key' : self.config['DEFAULT']['pstorage_api'],
+                        'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
+                        'filename' : image
+                    }
+                    response = requests.post(url, data = data).json()
+                    try:
+                        img_url = response['url']
+                        web_url = response['url_viewer']
+                    except:
+                        cprint("pstorage.space failed, trying next image host", 'yellow')
+                        self.upload_screens(meta, screens - i, img_host_num + 1, i)
+                elif img_host == "ptpimg":
+                    payload = {
+                        'format' : 'json',
+                        'api_key' : self.config['DEFAULT']['ptpimg_api'] # API key is obtained from inspecting element on the upload page. 
+                    }
+                    files = [('file-upload[0]', open(image, 'rb'))] 
+                    headers = { 'referer': 'https://ptpimg.me/index.php'} 
+                    url = "https://ptpimg.me/upload.php"
 
-                # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
-                response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
-                try:
-                    response = response.json()
-                    ptpimg_code = response[0]['code'] 
-                    ptpimg_ext = response[0]['ext'] 
-                    img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                    web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                except:
-                    # print(traceback.format_exc())
-                    cprint("ptpimg failed, trying next image host", 'yellow')
-                    self.upload_screens(meta, screens - i, img_host_num + 1, i)
-            else:
-                cprint("Please choose a supported image host in your config", 'grey', 'on_red')
-                exit()
+                    # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
+                    response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
+                    try:
+                        response = response.json()
+                        ptpimg_code = response[0]['code'] 
+                        ptpimg_ext = response[0]['ext'] 
+                        img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                        web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                    except:
+                        # print(traceback.format_exc())
+                        cprint("ptpimg failed, trying next image host", 'yellow')
+                        self.upload_screens(meta, screens - i, img_host_num + 1, i)
+                else:
+                    cprint("Please choose a supported image host in your config", 'grey', 'on_red')
+                    exit()
 
 
         
@@ -1237,7 +1251,17 @@ class Prep():
         return image_list
 
 
-
+    async def imgbox_upload(self, chdir, image_glob):
+        os.chdir(chdir)
+        image_list = []
+        image_glob = glob.glob("*.png")
+        async with pyimgbox.Gallery() as gallery:
+            async for submission in gallery.add(image_glob):
+                image_dict = {}
+                image_dict['web_url'] = submission['web_url']
+                image_dict['img_url'] = submission['image_url']
+                image_list.append(image_dict)
+        return image_list
 
 
 
