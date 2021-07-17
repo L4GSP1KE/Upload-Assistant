@@ -221,7 +221,7 @@ class BHD():
         for each in editions:
             if each in meta.get('edition'):
                 edition = each
-            elif meta.get(edition, "") == "":
+            elif meta.get('edition', "") == "":
                 edition = ""
             else:
                 edition = meta.get('edition')
