@@ -173,7 +173,7 @@ class BHD():
                     desc.write(f"[url={web_url}][img=350x350]{img_url}[/img][/url]")
                     if (each + 1) % 2 == 0:
                         desc.write("\n")
-                desc.write("[\center]")
+                desc.write("[/center]")
             # desc.write("\n[center][url=Forum Post Coming Soon]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
         return

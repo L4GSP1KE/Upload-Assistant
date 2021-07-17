@@ -145,7 +145,7 @@ class BLU():
                     desc.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
                     if (each + 1) % 3 == 0:
                         desc.write("\n")
-                desc.write("[\center]")
+                desc.write("[/center]")
 
             desc.write("\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
