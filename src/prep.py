@@ -1236,13 +1236,13 @@ class Prep():
             # description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
             # if i % 3 == 0:
             #     description.write("\n")
-            image_dict = {}
-            image_dict['web_url'] = web_url
-            image_dict['img_url'] = img_url
-            image_list.append(image_dict)
-            cli_ui.info_count(i-1, screens, "Uploaded")
-            i += 1
-            time.sleep(0.5)
+                image_dict = {}
+                image_dict['web_url'] = web_url
+                image_dict['img_url'] = img_url
+                image_list.append(image_dict)
+                cli_ui.info_count(i-1, screens, "Uploaded")
+                i += 1
+                time.sleep(0.5)
         # description.write("[/center]")
         # description.write("\n")
             
