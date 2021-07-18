@@ -6,7 +6,7 @@ from src.discparse import DiscParse
 import multiprocessing
 import os
 from os.path import basename
-from re import L
+import re
 import sys
 import shortuuid
 import asyncio
@@ -80,13 +80,15 @@ class Prep():
             meta['filelist'] = []
 
             try:
-                filename = guessit(bdinfo['title'].replace('-',''))['title']
+                guess_name = bdinfo['title'].replace('-','')
+                filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
                 except:
                     meta['search_year'] = ""
             except:
-                filename = guessit(bdinfo['label'].replace('-',''))['title']
+                guess_name = bdinfo['label'].replace('-','')
+                filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
                 except:
@@ -110,7 +112,8 @@ class Prep():
         elif meta['is_disc'] == "DVD":
             video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
-            filename = guessit(meta['discs'][0]['path'].replace('-',''))['title']
+            guess_name = meta['discs'][0]['path'].replace('-','')
+            filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
             except:
@@ -131,8 +134,10 @@ class Prep():
             videopath, meta['filelist'] = self.get_video(videoloc) 
 
             video, meta['scene'] = self.is_scene(videopath)
-
-            filename = guessit(ntpath.basename(video).replace('-',''))["title"]
+            guess_name = ntpath.basename(video).replace('-','')
+            filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))["title"]
+            pprint(guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name)))
+            await asyncio.sleep(10)
 
             try:
                 meta['search_year'] = guessit(video)['year']
