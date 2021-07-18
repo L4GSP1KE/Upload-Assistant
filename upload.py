@@ -46,6 +46,7 @@ async def do_the_thing(path, args, base_dir):
             meta, help = parser.parse(args, meta)
     else:
         cprint("Path does not exist", 'grey', 'on_red')
+        exit()
     if meta['imghost'] == None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
     if not meta['unattended']:
