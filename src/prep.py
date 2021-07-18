@@ -506,7 +506,7 @@ class Prep():
             (
                 ffmpeg
                 .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=random.randint(round(length/5) , round(length - length/5)))
-                .filter('scale', width * w_sar, height * h_sar)
+                .filter('scale', int(width * w_sar), int(height * h_sar))
                 .output(image, vframes=1)
                 .overwrite_output()
                 .global_args('-loglevel', 'quiet')
