@@ -80,13 +80,13 @@ class Prep():
             meta['filelist'] = []
 
             try:
-                filename = guessit(bdinfo['title'])['title']
+                filename = guessit(bdinfo['title'].replace('-',''))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
                 except:
                     meta['search_year'] = ""
             except:
-                filename = guessit(bdinfo['label'])['title']
+                filename = guessit(bdinfo['label'].replace('-',''))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
                 except:
@@ -110,7 +110,7 @@ class Prep():
         elif meta['is_disc'] == "DVD":
             video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
-            filename = guessit(meta['discs'][0]['path'])['title']
+            filename = guessit(meta['discs'][0]['path'].replace('-',''))['title']
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
             except:
@@ -132,7 +132,7 @@ class Prep():
 
             video, meta['scene'] = self.is_scene(videopath)
 
-            filename = guessit(ntpath.basename(video))["title"]
+            filename = guessit(ntpath.basename(video).replace('-',''))["title"]
 
             try:
                 meta['search_year'] = guessit(video)['year']
@@ -1471,35 +1471,60 @@ class Prep():
 
 
     def get_service(self, video):
-        service = ""
-        services = [
-            '9NOW', 'AE', 'AUBC', 'AMBC', 'AS', 'AJAZ', 
-            'ALL4', 'AMZN', 'AMC', 'ATK', 'ANPL', 'ANLB', 
-            'AOL', 'ATVP', 'ARD', 'iP', 'BKPL', 'BOOM', 
-            'CORE', 'BCORE', 'BRAV', 'CMOR', 'CNLP', 'CN', 
-            'CBC', 'CBS', 'CHGD', 'CMAX', 'CNBC', 'CC', 'CCGC', 
-            'COOK', 'CMT', 'CRKL', 'CRIT', 'CR', 'CSPN', 'CTV', 
-            'CUR', 'CW', 'CWS', 'DAZN', 'DSKI', 'DCU', 'DHF', 'DEST', 
-            'DDY', 'DTV', 'DISC', 'DSNY', 'DSNP', 'DIY', 'DOCC', 'DPLY', 
-            'DRPO', 'ETV', 'ETTV', 'EPIX', 'ESPN', 'ESQ', 'FAM', 'FJR', 
-            'FOOD', 'FOX', 'FPT', 'FTV', 'FREE', 'FUNI', 'FYI', 'GLBL', 
-            'GLOB', 'GO90', 'PLAY', 'HLMK', 'HBO', 'HMAX', 'HGTV', 'HIDI', 
-            'HIST', 'HS', 'HULU', 'TOU', 'IFC', 'ID', 'iT', 'ITV', 'KNPY', 
-            'KAYO', 'KNOW', 'LIFE', 'LN', 'MNBC', 'MTOD', 'MTV', 'NATG', 'NBA', 
-            'NBC', 'NF', 'NFLN', 'NFL', 'GC', 'NICK', 'NRK', 'PMNT', 'PMNP', 
-            'PCOK', 'PLUZ', 'PBS', 'PBSK', 'PSN', 'POGO', 'PA', 'PUHU', 'QIBI', 
-            'RKTN', 'RSTR', 'RTE', 'SBS', 'SESO', 'SHMI', 'SHO', 'SPIK', 'SNET', 
-            'SPRT', 'STAN', 'STARZ', 'STZ', 'SVT', 'SWER', 'SYFY', 'TBS', 'TEN', 
-            'TFOU', 'TIMV', 'TLC', 'TRVL', 'TUBI', 'TV3', 'TV4', 'TVL', 'VH1', 
-            'VICE', 'VMEO', 'UFC', 'UKTV', 'UNIV', 'USAN', 'VLCT', 'VIAP', 
-            'VIMEO', 'VRV', 'VUDU', 'WNET', 'WME', 'WWEN', 'XBOX', 
-            'YHOO', 'YT', 'RED', 'ZDF'
-            ]
-
+        service = guessit(video).get('streaming_service', "")
+        services = {
+            '9NOW': '9NOW', '9Now': '9NOW', 'AE': 'AE', 'A&E': 'AE', 'AJAZ': 'AJAZ', 'Al Jazeera English': 'AJAZ', 
+            'ALL4': 'ALL4', 'Channel 4': 'ALL4', 'AMBC': 'AMBC', 'ABC': 'AMBC', 'AMC': 'AMC', 'AMZN': 'AMZN', 
+            'Amazon Prime': 'AMZN', 'ANLB': 'ANLB', 'AnimeLab': 'ANLB', 'ANPL': 'ANPL', 'Animal Planet': 'ANPL', 
+            'AOL': 'AOL', 'ARD': 'ARD', 'AS': 'AS', 'Adult Swim': 'AS', 'ATK': 'ATK', "America's Test Kitchen": 'ATK', 
+            'ATVP': 'ATVP', 'AppleTV': 'ATVP', 'AUBC': 'AUBC', 'ABC Australia': 'AUBC', 'BCORE': 'BCORE', 'BKPL': 'BKPL', 
+            'Blackpills': 'BKPL', 'BluTV': 'BLU', 'Binge': 'BNGE', 'BOOM': 'BOOM', 'Boomerang': 'BOOM', 'BRAV': 'BRAV', 
+            'BravoTV': 'BRAV', 'CBC': 'CBC', 'CBS': 'CBS', 'CC': 'CC', 'Comedy Central': 'CC', 'CCGC': 'CCGC', 
+            'Comedians in Cars Getting Coffee': 'CCGC', 'CHGD': 'CHGD', 'CHRGD': 'CHGD', 'CMAX': 'CMAX', 'Cinemax': 'CMAX', 
+            'CMOR': 'CMOR', 'CMT': 'CMT', 'Country Music Television': 'CMT', 'CN': 'CN', 'Cartoon Network': 'CN', 'CNBC': 'CNBC', 
+            'CNLP': 'CNLP', 'Canal+': 'CNLP', 'COOK': 'COOK', 'CORE': 'CORE', 'CR': 'CR', 'Crunchy Roll': 'CR', 'Crave': 'CRAV', 
+            'CRIT': 'CRIT', 'CRKL': 'CRKL', 'Crackle': 'CRKL', 'CSPN': 'CSPN', 'CSpan': 'CSPN', 'CTV': 'CTV', 'CUR': 'CUR', 
+            'CuriosityStream': 'CUR', 'CW': 'CW', 'The CW': 'CW', 'CWS': 'CWS', 'CWSeed': 'CWS', 'DAZN': 'DAZN', 'DCU': 'DCU', 
+            'DC Universe': 'DCU', 'DDY': 'DDY', 'Digiturk Diledigin Yerde': 'DDY', 'DEST': 'DEST', 'DramaFever': 'DF', 'DHF': 'DHF', 
+            'Deadhouse Films': 'DHF', 'DISC': 'DISC', 'Discovery': 'DISC', 'DIY': 'DIY', 'DIY Network': 'DIY', 'DOCC': 'DOCC', 
+            'Doc Club': 'DOCC', 'DPLY': 'DPLY', 'DPlay': 'DPLY', 'DRPO': 'DRPO', 'Discovery Plus': 'DSCP', 'DSKI': 'DSKI', 
+            'Daisuki': 'DSKI', 'DSNP': 'DSNP', 'Disney+': 'DSNP', 'DSNY': 'DSNY', 'Disney': 'DSNY', 'DTV': 'DTV', 
+            'EPIX': 'EPIX', 'ePix': 'EPIX', 'ESPN': 'ESPN', 'ESQ': 'ESQ', 'Esquire': 'ESQ', 'ETTV': 'ETTV', 'El Trece': 'ETTV', 
+            'ETV': 'ETV', 'E!': 'ETV', 'FAM': 'FAM', 'Family': 'FAM', 'Fandor': 'FANDOR', 'Facebook Watch': 'FBWatch', 'FJR': 'FJR', 
+            'Family Jr': 'FJR', 'FOOD': 'FOOD', 'Food Network': 'FOOD', 'FOX': 'FOX', 'Fox': 'FOX', 'Fox Premium': 'FOXP', 
+            'UFC Fight Pass': 'FP', 'FPT': 'FPT', 'FREE': 'FREE', 'Freeform': 'FREE', 'FTV': 'FTV', 'FUNI': 'FUNI', 
+            'Foxtel': 'FXTL', 'FYI': 'FYI', 'FYI Network': 'FYI', 'GC': 'GC', 'NHL GameCenter': 'GC', 'GLBL': 'GLBL', 
+            'Global': 'GLBL', 'GLOB': 'GLOB', 'GloboSat Play': 'GLOB', 'GO90': 'GO90', 'GagaOOLala': 'Gaga', 'HBO': 'HBO', 
+            'HBO Go': 'HBO', 'HGTV': 'HGTV', 'HIDI': 'HIDI', 'HIST': 'HIST', 'History': 'HIST', 'HLMK': 'HLMK', 'Hallmark': 'HLMK', 
+            'HMAX': 'HMAX', 'HBO Max': 'HMAX', 'HS': 'HS', 'HULU': 'HULU', 'Hulu': 'HULU', 'hoichoi': 'HoiChoi', 'ID': 'ID', 
+            'Investigation Discovery': 'ID', 'IFC': 'IFC', 'iflix': 'IFX', 'National Audiovisual Institute': 'INA', 'ITV': 'ITV', 
+            'KAYO': 'KAYO', 'KNOW': 'KNOW', 'Knowledge Network': 'KNOW', 'KNPY': 'KNPY', 'LIFE': 'LIFE', 'Lifetime': 'LIFE', 'LN': 'LN', 
+            'MBC': 'MBC', 'MNBC': 'MNBC', 'MSNBC': 'MNBC', 'MTOD': 'MTOD', 'Motor Trend OnDemand': 'MTOD', 'MTV': 'MTV', 'MUBI': 'MUBI', 
+            'NATG': 'NATG', 'National Geographic': 'NATG', 'NBA': 'NBA', 'NBA TV': 'NBA', 'NBC': 'NBC', 'NF': 'NF', 'Netflix': 'NF', 
+            'National Film Board': 'NFB', 'NFL': 'NFL', 'NFLN': 'NFLN', 'NFL Now': 'NFLN', 'NICK': 'NICK', 'Nickelodeon': 'NICK', 'NRK': 'NRK', 
+            'Norsk Rikskringkasting': 'NRK', 'OnDemandKorea': 'ODK', 'Opto': 'OPTO', 'Oprah Winfrey Network': 'OWN', 'PA': 'PA', 'PBS': 'PBS', 
+            'PBSK': 'PBSK', 'PBS Kids': 'PBSK', 'PCOK': 'PCOK', 'Peacock': 'PCOK', 'PLAY': 'PLAY', 'PLUZ': 'PLUZ', 'Pluzz': 'PLUZ', 'PMNP': 'PMNP', 
+            'PMNT': 'PMNT', 'POGO': 'POGO', 'PokerGO': 'POGO', 'PSN': 'PSN', 'Playstation Network': 'PSN', 'PUHU': 'PUHU', 'QIBI': 'QIBI', 
+            'RED': 'RED', 'YouTube Red': 'RED', 'RKTN': 'RKTN', 'Rakuten TV': 'RKTN', 'The Roku Channel': 'ROKU', 'RSTR': 'RSTR', 'RTE': 'RTE', 
+            'RTE One': 'RTE', 'RUUTU': 'RUUTU', 'SBS': 'SBS', 'Science Channel': 'SCI', 'SESO': 'SESO', 'SeeSo': 'SESO', 'SHMI': 'SHMI', 'Shomi': 'SHMI', 
+            'SHO': 'SHO', 'Showtime': 'SHO', 'SNET': 'SNET', 'Sportsnet': 'SNET', 'Sony': 'SONY', 'SPIK': 'SPIK', 'Spike': 'SPIK', 'Spike TV': 'SPKE', 
+            'SPRT': 'SPRT', 'Sprout': 'SPRT', 'STAN': 'STAN', 'Stan': 'STAN', 'STARZ': 'STARZ', 'STZ': 'STZ', 'Starz': 'STZ', 'SVT': 'SVT', 
+            'Sveriges Television': 'SVT', 'SWER': 'SWER', 'SwearNet': 'SWER', 'SYFY': 'SYFY', 'Syfy': 'SYFY', 'TBS': 'TBS', 'TEN': 'TEN', 
+            'TFOU': 'TFOU', 'TFou': 'TFOU', 'TIMV': 'TIMV', 'TLC': 'TLC', 'TOU': 'TOU', 'TRVL': 'TRVL', 'TUBI': 'TUBI', 'TubiTV': 'TUBI', 
+            'TV3': 'TV3', 'TV3 Ireland': 'TV3', 'TV4': 'TV4', 'TV4 Sweeden': 'TV4', 'TVING': 'TVING', 'TVL': 'TVL', 'TV Land': 'TVL', 
+            'TVNZ': 'TVNZ', 'UFC': 'UFC', 'UKTV': 'UKTV', 'UNIV': 'UNIV', 'Univision': 'UNIV', 'USAN': 'USAN', 'USA Network': 'USAN', 
+            'VH1': 'VH1', 'VIAP': 'VIAP', 'VICE': 'VICE', 'Viceland': 'VICE', 'Viki': 'VIKI', 'VIMEO': 'VIMEO', 'VLCT': 'VLCT', 
+            'Velocity': 'VLCT', 'VMEO': 'VMEO', 'Vimeo': 'VMEO', 'VRV': 'VRV', 'VUDU': 'VUDU', 'WME': 'WME', 'WatchMe': 'WME', 'WNET': 'WNET', 
+            'W Network': 'WNET', 'WWEN': 'WWEN', 'WWE Network': 'WWEN', 'XBOX': 'XBOX', 'Xbox Video': 'XBOX', 'YHOO': 'YHOO', 'Yahoo': 'YHOO', 
+            'YT': 'YT', 'ZDF': 'ZDF', 'iP': 'iP', 'BBC iPlayer': 'iP', 'iQIYI': 'iQIYI', 'iT': 'iT', 'iTunes': 'iT'
+            }
+        
         video_name = video.replace('.', ' ')
-        for each in services:
-            if (' ' + each + ' ') in (' ' + video_name + ' '):
-                service = each
+        for key, value in services.items():
+            if (' ' + value + ' ') in (' ' + video_name + ' '):
+                service = value
+            elif key == service:
+                service = value
         return service
 
 
