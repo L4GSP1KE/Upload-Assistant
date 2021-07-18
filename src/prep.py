@@ -136,8 +136,6 @@ class Prep():
             video, meta['scene'] = self.is_scene(videopath)
             guess_name = ntpath.basename(video).replace('-','')
             filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))["title"]
-            pprint(guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name)))
-            await asyncio.sleep(10)
 
             try:
                 meta['search_year'] = guessit(video)['year']
