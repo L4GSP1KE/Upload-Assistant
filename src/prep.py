@@ -113,12 +113,12 @@ class Prep():
             video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-','')
-            filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
+            # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
+            filename = guessit(guess_name)['title']
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
             except:
                 meta['search_year'] = ""
-
             if meta.get('edit', False) == False:
                 mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", False, meta['uuid'], meta['base_dir'], export_text=False)
             #screenshots
@@ -472,12 +472,26 @@ class Prep():
     def dvd_screenshots(self, meta, discs):
         cprint("Saving Screens...", "grey", "on_yellow")
         ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO")
+        sar = 1
         for track in ifo_mi.tracks:
             if track.track_type == "Video":
-                length = track.duration
-                dar = track.display_aspect_ratio
-                width = track.width
-                height = track.height
+                length = float(track.duration)
+                par = float(track.pixel_aspect_ratio)
+                dar = float(track.display_aspect_ratio)
+                width = float(track.width)
+                height = float(track.height)
+        print(f"Pixel_Aspect_Ratio:{par}")
+        if par < 1:
+            # multiply that dar by the height and then do a simple width / height
+            new_height = dar * height
+            sar = width / new_height
+
+        if sar > 1:
+            w_sar = 1
+            h_sar = sar
+        else:
+            w_sar = sar
+            h_sar = 1
         
         length = round(float(length))
         if len(meta['discs'][0]['main_set']) >= 3:
@@ -492,7 +506,7 @@ class Prep():
             (
                 ffmpeg
                 .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=random.randint(round(length/5) , round(length - length/5)))
-                .filter('scale', width, height)
+                .filter('scale', width * w_sar, height * h_sar)
                 .output(image, vframes=1)
                 .overwrite_output()
                 .global_args('-loglevel', 'quiet')
@@ -613,7 +627,7 @@ class Prep():
         await asyncio.sleep(3)
         return meta
 
-    async def get_tmdb_id(self, filename, search_year, meta, category):
+    async def get_tmdb_id(self, filename, search_year, meta, category, attempted=0):
         search = tmdb.Search()
         try:
             if category == "MOVIE":
@@ -628,7 +642,12 @@ class Prep():
                 category = "TV"
             else:
                 category = "MOVIE"
-            await self.get_tmdb_id(filename, search_year, meta, category)
+            if attempted <= 1:
+                attempted += 1
+                await self.get_tmdb_id(filename, search_year, meta, category, attempted)
+            else:
+                cprint('Unable to find TMDb match, please retry and pass one as an argument', 'grey', 'on_red')
+                exit()
         return meta
     
     async def tmdb_other_meta(self, meta):
@@ -1160,9 +1179,7 @@ class Prep():
         image_glob = glob.glob("*.png")
         if img_host == 'imgbox':
             nest_asyncio.apply()
-            image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))
-            cprint(image_list, 'magenta')
-            time.sleep(5)                
+            image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
         else:
             for image in image_glob:        
                 if img_host == "imgbb":
@@ -1582,7 +1599,6 @@ class Prep():
         description.seek(0)
         if meta.get('discs', []) != []:
             discs = meta['discs']
-            cprint(discs, 'magenta')
             if discs[0]['type'] == "DVD":
                 description.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
             if len(discs) >= 2:
