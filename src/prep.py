@@ -480,7 +480,6 @@ class Prep():
                 dar = float(track.display_aspect_ratio)
                 width = float(track.width)
                 height = float(track.height)
-        print(f"Pixel_Aspect_Ratio:{par}")
         if par < 1:
             # multiply that dar by the height and then do a simple width / height
             new_height = dar * height
