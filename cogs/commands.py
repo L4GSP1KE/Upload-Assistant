@@ -326,12 +326,13 @@ class Commands(commands.Cog):
         else:
             trackers = config['TRACKERS']['default_trackers']
         trackers = trackers.split(',')
-        if "BLU" in trackers:
-            await message.add_reaction(config['DISCORD']['discord_emojis']['BLU'])
-            await asyncio.sleep(0.3)
-        if "BHD" in trackers:
-            await message.add_reaction(config['DISCORD']['discord_emojis']['BHD'])
-            await asyncio.sleep(0.3)
+        for each in trackers:
+            if "BLU" in each.replace(' ', ''):
+                await message.add_reaction(config['DISCORD']['discord_emojis']['BLU'])
+                await asyncio.sleep(0.3)
+            if "BHD" in each.replace(' ', ''):
+                await message.add_reaction(config['DISCORD']['discord_emojis']['BHD'])
+                await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['MANUAL'])
         await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['CANCEL'])
