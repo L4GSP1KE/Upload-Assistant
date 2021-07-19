@@ -636,17 +636,24 @@ class Prep():
             meta['tmdb'] = search.results[0]['id']
             meta['category'] = category
         except IndexError:
-            # meta['tmdb'] = "0"
-            if category == "MOVIE":
-                category = "TV"
-            else:
-                category = "MOVIE"
-            if attempted <= 1:
-                attempted += 1
-                await self.get_tmdb_id(filename, search_year, meta, category, attempted)
-            else:
-                cprint('Unable to find TMDb match, please retry and pass one as an argument', 'grey', 'on_red')
-                exit()
+            try:
+                if category == "MOVIE":
+                    search.movie(query=filename)
+                elif category == "TV":
+                    search.tv(query=filename)
+                meta['tmdb'] = search.results[0]['id']
+                meta['category'] = category
+            except IndexError:
+                if category == "MOVIE":
+                    category = "TV"
+                else:
+                    category = "MOVIE"
+                if attempted <= 1:
+                    attempted += 1
+                    await self.get_tmdb_id(filename, search_year, meta, category, attempted)
+                else:
+                    cprint('Unable to find TMDb match, please retry and pass one as an argument', 'grey', 'on_red')
+                    exit()
         return meta
     
     async def tmdb_other_meta(self, meta):
