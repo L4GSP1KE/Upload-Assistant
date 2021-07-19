@@ -41,7 +41,7 @@ class Commands(commands.Cog):
         print(f'Joined {guild.name} with {guild.member_count} users!')
 
     @commands.command(aliases=['up'])
-    async def upload(self, ctx, path=None, *args):
+    async def upload(self, ctx, path, message_id=0, *args):
         f"""
         Upload: for a list of arguments do {config['DISCORD']['command_prefix']}args
         """
@@ -65,7 +65,16 @@ class Commands(commands.Cog):
             #     if str(ua).lower() == "true":
             #         meta['unattended'] = True
             prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
-            await ctx.send(f"Preparing to upload: `{path}`")
+            preparing_embed = discord.Embed(title=f"Preparing to upload:", description=f"```{path}```", color=0xffff00)
+            if message_id == 0:
+                message = await ctx.send(embed=preparing_embed)
+                meta['embed_msg_id'] = message.id
+            else:
+                msg = await ctx.fetch_message(message_id)
+                message = await msg.edit(embed=preparing_embed)
+            message = await ctx.fetch_message(message_id)
+            meta['embed_msg_id'] = message.id
+            await message.clear_reactions()
             meta = await prep.gather_prep(meta=meta)
             # await ctx.send(file=discord.File(f"{base_dir}/tmp/{folder_id}/Mediainfo.json"))
             await self.send_embed_and_upload(ctx, meta)
@@ -181,7 +190,7 @@ class Commands(commands.Cog):
         elif len(files_total) >= 2:
             embed = discord.Embed(title=f"File search results for: `{args}`", color=0x00ff40, description=f"```• {files}```")
             embed.add_field(name="What Now?", value=f"Please be more specific or use `{config['DISCORD']['command_prefix']}search dir` to find a directory")
-            await ctx.send(embed=embed)
+            message = await ctx.send(embed=embed)
             return
         elif len(files_total) == 1:
             embed = discord.Embed(title=f"File search results for: {args}", color=0x00ff40, description=f"```{files}```")
@@ -189,7 +198,7 @@ class Commands(commands.Cog):
             message = await ctx.send(embed=embed)
             await message.add_reaction(config['DISCORD']['discord_emojis']['UPLOAD'])
             channel = message.channel
-
+            
 
             def check(reaction, user):
                 if reaction.message.id == message.id:
@@ -203,7 +212,7 @@ class Commands(commands.Cog):
             except asyncio.TimeoutError:
                 await channel.send(f"Search: `{args}`timed out")
             else:
-                await self.upload(ctx, files_total[0])
+                await self.upload(ctx, path=files_total[0], message_id=message.id)
 
 
 
@@ -250,7 +259,7 @@ class Commands(commands.Cog):
             except asyncio.TimeoutError:
                 await channel.send(f"Search: `{args}`timed out")
             else:
-                await self.upload(ctx, folders_total[0])
+                await self.upload(ctx, path=folders_total[0], message_id=message.id)
         # await ctx.send(folders_total)
         return
     
@@ -318,7 +327,13 @@ class Commands(commands.Cog):
         embed.set_thumbnail(url=f"https://image.tmdb.org/t/p/original{meta['poster']}")
         embed.set_footer(text=meta['uuid'])
         embed.set_author(name="L4G's Upload Assistant", url="https://github.com/L4GSP1KE/BluUpload", icon_url="https://images2.imgbox.com/6e/da/dXfdgNYs_o.png")
-        message = await ctx.send(embed=embed)
+        
+        if meta.get('embed_msg_id', '0') != '0':
+            message = await ctx.fetch_message(meta['embed_msg_id'])
+            await message.edit(embed=embed)
+        else:
+            message = await ctx.send(embed=embed)
+            meta['embed_msg_id'] = message.id
         channel = message.channel
 
         if meta.get('trackers', None) != None:
@@ -339,7 +354,6 @@ class Commands(commands.Cog):
         await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['UPLOAD'])
 
-        meta['embed_msg_id'] = message.id
         #Save meta to json
         with open (f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
             json.dump(meta, f, indent=4)
@@ -361,21 +375,30 @@ class Commands(commands.Cog):
             await self.bot.wait_for("reaction_add", timeout=43200, check=check)
         except asyncio.TimeoutError:
             try:
-                msg = await ctx.fetch_message(message.id)
-                await channel.send(f"{meta['uuid']} timed out")
+                msg = await ctx.fetch_message(meta['embed_msg_id'])
+                timeout_embed = discord.Embed(title=f"{meta['title']} has timed out", color=0xff0000)
+                await msg.clear_reactions()
+                await msg.edit(embed=timeout_embed)
                 return
             except:
                 print("timeout after edit")
                 pass
         except CancelException:
-            await channel.send(f"{meta['title']} cancelled")
+            msg = await ctx.fetch_message(meta['embed_msg_id'])
+            cancel_embed = discord.Embed(title=f"{meta['title']} has been cancelled", color=0xff0000)
+            await msg.clear_reactions()
+            await msg.edit(embed=cancel_embed)
             return
         except ManualException:
+            msg = await ctx.fetch_message(meta['embed_msg_id'])
+            await msg.clear_reactions()
             archive_url = await prep.package(meta)
             if archive_url == False:
-                await channel.send(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}.tar`")
+                archive_fail_embed = discord.Embed(title="Unable to upload prep files", description=f"The files can be found at `tmp/{meta['title']}.tar`", color=0xff0000)
+                await msg.edit(embed=archive_fail_embed)
             else:
-                await channel.send(f"Files can be found at {archive_url} or `tmp/{meta['title']}.tar`")
+                archive_embed = discord.Embed(title="Files can be found at:",description=f"{archive_url} or `tmp/{meta['title']}.tar`", color=0x00ff40)
+                await msg.edit(embed=archive_embed)
             return
         else:
             
@@ -390,8 +413,10 @@ class Commands(commands.Cog):
                         tracker = list(config['DISCORD']['discord_emojis'].keys())[list(config['DISCORD']['discord_emojis'].values()).index(str(each))]
                         if tracker not in ("UPLOAD"):
                             tracker_list.append(tracker)
-                
-            await channel.send(f"Uploading `{meta['name']}` to {tracker_list}")
+            
+            upload_embed_description = ' / '.join(tracker_list)
+            upload_embed = discord.Embed(title=f"Uploading `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
+            await msg.edit(embed=upload_embed)
 
 
             
@@ -404,8 +429,9 @@ class Commands(commands.Cog):
                 if meta['upload'] == True:
                     await blu.upload(meta)
                     await client.add_to_client(meta, "BLU")
-                    await channel.send(f"Uploaded `{meta['name']}`to BLU")
-                    return
+                    upload_embed_description = upload_embed_description.replace('BLU', '~~BLU~~')
+                    upload_embed = discord.Embed(title=f"Uploading `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
+                    await msg.edit(embed=upload_embed) 
             if "BHD" in tracker_list:
                 bhd = BHD(config=config)
                 dupes = await bhd.search_existing(meta)
@@ -413,8 +439,10 @@ class Commands(commands.Cog):
                 if meta['upload'] == True:
                     await bhd.upload(meta)
                     await client.add_to_client(meta, "BHD")
-                    await channel.send(f"Uploaded `{meta['name']}`to BHD")
-                    return
+                    upload_embed_description = upload_embed_description.replace('BHD', '~~BHD~~')
+                    upload_embed = discord.Embed(title=f"Uploading `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
+                    await msg.edit(embed=upload_embed)
+                    
             return None
     
     
