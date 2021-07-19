@@ -679,7 +679,7 @@ class Prep():
             meta['keywords'] = self.get_keywords(movie)
             if meta.get('anime', False) == False:
                 meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
-            meta['poster'] = response['poster_path']
+            meta['poster'] = response.get('poster_path', "")
             meta['overview'] = response['overview']
         elif meta['category'] == "TV":
             tv = tmdb.TV(meta['tmdb'])
@@ -700,7 +700,7 @@ class Prep():
             meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
             meta['keywords'] = self.get_keywords(tv)
             meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
-            meta['poster'] = response['poster_path']
+            meta['poster'] = response.get('poster_path', '')
             meta['overview'] = response['overview']
         meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
