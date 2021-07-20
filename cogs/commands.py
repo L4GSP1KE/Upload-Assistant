@@ -277,6 +277,13 @@ class Commands(commands.Cog):
         # await prep.upload_screens(meta, meta['screens'], 1, i=1)
         
         if meta.get('uploaded_screens', False) == False:
+            if meta.get('embed_msg_id', '0') != '0':
+                message = await ctx.fetch_message(meta['embed_msg_id'])
+                message = await message.edit(embed=discord.Embed(title="Generating Screenshots", color=0xffff00))
+            else:
+                message = await ctx.send(embed=discord.Embed(title="Generating Screenshots", color=0xffff00))
+                meta['embed_msg_id'] = message.id
+            channel = message.channel
             return_dict = multiprocessing.Manager().dict()
             u = multiprocessing.Process(target = prep.upload_screens, args=(meta, meta['screens'], 1, 1, return_dict))
             u.start()
@@ -290,6 +297,13 @@ class Commands(commands.Cog):
         #Create base .torrent
         
         if len(glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) == 0:
+            if meta.get('embed_msg_id', '0') != '0':
+                message = await ctx.fetch_message(meta['embed_msg_id'])
+                message = await message.edit(embed=discord.Embed(title="Hashing .torrent", color=0xffff00))
+            else:
+                message = await ctx.send(embed=discord.Embed(title="Hashing .torrent", color=0xffff00))
+                meta['embed_msg_id'] = message.id
+            channel = message.channel
             if meta['nohash'] == False:
                 p = multiprocessing.Process(target = prep.create_torrent, args=(meta, Path(meta['path'])))
                 p.start()
@@ -328,13 +342,7 @@ class Commands(commands.Cog):
         embed.set_footer(text=meta['uuid'])
         embed.set_author(name="L4G's Upload Assistant", url="https://github.com/L4GSP1KE/BluUpload", icon_url="https://images2.imgbox.com/6e/da/dXfdgNYs_o.png")
         
-        if meta.get('embed_msg_id', '0') != '0':
-            message = await ctx.fetch_message(meta['embed_msg_id'])
-            await message.edit(embed=embed)
-        else:
-            message = await ctx.send(embed=embed)
-            meta['embed_msg_id'] = message.id
-        channel = message.channel
+        await message.edit(embed=embed)
 
         if meta.get('trackers', None) != None:
             trackers = meta['trackers']
