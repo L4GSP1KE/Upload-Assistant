@@ -322,7 +322,7 @@ class Commands(commands.Cog):
         embed=discord.Embed(title=f"Upload: {meta['title']}", url=f"https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}", description=meta['overview'], color=0x0080ff, timestamp=datetime.utcnow())
         embed.add_field(name="Links", value=f"[TMDb](https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}){imdb}{tvdb}")
         embed.add_field(name=f"{res} / {meta['type']}{tag}", value=f"```{meta['name']}```", inline=False)
-        embed.add_field(name=f"POTENTIALLY MISSING INFORMATION:", value="\n\n".join(missing), inline=False)
+        embed.add_field(name=f"POTENTIALLY MISSING INFORMATION:", value="\n".join(missing), inline=False)
         # embed.add_field(name=meta['type'], value=meta['resolution'], inline=True)
         embed.set_thumbnail(url=f"https://image.tmdb.org/t/p/original{meta['poster']}")
         embed.set_footer(text=meta['uuid'])
@@ -417,6 +417,7 @@ class Commands(commands.Cog):
             upload_embed_description = ' / '.join(tracker_list)
             upload_embed = discord.Embed(title=f"Uploading `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
             await msg.edit(embed=upload_embed)
+            await msg.clear_reactions()
 
 
             
@@ -430,7 +431,7 @@ class Commands(commands.Cog):
                     await blu.upload(meta)
                     await client.add_to_client(meta, "BLU")
                     upload_embed_description = upload_embed_description.replace('BLU', '~~BLU~~')
-                    upload_embed = discord.Embed(title=f"Uploading `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
+                    upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
                     await msg.edit(embed=upload_embed) 
             if "BHD" in tracker_list:
                 bhd = BHD(config=config)
@@ -440,7 +441,7 @@ class Commands(commands.Cog):
                     await bhd.upload(meta)
                     await client.add_to_client(meta, "BHD")
                     upload_embed_description = upload_embed_description.replace('BHD', '~~BHD~~')
-                    upload_embed = discord.Embed(title=f"Uploading `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
+                    upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
                     await msg.edit(embed=upload_embed)
                     
             return None
