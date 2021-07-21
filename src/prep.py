@@ -1624,14 +1624,14 @@ class Prep():
                         description.write(f"{each['name']}:\n")
                         description.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
                         description.write("\n")
-            meta['description'] = description.read()
+            meta['description'] = "CUSTOM"
         if meta['nfo'] != False:
             description.write("[code]")
             nfo = glob.glob("*.nfo")[0]
             description.write(open(nfo, 'r').read())
             description.write("[/code]")
             description.write("\n")
-            meta['description'] = description.read()
+            meta['description'] = "CUSTOM"
         if desclink != None:
             description.write("[code]")
             parsed = urllib.parse.urlparse(desclink.replace('/raw/', '/'))
@@ -1640,17 +1640,17 @@ class Prep():
             description.write(requests.get(raw).text)
             description.write("[/code]\n")
             description.write("\n")
-            meta['description'] = description.read()
+            meta['description'] = "CUSTOM"
         if descfile != None:
             if os.path.isfile(descfile) == True:
                 text = open(descfile, 'r').read()
                 description.write(text)
-            meta['description'] = description.read()
+            meta['description'] = "CUSTOM"
         if meta['desc'] != None:
             description.write(meta['desc'])
             description.write("\n")
             description.write("\n")
-            meta['description'] = description.read()
+            meta['description'] = "CUSTOM"
         return meta
         
     async def tag_override(self, meta):
