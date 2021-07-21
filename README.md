@@ -38,6 +38,10 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
    
    Feel free to contact me if you need help, I'm not that hard to find.
 
+## **Updating:**
+  - To update first navigate into the Upload-Assistant directory: `cd Upload-Assistant`
+  - Run a `git pull`
+
   ## **CLI Usage:**
   
   `python3 upload.py /downloads/path/to/content --args`
