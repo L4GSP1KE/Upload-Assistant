@@ -816,7 +816,10 @@ class Prep():
                 # format = f"{format} {additional}"
             except:
                 additional = ""
-
+            try:
+                format_settings = mi['media']['track'][2]['Format_Settings']
+            except:
+                format_settings = ""
             #Channels
             channels = mi['media']['track'][2]['Channels']
             try:
@@ -869,9 +872,13 @@ class Prep():
             "16-ch": " Atmos",
             "Atmos Audio": " Atmos",
         }
+        format_settings_extra = {
+            "Dolby Surround EX" : "-EX"
+        }
 
         codec = audio.get(format, "") + audio_extra.get(additional, "")
         extra = format_extra.get(additional, "")
+        format_settings_extra.get(format_settings, "")
         
         if codec == "":
             codec = format
@@ -892,7 +899,7 @@ class Prep():
                     dual = "Dual-Audio"
             except:
                 pass
-        audio = f"{dual} {codec} {chan}{extra}"
+        audio = f"{dual} {codec} {chan}{format_settings}{extra}"
         return audio
 
 
