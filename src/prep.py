@@ -1624,7 +1624,7 @@ class Prep():
             description.write("[/code]")
             description.write("\n")
         if desclink != None:
-            parsed = urllib.parse.urlparse(desclink)
+            parsed = urllib.parse.urlparse(desclink.replace('/raw/', '/'))
             raw = parsed._replace(path=f"/raw{parsed.path}")
             raw = urllib.parse.urlunparse(raw)
             description.write(requests.get(raw).text)
