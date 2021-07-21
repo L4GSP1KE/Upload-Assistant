@@ -64,10 +64,11 @@ class Prep():
         meta['isdir'] = os.path.isdir(self.path)
         base_dir = meta['base_dir']
 
-        folder_id = shortuuid.uuid()
-        meta['uuid'] = folder_id 
-        if not os.path.exists(f"{base_dir}/tmp/{folder_id}"):
-            Path(f"{base_dir}/tmp/{folder_id}").mkdir(parents=True, exist_ok=True)
+        if meta.get('uuid', None) == None:
+            folder_id = shortuuid.uuid()
+            meta['uuid'] = folder_id 
+        if not os.path.exists(f"{base_dir}/tmp/{meta['uuid']}"):
+            Path(f"{base_dir}/tmp/{meta['uuid']}").mkdir(parents=True, exist_ok=True)
 
         if meta['debug']:
             cprint(f"ID: {meta['uuid']}", 'cyan')
@@ -81,14 +82,14 @@ class Prep():
 
             try:
                 guess_name = bdinfo['title'].replace('-','')
-                filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
                 except:
                     meta['search_year'] = ""
             except:
                 guess_name = bdinfo['label'].replace('-','')
-                filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
                 except:
@@ -96,7 +97,7 @@ class Prep():
             
             # await self.disc_screenshots(video, filename, bdinfo, folder_id, base_dir)
             if meta.get('edit', False) == False:
-                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, folder_id, base_dir))
+                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, meta['uuid'], base_dir))
                 ds.start()
                 while ds.is_alive() == True:
                     await asyncio.sleep(3)
@@ -135,7 +136,7 @@ class Prep():
 
             video, meta['scene'] = self.is_scene(videopath)
             guess_name = ntpath.basename(video).replace('-','')
-            filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))["title"]
+            filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))["title"]
 
             try:
                 meta['search_year'] = guessit(video)['year']
@@ -143,19 +144,19 @@ class Prep():
                 meta['search_year'] = ""
             
             if meta.get('edit', False) == False:
-                mi = self.exportInfo(videopath, meta['isdir'], folder_id, base_dir, export_text=True)
+                mi = self.exportInfo(videopath, meta['isdir'], meta['uuid'], base_dir, export_text=True)
                 meta['mediainfo'] = mi
             else:
                 mi = meta['mediainfo']
 
             if meta.get('resolution', None) == None:
-                meta['resolution'] = self.get_resolution(guessit(video), folder_id, base_dir)
+                meta['resolution'] = self.get_resolution(guessit(video), meta['uuid'], base_dir)
             # if meta.get('sd', None) == None:
             meta['sd'] = self.is_sd(meta['resolution'])
 
             # await self.screenshots(videopath, filename, folder_id, base_dir)
             if meta.get('edit', False) == False:
-                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, folder_id, base_dir))
+                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, meta['uuid'], base_dir))
                 s.start()
                 while s.is_alive() == True:
                     await asyncio.sleep(3)
@@ -652,7 +653,7 @@ class Prep():
                     attempted += 1
                     await self.get_tmdb_id(filename, search_year, meta, category, attempted)
                 else:
-                    cprint('Unable to find TMDb match, please retry and pass one as an argument', 'grey', 'on_red')
+                    cprint(f"Unable to find TMDb match for {filename}, please retry and pass one as an argument", 'grey', 'on_red')
                     exit()
         return meta
     
@@ -1450,7 +1451,7 @@ class Prep():
                                 ep = (str(item).zfill(2))
                                 episode += f"E{ep}"
                         else:
-                            episode = f"E{episodes.zfill(2)}"
+                            episode = f"E{str(int(episodes)).zfill(2)}"
                     else:
                         episode = ""
                         meta['tv_pack'] = 1

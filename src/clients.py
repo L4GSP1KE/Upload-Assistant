@@ -41,7 +41,7 @@ class Clients():
         
         local_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['local_path']
         remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['remote_path']
-
+        cprint(f"Adding to {torrent_client}", 'grey', 'on_yellow')
         if torrent_client.lower() == "rtorrent":
             self.rtorrent(meta['path'], torrent_path, torrent, meta, local_path, remote_path, client)
         elif torrent_client == "qbit":
