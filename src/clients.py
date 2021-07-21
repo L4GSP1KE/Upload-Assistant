@@ -47,7 +47,7 @@ class Clients():
         elif torrent_client == "qbit":
         # if is_disk != "":
         #     path = os.path.dirname(path)
-            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client, tracker, meta)
+            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client)
         elif torrent_client.lower() == "deluge":
             if meta['type'] == "DISC":
                 path = os.path.dirname(meta['path'])
@@ -109,7 +109,7 @@ class Clients():
         return
 
 
-    async def qbittorrent(self, path, torrent, local_path, remote_path, client, tracker, meta):
+    async def qbittorrent(self, path, torrent, local_path, remote_path, client):
         # infohash = torrent.infohash
         #Remote path mount
         # if isdir == True:
@@ -125,7 +125,7 @@ class Clients():
         except qbittorrentapi.LoginFailed:
             cprint("INCORRECT QBIT LOGIN CREDENTIALS", 'grey', 'on_red')
             exit()
-        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True, tags=tracker)
+        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True)
         qbt_client.torrents_resume(torrent.infohash)
         
         print(f"Added to: {path}")
