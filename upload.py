@@ -117,9 +117,6 @@ async def do_the_thing(path, args, base_dir):
     if isinstance(trackers, list) == False:
         trackers = [trackers]
     for tracker in trackers:
-        cprint(f"Meta['trackers'] = {meta.get('trackers', None)}", 'magenta')
-        cprint(f"trackers = {tracker}", 'magenta', 'on_yellow')
-        await asyncio.sleep(15)
         tracker = tracker.replace(" ", "")
         if tracker.upper() == "BLU":
             if meta['unattended']:
