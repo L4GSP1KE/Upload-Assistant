@@ -1211,7 +1211,7 @@ class Prep():
                         web_url = response['data']['url_viewer']
                     except:
                         cprint("imgbb failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i , img_host_num + 1, i)
+                        self.upload_screens(meta, screens - i , img_host_num + 1, i, return_dict)
                 elif img_host == "freeimage.host":
                     url = "https://freeimage.host/api/1/upload"
                     data = {
@@ -1227,7 +1227,7 @@ class Prep():
                         web_url = response['image']['url_viewer']
                     except:
                         cprint("freeimage.host failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i, img_host_num + 1, i)
+                        self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
                 elif img_host == "pstorage.space":
                     url = "https://pstorage.space/api/1/upload"
                     data = {
@@ -1241,7 +1241,7 @@ class Prep():
                         web_url = response['url_viewer']
                     except:
                         cprint("pstorage.space failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i, img_host_num + 1, i)
+                        self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
                 elif img_host == "ptpimg":
                     payload = {
                         'format' : 'json',
@@ -1262,7 +1262,7 @@ class Prep():
                     except:
                         # print(traceback.format_exc())
                         cprint("ptpimg failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i, img_host_num + 1, i)
+                        self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
                 else:
                     cprint("Please choose a supported image host in your config", 'grey', 'on_red')
                     exit()
