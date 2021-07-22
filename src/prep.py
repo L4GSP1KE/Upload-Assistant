@@ -196,7 +196,7 @@ class Prep():
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
         meta['hdr'] = self.get_hdr(mi, bdinfo)
         if meta.get('is_disc', None) == "BDMV": #Blu-ray Specific
-            meta['region'] = self.get_region(self.path, region=None)
+            meta['region'] = self.get_region(bdinfo, region=None)
             meta['video_codec'] = self.get_video_codec(bdinfo)
         else:
             meta['video_codec'] = mi['media']['track'][1]['Format']
@@ -1027,7 +1027,9 @@ class Prep():
         hdr = f"{dv} {hdr}"
         return hdr
 
-    def get_region(self, path, region):
+    def get_region(self, bdinfo, region):
+        label = bdinfo.get('label', bdinfo.get('title', bdinfo.get('path', ''))).replace('.', ' ')
+        region = None
         if region != None:
             region = region
         else: 
@@ -1049,9 +1051,10 @@ class Prep():
             "NOR" : "NOR",
             "FRA" : "FRA",
             }
-            region = regions.get(region, "")
-            # if region == "":
-            #     region = click.prompt("Enter region, leave blank for unknown", default="")
+            for key, value in regions.items():
+                if key in label:
+                    region = value
+                    
             if region == None:
                 region = ""
         return region
