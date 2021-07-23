@@ -95,15 +95,22 @@ class Clients():
             path = os.path.dirname(path)
         #Remote path mount
         if local_path in path:
+            path_dir = os.path.dirname(path)
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
+            shutil.copy(fr_file, f"{path_dir}/fr.torrent")
+            fr_file = f"{os.path.dirname(path)}/fr.torrent"
+            modified_fr = True
         if isdir == False:
             path = os.path.dirname(path)
         
-        # print(path)
+        
         cprint("Adding and starting torrent", 'grey', 'on_yellow')
         rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
-        # print(torrent.infohash)
+        
+        # Delete modified fr_file location
+        if modified_fr:
+            os.remove(f"{path_dir}/fr.torrent")
         if meta['debug']:
             cprint(f"Path: {path}", 'cyan')
             cprint(f"Fast Resume Path: {fr_file}", 'cyan')
