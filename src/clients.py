@@ -94,6 +94,7 @@ class Clients():
         if meta['type'] == "DISC":
             path = os.path.dirname(path)
         #Remote path mount
+        modified_fr = False
         if local_path in path:
             path_dir = os.path.dirname(path)
             path = path.replace(local_path, remote_path)
