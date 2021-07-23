@@ -106,6 +106,7 @@ class Clients():
         # print(torrent.infohash)
         if meta['debug']:
             cprint(f"Path: {path}", 'cyan')
+            cprint(f"Fast Resume Path: {fr_file}", 'cyan')
         return
 
 
