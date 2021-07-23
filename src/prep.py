@@ -344,8 +344,8 @@ class Prep():
                 scan = "p"
             else:
                 scan = "i"
-            width_list = [3840, 1920, 1280, 720, 15360, 7680, 0]
-            height_list = [2160, 1080, 720, 576, 480, 8640, 4320, 0]
+            width_list = [3840, 2560, 1920, 1280, 720, 15360, 7680, 0]
+            height_list = [2160, 1440, 1080, 720, 576, 480, 8640, 4320, 0]
             width = self.closest(width_list, int(width))
             height = self.closest(height_list, int(height))
             res = f"{width}x{height}{scan}"
@@ -358,6 +358,7 @@ class Prep():
     def mi_resolution(self, res, guess):
         res_map = {
             "3840x2160p" : "2160p", "2160p" : "2160p",
+            "2560x1440p" : "1440p", "1440p" : "1440p",
             "1920x1080p" : "1080p", "1080p" : "1080p",
             "1920x1080i" : "1080i", "1080i" : "1080i", 
             "1280x720p" : "720p", "720p" : "720p",
@@ -378,7 +379,7 @@ class Prep():
                
 
     def is_sd(self, resolution):
-        if resolution in ("OTHER", "480i", "480p", "576i", "576p"):
+        if resolution in ("480i", "480p", "576i", "576p"):
             sd = 1
         else:
             sd = 0
