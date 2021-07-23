@@ -832,7 +832,10 @@ class Prep():
             if "LFE" in channel_layout:
                 chan = f"{int(channels) - 1}.1"
             elif channel_layout == "":
-                chan = f"{int(channels) - 1}.1"
+                if int(channels) <= 2:
+                    chan = f"{int(channels)}.0"
+                else:
+                    chan = f"{int(channels) - 1}.1"
             else:
                 chan = f"{channels}.0"
             
