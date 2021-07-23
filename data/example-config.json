@@ -55,8 +55,8 @@
             "qbit_user" : "username",
             "qbit_pass" : "password",
 
-            "local_path" : "/LocalPath",
-            "remote_path" : "/RemotePath"
+            "local_path" : "E:\\downloads\\tv",
+            "remote_path" : "/remote/downloads/tv"
         },
 
         "rtorrent_sample" : {
