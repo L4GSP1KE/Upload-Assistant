@@ -1405,7 +1405,7 @@ class Prep():
                 if meta['is_disc'] == 'BDMV':
                     name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region']
-                if meta['is_disc'] == 'DVD':
+                if meta['is_disc'] == 'DVD' or meta['id_disc'] == "HDDVD":
                     name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
