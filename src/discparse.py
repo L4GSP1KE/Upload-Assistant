@@ -215,3 +215,19 @@ class DiscParse():
                     dvd_size = "DVD5"
             each['size'] = dvd_size
         return discs
+    
+    async def get_hddvd_info(self, discs):
+        for each in discs:
+            path = each.get('path')
+            os.chdir(path)
+            files = glob("*.EVO")
+            size = 0
+            largest = files[0]
+            # get largest file from files
+            for file in files:
+                file_size = os.path.getsize(file)
+                if file_size > size:
+                    largest = file
+            each['evo_mi'] = MediaInfo.parse(os.path.basename(largest), output='STRING', full=False)
+            each['largest_evo'] = os.path.abspath(f"{path}/{largest}")
+        return discs

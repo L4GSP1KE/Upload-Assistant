@@ -100,7 +100,7 @@ class Prep():
                 ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, meta['uuid'], base_dir))
                 ds.start()
                 while ds.is_alive() == True:
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(1)
 
             if meta.get('resolution', None) == None:
                 meta['resolution'] = self.mi_resolution(bdinfo['video'][0]['res'], guessit(video))
@@ -127,10 +127,26 @@ class Prep():
                 ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, meta['discs']))
                 ds.start()
                 while ds.is_alive() == True:
-                    await asyncio.sleep(3)
+                    await asyncio.sleep(1)
             #NTSC/PAL
             meta['dvd_size'] = await self.get_dvd_size(meta['discs'])
-        #If NOT BD/VD
+        elif meta['is_disc'] == "HDDVD":
+            video, meta['scene'] = self.is_scene(self.path)
+            meta['filelist'] = []
+            guess_name = meta['discs'][0]['path'].replace('-','')
+            filename = guessit(guess_name)['title']
+            try:
+                meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
+            except:
+                meta['search_year'] = ""
+            if meta.get('edit', False) == False:
+                mi = self.exportInfo(meta['largest_evo'], False, meta['uuid'], meta['base_dir'], export_text=False)
+            if meta.get('edit', False) == False:
+                ds = multiprocessing.Process(target=self.screenshots, args=(meta['discs'][0]['largest_evo'], filename, meta['uuid'], base_dir))
+                ds.start()
+                while ds.is_alive() == True:
+                    await asyncio.sleep(1)
+        #If NOT BD/DVD/HDDVD
         else:
             videopath, meta['filelist'] = self.get_video(videoloc) 
 
@@ -256,12 +272,27 @@ class Prep():
                         'size' : ""
                     }
                     discs.append(disc)
+                elif each == "HVDVD_TS":
+                    is_disc = "HDDVD"
+                    disc = {
+                        'path' : f"{path}/{each}",
+                        'name' : os.path.basename(path),
+                        'type' : 'HDDVD',
+                        'evo_mi' : '',
+                        'largest_evo' : ""
+                    }
+
         if is_disc == "BDMV":
             discs, bdinfo = await parse.get_bdinfo(discs, meta['uuid'], meta['base_dir'])
         elif is_disc == "DVD":
             discs = await parse.get_dvdinfo(discs)
             export = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
             export.write(discs[0]['ifo_mi'])
+            export.close()
+        elif is_disc == "HDDVD":
+            discs = await parse.get_hddvd_info(discs)
+            export = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
+            export.write(discs[0]['evo_mi'])
             export.close()
         return is_disc, videoloc, bdinfo, discs
 
@@ -961,6 +992,8 @@ class Prep():
             elif source in ("Web"):
                 if type == "ENCODE":
                     type = "WEBRIP"
+            elif source in ("HD-DVD"):
+                source = "HDDVD"
         except Exception:
             # print(traceback.format_exc())
             # prompt = click.prompt("Unable to find source, please choose one", type=click.Choice(["BR", "DVD"], case_sensitive=False), default="BR")
@@ -1346,7 +1379,7 @@ class Prep():
                 if meta['is_disc'] == 'BDMV':
                     name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region']
-                elif meta['is_disc'] == 'DVD':
+                elif meta['is_disc'] == 'DVD' or meta['is_disc'] == 'HDDVD':
                     name = f"{title} {alt_title} {year} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
