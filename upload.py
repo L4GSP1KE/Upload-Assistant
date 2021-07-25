@@ -80,6 +80,18 @@ async def do_the_thing(path, args, base_dir):
         trackers = config['TRACKERS']['default_trackers']
     if "," in trackers:
         trackers = trackers.split(',')
+    confirm = get_confirmation(meta)  
+    while confirm == False:
+        # help.print_help()
+        args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv)")
+
+        meta, help = parser.parse(args.split(), meta)
+        # meta = await prep.tmdb_other_meta(meta)
+        meta['edit'] = True
+        meta = await prep.gather_prep(meta=meta) 
+        meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
+        confirm = get_confirmation(meta)
+    
     if meta.get('manual', False):
         for tracker in trackers:
             tracker = tracker.replace(" ", "")
@@ -96,18 +108,6 @@ async def do_the_thing(path, args, base_dir):
             cprint(meta['name'], 'grey', 'on_green')
             cprint(f"Files can be found at {url} or `tmp/{meta['title']}-{meta['uuid']}.tar`", 'grey', 'on_green')
         exit()
-    confirm = get_confirmation(meta)  
-    while confirm == False:
-        # help.print_help()
-        args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv)")
-
-        meta, help = parser.parse(args.split(), meta)
-        # meta = await prep.tmdb_other_meta(meta)
-        meta['edit'] = True
-        meta = await prep.gather_prep(meta=meta) 
-        meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
-        confirm = get_confirmation(meta)
-    
     # if meta.get('trackers', None) != None:
     #     trackers = meta['trackers']
     # else:
