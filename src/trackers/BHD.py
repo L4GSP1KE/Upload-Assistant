@@ -174,7 +174,7 @@ class BHD():
                     if (each + 1) % 2 == 0:
                         desc.write("\n")
                 desc.write("[/center]")
-            # desc.write("\n[center][url=Forum Post Coming Soon]Created by L4G's Upload Assistant[/url][/center]")
+            desc.write("\n[center][url=https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
         return
    
