@@ -577,7 +577,6 @@ class Prep():
             loglevel = 'quiet'
             debug = True
             if bool(meta.get('debug', False)):
-                print(meta['debug'])
                 loglevel = 'verbose'
                 debug = False
             while i != self.screens:
