@@ -16,3 +16,4 @@ requests
 imdbpy
 pyimgbox
 nest_asyncio
+bencode.py
