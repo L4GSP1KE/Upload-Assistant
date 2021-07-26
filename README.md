@@ -24,7 +24,9 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
 
 ## **Setup:**
    - **REQUIRES AT LEAST PYTHON 3.6 AND PIP3**
-   - REQUIRES [mono](https://www.mono-project.com/) on linux systems for BDInfo
+   - Needs [mono](https://www.mono-project.com/) on linux systems for BDInfo
+   - Also needs MediaInfo and ffmpeg installed on your system
+      - On windows system, ffmpeg must be added to PATH (https://windowsloop.com/install-ffmpeg-windows-10/)
    - Clone the repo to your system `git clone https://github.com/L4GSP1KE/Upload-Assistant.git`
    - Copy and Rename `data/example-config.json` to `data/config.json`
    - Edit `config.json` to use your information (more detailed information in the wiki(coming soon))
