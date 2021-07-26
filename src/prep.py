@@ -172,7 +172,7 @@ class Prep():
 
             # await self.screenshots(videopath, filename, folder_id, base_dir)
             if meta.get('edit', False) == False:
-                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, meta['uuid'], base_dir))
+                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, meta['uuid'], base_dir, meta))
                 s.start()
                 while s.is_alive() == True:
                     await asyncio.sleep(3)
@@ -566,7 +566,7 @@ class Prep():
                 time.sleep(1)
 
 
-    def screenshots(self, path, filename, folder_id, base_dir):
+    def screenshots(self, path, filename, folder_id, base_dir, meta):
         cprint("Saving Screens...", "grey", "on_yellow")
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
@@ -574,6 +574,12 @@ class Prep():
             length = round(float(length))
             # for i in range(screens):
             i = 0
+            loglevel = 'quiet'
+            debug = True
+            if bool(meta.get('debug', False)):
+                print(meta['debug'])
+                loglevel = 'verbose'
+                debug = False
             while i != self.screens:
                 image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
                 (
@@ -581,8 +587,8 @@ class Prep():
                     .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
                     .output(image, vframes=1)
                     .overwrite_output()
-                    .global_args('-loglevel', 'quiet')
-                    .run(quiet=True)
+                    .global_args('-loglevel', loglevel)
+                    .run(quiet=debug)
                 )
                 # print(os.path.getsize(image))
                 # print(f'{i+1}/{self.screens}')
@@ -1223,7 +1229,7 @@ class Prep():
         cprint('Uploading Screens', 'grey', 'on_yellow')
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
-        if img_host != self.img_host:
+        if img_host != self.img_host and meta.get('imghost', None) == None:
             img_host = self.img_host
             i -= 1
            
