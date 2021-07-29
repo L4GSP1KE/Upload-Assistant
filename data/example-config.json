@@ -72,7 +72,7 @@
             "deluge_url" : "localhost",
             "deluge_port" : "8080",
             "deluge_user" : "username",
-            "deluge_password" : "password",
+            "deluge_pass" : "password",
 
             "local_path" : "/LocalPath",
             "remote_path" : "/RemotePath"
