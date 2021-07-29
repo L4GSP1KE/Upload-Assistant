@@ -196,17 +196,18 @@ def dupe_check(dupes, meta):
     else:    
         dupe_text = "\n".join(dupes)
         cli_ui.info(dupe_text)
-
         if meta['unattended']:
             if meta.get('dupe', False) == False:
                 cprint("Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --dupe", 'grey', 'on_red')
                 exit()
             else:
                 cprint("Found potential dupes. -dupe/--dupe was passed. Uploading anyways", 'grey', 'on_yellow')
+                upload = True
         print()
         cli_ui.info_section(cli_ui.bold, "Are these dupes?")
         print()
-        upload = cli_ui.ask_yes_no("Upload Anyways?", default=False)
+        if not meta['unattended']:
+            upload = cli_ui.ask_yes_no("Upload Anyways?", default=False)
 
         if upload == False:
             meta['upload'] = False
