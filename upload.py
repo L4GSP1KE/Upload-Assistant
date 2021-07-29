@@ -198,7 +198,7 @@ def dupe_check(dupes, meta):
         cli_ui.info(dupe_text)
 
         if meta['unattended']:
-            if dupes != []:
+            if meta.get('dupe', False) == False:
                 cprint("Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --dupe", 'grey', 'on_red')
                 exit()
             else:
