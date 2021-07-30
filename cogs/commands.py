@@ -71,7 +71,7 @@ class Commands(commands.Cog):
                 meta['embed_msg_id'] = message.id
             else:
                 msg = await ctx.fetch_message(message_id)
-                message = await msg.edit(embed=preparing_embed)
+                await msg.edit(embed=preparing_embed)
             message = await ctx.fetch_message(message_id)
             meta['embed_msg_id'] = message.id
             await message.clear_reactions()
@@ -279,11 +279,12 @@ class Commands(commands.Cog):
         if meta.get('uploaded_screens', False) == False:
             if meta.get('embed_msg_id', '0') != '0':
                 message = await ctx.fetch_message(meta['embed_msg_id'])
-                message = await message.edit(embed=discord.Embed(title="Generating Screenshots", color=0xffff00))
+                await message.edit(embed=discord.Embed(title="Uploading Screenshots", color=0xffff00))
             else:
-                message = await ctx.send(embed=discord.Embed(title="Generating Screenshots", color=0xffff00))
+                message = await ctx.send(embed=discord.Embed(title="Uploading Screenshots", color=0xffff00))
                 meta['embed_msg_id'] = message.id
-            channel = message.channel
+            
+            channel = message.channel.id
             return_dict = multiprocessing.Manager().dict()
             u = multiprocessing.Process(target = prep.upload_screens, args=(meta, meta['screens'], 1, 1, return_dict))
             u.start()
@@ -298,10 +299,10 @@ class Commands(commands.Cog):
         
         if len(glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) == 0:
             if meta.get('embed_msg_id', '0') != '0':
-                message = await ctx.fetch_message(meta['embed_msg_id'])
-                message = await message.edit(embed=discord.Embed(title="Hashing .torrent", color=0xffff00))
+                message = await ctx.fetch_message(int(meta['embed_msg_id']))
+                await message.edit(embed=discord.Embed(title="Creating .torrent", color=0xffff00))
             else:
-                message = await ctx.send(embed=discord.Embed(title="Hashing .torrent", color=0xffff00))
+                message = await ctx.send(embed=discord.Embed(title="Creating .torrent", color=0xffff00))
                 meta['embed_msg_id'] = message.id
             channel = message.channel
             if meta['nohash'] == False:
