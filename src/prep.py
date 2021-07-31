@@ -1728,7 +1728,14 @@ class Prep():
     
 
     async def package(self, meta):
-        archive = f"{meta['base_dir']}/tmp/{meta['title']}-{meta['uuid']}"
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/GENERIC_INFO.txt", 'w') as generic:
+            generic.write(f"Name: {meta['name']}\n")
+            generic.write(f"TMDB: https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}\n")
+            generic.write(f"IMDb: https://www.imdb.com/title/{meta['imdb_id']}\n")
+            generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
+            generic.write(f"TMDB Poster: https://image.tmdb.org/t/p/original{meta['poster']}\n")
+        title = re.sub("[^0-9a-zA-Z\[\]]+", " ", meta['title'])
+        archive = f"{meta['base_dir']}/tmp/{meta['uuid']}/{title}"
         shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
         files = {
             "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
