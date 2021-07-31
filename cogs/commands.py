@@ -325,7 +325,7 @@ class Commands(commands.Cog):
         if meta['tvdb_id'] == "0":
             tvdb = ""
         else:
-            tvdb = f" / [TVDb](https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series)"
+            tvdb = f" / [TVDB](https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series)"
         if meta['is_disc'] == "DVD":
             res = meta['source']
         else:
@@ -334,7 +334,7 @@ class Commands(commands.Cog):
 
 
         embed=discord.Embed(title=f"Upload: {meta['title']}", url=f"https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}", description=meta['overview'], color=0x0080ff, timestamp=datetime.utcnow())
-        embed.add_field(name="Links", value=f"[TMDb](https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}){imdb}{tvdb}")
+        embed.add_field(name="Links", value=f"[TMDB](https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}){imdb}{tvdb}")
         embed.add_field(name=f"{res} / {meta['type']}{tag}", value=f"```{meta['name']}```", inline=False)
         embed.add_field(name=f"POTENTIALLY MISSING INFORMATION:", value="\n".join(missing), inline=False)
         # embed.add_field(name=meta['type'], value=meta['resolution'], inline=True)
