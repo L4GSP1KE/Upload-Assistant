@@ -631,6 +631,9 @@ class Prep():
             type = "HDTV"
         elif is_disc != None:
             type = "DISC"
+        elif "dvdrip" in filename:
+            cprint("DVDRip Detected, exiting", 'grey', 'on_red')
+            exit()
         else:
             type = "ENCODE"
         return type
