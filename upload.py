@@ -98,7 +98,6 @@ async def do_the_thing(path, args, base_dir):
     if meta.get('manual', False):
         for tracker in trackers:
             tracker = tracker.replace(" ", "")
-            print(tracker)
             if tracker.upper() == "BLU":
                 blu = BLU(config=config) 
                 await blu.edit_desc(meta)
