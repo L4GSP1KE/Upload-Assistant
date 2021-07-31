@@ -1,3 +1,4 @@
+from requests import NullHandler
 from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
@@ -63,7 +64,7 @@ async def do_the_thing(path, args, base_dir):
 
     if meta.get('image_list', False) == False:
         return_dict = {}
-        meta['image_list'] = prep.upload_screens(meta, meta['screens'], 1, 1, return_dict)
+        meta['image_list'], dummy_var = prep.upload_screens(meta, meta['screens'], 1, 1, return_dict)
         if meta['debug']:
             pprint(meta['image_list'])
         # meta['uploaded_screens'] = True

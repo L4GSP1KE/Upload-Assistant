@@ -1235,6 +1235,7 @@ class Prep():
         # description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
         # description.write('[center]')
         image_list = []
+        newhost_list = []
         image_glob = glob.glob("*.png")
         if img_host == 'imgbox':
             nest_asyncio.apply()
@@ -1253,7 +1254,7 @@ class Prep():
                         web_url = response['data']['url_viewer']
                     except:
                         cprint("imgbb failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i , img_host_num + 1, i, return_dict)
+                        newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, return_dict)
                 elif img_host == "freeimage.host":
                     url = "https://freeimage.host/api/1/upload"
                     data = {
@@ -1269,7 +1270,7 @@ class Prep():
                         web_url = response['image']['url_viewer']
                     except:
                         cprint("freeimage.host failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
+                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
                 elif img_host == "pstorage.space":
                     url = "https://pstorage.space/api/1/upload"
                     data = {
@@ -1283,7 +1284,7 @@ class Prep():
                         web_url = response['url_viewer']
                     except:
                         cprint("pstorage.space failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
+                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
                 elif img_host == "ptpimg":
                     payload = {
                         'format' : 'json',
@@ -1304,7 +1305,7 @@ class Prep():
                     except:
                         # print(traceback.format_exc())
                         cprint("ptpimg failed, trying next image host", 'yellow')
-                        self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
+                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
                 else:
                     cprint("Please choose a supported image host in your config", 'grey', 'on_red')
                     exit()
@@ -1315,19 +1316,24 @@ class Prep():
             # description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
             # if i % 3 == 0:
             #     description.write("\n")
-                image_dict = {}
-                image_dict['web_url'] = web_url
-                image_dict['img_url'] = img_url
-                image_list.append(image_dict)
-                cli_ui.info_count(i-1, screens, "Uploaded")
+                if len(newhost_list) >=1:
+                    image_list.extend(newhost_list)
+                else:
+                    image_dict = {}
+                    image_dict['web_url'] = web_url
+                    image_dict['img_url'] = img_url
+                    image_list.append(image_dict)
+                    cli_ui.info_count(i-1, self.screens, "Uploaded")
                 i += 1
                 time.sleep(0.5)
+                if i > self.screens:
+                    break
         # description.write("[/center]")
         # description.write("\n")
             
         # description.close()
         return_dict['image_list'] = image_list
-        return image_list
+        return image_list, i
 
 
     async def imgbox_upload(self, chdir, image_glob):

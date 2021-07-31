@@ -273,8 +273,7 @@ class Commands(commands.Cog):
     async def send_embed_and_upload(self,ctx,meta):
         prep = Prep(path=Path(meta['path']), screens=meta['screens'], img_host=meta['imghost'], config=config)
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
-        #Upload Screens
-        # await prep.upload_screens(meta, meta['screens'], 1, i=1)
+        
         
         if meta.get('uploaded_screens', False) == False:
             if meta.get('embed_msg_id', '0') != '0':
