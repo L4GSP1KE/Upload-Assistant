@@ -12,12 +12,12 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - Adds to your client, seeding instantly
   - ALL WITH MINIMAL INPUT!
 
-  - Currently works with .mkv/.mp4/Blu-ray/DVD
+  - Currently works with .mkv/.mp4/Blu-ray/DVD/HD-DVDs
 
 
 
 ## Coming Soon:
-  - HDDVD
+  - Hit me with feature requests
 
 
   
