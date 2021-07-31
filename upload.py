@@ -93,9 +93,12 @@ async def do_the_thing(path, args, base_dir):
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         confirm = get_confirmation(meta)
     
+    if isinstance(trackers, list) == False:
+        trackers = [trackers]
     if meta.get('manual', False):
         for tracker in trackers:
             tracker = tracker.replace(" ", "")
+            print(tracker)
             if tracker.upper() == "BLU":
                 blu = BLU(config=config) 
                 await blu.edit_desc(meta)
@@ -115,8 +118,6 @@ async def do_the_thing(path, args, base_dir):
     #     trackers = config['TRACKERS']['default_trackers']
     # if "," in trackers:
     #     trackers = trackers.split(',')
-    if isinstance(trackers, list) == False:
-        trackers = [trackers]
     for tracker in trackers:
         tracker = tracker.replace(" ", "")
         if tracker.upper() == "BLU":
