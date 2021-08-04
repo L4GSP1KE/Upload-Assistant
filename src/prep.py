@@ -840,6 +840,7 @@ class Prep():
     def get_audio_v2(self, mi, anime, bdinfo):
         #Get formats
         if bdinfo != None: #Disks
+            format_settings = ""
             format = bdinfo['audio'][0]['codec']
             try:
                 additional = bdinfo['audio'][0]['atmos_why_you_be_like_this']
