@@ -91,8 +91,8 @@ class Clients():
 
 
         isdir = os.path.isdir(path)
-        if meta['type'] == "DISC":
-            path = os.path.dirname(path)
+        # if meta['type'] == "DISC":
+        #     path = os.path.dirname(path)
         #Remote path mount
         modified_fr = False
         if local_path in path:
@@ -114,7 +114,6 @@ class Clients():
             os.remove(f"{path_dir}/fr.torrent")
         if meta['debug']:
             cprint(f"Path: {path}", 'cyan')
-            cprint(f"Fast Resume Path: {fr_file}", 'cyan')
         return
 
 
