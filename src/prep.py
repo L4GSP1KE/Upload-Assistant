@@ -81,14 +81,14 @@ class Prep():
             meta['filelist'] = []
 
             try:
-                guess_name = bdinfo['title'].replace('-','')
+                guess_name = bdinfo['title'].replace('-',' ')
                 filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
                 except:
                     meta['search_year'] = ""
             except:
-                guess_name = bdinfo['label'].replace('-','')
+                guess_name = bdinfo['label'].replace('-',' ')
                 filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
@@ -113,7 +113,7 @@ class Prep():
         elif meta['is_disc'] == "DVD":
             video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
-            guess_name = meta['discs'][0]['path'].replace('-','')
+            guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
             filename = guessit(guess_name)['title']
             try:
@@ -151,7 +151,7 @@ class Prep():
             videopath, meta['filelist'] = self.get_video(videoloc) 
 
             video, meta['scene'] = self.is_scene(videopath)
-            guess_name = ntpath.basename(video).replace('-','')
+            guess_name = ntpath.basename(video).replace('-',' ')
             filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))["title"]
 
             try:
@@ -177,7 +177,8 @@ class Prep():
                 while s.is_alive() == True:
                     await asyncio.sleep(3)
         
-        
+        if " AKA " in filename.replace('.',' '):
+            filename = filename.split('AKA')[0]
 
         meta['bdinfo'] = bdinfo
         
@@ -996,7 +997,8 @@ class Prep():
                             system = "NTSC"
                     except:
                         system = ""
-                        # system = click.prompt("Encoding system not found", type=click.Choice(["PAL", "NTSC"], case_sensitive=False))
+                finally:        
+                    # system = click.prompt("Encoding system not found", type=click.Choice(["PAL", "NTSC"], case_sensitive=False))
                     source = system
             elif source in ("Web"):
                 if type == "ENCODE":
