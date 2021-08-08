@@ -83,6 +83,7 @@ class Prep():
             try:
                 guess_name = bdinfo['title'].replace('-',' ')
                 filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                untouched_filename = bdinfo['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
                 except:
@@ -90,6 +91,7 @@ class Prep():
             except:
                 guess_name = bdinfo['label'].replace('-',' ')
                 filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                untouched_filename = bdinfo['label']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
                 except:
@@ -116,6 +118,7 @@ class Prep():
             guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
             filename = guessit(guess_name)['title']
+            untouched_filename = os.path.basename(meta['discs'][0]['path'])
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
             except:
@@ -135,6 +138,7 @@ class Prep():
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-','')
             filename = guessit(guess_name)['title']
+            untouched_filename = os.path.basename(meta['discs'][0]['path'])
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
             except:
@@ -153,7 +157,7 @@ class Prep():
             video, meta['scene'] = self.is_scene(videopath)
             guess_name = ntpath.basename(video).replace('-',' ')
             filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))["title"]
-
+            untouched_filename = os.path.basename(video)
             try:
                 meta['search_year'] = guessit(video)['year']
             except:
@@ -192,7 +196,7 @@ class Prep():
 
                
         if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
-            meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'])
+            meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'], untouched_filename)
         elif meta.get('imdb', None) != None:
             meta = await self.get_tmdb_from_imdb(meta, filename)
         else:
@@ -668,7 +672,7 @@ class Prep():
         await asyncio.sleep(3)
         return meta
 
-    async def get_tmdb_id(self, filename, search_year, meta, category, attempted=0):
+    async def get_tmdb_id(self, filename, search_year, meta, category, untouched_filename="", attempted=0):
         search = tmdb.Search()
         try:
             if category == "MOVIE":
@@ -692,7 +696,10 @@ class Prep():
                     category = "MOVIE"
                 if attempted <= 1:
                     attempted += 1
-                    await self.get_tmdb_id(filename, search_year, meta, category, attempted)
+                    meta = await self.get_tmdb_id(filename, search_year, meta, category, untouched_filename, attempted)
+                elif attempted == 2:
+                    attempted += 1
+                    meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename)['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
                 else:
                     cprint(f"Unable to find TMDb match for {filename}, please retry and pass one as an argument", 'grey', 'on_red')
                     exit()
@@ -785,7 +792,7 @@ class Prep():
             if each['id'] == 16:
                 animation = True
         if response['original_language'] == 'ja' and animation == True:
-            romaji, mal_id, eng_title, season_year = self.get_romaji(tmdb_name)
+            romaji, mal_id, eng_title, season_year, episodes = self.get_romaji(tmdb_name)
             alt_name = f" AKA {romaji}"
             
             anime = True
@@ -809,6 +816,7 @@ class Prep():
                         native
                     }
                     seasonYear
+                    episodes
                 }
             }
         '''
@@ -826,7 +834,8 @@ class Prep():
         mal_id = json['data']['Media']['idMal']
         eng_title = json['data']['Media']['title']['english']
         season_year = json['data']['Media']['seasonYear']
-        return romaji, mal_id, eng_title, season_year
+        episodes = json['data']['Media']['episodes']
+        return romaji, mal_id, eng_title, season_year, episodes
 
 
 
@@ -1498,7 +1507,7 @@ class Prep():
                     meta['tv_pack'] = 1
             else:
                 parsed = anitopy.parse(Path(video).name)
-                romaji, mal_id, eng_title, seasonYear = self.get_romaji(guessit(parsed['anime_title'])['title'])
+                romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
                     meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
@@ -1527,20 +1536,43 @@ class Prep():
                     season = f"S{season.zfill(2)}"
                 except:
                     try:
-                        data = {
-                            'id' : str(meta['tvdb_id']),
-                            'origin' : 'tvdb',
-                            'absolute' : str(parsed['episode_number']),
-                            'destination' : 'anidb'
-                        }
-                        url = "http://thexem.de/map/single"
-                        response = requests.post(url, data=data).json()
-                        season = f"S{str(response['data']['anidb']['season']).zfill(2)}"
-                        if len(filelist) == 1:
-                            episode = f"E{str(response['data']['anidb']['episode']).zfill(2)}"
+                        if int(parsed['episode_number']) >= anilist_episodes:
+                            data = {
+                                'id' : str(meta['tvdb_id']),
+                                'origin' : 'tvdb',
+                                'absolute' : str(parsed['episode_number']),
+                                # 'destination' : 'tvdb'
+                            }
+                            url = "http://thexem.de/map/single"
+                            response = requests.post(url, data=data).json()
+                            if response['result'] == "failure":
+                                raise XEMNotFound
+                            season = f"S{str(response['data']['scene']['season']).zfill(2)}"
+                            if len(filelist) == 1:
+                                episode = f"E{str(response['data']['scene']['episode']).zfill(2)}"
+                        else:
+                            #Get season from xem name map
+                            for season_number in range(1,25):
+                                season = ""
+                                allNamesUrl = f"http://thexem.de/map/allNames?origin=tvdb&season={season_number}"
+                                allNamesResponse = requests.post(allNamesUrl).json()
+                                lower_nospace = guessit(parsed['anime_title'])['title'].lower().replace(' ','')
+                                show_names = allNamesResponse['data'][str(meta['tvdb_id'])]
+                                if isinstance(show_names, list):
+                                    for name in show_names:
+                                        if lower_nospace in name.lower().replace(' ',''):
+                                            season = f"S{str(season_number).zfill(2)}"
+                                            break
+                                if season != "":
+                                    break
+                                await asyncio.sleep(0.5)
                     except:
-                        # print(f"{meta['title']} does not exist on thexem")
-                        season = "S01"
+                        try:
+                            season = guessit(video)['season']
+                        except:
+                            season = "S01"
+                        await asyncio.sleep(15)
+                        cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
                 try:
                     version = parsed['release_version']
                     version = f"v{version}"
@@ -1791,3 +1823,16 @@ class Prep():
     
 
     
+
+
+
+
+
+
+
+
+
+
+
+class XEMNotFound(Exception):
+    pass
