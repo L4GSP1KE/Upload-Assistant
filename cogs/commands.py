@@ -156,7 +156,7 @@ class Commands(commands.Cog):
         except FileNotFoundError:
             await ctx.send("ID not found, please try again using the ID in the footer")
             return
-        prep = Prep(path=Path(meta['path']), screens=meta['screens'], img_host=meta['imghost'], config=config) 
+        prep = Prep(path=meta['path'], screens=meta['screens'], img_host=meta['imghost'], config=config) 
         meta, help = parser.parse(args, meta)
         msg = await ctx.fetch_message(meta['embed_msg_id'])
         await msg.delete()
@@ -497,7 +497,8 @@ class Commands(commands.Cog):
                 for each in dupes:
                     if each == meta['name']:
                         meta['name'] = f"{meta['name']} DUPE?"
-
+            finally:
+                await message.delete()
         return meta
 
     async def get_missing(self, meta):
