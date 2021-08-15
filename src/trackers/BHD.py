@@ -163,7 +163,7 @@ class BHD():
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'a') as desc:
-            desc.write(base)
+            desc.write(base.replace("[img=250]", "[img=250x250]"))
             images = meta['image_list']
             if len(images) > 0: 
                 desc.write("[center]")
