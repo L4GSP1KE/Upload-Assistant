@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import argparse
-import click
 from pprint import pprint
 import time
 from termcolor import cprint
@@ -16,9 +15,6 @@ class Args():
     
 
      
-   
-    # @click.option('--debug', is_flag=True, help="Used for testing features")
-    # @click.option('--bdinfo', '-bdinfo', help="Choose to paste BDInfo instead of scan", is_flag=True)
     def parse(self, args, meta):
         input = args
         parser = argparse.ArgumentParser()

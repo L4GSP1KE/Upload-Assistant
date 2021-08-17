@@ -1004,7 +1004,7 @@ class Prep():
                     except:
                         system = ""
                 finally:        
-                    # system = click.prompt("Encoding system not found", type=click.Choice(["PAL", "NTSC"], case_sensitive=False))
+                    
                     source = system
             elif source in ("Web"):
                 if type == "ENCODE":
@@ -1013,7 +1013,6 @@ class Prep():
                 source = "HDDVD"
         except Exception:
             # print(traceback.format_exc())
-            # prompt = click.prompt("Unable to find source, please choose one", type=click.Choice(["BR", "DVD"], case_sensitive=False), default="BR")
             # source = get_source(type_id, prompt, 2)
             source = "BluRay"
 
