@@ -366,7 +366,7 @@ class Prep():
             except:
                 width = 0
                 height = 0
-            if mi['media']['track'][1]['FrameRate_Mode'] == "CFR":
+            if mi['media']['track'][1].get('FrameRate_Mode', "") == "CFR":
                 framerate = mi['media']['track'][1]['FrameRate']
             else:
                 framerate = ""
