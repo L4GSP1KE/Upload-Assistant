@@ -367,7 +367,6 @@ class Prep():
                 width = 0
                 height = 0
             framerate = mi['media']['track'][1].get('FrameRate', '')
-            print(framerate)
             try:
                 scan = mi['media']['track'][1]['ScanType']
             except:
