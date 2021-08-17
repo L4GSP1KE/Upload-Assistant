@@ -1,5 +1,4 @@
 discord.py
-click
 torf
 termcolor
 shortuuid
