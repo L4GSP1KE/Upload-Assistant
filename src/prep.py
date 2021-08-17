@@ -312,7 +312,7 @@ class Prep():
         filelist = []
         if os.path.isdir(videoloc):
             os.chdir(videoloc)
-            filelist = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.m2ts')
+            filelist = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.ts')
             video = sorted(filelist)[0]        
         else:
             video= videoloc
@@ -366,10 +366,8 @@ class Prep():
             except:
                 width = 0
                 height = 0
-            if mi['media']['track'][1].get('FrameRate_Mode', "") == "CFR":
-                framerate = mi['media']['track'][1]['FrameRate']
-            else:
-                framerate = ""
+            framerate = mi['media']['track'][1].get('FrameRate', '')
+            print(framerate)
             try:
                 scan = mi['media']['track'][1]['ScanType']
             except:
