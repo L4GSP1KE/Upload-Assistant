@@ -120,10 +120,14 @@ async def do_the_thing(path, args, base_dir):
     for tracker in trackers:
         tracker = tracker.replace(" ", "")
         if tracker.upper() == "BLU":
+            if meta['debug']:
+                debug = "(DEBUG)"
+            else:
+                debug = ""
             if meta['unattended']:
                 upload_to_blu = True
             else:
-                upload_to_blu = cli_ui.ask_yes_no("Upload to BLU?", default=meta['unattended'])
+                upload_to_blu = cli_ui.ask_yes_no(f"Upload to BLU? {debug}", default=meta['unattended'])
             if upload_to_blu:
                 print("Uploading to BLU")
                 blu = BLU(config=config)
@@ -139,10 +143,14 @@ async def do_the_thing(path, args, base_dir):
                 draft = "Draft"
             else:
                 draft = "Live"
+            if meta['debug']:
+                debug = "(DEBUG)"
+            else:
+                debug = ""
             if meta['unattended']:
                 upload_to_bhd = True
             else:
-                upload_to_bhd = cli_ui.ask_yes_no(f"Upload to BHD? ({draft})", default=meta['unattended'])
+                upload_to_bhd = cli_ui.ask_yes_no(f"Upload to BHD? ({draft}) {debug}", default=meta['unattended'])
             if upload_to_bhd:
                 print("Uploading to BHD")
                 dupes = await bhd.search_existing(meta)
