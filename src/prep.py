@@ -118,7 +118,7 @@ class Prep():
             guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
             filename = guessit(guess_name)['title']
-            untouched_filename = os.path.basename(meta['discs'][0]['path'])
+            untouched_filename = os.path.basename(os.path.dirname(meta['discs'][0]['path']))
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
             except:
@@ -211,7 +211,7 @@ class Prep():
         meta['video'] = video
         meta['audio'] = self.get_audio_v2(mi, meta['anime'], bdinfo)
         meta['3D'] = self.is_3d(mi, bdinfo)
-        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi)
+        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'])
         if meta.get('service', None) == None:
             meta['service'] = self.get_service(video)
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
@@ -976,7 +976,7 @@ class Prep():
         return tag
 
 
-    def get_source(self, type, video, path, mi):
+    def get_source(self, type, video, path, mi, is_disc):
         try:
             try:
                 source = guessit(video)['source']
@@ -991,7 +991,7 @@ class Prep():
                     source = "Blu-ray"
                 elif type in ('ENCODE', 'REMUX'):
                     source = "BluRay"
-            elif source in ("DVD", "dvd"):
+            if is_disc == "DVD":
                 try:
                    system = mi['media']['track'][1]['Standard']
                 except:
@@ -1813,6 +1813,8 @@ class Prep():
         for each in grouped_sizes:
             if len(each) > 1:
                 dvd_sizes.append(f"{len(each)}x{each[0]}")
+            else:
+                dvd_sizes.append(each[0])
         dvd_sizes.sort()
         compact = " ".join(dvd_sizes)
         return compact

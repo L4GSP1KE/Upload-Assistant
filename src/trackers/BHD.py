@@ -131,7 +131,7 @@ class BHD():
         elif meta['is_disc'] == "DVD":
             if "DVD5" in meta['dvd_size']:
                 type_id = "DVD 5"
-            if "DVD9" in meta['dvd_size']:
+            elif "DVD9" in meta['dvd_size']:
                 type_id = "DVD 9"    
         else:
             if meta['type'] == "REMUX":
