@@ -991,7 +991,7 @@ class Prep():
                     source = "Blu-ray"
                 elif type in ('ENCODE', 'REMUX'):
                     source = "BluRay"
-            if is_disc == "DVD":
+            if is_disc == "DVD" or source in ("DVD", "dvd"):
                 try:
                    system = mi['media']['track'][1]['Standard']
                 except:
@@ -1004,7 +1004,8 @@ class Prep():
                     except:
                         system = ""
                 finally:        
-                    
+                    if type == "REMUX":
+                        system = f"{system} DVD"
                     source = system
             elif source in ("Web"):
                 if type == "ENCODE":
