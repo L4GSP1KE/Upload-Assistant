@@ -450,6 +450,8 @@ class Prep():
     """
 
     def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir):
+        if self.screens == 0:
+            return
         cprint("Saving Screens...", "grey", "on_yellow")
         #Get longest m2ts
         length = 0 
@@ -505,6 +507,8 @@ class Prep():
                 
         
     def dvd_screenshots(self, meta, discs):
+        if self.screens == 0:
+            return
         cprint("Saving Screens...", "grey", "on_yellow")
         ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB")
         sar = 1
@@ -573,6 +577,8 @@ class Prep():
 
 
     def screenshots(self, path, filename, folder_id, base_dir, meta):
+        if self.screens == 0:
+            return
         cprint("Saving Screens...", "grey", "on_yellow")
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
@@ -761,7 +767,7 @@ class Prep():
             meta['overview'] = response['overview']
         meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
-        difference = SequenceMatcher(None, meta['title'], meta['aka'][5:]).ratio()
+        difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
         if difference >= 0.8:
             meta['aka'] = ""
             
@@ -1243,7 +1249,8 @@ class Prep():
     Upload Screenshots
     """
     def upload_screens(self, meta, screens, img_host_num, i, return_dict):
-        cprint('Uploading Screens', 'grey', 'on_yellow')
+        if self.screens != 0:
+            cprint('Uploading Screens', 'grey', 'on_yellow')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
         if img_host != self.img_host and meta.get('imghost', None) == None:
