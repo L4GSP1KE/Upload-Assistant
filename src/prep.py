@@ -506,11 +506,11 @@ class Prep():
         
     def dvd_screenshots(self, meta, discs):
         cprint("Saving Screens...", "grey", "on_yellow")
-        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO")
+        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB")
         sar = 1
         for track in ifo_mi.tracks:
             if track.track_type == "Video":
-                length = float(track.duration)
+                length = float(track.duration)/1000
                 par = float(track.pixel_aspect_ratio)
                 dar = float(track.display_aspect_ratio)
                 width = float(track.width)
@@ -534,12 +534,18 @@ class Prep():
         i = 0
 
         while i != self.screens:
+            if n >= len(main_set):
+                n = 0
             if n >= self.screens:
                 n -= self.screens
             image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][0]['name']}-{i}.png"
+            img_time = random.randint(round(length/5) , round(length - length/5))
+            cprint(main_set[n],'magenta')
+            cprint(img_time,'magenta')
+            cprint(length,'magenta')
             (
                 ffmpeg
-                .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=random.randint(round(length/5) , round(length - length/5)))
+                .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
                 .filter('scale', int(width * w_sar), int(height * h_sar))
                 .output(image, vframes=1)
                 .overwrite_output()
@@ -548,6 +554,7 @@ class Prep():
             )
             # print(os.path.getsize(image))
             # print(f'{i+1}/{self.screens}')
+            n += 1
             cli_ui.info_count(i, self.screens, "Screens Saved")
             # print(Path(image))
             if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
@@ -994,6 +1001,8 @@ class Prep():
             if is_disc == "DVD" or source in ("DVD", "dvd"):
                 try:
                    system = mi['media']['track'][1]['Standard']
+                   if system not in ("PAL", "NTSC"):
+                       raise WeirdSystem
                 except:
                     try:
                         other = guessit(video)['other']
@@ -1834,4 +1843,6 @@ class Prep():
 
 
 class XEMNotFound(Exception):
+    pass
+class WeirdSystem(Exception):
     pass
