@@ -540,9 +540,6 @@ class Prep():
                 n -= self.screens
             image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][0]['name']}-{i}.png"
             img_time = random.randint(round(length/5) , round(length - length/5))
-            cprint(main_set[n],'magenta')
-            cprint(img_time,'magenta')
-            cprint(length,'magenta')
             (
                 ffmpeg
                 .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
