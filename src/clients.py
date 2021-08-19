@@ -45,9 +45,7 @@ class Clients():
         if torrent_client.lower() == "rtorrent":
             self.rtorrent(meta['path'], torrent_path, torrent, meta, local_path, remote_path, client)
         elif torrent_client == "qbit":
-        # if is_disk != "":
-        #     path = os.path.dirname(path)
-            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client)
+            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client, meta['is_disc'])
         elif torrent_client.lower() == "deluge":
             if meta['type'] == "DISC":
                 path = os.path.dirname(meta['path'])
@@ -117,11 +115,13 @@ class Clients():
         return
 
 
-    async def qbittorrent(self, path, torrent, local_path, remote_path, client):
+    async def qbittorrent(self, path, torrent, local_path, remote_path, client, is_disc):
         # infohash = torrent.infohash
         #Remote path mount
         isdir = os.path.isdir(path)
         if not isdir:
+            path = os.path.dirname(path)
+        if is_disc != "":
             path = os.path.dirname(path)
         if local_path in path:
             path = path.replace(local_path, remote_path)
