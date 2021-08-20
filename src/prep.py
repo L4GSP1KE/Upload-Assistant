@@ -1019,12 +1019,12 @@ class Prep():
                     if type == "REMUX":
                         system = f"{system} DVD"
                     source = system
-            elif source in ("Web"):
+            if source in ("Web"):
                 if type == "ENCODE":
                     type = "WEBRIP"
-            elif source in ("HD-DVD"):
+            if source in ("HD-DVD"):
                 source = "HDDVD"
-            elif type in ("WEBDL"):
+            if type in ("WEBDL", 'WEBRIP'):
                 source = "Web"
         except Exception:
             # print(traceback.format_exc())
