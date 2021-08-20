@@ -1024,9 +1024,10 @@ class Prep():
                     type = "WEBRIP"
             elif source in ("HD-DVD"):
                 source = "HDDVD"
+            elif type in ("WEBDL"):
+                source = "Web"
         except Exception:
             # print(traceback.format_exc())
-            # source = get_source(type_id, prompt, 2)
             source = "BluRay"
 
         return source, type
