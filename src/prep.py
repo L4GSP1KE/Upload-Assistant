@@ -1730,7 +1730,7 @@ class Prep():
         if meta['nfo'] != False:
             description.write("[code]")
             nfo = glob.glob("*.nfo")[0]
-            description.write(open(nfo, 'r').read())
+            description.write(open(nfo, 'r', encoding="utf-8").read())
             description.write("[/code]")
             description.write("\n")
             meta['description'] = "CUSTOM"
