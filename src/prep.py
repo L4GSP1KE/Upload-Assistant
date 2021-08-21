@@ -734,7 +734,7 @@ class Prep():
             if meta['imdb_id'] == "":
                 meta['imdb_id'] = '0'
             meta['tvdb_id'] = external.get('tvdb_id', '0')
-            if meta['tvdb_id'] == "":
+            if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
             
             # meta['aka'] = f" AKA {response['original_title']}"
@@ -755,7 +755,7 @@ class Prep():
             if meta['imdb_id'] == "":
                 meta['imdb_id'] = '0'
             meta['tvdb_id'] = external.get('tvdb_id', '0')
-            if meta['tvdb_id'] == "":
+            if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
 
             
