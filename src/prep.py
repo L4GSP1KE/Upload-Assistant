@@ -876,6 +876,8 @@ class Prep():
                 additional = ""
             try:
                 format_settings = mi['media']['track'][2]['Format_Settings']
+                if format_settings in ['Explicit']:
+                    format_settings = ""
             except:
                 format_settings = ""
             #Channels
@@ -939,7 +941,7 @@ class Prep():
 
         codec = audio.get(format, "") + audio_extra.get(additional, "")
         extra = format_extra.get(additional, "")
-        format_settings_extra.get(format_settings, "")
+        format_settings = format_settings_extra.get(format_settings, "")
         
         if codec == "":
             codec = format
