@@ -733,6 +733,8 @@ class Prep():
             meta['imdb_id'] = external.get('imdb_id', "0")
             if meta['imdb_id'] == "":
                 meta['imdb_id'] = '0'
+            else:
+                meta['imdb_id'] = str(int(meta['imdb_id'])).zfill(7)
             meta['tvdb_id'] = external.get('tvdb_id', '0')
             if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
@@ -754,6 +756,8 @@ class Prep():
             meta['imdb_id'] = external.get('imdb_id', "0")
             if meta['imdb_id'] == "":
                 meta['imdb_id'] = '0'
+            else:
+                meta['imdb_id'] = str(int(meta['imdb_id'])).zfill(7)
             meta['tvdb_id'] = external.get('tvdb_id', '0')
             if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
