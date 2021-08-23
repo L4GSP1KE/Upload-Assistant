@@ -34,7 +34,7 @@ class Clients():
             default_torrent_client = meta['client']
         if meta.get('client', None) == 'none':
             return
-        if self.config['TORRENT_CLIENTS'][default_torrent_client] == "none":
+        if default_torrent_client == "none":
             return 
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_client = client['torrent_client']
