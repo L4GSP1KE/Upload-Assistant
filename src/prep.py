@@ -1218,14 +1218,14 @@ class Prep():
         video = meta['video']
         if meta['isdir'] == True:
             os.chdir(path)
-            globs = glob.glob("*.mkv") + glob.glob("*.mp4")
+            globs = glob.glob("*.mkv") + glob.glob("*.mp4") + glob.glob("*.ts")
             if len(globs) == 1:
                 path = video
         if meta['bdinfo'] != None:
             include, exclude = "", ""
         else:
             exclude = ["*.*", "sample.mkv"] 
-            include = ["*.mkv", "*.mp4"]
+            include = ["*.mkv", "*.mp4", "*.ts"]
         torrent = Torrent(path,
             # trackers = [announce],
             # source = "",
