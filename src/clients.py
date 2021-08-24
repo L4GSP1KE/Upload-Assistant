@@ -119,8 +119,8 @@ class Clients():
         # infohash = torrent.infohash
         #Remote path mount
         isdir = os.path.isdir(path)
-        if not isdir:
-            path = os.path.dirname(path)
+        # if not isdir:
+        #     path = os.path.dirname(path)
         if is_disc != "":
             path = os.path.dirname(path)
         if local_path in path:
