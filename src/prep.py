@@ -1524,7 +1524,8 @@ class Prep():
                     meta['tv_pack'] = 1
             else:
                 parsed = anitopy.parse(Path(video).name)
-                romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
+                # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
+                romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(parsed['anime_title'])
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
                     meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
@@ -1569,20 +1570,26 @@ class Prep():
                                 episode = f"E{str(response['data']['scene']['episode']).zfill(2)}"
                         else:
                             #Get season from xem name map
-                            for season_number in range(1,25):
-                                season = ""
-                                allNamesUrl = f"http://thexem.de/map/allNames?origin=tvdb&season={season_number}"
-                                allNamesResponse = requests.post(allNamesUrl).json()
-                                lower_nospace = guessit(parsed['anime_title'])['title'].lower().replace(' ','')
-                                show_names = allNamesResponse['data'][str(meta['tvdb_id'])]
-                                if isinstance(show_names, list):
-                                    for name in show_names:
-                                        if lower_nospace in name.lower().replace(' ',''):
-                                            season = f"S{str(season_number).zfill(2)}"
-                                            break
-                                if season != "":
-                                    break
-                                await asyncio.sleep(0.5)
+                            season = ""
+                            names_url = f"http://thexem.de/map/names?origin=tvdb&id={str(meta['tvdb_id'])}"
+                            names_response = requests.get(names_url).json()
+                            if names_response['result'] == "success":
+                                for season_num, values in names_response['data'].items():
+                                    for lang, names in values.items():
+                                        if lang == "jp":
+                                            for name in names:
+                                                if re.sub("[^0-9a-zA-Z\[\]]+", " ", romaji.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", " ", name.lower().replace(' ', '')):
+                                                    if season_num != "all":
+                                                        season = f"S{season_num.zfill(2)}"
+                                                    else:
+                                                        season = "S01"
+                                        if lang == "us":
+                                            for name in names:
+                                                if re.sub("[^0-9a-zA-Z\[\]]+", " ", eng_title.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", " ", name.lower().replace(' ', '')):
+                                                    if season_num != "all":
+                                                        season = f"S{season_num.zfill(2)}"
+                                                    else:
+                                                        season = "S01"
                     except:
                         try:
                             season = guessit(video)['season']
@@ -1590,6 +1597,7 @@ class Prep():
                             season = "S01"
                         await asyncio.sleep(15)
                         cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
+                        await asyncio.sleep(2)
                 try:
                     version = parsed['release_version']
                     version = f"v{version}"
