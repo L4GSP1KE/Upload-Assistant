@@ -1560,6 +1560,11 @@ class Prep():
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
                     meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
+                if meta['debug']:
+                    cprint("get_season_episode", 'cyan')
+                    cprint(f"{parsed['anime_title']=}", 'cyan')
+                    cprint(f"{eng_title=}", 'cyan')
+                    cprint(f"{romaji=}", 'cyan')
                 meta = await self.tmdb_other_meta(meta)
                 tag = parsed.get('release_group', "")
                 if tag != "":
@@ -1621,14 +1626,15 @@ class Prep():
                                                         season = f"S{season_num.zfill(2)}"
                                                     else:
                                                         season = "S01"
+                            else:
+                                raise XEMNotFound
                     except:
                         try:
                             season = guessit(video)['season']
                         except:
                             season = "S01"
-                        await asyncio.sleep(15)
                         cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(3)
                 try:
                     version = parsed['release_version']
                     version = f"v{version}"
