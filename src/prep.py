@@ -952,9 +952,8 @@ class Prep():
             "Dolby Digital" : "DD",
             "Dolby Digital Plus" : "DD+",
             "Dolby TrueHD" : "TrueHD",
-            "DTS-ES Discrete" : "DTS-ES",
-            "DTS-ES Matrix" : "DTS-ES",
-            "DTS-HD High Resolution Audio" : "DTS-HD HRA",
+            "DTS-ES" : "DTS-ES",
+            "DTS-HD High" : "DTS-HD HRA",
             "Free Lossless Audio Codec" : "FLAC",
             "DTS-HD Master Audio" : "DTS-HD MA"
             }
