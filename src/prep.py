@@ -1640,6 +1640,7 @@ class Prep():
                         except:
                             season = "S01"
                         cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
+                        cprint(f"If {season} is incorrect, use --season to correct", 'grey', 'on_yellow')
                         await asyncio.sleep(3)
                 try:
                     version = parsed['release_version']
@@ -1650,11 +1651,11 @@ class Prep():
             if meta.get('manual_season', None) == None:
                 meta['season'] = season
             else:
-                meta['season'] = f"S{meta['manual_season'].zfill(2)}"
+                meta['season'] = f"S{meta['manual_season'].lower().replace('s', '').zfill(2)}"
             if meta.get('manual_episode', None) == None:
                 meta['episode'] = episode
             else:
-                meta['episode'] = f"E{meta['manual_episode'].zfill(2)}"
+                meta['episode'] = f"E{meta['manual_episode'].lower().replace('e', '').zfill(2)}"
             
             if " COMPLETE " in Path(video).name.replace('.', ' '):
                 meta['season'] = "COMPLETE"
