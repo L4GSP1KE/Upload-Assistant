@@ -1838,7 +1838,7 @@ class Prep():
             generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
             generic.write(f"TMDB Poster: {meta['poster']}\n")
             generic.write(f"Images: {meta['image_list']}\n")
-        title = re.sub("[^0-9a-zA-Z\[\]]+", " ", meta['title'])
+        title = re.sub("[^0-9a-zA-Z\[\]]+", "", meta['title'])
         archive = f"{meta['base_dir']}/tmp/{meta['uuid']}/{title}"
         shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
         files = {
