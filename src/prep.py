@@ -1566,12 +1566,12 @@ class Prep():
                     cprint(f"{eng_title=}", 'cyan')
                     cprint(f"{romaji=}", 'cyan')
                 meta = await self.tmdb_other_meta(meta)
-                meta['title'] = eng_title
-                difference = SequenceMatcher(None, eng_title, romaji.lower()).ratio()
-                if difference >= 0.8:
-                    meta['aka'] = ""
-                else:
-                    meta['aka'] = f" AKA {romaji}"
+                # meta['title'] = eng_title
+                # difference = SequenceMatcher(None, eng_title, romaji.lower()).ratio()
+                # if difference >= 0.8:
+                #     meta['aka'] = ""
+                # else:
+                #     meta['aka'] = f" AKA {romaji}"
                 tag = parsed.get('release_group', "")
                 if tag != "":
                     meta['tag'] = f"-{tag}"
