@@ -209,7 +209,9 @@ class Prep():
         meta = await self.tag_override(meta)
 
         meta['video'] = video
-        meta['audio'] = self.get_audio_v2(mi, meta['anime'], bdinfo)
+        meta['audio'], meta['channels'] = self.get_audio_v2(mi, meta['anime'], bdinfo)
+        if meta['tag'][1:].startswith(meta['channels']):
+            meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
         meta['3D'] = self.is_3d(mi, bdinfo)
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'])
         if meta.get('service', None) == None:
@@ -731,7 +733,7 @@ class Prep():
             
             external = movie.external_ids()
             meta['imdb_id'] = external.get('imdb_id', "0")
-            if meta['imdb_id'] == "":
+            if meta['imdb_id'] == "" or meta['imdb_id'] == None:
                 meta['imdb_id'] = '0'
             else:
                 meta['imdb_id'] = str(int(meta['imdb_id'].replace('tt', ''))).zfill(7)
@@ -754,7 +756,7 @@ class Prep():
             
             external = tv.external_ids()
             meta['imdb_id'] = external.get('imdb_id', "0")
-            if meta['imdb_id'] == "":
+            if meta['imdb_id'] == "" or meta['imdb_id'] == None:
                 meta['imdb_id'] = '0'
             else:
                 meta['imdb_id'] = str(int(meta['imdb_id'].replace('tt', ''))).zfill(7)
@@ -873,6 +875,7 @@ class Prep():
 
         else: 
             format = mi['media']['track'][2]['Format']
+            commercial = mi['media']['track'][2].get('Format_Commercial', '')
             try:
                 additional = mi['media']['track'][2]['Format_AdditionalFeatures']
                 # format = f"{format} {additional}"
@@ -904,11 +907,11 @@ class Prep():
                 chan = f"{channels}.0"
             
         
-        extra = ""
-        dual = ""
+        extra = dual = ""
         
         #Convert commercial name to naming conventions
         audio = {
+            #Format
             "DTS": "DTS",
             "AAC": "AAC",
             "AAC LC": "AAC",
@@ -919,6 +922,7 @@ class Prep():
             "Opus": "OPUS",
             "Vorbis": "VORBIS",
             "PCM": "LPCM",
+
             #BDINFO AUDIOS
             "LPCM Audio" : "LPCM",
             "Dolby Digital Audio" : "DD",
@@ -928,6 +932,7 @@ class Prep():
             "DTS Audio" : "DTS", 
             "DTS-HD Master Audio" : "DTS-HD MA",
             "DTS-HD High-Res Audio" : "DTS-HD HRA",
+            "DTS:X Master Audio" : "DTS:X"
         }
         audio_extra = {
             "XLL": "-HD MA",
@@ -940,16 +945,43 @@ class Prep():
             "Atmos Audio": " Atmos",
         }
         format_settings_extra = {
-            "Dolby Surround EX" : "-EX"
+            "Dolby Surround EX" : "EX"
         }
 
-        codec = audio.get(format, "") + audio_extra.get(additional, "")
-        extra = format_extra.get(additional, "")
+        commercial_names = {
+            "Dolby Digital" : "DD",
+            "Dolby Digital Plus" : "DD+",
+            "Dolby TrueHD" : "TrueHD",
+            "DTS-ES Discrete" : "DTS-ES",
+            "DTS-ES Matrix" : "DTS-ES",
+            "DTS-HD High Resolution Audio" : "DTS-HD HRA",
+            "Free Lossless Audio Codec" : "FLAC",
+            "DTS-HD Master Audio" : "DTS-HD MA"
+            }
+
+        
+        search_format = True
+        for key, value in commercial_names.items():
+            if key in commercial:
+                codec = value
+                search_format = False
+            if "Atmos" in commercial:
+                extra = " Atmos"
+        if search_format:
+            codec = audio.get(format, "") + audio_extra.get(additional, "")
+            extra = format_extra.get(additional, "")
         format_settings = format_settings_extra.get(format_settings, "")
         
+
         if codec == "":
             codec = format
-
+        
+        if format.startswith("DTS"):
+            if additional.endswith("X"):
+                codec = "DTS:X"
+                chan = f"{int(channels) - 1}.1"
+        if format == "MPEG Audio":
+            codec = mi['media']['track'][2].get('CodecID_Hint', '')
 
         if anime == True:
             eng, jap = False, False
@@ -966,8 +998,8 @@ class Prep():
                     dual = "Dual-Audio"
             except:
                 pass
-        audio = f"{dual} {codec} {chan}{format_settings}{extra}"
-        return audio
+        audio = f"{dual} {codec} {format_settings} {chan}{extra}"
+        return audio, chan
 
 
     def is_3d(self, mi, bdinfo):
@@ -1150,7 +1182,7 @@ class Prep():
         except:
             format = bdinfo['video'][0]['codec']
             format_profile = bdinfo['video'][0]['profile']
-        if type in ("ENCODE", "WEBRIP"): #ENCODE or WEBRIP
+        if type in ("ENCODE", "WEBRIP", "HDTV"): #ENCODE or WEBRIP
             if format == 'AVC':
                 codec = 'x264'
             elif format == 'HEVC':
