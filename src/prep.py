@@ -1560,11 +1560,6 @@ class Prep():
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
                     meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
-                if meta['debug']:
-                    cprint("get_season_episode", 'cyan')
-                    cprint(f"{parsed['anime_title']=}", 'cyan')
-                    cprint(f"{eng_title=}", 'cyan')
-                    cprint(f"{romaji=}", 'cyan')
                 meta = await self.tmdb_other_meta(meta)
                 # meta['title'] = eng_title
                 # difference = SequenceMatcher(None, eng_title, romaji.lower()).ratio()
