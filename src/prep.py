@@ -865,6 +865,7 @@ class Prep():
         if bdinfo != None: #Disks
             format_settings = ""
             format = bdinfo['audio'][0]['codec']
+            commercial = format
             try:
                 additional = bdinfo['audio'][0]['atmos_why_you_be_like_this']
             except:
