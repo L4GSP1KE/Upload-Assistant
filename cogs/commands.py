@@ -70,9 +70,9 @@ class Commands(commands.Cog):
                 message = await ctx.send(embed=preparing_embed)
                 meta['embed_msg_id'] = message.id
             else:
-                msg = await ctx.fetch_message(message_id)
-                await msg.edit(embed=preparing_embed)
-            message = await ctx.fetch_message(message_id)
+                message = await ctx.fetch_message(message_id)
+                await message.edit(embed=preparing_embed)
+            # message = await ctx.fetch_message(message_id)
             meta['embed_msg_id'] = message.id
             await message.clear_reactions()
             meta = await prep.gather_prep(meta=meta)
