@@ -18,6 +18,7 @@ from pathlib import Path
 from pprint import pprint
 from glob import glob
 from termcolor import cprint
+import argparse
 
 
 
@@ -41,23 +42,31 @@ class Commands(commands.Cog):
         print(f'Joined {guild.name} with {guild.member_count} users!')
 
     @commands.command(aliases=['up'])
-    async def upload(self, ctx, path, message_id=0, *args):
+    async def upload(self, ctx, path, *args, message_id=0):
         f"""
         Upload: for a list of arguments do {config['DISCORD']['command_prefix']}args
         """
         if ctx.channel.id != int(config['DISCORD']['discord_channel_id']):
             return
 
+        parser = Args(config)
         if path == None:
             await ctx.send("Missing Path")
             return
-        parser = Args(config)
+        elif path.lower() == "-h":
+            meta, help = parser.parse("", dict())
+            await ctx.send(parser.help)
+            return
         meta = dict()
         meta['base_dir'] = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
         path = os.path.abspath(path)
         if os.path.exists(path):
             meta['path'] = path
-            meta, help = parser.parse(args, meta)
+            try:
+                meta, help = parser.parse(args, meta)
+            except SystemExit as error:
+                await ctx.send(f"Invalid argument detected, use `{config['DISCORD']['command_prefix']}args` for list of valid args")
+                return
             if meta['imghost'] == None:
                 meta['imghost'] = config['DEFAULT']['img_host_1']
             # if not meta['unattended']:
@@ -87,37 +96,47 @@ class Commands(commands.Cog):
         f"""
         Arguments for {config['DISCORD']['command_prefix']}upload
         """
-        await ctx.send("""
-        ```Optional arguments:
+
+        parser = Args(config)
+        meta, help = parser.parse("", dict())
+        help = help.format_help()
+        help = help.split('optional')[1]
+        if len(help) > 2000:
+            await ctx.send(f"```{help[:1990]}```")
+            await ctx.send(f"```{help[1991:]}```")
+        else:
+            await ctx.send(help.format_help())
+        # await ctx.send("""
+        # ```Optional arguments:
     
-            -s, --screens [SCREENS]
-                                Number of screenshots
-            -c, --category [{movie,tv,fanres}]
-                                Category
-            -t, --type [{disc,remux,encode,webdl,web-dl,webrip,hdtv}]
-                                Type
-            -res, --resolution 
-                    [{2160p,1080p,1080i,720p,576p,576i,480p,480i,8640p,4320p,other}]
-                                Resolution
-            -tmdb, --tmdb [TMDB]
-                                TMDb ID
-            -g, --tag [TAG]
-                                Group Tag
-            -serv, --service [SERVICE]
-                                Streaming Service
-            -edition, --edition [EDITION]
-                                Edition
-            -d, --desc [DESC]
-                                Custom Description (string)
-            -nfo, --nfo           
-                                Use .nfo in directory for description
-            -k, --keywords [KEYWORDS]
-                                Add comma seperated keywords e.g. 'keyword, keyword2, etc'
-            -reg, --region [REGION]
-                                Region for discs
-            -a, --anon          Upload anonymously
-            -st, --stream       Stream Optimized Upload
-            -debug, --debug     Debug Mode```""")
+        #     -s, --screens [SCREENS]
+        #                         Number of screenshots
+        #     -c, --category [{movie,tv,fanres}]
+        #                         Category
+        #     -t, --type [{disc,remux,encode,webdl,web-dl,webrip,hdtv}]
+        #                         Type
+        #     -res, --resolution 
+        #             [{2160p,1080p,1080i,720p,576p,576i,480p,480i,8640p,4320p,other}]
+        #                         Resolution
+        #     -tmdb, --tmdb [TMDB]
+        #                         TMDb ID
+        #     -g, --tag [TAG]
+        #                         Group Tag
+        #     -serv, --service [SERVICE]
+        #                         Streaming Service
+        #     -edition, --edition [EDITION]
+        #                         Edition
+        #     -d, --desc [DESC]
+        #                         Custom Description (string)
+        #     -nfo, --nfo           
+        #                         Use .nfo in directory for description
+        #     -k, --keywords [KEYWORDS]
+        #                         Add comma seperated keywords e.g. 'keyword, keyword2, etc'
+        #     -reg, --region [REGION]
+        #                         Region for discs
+        #     -a, --anon          Upload anonymously
+        #     -st, --stream       Stream Optimized Upload
+        #     -debug, --debug     Debug Mode```""")
 
 
     # @commands.group(invoke_without_command=True)
@@ -157,12 +176,18 @@ class Commands(commands.Cog):
             await ctx.send("ID not found, please try again using the ID in the footer")
             return
         prep = Prep(path=meta['path'], screens=meta['screens'], img_host=meta['imghost'], config=config) 
-        meta, help = parser.parse(args, meta)
+        try:
+            meta, help = parser.parse(args, meta)
+        except argparse.ArgumentError as error:
+            ctx.send(error)
         msg = await ctx.fetch_message(meta['embed_msg_id'])
         await msg.delete()
+        new_msg = await msg.channel.send(f"Editing {meta['uuid']}")
+        meta['embed_msg_id'] = new_msg.id
         meta['edit'] = True
         meta = await prep.gather_prep(meta=meta) 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
+        await self.send_embed_and_upload(ctx, meta)
 
 
 
@@ -337,11 +362,11 @@ class Commands(commands.Cog):
         embed.add_field(name="Links", value=f"[TMDB](https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}){imdb}{tvdb}")
         embed.add_field(name=f"{res} / {meta['type']}{tag}", value=f"```{meta['name']}```", inline=False)
         embed.add_field(name=f"POTENTIALLY MISSING INFORMATION:", value="\n".join(missing), inline=False)
-        # embed.add_field(name=meta['type'], value=meta['resolution'], inline=True)
         embed.set_thumbnail(url=f"https://image.tmdb.org/t/p/original{meta['poster']}")
         embed.set_footer(text=meta['uuid'])
         embed.set_author(name="L4G's Upload Assistant", url="https://github.com/L4GSP1KE/BluUpload", icon_url="https://images2.imgbox.com/6e/da/dXfdgNYs_o.png")
         
+        message = await ctx.fetch_message(meta['embed_msg_id'])
         await message.edit(embed=embed)
 
         if meta.get('trackers', None) != None:

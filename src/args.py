@@ -3,6 +3,7 @@ import argparse
 from pprint import pprint
 import time
 from termcolor import cprint
+import traceback
 
 
 class Args():
@@ -48,7 +49,11 @@ class Args():
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
         parser.add_argument('-ua', '--unattended', action='store_true', required=False, help=argparse.SUPPRESS)
         
+        
         args = parser.parse_args(input)
+    
+        
+
         args = vars(args)
 
         for key in args:
