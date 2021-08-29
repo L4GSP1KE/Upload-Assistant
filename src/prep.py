@@ -1837,7 +1837,7 @@ class Prep():
         else:
             res = meta['resolution']
 
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/GENERIC_INFO.txt", 'w') as generic:
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/GENERIC_INFO.txt", 'w', encoding="utf-8") as generic:
             generic.write(f"Name: {meta['name']}\n\n")
             generic.write(f"Overview: {meta['overview']}\n\n")
             generic.write(f"{res} / {meta['type']}{tag}\n\n")
