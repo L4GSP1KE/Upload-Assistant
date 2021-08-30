@@ -134,7 +134,7 @@ class BLU():
         
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]DESCRIPTION.txt", 'a') as desc:
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]DESCRIPTION.txt", 'w') as desc:
             desc.write(base)
             images = meta['image_list']
             if len(images) > 0: 
