@@ -1255,7 +1255,7 @@ class Prep():
             globs = glob.glob("*.mkv") + glob.glob("*.mp4") + glob.glob("*.ts")
             if len(globs) == 1:
                 path = video
-        if meta['bdinfo'] != None:
+        if meta['is_disc']:
             include, exclude = "", ""
         else:
             exclude = ["*.*", "sample.mkv"] 
@@ -1264,8 +1264,8 @@ class Prep():
             # trackers = [announce],
             # source = "",
             private = True,
-            exclude_globs = [exclude],
-            include_globs = [include],
+            exclude_globs = exclude or [],
+            include_globs = include or [],
             created_by = "L4G's Upload Assistant")
         cprint("Creating .torrent", 'grey', 'on_yellow')
         torrent.piece_size_max = 16777216
