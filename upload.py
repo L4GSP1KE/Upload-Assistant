@@ -33,7 +33,7 @@ except:
     args = []
 
 if path in ['-h', '--help']:
-    meta, help = parser.parse("", dict())
+    meta, help, before_args = parser.parse("", dict())
     help.print_help()
     exit()
 cli_ui.setup(color='always', title="L4G's Upload Assistant")
@@ -44,7 +44,7 @@ async def do_the_thing(path, args, base_dir):
     path = os.path.abspath(path)
     if os.path.exists(path):
             meta['path'] = path
-            meta, help = parser.parse(args, meta)
+            meta, help, before_args = parser.parse(args, meta)
     else:
         cprint("Path does not exist", 'grey', 'on_red')
         exit()
@@ -86,7 +86,7 @@ async def do_the_thing(path, args, base_dir):
         # help.print_help()
         args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv)")
 
-        meta, help = parser.parse(args.split(), meta)
+        meta, help, before_args = parser.parse(args.split(), meta)
         # meta = await prep.tmdb_other_meta(meta)
         meta['edit'] = True
         meta = await prep.gather_prep(meta=meta) 
