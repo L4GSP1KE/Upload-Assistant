@@ -96,34 +96,34 @@ async def do_the_thing(path, args, base_dir):
     if isinstance(trackers, list) == False:
         trackers = [trackers]
     if meta.get('manual', False):
-        for tracker in trackers:
-            tracker = tracker.replace(" ", "")
-            if tracker.upper() == "BLU":
-                blu = BLU(config=config) 
-                await blu.edit_desc(meta)
-            if tracker.upper() == "BHD":
-                bhd = BHD(config=config)
-                await bhd.edit_desc(meta)       
-        url = await prep.package(meta)
-        if url == False:
-            cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}-{meta['uuid']}.tar", 'grey', 'on_yellow')
-        else:
-            cprint(meta['name'], 'grey', 'on_green')
-            cprint(f"Files can be found at {url} or `tmp/{meta['title']}-{meta['uuid']}.tar`", 'grey', 'on_green')
-        exit()
-    # if meta.get('trackers', None) != None:
-    #     trackers = meta['trackers']
-    # else:
-    #     trackers = config['TRACKERS']['default_trackers']
-    # if "," in trackers:
-    #     trackers = trackers.split(',')
+        trackers.insert(0, "MANUAL")
+    
+
     for tracker in trackers:
         tracker = tracker.replace(" ", "")
+        if meta['debug']:
+            debug = "(DEBUG)"
+        else:
+            debug = ""
+        
+        if tracker.upper() == "MANUAL":
+            do_manual = cli_ui.ask_yes_no(f"Get files for manual upload?", default=True)
+            if do_manual:
+                for manual_tracker in trackers:
+                    manual_tracker = manual_tracker.replace(" ", "")
+                    if manual_tracker.upper() == "BLU":
+                        blu = BLU(config=config) 
+                        await blu.edit_desc(meta)
+                    if manual_tracker.upper() == "BHD":
+                        bhd = BHD(config=config)
+                        await bhd.edit_desc(meta)       
+                url = await prep.package(meta)
+                if url == False:
+                    cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}-{meta['uuid']}.tar", 'grey', 'on_yellow')
+                else:
+                    cprint(meta['name'], 'grey', 'on_green')
+                    cprint(f"Files can be found at {url} or `tmp/{meta['title']}-{meta['uuid']}.tar`", 'grey', 'on_green')  
         if tracker.upper() == "BLU":
-            if meta['debug']:
-                debug = "(DEBUG)"
-            else:
-                debug = ""
             if meta['unattended']:
                 upload_to_blu = True
             else:
@@ -143,10 +143,6 @@ async def do_the_thing(path, args, base_dir):
                 draft = "Draft"
             else:
                 draft = "Live"
-            if meta['debug']:
-                debug = "(DEBUG)"
-            else:
-                debug = ""
             if meta['unattended']:
                 upload_to_bhd = True
             else:
