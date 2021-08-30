@@ -42,7 +42,7 @@ class Commands(commands.Cog):
         print(f'Joined {guild.name} with {guild.member_count} users!')
 
     @commands.command(aliases=['up'])
-    async def upload(self, ctx, path, *args, message_id=0):
+    async def upload(self, ctx, path, *args, message_id=0, search_args=tuple()):
         f"""
         Upload: for a list of arguments do {config['DISCORD']['command_prefix']}args
         """
@@ -54,7 +54,7 @@ class Commands(commands.Cog):
             await ctx.send("Missing Path")
             return
         elif path.lower() == "-h":
-            meta, help = parser.parse("", dict())
+            meta, help, before_args = parser.parse("", dict())
             await ctx.send(parser.help)
             return
         meta = dict()
@@ -63,7 +63,8 @@ class Commands(commands.Cog):
         if os.path.exists(path):
             meta['path'] = path
             try:
-                meta, help = parser.parse(args, meta)
+                args = args + search_args
+                meta, help, before_args = parser.parse(args, meta)
             except SystemExit as error:
                 await ctx.send(f"Invalid argument detected, use `{config['DISCORD']['command_prefix']}args` for list of valid args")
                 return
@@ -98,7 +99,7 @@ class Commands(commands.Cog):
         """
 
         parser = Args(config)
-        meta, help = parser.parse("", dict())
+        meta, help, before_args = parser.parse("", dict())
         help = help.format_help()
         help = help.split('optional')[1]
         if len(help) > 2000:
@@ -177,7 +178,7 @@ class Commands(commands.Cog):
             return
         prep = Prep(path=meta['path'], screens=meta['screens'], img_host=meta['imghost'], config=config) 
         try:
-            meta, help = parser.parse(args, meta)
+            meta, help, before_args = parser.parse(args, meta)
         except argparse.ArgumentError as error:
             ctx.send(error)
         msg = await ctx.fetch_message(meta['embed_msg_id'])
@@ -199,13 +200,26 @@ class Commands(commands.Cog):
         """
         Search for a file to upload
         """
+        search_terms = args
+        parser = Args(config)
+        try:
+            input_string = args
+            dict, parser, before_args = parser.parse(tuple(input_string.split(' ')), {})
+            search_terms = " ".join(before_args)
+            args = args.replace(search_terms, '')
+            while args.startswith(" "):
+                args = args[1:]
+        except SystemExit as error:
+            await ctx.send(f"Invalid argument detected, use `{config['DISCORD']['command_prefix']}args` for list of valid args")
+            return
+
         if ctx.channel.id != int(config['DISCORD']['discord_channel_id']):
             return
         search = Search(config=config)
-        if args == None:
+        if search_terms == None:
             await ctx.send("Missing search term(s)")
             return
-        files_total = await search.searchFile(args)
+        files_total = await search.searchFile(search_terms)
         if files_total == []:
             await ctx.send("Nothing Found")
             return
@@ -213,12 +227,12 @@ class Commands(commands.Cog):
         if not files_total:
             embed = discord.Embed(description="No files found")
         elif len(files_total) >= 2:
-            embed = discord.Embed(title=f"File search results for: `{args}`", color=0x00ff40, description=f"```• {files}```")
+            embed = discord.Embed(title=f"File search results for: `{search_terms}`", color=0x00ff40, description=f"```• {files}```")
             embed.add_field(name="What Now?", value=f"Please be more specific or use `{config['DISCORD']['command_prefix']}search dir` to find a directory")
             message = await ctx.send(embed=embed)
             return
         elif len(files_total) == 1:
-            embed = discord.Embed(title=f"File search results for: {args}", color=0x00ff40, description=f"```{files}```")
+            embed = discord.Embed(title=f"File search results for: {search_terms}", color=0x00ff40, description=f"```{files}```")
             embed.set_footer(text=f"{config['DISCORD']['discord_emojis']['UPLOAD']} to Upload")
             message = await ctx.send(embed=embed)
             await message.add_reaction(config['DISCORD']['discord_emojis']['UPLOAD'])
@@ -235,9 +249,9 @@ class Commands(commands.Cog):
             try:
                 await self.bot.wait_for("reaction_add", timeout=120, check=check)
             except asyncio.TimeoutError:
-                await channel.send(f"Search: `{args}`timed out")
+                await channel.send(f"Search: `{search_terms}`timed out")
             else:
-                await self.upload(ctx, path=files_total[0], message_id=message.id)
+                await self.upload(ctx, files_total[0], search_args=tuple(args.split(" ")), message_id=message.id)
 
 
 
@@ -246,13 +260,26 @@ class Commands(commands.Cog):
         """
         Search for a directory to upload
         """
+        search_terms = args
+        parser = Args(config)
+        try:
+            input_string = args
+            dict, parser, before_args = parser.parse(tuple(input_string.split(' ')), {})
+            search_terms = " ".join(before_args)
+            args = args.replace(search_terms, '')
+            while args.startswith(" "):
+                args = args[1:]
+        except SystemExit as error:
+            await ctx.send(f"Invalid argument detected, use `{config['DISCORD']['command_prefix']}args` for list of valid args")
+            return
+
         if ctx.channel.id != int(config['DISCORD']['discord_channel_id']):
             return
         search = Search(config=config)
-        if args == None:
+        if search_terms == None:
             await ctx.send("Missing search term(s)")
             return
-        folders_total = await search.searchFolder(args)
+        folders_total = await search.searchFolder(search_terms)
         if folders_total == []:
             await ctx.send("Nothing Found")
             return
@@ -260,12 +287,12 @@ class Commands(commands.Cog):
         if not folders_total:
             embed = discord.Embed(description="No files found")
         elif len(folders_total) >= 2:
-            embed = discord.Embed(title=f"Directory search results for: `{args}`", color=0x00ff40, description=f"```• {folders}```")
+            embed = discord.Embed(title=f"Directory search results for: `{search_terms}`", color=0x00ff40, description=f"```• {folders}```")
             embed.add_field(name="What Now?", value=f"Please be more specific or use `{config['DISCORD']['command_prefix']}search dir` to find a directory")
             await ctx.send(embed=embed)
             return
         elif len(folders_total) == 1:
-            embed = discord.Embed(title=f"Directory search results for: {args}", color=0x00ff40, description=f"```{folders}```")
+            embed = discord.Embed(title=f"Directory search results for: {search_terms}", color=0x00ff40, description=f"```{folders}```")
             embed.set_footer(text=f"{config['DISCORD']['discord_emojis']['UPLOAD']} to Upload")
             message = await ctx.send(embed=embed)
             await message.add_reaction(config['DISCORD']['discord_emojis']['UPLOAD'])
@@ -282,9 +309,9 @@ class Commands(commands.Cog):
             try:
                 await self.bot.wait_for("reaction_add", timeout=120, check=check)
             except asyncio.TimeoutError:
-                await channel.send(f"Search: `{args}`timed out")
+                await channel.send(f"Search: `{search_terms}`timed out")
             else:
-                await self.upload(ctx, path=folders_total[0], message_id=message.id)
+                await self.upload(ctx, path=folders_total[0], search_args=tuple(args.split(" ")), message_id=message.id)
         # await ctx.send(folders_total)
         return
     
