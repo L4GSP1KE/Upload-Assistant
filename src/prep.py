@@ -655,7 +655,7 @@ class Prep():
 
     def get_cat(self, video):
         # if category is None:
-        category = guessit(video)['type']
+        category = guessit(video.replace('1.0', ''))['type']
         if category.lower() == "movie":
             category = "MOVIE" #1
         elif category.lower() in ("tv", "episode"):
