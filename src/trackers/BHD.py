@@ -124,7 +124,7 @@ class BHD():
             for each in bd_sizes:
                 if bdinfo['size'] < each:
                     bd_size = each
-            if meta['uhd'] == "UHD":
+            if meta['uhd'] == "UHD" and bd_size != 25:
                 type_id = f"UHD {bd_size}"
             else:
                 type_id = f"BD {bd_size}"
