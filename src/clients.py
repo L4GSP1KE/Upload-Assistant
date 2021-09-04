@@ -10,6 +10,7 @@ import base64
 from pyrobase.parts import Bunch
 import errno
 import asyncio
+import ssl
 import shutil
 
 from termcolor import cprint
@@ -72,7 +73,7 @@ class Clients():
 
 
     def rtorrent(self, path, torrent_path, torrent, meta, local_path, remote_path, client):
-        rtorrent = xmlrpc.client.Server(client['rtorrent_url'])
+        rtorrent = xmlrpc.client.Server(client['rtorrent_url'], context=ssl._create_stdlib_context())
         metainfo = bencode.bread(torrent_path)
         try:
             fast_resume = self.add_fast_resume(metainfo, path, torrent)
