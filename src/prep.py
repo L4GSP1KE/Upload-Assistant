@@ -1310,7 +1310,7 @@ class Prep():
             nest_asyncio.apply()
             image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
         else:
-            for image in image_glob:        
+            for image in image_glob[-screens:]:        
                 if img_host == "imgbb":
                     url = "https://api.imgbb.com/1/upload"
                     data = {
