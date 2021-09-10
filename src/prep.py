@@ -527,14 +527,16 @@ class Prep():
             # multiply that dar by the height and then do a simple width / height
             new_height = dar * height
             sar = width / new_height
-
-        if sar > 1:
+        else:
+            sar = par
+        
+        if sar < 1:
             w_sar = 1
             h_sar = sar
         else:
             w_sar = sar
             h_sar = 1
-        
+    
         length = round(float(length))
         if len(meta['discs'][0]['main_set']) >= 3:
             main_set = meta['discs'][0]['main_set'][1:-1]
@@ -548,19 +550,23 @@ class Prep():
                 n -= self.screens
             image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][0]['name']}-{i}.png"
             img_time = random.randint(round(length/5) , round(length - length/5))
+            loglevel = 'quiet'
+            debug = True
+            if bool(meta.get('debug', False)):
+                loglevel = 'verbose'
+                debug = False
             (
                 ffmpeg
                 .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
                 .filter('scale', int(width * w_sar), int(height * h_sar))
                 .output(image, vframes=1)
                 .overwrite_output()
-                .global_args('-loglevel', 'quiet')
-                .run(quiet=True)
+                .global_args('-loglevel', loglevel)
+                .run(quiet=debug)
             )
             # print(os.path.getsize(image))
             # print(f'{i+1}/{self.screens}')
             n += 1
-            cli_ui.info_count(i, self.screens, "Screens Saved")
             # print(Path(image))
             if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                 i += 1
@@ -578,6 +584,7 @@ class Prep():
             else:
                 cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                 time.sleep(1)
+            cli_ui.info_count(i-1, self.screens, "Screens Saved")
 
 
     def screenshots(self, path, filename, folder_id, base_dir, meta):
