@@ -1307,6 +1307,11 @@ class Prep():
         if img_host != self.img_host and meta.get('imghost', None) == None:
             img_host = self.img_host
             i -= 1
+        elif img_host_num == 1 and meta.get('imghost') != img_host:
+            img_host = meta.get('imghost')
+            img_host_num = 0
+
+        
            
         # description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
         # description.write('[center]')
@@ -1399,10 +1404,10 @@ class Prep():
                     image_dict['web_url'] = web_url
                     image_dict['img_url'] = img_url
                     image_list.append(image_dict)
-                    cli_ui.info_count(i-1, self.screens, "Uploaded")
+                    cli_ui.info_count(i, self.screens, "Uploaded")
                     i += 1
                 time.sleep(0.5)
-                if i > self.screens:
+                if i >= self.screens:
                     break
         # description.write("[/center]")
         # description.write("\n")
