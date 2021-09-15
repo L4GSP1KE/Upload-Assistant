@@ -1400,7 +1400,7 @@ class Prep():
                     image_dict['img_url'] = img_url
                     image_list.append(image_dict)
                     cli_ui.info_count(i-1, self.screens, "Uploaded")
-                i += 1
+                    i += 1
                 time.sleep(0.5)
                 if i > self.screens:
                     break
