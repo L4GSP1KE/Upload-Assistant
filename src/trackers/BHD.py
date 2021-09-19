@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 # import discord
-# import asyncio
+import asyncio
 from torf import Torrent
 import requests
 from difflib import SequenceMatcher
 from termcolor import cprint
+import distutils.util
 import urllib
 from pprint import pprint
 
@@ -205,7 +206,7 @@ class BHD():
 
     async def get_live(self, meta): 
         draft = self.config['TRACKERS']['BHD']['draft_default']
-        draft = bool(draft) #0 for send to draft, 1 for live
+        draft = bool(distutils.util.strtobool(draft)) #0 for send to draft, 1 for live
         if draft:
             draft_int = 0
         else:
