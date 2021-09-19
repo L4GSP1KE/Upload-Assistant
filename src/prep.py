@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from src.args import Args
+
 from math import exp
 import nest_asyncio
 import imdb
@@ -37,6 +39,7 @@ from subprocess import Popen
 import cli_ui
 from pprint import pprint
 import itertools
+import cli_ui
 
 
 
@@ -59,7 +62,8 @@ class Prep():
         tmdb.API_KEY = config['DEFAULT']['tmdb_api']
 
 
-    async def gather_prep(self, meta):
+    async def gather_prep(self, meta, mode):
+        meta['mode'] = mode
         base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
         meta['isdir'] = os.path.isdir(self.path)
         base_dir = meta['base_dir']
@@ -494,8 +498,6 @@ class Prep():
             cli_ui.info_count(i, self.screens, "Screens Saved")
             if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                 i += 1
-            elif os.path.getsize(Path(image)) <= 20000000 and self.img_host == "pstorage.space":
-                i += 1
             elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                 i += 1
             elif os.path.getsize(Path(image)) <= 10000:
@@ -570,8 +572,6 @@ class Prep():
             # print(Path(image))
             if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                 i += 1
-            elif os.path.getsize(Path(image)) <= 20000000 and self.img_host == "pstorage.space":
-                i += 1
             elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                 i += 1
             elif os.path.getsize(Path(image)) <= 10000:
@@ -617,8 +617,6 @@ class Prep():
                 cli_ui.info_count(i, self.screens, "Screens Saved")
                 # print(Path(image))
                 if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                    i += 1
-                elif os.path.getsize(Path(image)) <= 20000000 and self.img_host == "pstorage.space":
                     i += 1
                 elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                     i += 1
@@ -719,8 +717,12 @@ class Prep():
                     attempted += 1
                     meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename)['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
                 else:
-                    cprint(f"Unable to find TMDb match for {filename}, please retry and pass one as an argument", 'grey', 'on_red')
-                    exit()
+                    cprint(f"Unable to find TMDb match for {filename}", 'grey', 'on_red')
+                    if meta.get('mode', 'discord') == 'cli':
+                        tmdb_id = cli_ui.ask_string("Please enter tmdb id:")
+                        parser = Args(config=self.config)
+                        meta['category'], meta['tmdb'] = parser.parse_tmdb_id(id=tmdb_id, category=meta.get('category'))
+
         return meta
     
     async def tmdb_other_meta(self, meta):
@@ -1331,7 +1333,7 @@ class Prep():
                     }
                     response = requests.post(url, data = data).json()
                     try:
-                        img_url = response['data']['url']
+                        img_url = response['data']['medium']['url']
                         web_url = response['data']['url_viewer']
                     except:
                         cprint("imgbb failed, trying next image host", 'yellow')
@@ -1347,24 +1349,11 @@ class Prep():
                     files= {open(image, 'rb')}
                     response = requests.post(url, data = data).json()
                     try:
-                        img_url = response['image']['url']
+                        pprint(response)
+                        img_url = response['image']['medium']['url']
                         web_url = response['image']['url_viewer']
                     except:
                         cprint("freeimage.host failed, trying next image host", 'yellow')
-                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
-                elif img_host == "pstorage.space":
-                    url = "https://pstorage.space/api/1/upload"
-                    data = {
-                        'key' : self.config['DEFAULT']['pstorage_api'],
-                        'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
-                        'filename' : image
-                    }
-                    response = requests.post(url, data = data).json()
-                    try:
-                        img_url = response['url']
-                        web_url = response['url_viewer']
-                    except:
-                        cprint("pstorage.space failed, trying next image host", 'yellow')
                         newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
                 elif img_host == "ptpimg":
                     payload = {
@@ -1421,11 +1410,11 @@ class Prep():
         os.chdir(chdir)
         image_list = []
         image_glob = glob.glob("*.png")
-        async with pyimgbox.Gallery() as gallery:
+        async with pyimgbox.Gallery(thumb_width=350, square_thumbs=False) as gallery:
             async for submission in gallery.add(image_glob):
                 image_dict = {}
                 image_dict['web_url'] = submission['web_url']
-                image_dict['img_url'] = submission['image_url']
+                image_dict['img_url'] = submission['thumbnail_url']
                 image_list.append(image_dict)
         return image_list
 

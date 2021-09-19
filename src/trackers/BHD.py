@@ -125,10 +125,13 @@ class BHD():
             for each in bd_sizes:
                 if bdinfo['size'] < each:
                     bd_size = each
+                    break
             if meta['uhd'] == "UHD" and bd_size != 25:
                 type_id = f"UHD {bd_size}"
             else:
                 type_id = f"BD {bd_size}"
+            if type_id not in ['UHD 100', 'UHD 66', 'UHD 50', 'BD 50', 'BD 25']:
+                type_id = "Other"
         elif meta['is_disc'] == "DVD":
             if "DVD5" in meta['dvd_size']:
                 type_id = "DVD 5"

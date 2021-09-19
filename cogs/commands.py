@@ -85,7 +85,7 @@ class Commands(commands.Cog):
             # message = await ctx.fetch_message(message_id)
             meta['embed_msg_id'] = message.id
             await message.clear_reactions()
-            meta = await prep.gather_prep(meta=meta)
+            meta = await prep.gather_prep(meta=meta, mode="discord")
             # await ctx.send(file=discord.File(f"{base_dir}/tmp/{folder_id}/Mediainfo.json"))
             await self.send_embed_and_upload(ctx, meta)
         else:
@@ -186,7 +186,7 @@ class Commands(commands.Cog):
         new_msg = await msg.channel.send(f"Editing {meta['uuid']}")
         meta['embed_msg_id'] = new_msg.id
         meta['edit'] = True
-        meta = await prep.gather_prep(meta=meta) 
+        meta = await prep.gather_prep(meta=meta, mode="discord") 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         await self.send_embed_and_upload(ctx, meta)
 

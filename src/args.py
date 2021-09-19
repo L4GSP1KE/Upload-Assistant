@@ -32,7 +32,7 @@ class Args():
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
-        parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'freeimage.host', 'pstorage', 'imgbox'])
+        parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'freeimage.host', 'imgbox'])
         parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
         parser.add_argument('-hb', '--desclink', nargs='*', required=False, help="Custom Description (link to hastebin)")
         parser.add_argument('-nfo', '--nfo', action='store_true', required=False, help="Use .nfo in directory for description")
@@ -70,6 +70,8 @@ class Args():
                         meta['manual_season'] = meta[key]
                     elif key == 'episode':
                         meta['manual_episode'] = meta[key]
+                    elif key == 'tmdb':
+                        meta['category'], meta['tmdb'] = self.parse_tmdb_id(meta[key], meta.get('category'))
                 else:
                     meta[key] = value
             else:
@@ -90,7 +92,17 @@ class Args():
         return result
 
 
-
+    def parse_tmdb_id(self, id, category):
+        id = id.lower().lstrip()
+        if id.startswith('tv'):
+            id = id.split('/')[1]
+            category = 'TV'
+        elif id.startswith('movie'):
+            id = id.split('/')[1]
+            category = 'MOVIE'
+        else:
+            id = id
+        return category, id
 
 
 

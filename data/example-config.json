@@ -3,15 +3,13 @@
         "tmdb_api" : "tmdb_api key",
 
         "imgbb_api" : "imgbb api key",
-        "pstorage_api" : "pstorage.space api key",
         "freeimage_api" : "6d207e02198a847aa98d0a2a901485a5",
         "ptpimg_api" : "ptpimg api key",
 
         "img_host_1": "imgbb",
         "img_host_2": "freeimage.host",
         "img_host_3": "ptpimg",
-        "img_host_4": "pstorage",
-        "img_host_5": "imgbox",
+        "img_host_4": "imgbox",
 
         "anon" : "False",
         "screens" : "6",

@@ -59,7 +59,7 @@ async def do_the_thing(path, args, base_dir):
     
     
     prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
-    meta = await prep.gather_prep(meta=meta) 
+    meta = await prep.gather_prep(meta=meta, mode='cli') 
     meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
 
     if meta.get('image_list', False) == False:
@@ -89,7 +89,7 @@ async def do_the_thing(path, args, base_dir):
         meta, help, before_args = parser.parse(args.split(), meta)
         # meta = await prep.tmdb_other_meta(meta)
         meta['edit'] = True
-        meta = await prep.gather_prep(meta=meta) 
+        meta = await prep.gather_prep(meta=meta, mode='cli') 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         confirm = get_confirmation(meta)
     
