@@ -394,7 +394,18 @@ class Prep():
         return resolution
 
     def closest(self, lst, K):
-        return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
+        lst = sorted(lst)
+        mi_input = K
+        res = 0
+        for each in lst:
+            if mi_input > each:
+                pass
+            else:
+                res = each
+                break
+        return res
+            
+        # return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
 
     def mi_resolution(self, res, guess):
         res_map = {
