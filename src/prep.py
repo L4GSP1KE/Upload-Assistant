@@ -137,6 +137,8 @@ class Prep():
                     await asyncio.sleep(1)
             #NTSC/PAL
             meta['dvd_size'] = await self.get_dvd_size(meta['discs'])
+            meta['resolution'] = self.get_resolution(guessit(video), meta['uuid'], base_dir)
+            meta['sd'] = self.is_sd(meta['resolution'])
         elif meta['is_disc'] == "HDDVD":
             video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
@@ -154,6 +156,8 @@ class Prep():
                 ds.start()
                 while ds.is_alive() == True:
                     await asyncio.sleep(1)
+            meta['resolution'] = self.get_resolution(guessit(video), meta['uuid'], base_dir)
+            meta['sd'] = self.is_sd(meta['resolution'])
         #If NOT BD/DVD/HDDVD
         else:
             videopath, meta['filelist'] = self.get_video(videoloc) 
