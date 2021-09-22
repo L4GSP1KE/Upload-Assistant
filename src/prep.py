@@ -1792,6 +1792,7 @@ class Prep():
             discs = meta['discs']
             if discs[0]['type'] == "DVD":
                 description.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
+                description.write("\n")
             if len(discs) >= 2:
                 for each in discs[1:]:
                     if each['type'] == "BDMV":
