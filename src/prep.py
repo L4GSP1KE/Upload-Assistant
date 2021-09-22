@@ -216,7 +216,7 @@ class Prep():
         meta = await self.tag_override(meta)
 
         meta['video'] = video
-        meta['audio'], meta['channels'] = self.get_audio_v2(mi, meta['anime'], bdinfo)
+        meta['audio'], meta['channels'] = self.get_audio_v2(mi, meta, bdinfo)
         if meta['tag'][1:].startswith(meta['channels']):
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
         meta['3D'] = self.is_3d(mi, bdinfo)
@@ -770,6 +770,7 @@ class Prep():
                 meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response.get('poster_path', "")
             meta['overview'] = response['overview']
+            meta['original_language'] = response['original_language']
         elif meta['category'] == "TV":
             tv = tmdb.TV(meta['tmdb'])
             response = tv.info()
@@ -793,6 +794,7 @@ class Prep():
             meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response.get('poster_path', '')
             meta['overview'] = response['overview']
+            meta['original_language'] = response['original_language']
         meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
@@ -882,7 +884,7 @@ class Prep():
     """
     Mediainfo/Bdinfo > meta
     """
-    def get_audio_v2(self, mi, anime, bdinfo):
+    def get_audio_v2(self, mi, meta, bdinfo):
         #Get formats
         if bdinfo != None: #Disks
             format_settings = ""
@@ -1005,8 +1007,8 @@ class Prep():
         if format == "MPEG Audio":
             codec = mi['media']['track'][2].get('CodecID_Hint', '')
 
-        if anime == True:
-            eng, jap = False, False
+        if meta['original_language'] != 'en':
+            eng, orig = False, False
             try:
                 for t in mi['media']['track']:
                     if t['@type'] != "Audio":
@@ -1014,9 +1016,9 @@ class Prep():
                     else: 
                         if t['Language'] == "en":
                             eng = True
-                        if t['Language'] == "ja":
-                            jap = True
-                if eng and jap == True:
+                        if t['Language'] == meta['original_language']:
+                            orig = True
+                if eng and orig == True:
                     dual = "Dual-Audio"
             except:
                 pass
