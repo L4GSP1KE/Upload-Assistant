@@ -53,7 +53,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
 
 
 ## **Discord Bot Usage:** 
-  **To start the bot** `python3 bot.py`
+  **To start the bot** `python3 discordbot.py`
   I recommend running this in screen
   
   **Commands:**
