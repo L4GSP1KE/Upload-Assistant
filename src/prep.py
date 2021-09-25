@@ -654,7 +654,7 @@ class Prep():
     """
 
     def get_type(self, video, scene, is_disc):
-        filename = video.lower()
+        filename = os.path.basename(video).lower()
         if "remux" in filename:
             type = "REMUX"
         elif any(word in filename for word in [" web ", ".web.", "web-dl"]):
