@@ -569,9 +569,9 @@ class Prep():
             img_time = random.randint(round(length/5) , round(length - length/5))
             loglevel = 'quiet'
             debug = True
-            if bool(meta.get('debug', False)):
-                loglevel = 'verbose'
-                debug = False
+            # if bool(meta.get('debug', False)):
+            #     loglevel = 'verbose'
+            #     debug = False
             (
                 ffmpeg
                 .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
@@ -614,9 +614,9 @@ class Prep():
             i = 0
             loglevel = 'quiet'
             debug = True
-            if bool(meta.get('debug', False)):
-                loglevel = 'verbose'
-                debug = False
+            # if bool(meta.get('debug', False)):
+            #     loglevel = 'verbose'
+            #     debug = False
             while i != self.screens:
                 image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
                 (
