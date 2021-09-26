@@ -345,14 +345,14 @@ class Prep():
             #MediaInfo to text
             if isdir == False:
                 os.chdir(os.path.dirname(video))
-            media_info = MediaInfo.parse(os.path.basename(video), output="STRING", full=False)
+            media_info = MediaInfo.parse(os.path.basename(video), output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
             export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
             export.write(media_info)
             export.close()
             mi_dump = media_info
 
         #MediaInfo to JSON
-        media_info = MediaInfo.parse(video, output="JSON")
+        media_info = MediaInfo.parse(video, output="JSON", mediainfo_options={'inform_version' : '1'})
         export = open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", 'w', encoding='utf-8')
         export.write(media_info)
         export.close()
@@ -531,7 +531,7 @@ class Prep():
         if self.screens == 0:
             return
         cprint("Saving Screens...", "grey", "on_yellow")
-        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB")
+        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", mediainfo_options={'inform_version' : '1'})
         sar = 1
         for track in ifo_mi.tracks:
             if track.track_type == "Video":

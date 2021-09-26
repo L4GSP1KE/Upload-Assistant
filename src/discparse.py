@@ -205,8 +205,8 @@ class DiscParse():
             # print(main_set[0][:2])
             each['vob'] = vob = f"{path}/VTS_{set}_1.VOB"
             each['ifo'] = ifo = f"{path}/VTS_{set}_0.IFO"
-            each['vob_mi'] = MediaInfo.parse(os.path.basename(vob), output='STRING', full=False)
-            each['ifo_mi'] = MediaInfo.parse(os.path.basename(ifo), output='STRING', full=False)
+            each['vob_mi'] = MediaInfo.parse(os.path.basename(vob), output='STRING', full=False, mediainfo_options={'inform_version' : '1'})
+            each['ifo_mi'] = MediaInfo.parse(os.path.basename(ifo), output='STRING', full=False, mediainfo_options={'inform_version' : '1'})
 
             size = sum(os.path.getsize(f) for f in os.listdir('.') if os.path.isfile(f))/float(1<<30)
             if size < 9:
@@ -228,6 +228,6 @@ class DiscParse():
                 file_size = os.path.getsize(file)
                 if file_size > size:
                     largest = file
-            each['evo_mi'] = MediaInfo.parse(os.path.basename(largest), output='STRING', full=False)
+            each['evo_mi'] = MediaInfo.parse(os.path.basename(largest), output='STRING', full=False, mediainfo_options={'inform_version' : '1'})
             each['largest_evo'] = os.path.abspath(f"{path}/{largest}")
         return discs
