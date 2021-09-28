@@ -1136,22 +1136,26 @@ class Prep():
             try:
                 hdr_mi = mi['media']['track'][1]['colour_primaries']
                 if hdr_mi in ("BT.2020", "REC.2020"):
-                    hdr = "HDR"
+                    hdr = ""
                     try:
-                        if "HDR10+" in mi['media']['track'][1]['HDR_Format_String']:
+                        hdr_format_string = mi['media']['track'][1]['HDR_Format_String']
+                        if "HDR10" in hdr_format_string:
+                            hdr = "HDR"
+                        if "HDR10+" in hdr_format_string:
                             hdr = "HDR10+"
                     except:
-                        hdr = "PQ10"
-                    try:
-                        if "HLG" in mi['media']['track'][1]['transfer_characteristics_Original']:
-                            hdr = "HLG"
-                    except:
-                        pass
+                        if mi['media']['track'][1].get('HDR_Format_String', None) == None and "PQ" in (mi['media']['track'][1].get('transfer_characteristics'), mi['media']['track'][1].get('transfer_characteristics_Original', None)):
+                            hdr = "PQ10"
+                    transfer_characteristics = mi['media']['track'][1].get('transfer_characteristics_Original', None)
+                    if "HLG" in transfer_characteristics:
+                        hdr = "HLG"
+                    if hdr != "HLG" and "BT.2020 (10-bit)" in transfer_characteristics:
+                        hdr = "WCG"
             except:
                 pass
 
             try:
-                # print(mi['media']['track'][1]['HDR_Format'])
+
                 if "Dolby Vision" in mi['media']['track'][1]['HDR_Format']:
                     dv = "DV"
             except:
