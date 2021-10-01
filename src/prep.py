@@ -755,8 +755,11 @@ class Prep():
             movie = tmdb.Movies(meta['tmdb'])
             response = movie.info()
             meta['title'] = response['title']
-            meta['year'] = datetime.strptime(response['release_date'],'%Y-%m-%d').year
-            
+            if response['release_date']:
+                meta['year'] = datetime.strptime(response['release_date'],'%Y-%m-%d').year
+            else:
+                cprint('TMDB does not have a release date, using year from filename instead (if it exists)', 'yellow')
+                meta['year'] = meta['search_year']
             external = movie.external_ids()
             meta['imdb_id'] = external.get('imdb_id', "0")
             if meta['imdb_id'] == "" or meta['imdb_id'] == None:
@@ -779,8 +782,11 @@ class Prep():
             tv = tmdb.TV(meta['tmdb'])
             response = tv.info()
             meta['title'] = response['name']
-            meta['year'] = datetime.strptime(response['first_air_date'],'%Y-%m-%d').year
-            
+            if response['first_air_date']:
+                meta['year'] = datetime.strptime(response['first_air_date'],'%Y-%m-%d').year
+            else:
+                cprint('TMDB does not have a release date, using year from filename instead (if it exists)', 'yellow')
+                meta['year'] = meta['search_year']
             external = tv.external_ids()
             meta['imdb_id'] = external.get('imdb_id', "0")
             if meta['imdb_id'] == "" or meta['imdb_id'] == None:
