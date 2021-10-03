@@ -202,10 +202,10 @@ class Prep():
         else:
             meta['category'] = meta['category'].upper()
 
-               
+        meta['category'], meta['tmdb'], meta['imdb'] = self.get_tmdb_imdb_from_mediainfo(mi, meta['category'])      
         if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'], untouched_filename)
-        elif meta.get('imdb', None) != None:
+        elif meta.get('imdb', None) != None and meta.get('tmdb', None) == None:
             meta = await self.get_tmdb_from_imdb(meta, filename)
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
@@ -761,11 +761,14 @@ class Prep():
                 cprint('TMDB does not have a release date, using year from filename instead (if it exists)', 'yellow')
                 meta['year'] = meta['search_year']
             external = movie.external_ids()
-            meta['imdb_id'] = external.get('imdb_id', "0")
-            if meta['imdb_id'] == "" or meta['imdb_id'] == None:
-                meta['imdb_id'] = '0'
+            if meta.get('imdb', None) == None:
+                imdb_id = external.get('imdb_id', "0")
+                if imdb_id == "" or imdb_id == None:
+                    meta['imdb_id'] = '0'
+                else:
+                    meta['imdb_id'] = str(int(imdb_id.replace('tt', ''))).zfill(7)
             else:
-                meta['imdb_id'] = str(int(meta['imdb_id'].replace('tt', ''))).zfill(7)
+                meta['imdb_id'] = meta['imdb']
             meta['tvdb_id'] = external.get('tvdb_id', '0')
             if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
@@ -788,11 +791,14 @@ class Prep():
                 cprint('TMDB does not have a release date, using year from filename instead (if it exists)', 'yellow')
                 meta['year'] = meta['search_year']
             external = tv.external_ids()
-            meta['imdb_id'] = external.get('imdb_id', "0")
-            if meta['imdb_id'] == "" or meta['imdb_id'] == None:
-                meta['imdb_id'] = '0'
+            if meta.get('imdb', None) == None:
+                imdb_id = external.get('imdb_id', "0")
+                if imdb_id == "" or imdb_id == None:
+                    meta['imdb_id'] = '0'
+                else:
+                    meta['imdb_id'] = str(int(imdb_id.replace('tt', ''))).zfill(7)
             else:
-                meta['imdb_id'] = str(int(meta['imdb_id'].replace('tt', ''))).zfill(7)
+                meta['imdb_id'] = meta['imdb']
             meta['tvdb_id'] = external.get('tvdb_id', '0')
             if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
@@ -1923,8 +1929,17 @@ class Prep():
         return compact
     
 
-    
-
+    def get_tmdb_imdb_from_mediainfo(self, mediainfo, category):
+        tmdbid =  imdbid = None
+        if mediainfo['media']['track'][0].get('extra'):
+            extra = mediainfo['media']['track'][0]['extra']
+            for each in extra:
+                if each.lower().startswith('tmdb'):
+                    parser = Args(config=self.config)
+                    category, tmdbid = parser.parse_tmdb_id(id = extra[each], category=category)
+                if each.lower().startswith('imdb'):
+                    imdbid = str(int(extra[each].replace('tt', ''))).zfill(7)
+        return category, tmdbid, imdbid
 
 
 
