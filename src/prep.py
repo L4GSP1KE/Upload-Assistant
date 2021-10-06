@@ -235,7 +235,7 @@ class Prep():
         else:
             meta['video_encode'], meta['video_codec'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
-            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), video, bdinfo)
+            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), video, bdinfo, meta['filelist'])
 
         
         
@@ -1251,7 +1251,7 @@ class Prep():
         return video_encode, video_codec
 
 
-    def get_edition(self, guess, video, bdinfo):
+    def get_edition(self, guess, video, bdinfo, filelist):
         repack = ""
         if bdinfo != None:
             try:
@@ -1263,6 +1263,8 @@ class Prep():
                 edition = guess['edition']
             except:
                 edition = ""
+        if len(filelist) >= 2:
+            video = os.path.dirname(video)
         if "open matte" in video.replace('.', ' ').lower():
             edition = edition + "Open Matte"
         if "REPACK" in video:
