@@ -30,7 +30,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
       - On linux systems, get it from your favorite package manager
    - Clone the repo to your system `git clone https://github.com/L4GSP1KE/Upload-Assistant.git`
    - Copy and Rename `data/example-config.json` to `data/config.json`
-   - Edit `config.json` to use your information (more detailed information in the wiki(coming soon))
+   - Edit `config.json` to use your information (more detailed information in the [wiki](https://github.com/L4GSP1KE/Upload-Assistant/wiki))
       - tmdb_api (v3) key can be obtained from https://developers.themoviedb.org/3/getting-started/introduction
       - image host api keys can be obtained from their respective sites
       - discord bot token can be obtained from https://discord.com/developers/
