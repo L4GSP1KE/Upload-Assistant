@@ -1940,7 +1940,10 @@ class Prep():
                     parser = Args(config=self.config)
                     category, tmdbid = parser.parse_tmdb_id(id = extra[each], category=category)
                 if each.lower().startswith('imdb'):
-                    imdbid = str(int(extra[each].replace('t', ''))).zfill(7)
+                    try:
+                        imdbid = str(int(extra[each].replace('tt', ''))).zfill(7)
+                    except:
+                        pass
         return category, tmdbid, imdbid
 
 
