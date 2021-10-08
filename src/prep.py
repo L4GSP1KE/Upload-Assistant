@@ -1384,7 +1384,6 @@ class Prep():
                     files= {open(image, 'rb')}
                     response = requests.post(url, data = data).json()
                     try:
-                        pprint(response)
                         img_url = response['image']['medium']['url']
                         web_url = response['image']['url_viewer']
                     except:
