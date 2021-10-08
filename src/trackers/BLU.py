@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # import discord
-# import asyncio
+import asyncio
 from torf import Torrent
 import requests
 from difflib import SequenceMatcher
@@ -158,13 +158,17 @@ class BLU():
         dupes = []
         cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
         url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(meta['clean_name'])}&api_token={self.config['TRACKERS']['BLU']['api_key']}"
-        response = requests.get(url=url)
-        response = response.json()
-        for each in response['data']:
-            result = [each][0]['attributes']['name']
-            # print(result)
-            difference = SequenceMatcher(None, meta['clean_name'], result).ratio()
-            if difference >= 0.05:
-                dupes.append(result)
+        try:
+            response = requests.get(url=url)
+            response = response.json()
+            for each in response['data']:
+                result = [each][0]['attributes']['name']
+                # print(result)
+                difference = SequenceMatcher(None, meta['clean_name'], result).ratio()
+                if difference >= 0.05:
+                    dupes.append(result)
+        except:
+            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            await asyncio.sleep(5)
 
         return dupes
