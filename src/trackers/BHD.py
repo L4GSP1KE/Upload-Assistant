@@ -111,8 +111,8 @@ class BHD():
             "HD-DVD" : "HD-DVD",
             "Web" : "WEB",
             "HDTV" : "HDTV",
-            "NTSC DVD" : "DVD",
-            "PAL DVD" : "DVD"
+            "NTSC" : "DVD",
+            "PAL" : "DVD"
         }
         
         source_id = sources.get(source)
