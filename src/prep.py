@@ -327,7 +327,7 @@ class Prep():
             filelist = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.ts')
             video = sorted(filelist)[0]        
         else:
-            video= videoloc
+            video = videoloc
             filelist.append(videoloc)
         return video, filelist
 
@@ -1940,7 +1940,7 @@ class Prep():
                     parser = Args(config=self.config)
                     category, tmdbid = parser.parse_tmdb_id(id = extra[each], category=category)
                 if each.lower().startswith('imdb'):
-                    imdbid = str(int(extra[each].replace('tt', ''))).zfill(7)
+                    imdbid = str(int(extra[each].replace('t', ''))).zfill(7)
         return category, tmdbid, imdbid
 
 
