@@ -202,7 +202,7 @@ class Prep():
         else:
             meta['category'] = meta['category'].upper()
 
-        meta['category'], meta['tmdb'], meta['imdb'] = self.get_tmdb_imdb_from_mediainfo(mi, meta['category'], meta['is_disc'])      
+        meta['category'], meta['tmdb'], meta['imdb'] = self.get_tmdb_imdb_from_mediainfo(mi, meta['category'], meta['is_disc'], meta['tmdb'], meta['imdb'])      
         if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'], untouched_filename)
         elif meta.get('imdb', None) != None and meta.get('tmdb', None) == None:
@@ -741,6 +741,7 @@ class Prep():
         return meta
     
     async def tmdb_other_meta(self, meta):
+        
         if meta['tmdb'] == "0":
             try:
                 title = guessit(meta['path'])['title'].lower()
@@ -1930,8 +1931,7 @@ class Prep():
         return compact
     
 
-    def get_tmdb_imdb_from_mediainfo(self, mediainfo, category, is_disc):
-        tmdbid =  imdbid = None
+    def get_tmdb_imdb_from_mediainfo(self, mediainfo, category, is_disc, tmdbid, imdbid):
         if not is_disc:
             if mediainfo['media']['track'][0].get('extra'):
                 extra = mediainfo['media']['track'][0]['extra']
