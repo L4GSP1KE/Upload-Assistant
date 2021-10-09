@@ -202,7 +202,7 @@ class Prep():
         else:
             meta['category'] = meta['category'].upper()
 
-        meta['category'], meta['tmdb'], meta['imdb'] = self.get_tmdb_imdb_from_mediainfo(mi, meta['category'])      
+        meta['category'], meta['tmdb'], meta['imdb'] = self.get_tmdb_imdb_from_mediainfo(mi, meta['category'], meta['is_disc'])      
         if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'], untouched_filename)
         elif meta.get('imdb', None) != None and meta.get('tmdb', None) == None:
@@ -1520,7 +1520,7 @@ class Prep():
                 if meta['is_disc'] == 'BDMV':
                     name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region']
-                if meta['is_disc'] == 'DVD' or meta['id_disc'] == "HDDVD":
+                if meta['is_disc'] == 'DVD' or meta['is_disc'] == "HDDVD":
                     name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
@@ -1930,9 +1930,9 @@ class Prep():
         return compact
     
 
-    def get_tmdb_imdb_from_mediainfo(self, mediainfo, category):
+    def get_tmdb_imdb_from_mediainfo(self, mediainfo, category, is_disc):
         tmdbid =  imdbid = None
-        if mediainfo != [] or mediainfo != None:
+        if not is_disc:
             if mediainfo['media']['track'][0].get('extra'):
                 extra = mediainfo['media']['track'][0]['extra']
                 for each in extra:
