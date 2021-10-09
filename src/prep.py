@@ -1932,17 +1932,18 @@ class Prep():
 
     def get_tmdb_imdb_from_mediainfo(self, mediainfo, category):
         tmdbid =  imdbid = None
-        if mediainfo['media']['track'][0].get('extra'):
-            extra = mediainfo['media']['track'][0]['extra']
-            for each in extra:
-                if each.lower().startswith('tmdb'):
-                    parser = Args(config=self.config)
-                    category, tmdbid = parser.parse_tmdb_id(id = extra[each], category=category)
-                if each.lower().startswith('imdb'):
-                    try:
-                        imdbid = str(int(extra[each].replace('tt', ''))).zfill(7)
-                    except:
-                        pass
+        if mediainfo != [] or mediainfo != None:
+            if mediainfo['media']['track'][0].get('extra'):
+                extra = mediainfo['media']['track'][0]['extra']
+                for each in extra:
+                    if each.lower().startswith('tmdb'):
+                        parser = Args(config=self.config)
+                        category, tmdbid = parser.parse_tmdb_id(id = extra[each], category=category)
+                    if each.lower().startswith('imdb'):
+                        try:
+                            imdbid = str(int(extra[each].replace('tt', ''))).zfill(7)
+                        except:
+                            pass
         return category, tmdbid, imdbid
 
 
