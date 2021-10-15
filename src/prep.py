@@ -1634,14 +1634,14 @@ class Prep():
                 except:
                     try:
                         if int(parsed['episode_number']) >= anilist_episodes:
-                            data = {
+                            params = {
                                 'id' : str(meta['tvdb_id']),
                                 'origin' : 'tvdb',
                                 'absolute' : str(parsed['episode_number']),
                                 # 'destination' : 'tvdb'
                             }
                             url = "http://thexem.de/map/single"
-                            response = requests.post(url, data=data).json()
+                            response = requests.post(url, params=params).json()
                             if response['result'] == "failure":
                                 raise XEMNotFound
                             season = f"S{str(response['data']['scene']['season']).zfill(2)}"
