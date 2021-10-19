@@ -1829,12 +1829,10 @@ class Prep():
             description.write("\n")
             meta['description'] = "CUSTOM"
         if desclink != None:
-            description.write("[code]")
             parsed = urllib.parse.urlparse(desclink.replace('/raw/', '/'))
             raw = parsed._replace(path=f"/raw{parsed.path}")
             raw = urllib.parse.urlunparse(raw)
             description.write(requests.get(raw).text)
-            description.write("[/code]\n")
             description.write("\n")
             meta['description'] = "CUSTOM"
         if descfile != None:
@@ -1845,8 +1843,8 @@ class Prep():
         if meta['desc'] != None:
             description.write(meta['desc'])
             description.write("\n")
-            description.write("\n")
             meta['description'] = "CUSTOM"
+        description.write("\n")
         return meta
         
     async def tag_override(self, meta):
