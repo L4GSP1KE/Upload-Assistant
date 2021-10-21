@@ -555,8 +555,11 @@ class Prep():
             h_sar = 1
     
         length = round(float(length))
-        if len(meta['discs'][0]['main_set']) >= 3:
+        main_set_length = len(meta['discs'][0]['main_set'])
+        if main_set_length >= 3:
             main_set = meta['discs'][0]['main_set'][1:-1]
+        else:
+            main_set = meta['discs'][0]['main_set'][1:]
         n = 0        
         i = 0
 
