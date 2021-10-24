@@ -21,8 +21,8 @@ from pprint import pprint
 base_dir = os.path.abspath(os.path.dirname(__file__))
 with open(f"{base_dir}/data/config.json", 'r', encoding="utf-8-sig") as f:
     config = json.load(f)
-    
 
+    
 client = Clients(config=config)
 parser = Args(config)
 file = sys.argv[0]

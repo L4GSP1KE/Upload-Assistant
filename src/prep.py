@@ -1215,8 +1215,10 @@ class Prep():
     
     def get_video_codec(self, bdinfo):
         codecs = {
+            "MPEG-2 Video" : "MPEG-2",
             "MPEG-4 AVC Video" : "AVC",
             "MPEG-H HEVC Video" : "HEVC",
+            "VC-1 Video" : "VC-1"
         }
         codec = codecs.get(bdinfo['video'][0]['codec'], "")
         return codec
