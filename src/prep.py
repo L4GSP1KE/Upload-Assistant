@@ -1009,7 +1009,7 @@ class Prep():
             if key in commercial:
                 codec = value
                 search_format = False
-            if "Atmos" in commercial:
+            if "Atmos" in commercial or format_extra.get(additional, "") == " Atmos":
                 extra = " Atmos"
         if search_format:
             codec = audio.get(format, "") + audio_extra.get(additional, "")
