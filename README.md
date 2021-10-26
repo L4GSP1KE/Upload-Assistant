@@ -34,7 +34,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
       - tmdb_api (v3) key can be obtained from https://developers.themoviedb.org/3/getting-started/introduction
       - image host api keys can be obtained from their respective sites
       - discord bot token can be obtained from https://discord.com/developers/
-   - Install necessary python modules `pip3 install -U -r requirements.txt`
+   - Install necessary python modules `pip3 install --user -U -r requirements.txt`
    
 
    **Additional Resources are found in the [wiki](https://github.com/L4GSP1KE/Upload-Assistant/wiki)**
@@ -44,7 +44,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
 ## **Updating:**
   - To update first navigate into the Upload-Assistant directory: `cd Upload-Assistant`
   - Run a `git pull` to grab latest updates
-  - Run `pip3 install -U -r requirements.txt` to ensure dependencies are up to date
+  - Run `pip3 install --user -U -r requirements.txt` to ensure dependencies are up to date
   ## **CLI Usage:**
   
   `python3 upload.py /downloads/path/to/content --args`
