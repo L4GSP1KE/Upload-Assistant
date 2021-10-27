@@ -1835,11 +1835,16 @@ class Prep():
             meta['description'] = "CUSTOM"
         if desclink != None:
             parsed = urllib.parse.urlparse(desclink.replace('/raw/', '/'))
-            raw = parsed._replace(path=f"/raw{parsed.path}")
+            split = os.path.split(parsed.path)
+            if split[0] != '/':
+                raw = parsed._replace(path=f"{split[0]}/raw/{split[1]}")
+            else:
+                raw = parsed._replace(path=f"/raw{parsed.path}")
             raw = urllib.parse.urlunparse(raw)
             description.write(requests.get(raw).text)
             description.write("\n")
             meta['description'] = "CUSTOM"
+            
         if descfile != None:
             if os.path.isfile(descfile) == True:
                 text = open(descfile, 'r').read()
