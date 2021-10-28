@@ -1034,9 +1034,9 @@ class Prep():
                     if t['@type'] != "Audio":
                         pass
                     else: 
-                        if t['Language'] == "en":
+                        if t['Language'] == "en" and "commentary" not in t.get('Title', '').lower():
                             eng = True
-                        if t['Language'] == meta['original_language']:
+                        if t['Language'] == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
                             orig = True
                 if eng and orig == True:
                     dual = "Dual-Audio"
