@@ -129,6 +129,9 @@ class Prep():
                 meta['search_year'] = ""
             if meta.get('edit', False) == False:
                 mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", False, meta['uuid'], meta['base_dir'], export_text=False)
+                meta['mediainfo'] = mi
+            else:
+                mi = meta['mediainfo']
             #screenshots
             if meta.get('edit', False) == False:
                 ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, meta['discs']))
@@ -151,6 +154,9 @@ class Prep():
                 meta['search_year'] = ""
             if meta.get('edit', False) == False:
                 mi = self.exportInfo(meta['largest_evo'], False, meta['uuid'], meta['base_dir'], export_text=False)
+                meta['mediainfo'] = mi
+            else:
+                mi = meta['mediainfo']
             if meta.get('edit', False) == False:
                 ds = multiprocessing.Process(target=self.screenshots, args=(meta['discs'][0]['largest_evo'], filename, meta['uuid'], base_dir))
                 ds.start()
