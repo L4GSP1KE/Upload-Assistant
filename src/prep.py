@@ -214,7 +214,7 @@ class Prep():
         if meta.get('tag', None) == None:
             meta['tag'] = self.get_tag(video, meta)
         else:
-            if not meta['tag'].startswith('-'):
+            if not meta['tag'].startswith('-') and meta['tag'] != "":
                 meta['tag'] = f"-{meta['tag']}"
         meta = await self.get_season_episode(video, meta)
         meta = await self.tag_override(meta)
