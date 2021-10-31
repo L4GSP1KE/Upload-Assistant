@@ -77,13 +77,15 @@ class Prep():
         if meta['debug']:
             cprint(f"ID: {meta['uuid']}", 'cyan')
 
-        meta['is_disc'], videoloc, bdinfo, meta['discs'] = await self.get_disc(meta)
-        
+        if meta.get('edit', False) == False:
+            meta['is_disc'], videoloc, bdinfo, meta['discs'] = await self.get_disc(meta)
+        else:
+            parse = DiscParse()
+            discs, bdinfo = await parse.get_bdinfo(meta['discs'], meta['uuid'], meta['base_dir'])
         # If BD:
         if meta['is_disc'] == "BDMV":
             video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
-
             try:
                 guess_name = bdinfo['title'].replace('-',' ')
                 filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
@@ -236,7 +238,7 @@ class Prep():
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
         meta['hdr'] = self.get_hdr(mi, bdinfo)
         if meta.get('is_disc', None) == "BDMV": #Blu-ray Specific
-            meta['region'] = self.get_region(bdinfo, region=None)
+            meta['region'] = self.get_region(bdinfo, meta.get('region', None))
             meta['video_codec'] = self.get_video_codec(bdinfo)
         else:
             meta['video_encode'], meta['video_codec'] = self.get_video_encode(mi, meta['type'], bdinfo)
@@ -1084,7 +1086,7 @@ class Prep():
                 except:
                     source = "BluRay"
             
-            if source in ("Blu-ray", "Ultra HD Blu-ray", "BluRay", "BR"):
+            if source in ("Blu-ray", "Ultra HD Blu-ray", "BluRay", "BR") or is_disc == "BDMV":
                 if type == "DISC":
                     source = "Blu-ray"
                 elif type in ('ENCODE', 'REMUX'):
@@ -1110,7 +1112,7 @@ class Prep():
             if source in ("Web"):
                 if type == "ENCODE":
                     type = "WEBRIP"
-            if source in ("HD-DVD"):
+            if is_disc == "HDDVD":
                 source = "HDDVD"
             if type in ("WEBDL", 'WEBRIP'):
                 source = "Web"
@@ -1186,9 +1188,8 @@ class Prep():
         hdr = f"{dv} {hdr}"
         return hdr
 
-    def get_region(self, bdinfo, region):
+    def get_region(self, bdinfo, region=None):
         label = bdinfo.get('label', bdinfo.get('title', bdinfo.get('path', ''))).replace('.', ' ')
-        region = None
         if region != None:
             region = region
         else: 
@@ -1506,9 +1507,12 @@ class Prep():
                 if meta['is_disc'] == 'BDMV':
                     name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region']
-                elif meta['is_disc'] == 'DVD' or meta['is_disc'] == 'HDDVD':
+                elif meta['is_disc'] == 'DVD': 
                     name = f"{title} {alt_title} {year} {edition} {repack} {source} {dvd_size} {audio}"
-                    potential_missing = ['edition']
+                    potential_missing = ['edition', 'region']
+                elif meta['is_disc'] == 'HDDVD':
+                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
+                    potential_missing = ['edition', 'region']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
                 potential_missing = ['edition', 'description']
@@ -1532,9 +1536,12 @@ class Prep():
                 if meta['is_disc'] == 'BDMV':
                     name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region']
-                if meta['is_disc'] == 'DVD' or meta['is_disc'] == "HDDVD":
+                if meta['is_disc'] == 'DVD':
                     name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition']
+                elif meta['is_disc'] == 'HDDVD':
+                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
+                    potential_missing = ['edition', 'region']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
