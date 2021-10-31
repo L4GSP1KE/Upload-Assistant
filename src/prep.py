@@ -1212,7 +1212,7 @@ class Prep():
             "FRA" : "FRA",
             }
             for key, value in regions.items():
-                if key in label:
+                if f" {key} " in label:
                     region = value
                     
             if region == None:
