@@ -419,7 +419,6 @@ class Commands(commands.Cog):
             json.dump(meta, f, indent=4)
             f.close()
         
-        
         def check(reaction, user):
             if reaction.message.id == meta['embed_msg_id']:
                 if str(user.id) == config['DISCORD']['admin_id']: 
@@ -429,8 +428,8 @@ class Commands(commands.Cog):
                         if meta['embed_msg_id']:
                             pass
                         raise CancelException
-                    if str(reaction.emoji) == config['DISCORD']['discord_emojis']['MANUAL']:
-                        raise ManualException
+                    # if str(reaction.emoji) == config['DISCORD']['discord_emojis']['MANUAL']:
+                    #     raise ManualException
         try:
             await self.bot.wait_for("reaction_add", timeout=43200, check=check)
         except asyncio.TimeoutError:
@@ -449,17 +448,17 @@ class Commands(commands.Cog):
             await msg.clear_reactions()
             await msg.edit(embed=cancel_embed)
             return
-        except ManualException:
-            msg = await ctx.fetch_message(meta['embed_msg_id'])
-            await msg.clear_reactions()
-            archive_url = await prep.package(meta)
-            if archive_url == False:
-                archive_fail_embed = discord.Embed(title="Unable to upload prep files", description=f"The files can be found at `tmp/{meta['title']}.tar`", color=0xff0000)
-                await msg.edit(embed=archive_fail_embed)
-            else:
-                archive_embed = discord.Embed(title="Files can be found at:",description=f"{archive_url} or `tmp/{meta['title']}.tar`", color=0x00ff40)
-                await msg.edit(embed=archive_embed)
-            return
+        # except ManualException:
+        #     msg = await ctx.fetch_message(meta['embed_msg_id'])
+        #     await msg.clear_reactions()
+        #     archive_url = await prep.package(meta)
+        #     if archive_url == False:
+        #         archive_fail_embed = discord.Embed(title="Unable to upload prep files", description=f"The files can be found at `tmp/{meta['title']}.tar`", color=0xff0000)
+        #         await msg.edit(embed=archive_fail_embed)
+        #     else:
+        #         archive_embed = discord.Embed(title="Files can be found at:",description=f"{archive_url} or `tmp/{meta['title']}.tar`", color=0x00ff40)
+        #         await msg.edit(embed=archive_embed)
+        #     return
         else:
             
             #Check which are selected and upload to them
@@ -483,6 +482,25 @@ class Commands(commands.Cog):
             
 
             client = Clients(config=config)
+            if "MANUAL" in tracker_list:
+                for manual_tracker in tracker_list:
+                    manual_tracker = manual_tracker.replace(" ", "")
+                    if manual_tracker.upper() == "BLU":
+                        blu = BLU(config=config) 
+                        await blu.edit_desc(meta)
+                    if manual_tracker.upper() == "BHD":
+                        bhd = BHD(config=config)
+                        await bhd.edit_desc(meta) 
+                archive_url = await prep.package(meta)
+                upload_embed_description = upload_embed_description.replace('MANUAL', '~~MANUAL~~')
+                if archive_url == False:
+                    upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0xff0000)
+                    upload_embed.add_field(name="Unable to upload prep files", value=f"The files can be found at `tmp/{meta['title']}.tar`")
+                    await msg.edit(embed=upload_embed)
+                else:
+                    upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
+                    upload_embed.add_field(name="Files can be found at:",value=f"{archive_url} or `tmp/{meta['uuid']}`")
+                    await msg.edit(embed=upload_embed)
             if "BLU" in tracker_list:
                 blu = BLU(config=config)
                 dupes = await blu.search_existing(meta)
@@ -503,7 +521,6 @@ class Commands(commands.Cog):
                     upload_embed_description = upload_embed_description.replace('BHD', '~~BHD~~')
                     upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
                     await msg.edit(embed=upload_embed)
-                    
             return None
     
     
