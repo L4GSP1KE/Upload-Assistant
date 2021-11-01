@@ -373,7 +373,7 @@ class Commands(commands.Cog):
         if meta['imdb_id'] == "0":
             imdb = ""
         else:
-            imdb = f" / [IMDb](https://www.imdb.com/title/{meta['imdb_id']})"
+            imdb = f" / [IMDb](https://www.imdb.com/title/tt{meta['imdb_id']})"
         if meta['tvdb_id'] == "0":
             tvdb = ""
         else:

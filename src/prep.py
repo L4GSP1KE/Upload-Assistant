@@ -1906,7 +1906,7 @@ class Prep():
             generic.write(f"{res} / {meta['type']}{tag}\n\n")
             generic.write(f"Category: {meta['category']}\n")
             generic.write(f"TMDB: https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}\n")
-            generic.write(f"IMDb: https://www.imdb.com/title/{meta['imdb_id']}\n")
+            generic.write(f"IMDb: https://www.imdb.com/title/tt{meta['imdb_id']}\n")
             generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
             generic.write(f"TMDB Poster: {meta['poster']}\n")
             if len(meta['image_list']) > 0:
