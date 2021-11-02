@@ -24,7 +24,7 @@ class Args():
         parser.add_argument('-c', '--category', nargs='*', required=False, help="Category [MOVIE, TV, FANRES]", choices=['movie', 'tv', 'fanres'])
         parser.add_argument('-t', '--type', nargs='*', required=False, help="Type [DISC, REMUX, ENCODE, WEBDL, WEBRIP, HDTV]", choices=['disc', 'remux', 'encode', 'webdl', 'web-dl', 'webrip', 'hdtv'])
         parser.add_argument('-res', '--resolution', nargs='*', required=False, help="Resolution [2160p, 1080p, 1080i, 720p, 576p, 576i, 480p, 480i, 8640p, 4320p, OTHER]", choices=['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'other'])
-        parser.add_argument('-tmdb', '--tmdb', nargs='*', required=False, help="TMDb ID", type=str)
+        parser.add_argument('-tmdb', '--tmdb', nargs='*', required=False, help="TMDb ID", type=str, dest='tmdb_manual')
         parser.add_argument('-imdb', '--imdb', nargs='*', required=False, help="IMDb ID", type=str)
         parser.add_argument('-g', '--tag', nargs='?', required=False, help="Group Tag", type=str, const="")
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
@@ -52,12 +52,11 @@ class Args():
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
 
+        if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
+            meta['tmdb_manual'] = meta['imdb'] = None
         for key in args:
             value = args.get(key)
             if value != None:
-                # if type(value) == str:
-                #     while value.startswith(" "):
-                #         value = value[1:]
                 if isinstance(value, list):
                     meta[key] = self.list_to_string(value)
                     if key == 'type':
@@ -70,8 +69,8 @@ class Args():
                         meta['manual_season'] = meta[key]
                     elif key == 'episode':
                         meta['manual_episode'] = meta[key]
-                    elif key == 'tmdb':
-                        meta['category'], meta['tmdb'] = self.parse_tmdb_id(meta[key], meta.get('category'))
+                    elif key == 'tmdb_manual':
+                        meta['category'], meta['tmdb_manual'] = self.parse_tmdb_id(meta[key], meta.get('category'))
                 else:
                     meta[key] = value
             else:
@@ -80,7 +79,6 @@ class Args():
                 meta[key] = value
             # if key == 'help' and value == True:
             #     parser.print_help()
-        
         return meta, parser, before_args
 
 

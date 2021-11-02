@@ -77,11 +77,11 @@ class Prep():
         if meta['debug']:
             cprint(f"ID: {meta['uuid']}", 'cyan')
 
-        if meta.get('edit', False) == False:
-            meta['is_disc'], videoloc, bdinfo, meta['discs'] = await self.get_disc(meta)
-        else:
-            parse = DiscParse()
-            discs, bdinfo = await parse.get_bdinfo(meta['discs'], meta['uuid'], meta['base_dir'])
+        # if meta.get('edit', False) == False:
+        meta['is_disc'], videoloc, bdinfo, meta['discs'] = await self.get_disc(meta)
+        # elif meta.get('edit', False) == True and meta.get('is_disc', ):
+        #     parse = DiscParse()
+        #     discs, bdinfo = await parse.get_bdinfo(meta['discs'], meta['uuid'], meta['base_dir'])
         # If BD:
         if meta['is_disc'] == "BDMV":
             video, meta['scene'] = self.is_scene(self.path)
@@ -203,6 +203,7 @@ class Prep():
         meta['bdinfo'] = bdinfo
         
         
+        meta['tmdb'] = meta.get('tmdb_manual', None)
         if meta.get('type', None) == None:
             meta['type'] = self.get_type(video, meta['scene'], meta['is_disc'])
         if meta.get('category', None) == None:
@@ -213,7 +214,7 @@ class Prep():
             meta['category'], meta['tmdb'], meta['imdb'] = self.get_tmdb_imdb_from_mediainfo(mi, meta['category'], meta['is_disc'], meta['tmdb'], meta['imdb'])      
         if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'], untouched_filename)
-        elif meta.get('imdb', None) != None and meta.get('tmdb', None) == None:
+        elif meta.get('imdb', None) != None and meta.get('tmdb_manual', None) == None:
             meta = await self.get_tmdb_from_imdb(meta, filename)
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
@@ -308,7 +309,10 @@ class Prep():
                     }
 
         if is_disc == "BDMV":
-            discs, bdinfo = await parse.get_bdinfo(discs, meta['uuid'], meta['base_dir'])
+            if meta.get('edit', False) == False:
+                discs, bdinfo = await parse.get_bdinfo(discs, meta['uuid'], meta['base_dir'])
+            else:
+                discs, bdinfo = await parse.get_bdinfo(meta['discs'], meta['uuid'], meta['base_dir'])
         elif is_disc == "DVD":
             discs = await parse.get_dvdinfo(discs)
             export = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
@@ -704,10 +708,10 @@ class Prep():
         info = find.info(external_source="imdb_id")
         if len(info['movie_results']) >= 1:
             meta['category'] = "MOVIE"
-            meta['tmdb'] = meta['tmdb_manual'] = info['movie_results'][0]['id']
+            meta['tmdb'] =  info['movie_results'][0]['id']
         elif len(info['tv_results']) >= 1:
             meta['category'] = "TV"
-            meta['tmdb'] = meta['tmdb_manual'] = info['tv_results'][0]['id']
+            meta['tmdb'] =  info['tv_results'][0]['id']
         else:
             cprint("TMDb was unable to find anything with that IMDb, searching TMDb normally", 'grey', 'on_yellow')
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'])
