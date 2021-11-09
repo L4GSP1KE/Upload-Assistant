@@ -1280,6 +1280,10 @@ class Prep():
                 edition = guess['edition']
             except:
                 edition = ""
+        if isinstance(edition, list):
+            cprint("More than one edition detected, please edit --edition", 'grey', 'on_yellow')
+            time.sleep(2)
+            edition = ""
         if len(filelist) >= 2:
             video = os.path.dirname(video)
         if "open matte" in video.replace('.', ' ').lower():
@@ -1432,7 +1436,6 @@ class Prep():
                     exit()
 
 
-        
             
             # description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
             # if i % 3 == 0:
