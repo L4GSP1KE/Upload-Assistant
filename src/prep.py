@@ -830,7 +830,7 @@ class Prep():
         meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
-        if difference >= 0.8:
+        if difference >= 0.8 or meta['aka'][5:].strip() == "":
             meta['aka'] = ""
             
         
@@ -899,11 +899,17 @@ class Prep():
         # Make the HTTP Api request
         response = requests.post(url, json={'query': query, 'variables': variables})
         json = response.json()
-        romaji = json['data']['Media']['title']['romaji']
-        mal_id = json['data']['Media']['idMal']
-        eng_title = json['data']['Media']['title']['english']
-        season_year = json['data']['Media']['seasonYear']
-        episodes = json['data']['Media']['episodes']
+        pprint(json)
+        if json['data']['Media'] != None:
+            romaji = json['data']['Media']['title']['romaji']
+            mal_id = json['data']['Media']['idMal']
+            eng_title = json['data']['Media']['title']['english']
+            season_year = json['data']['Media']['seasonYear']
+            episodes = json['data']['Media']['episodes']
+        else:
+            romaji = eng_title = season_year  = ""
+            episodes = mal_id = 0
+
         return romaji, mal_id, eng_title, season_year, episodes
 
 
