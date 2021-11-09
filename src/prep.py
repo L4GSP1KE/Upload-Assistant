@@ -899,7 +899,6 @@ class Prep():
         # Make the HTTP Api request
         response = requests.post(url, json={'query': query, 'variables': variables})
         json = response.json()
-        pprint(json)
         if json['data']['Media'] != None:
             romaji = json['data']['Media']['title']['romaji']
             mal_id = json['data']['Media']['idMal']
