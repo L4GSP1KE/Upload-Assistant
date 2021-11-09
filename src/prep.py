@@ -788,8 +788,12 @@ class Prep():
             meta['tvdb_id'] = external.get('tvdb_id', '0')
             if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
+            videos = movie.videos()
+            for each in videos.get('results', []):
+                if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
+                    meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
+                    break
             
-            # meta['aka'] = f" AKA {response['original_title']}"
             meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
             meta['keywords'] = self.get_keywords(movie)
             if meta.get('anime', False) == False:
@@ -818,7 +822,11 @@ class Prep():
             meta['tvdb_id'] = external.get('tvdb_id', '0')
             if meta['tvdb_id'] in ["", None, " ", "None"]:
                 meta['tvdb_id'] = '0'
-
+            videos = tv.videos()
+            for each in videos.get('results', []):
+                if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
+                    meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
+                    break
             
             # meta['aka'] = f" AKA {response['original_name']}"
             meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
@@ -872,7 +880,7 @@ class Prep():
         return mal_id, alt_name, anime
 
     def get_romaji(self, tmdb_name):
-        tmdb_name = tmdb_name.replace('-', "")
+        tmdb_name = tmdb_name.replace('-', "").replace("The Movie", "")
         tmdb_name = ' '.join(tmdb_name.split())
         query = '''
             query ($search: String) { 
