@@ -39,7 +39,7 @@ class THR():
         await self.edit_torrent(meta)
         cat_id = await self.get_cat_id(meta)
         subs = self.get_subtitles(meta)
-        await self.edit_desc(meta)
+        pronfo = await self.edit_desc(meta)
 
 
         if meta['bdinfo'] != None:
@@ -59,9 +59,10 @@ class THR():
         await asyncio.sleep(3)
         name = browser.find_element(By.NAME, "name")
         name.send_keys(meta['name'].replace("DD+", "DDP"))
-        nfo = browser.find_element(By.NAME, "nfo")
-        nfo.send_keys(mi_file)
-        await asyncio.sleep(3)
+        if pronfo == False:
+            nfo = browser.find_element(By.NAME, "nfo")
+            nfo.send_keys(mi_file)
+            await asyncio.sleep(3)
 
         if len(subs) >= 1:
             if 'hr' in subs:
@@ -142,6 +143,7 @@ class THR():
         return 
         
     async def edit_desc(self, meta):
+        pronfo = False
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]DESCRIPTION.txt", 'w') as desc:
             desc.write(base)
@@ -163,12 +165,26 @@ class THR():
                     image_list.append(img_url)
                 except:
                     cprint("Failed to upload image", 'yellow')
+            
             desc.write("[align=center]")
+            # ProNFO
+            pronfo_url = f"https://www.pronfo.com/api/v1/access/upload/{self.config['TRACKERS']['THR'].get('pronfo_api_key', "")}"
+            data = {
+                'content' : open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r').read(),
+                'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme'),
+                'rapi' : self.config['TRACKERS']['THR'].get('pronfo_rapi_id')
+            }
+            response = requests.post(pronfo_url, data=data).json()
+            if response.get('error', True) == False:
+                mi_img = response.get('url')
+                desc.write(f"[img]{mi_img}[/img]")
+                pronfo = True
+
             for each in image_list:
                 desc.write(f"[img]{each}[/img]")
             desc.write("\n[url=https://www.torrenthr.org/forums.php?action=viewtopic&topicid=8977]Created by L4G's Upload Assistant[/url][/align]")
             desc.close()
-        return 
+        return pronfo
 
    
 
@@ -191,9 +207,9 @@ class THR():
         os.environ['WDM_LOCAL'] = '1'
         os.environ['WDM_LOG_LEVEL'] = '0'
         options = Options()
-        if not meta['debug']:
-            options.add_argument("--headless")
         if platform.system() == "Windows":
+            if not meta['debug']:
+                options.add_argument("--headless")
             s = Service(GeckoDriverManager().install())
             browser = Firefox(service=s, options=options)
         elif platform.system() == "Linux":
