@@ -36,7 +36,10 @@
             "username" : "username",
             "password" : "password",
             "img_api" : "get this from the forum post",
-            "announce_url" : "http://www.torrenthr.org/announce.php?passkey=yourpasskeyhere"
+            "announce_url" : "http://www.torrenthr.org/announce.php?passkey=yourpasskeyhere",
+            "pronfo_api_key" : "pronfo api key",
+            "pronfo_theme" : "pronfo theme code",
+            "pronfo_rapd_id" : "pronfo remote api id"
         }
     },
 
