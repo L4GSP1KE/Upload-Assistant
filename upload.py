@@ -5,7 +5,7 @@ from src.prep import Prep
 from src.search import Search
 from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
-from src.trackers.THR import THR
+
 
 import json
 from termcolor import cprint
@@ -157,6 +157,7 @@ async def do_the_thing(path, args, base_dir):
                     await bhd.upload(meta)
                     await client.add_to_client(meta, "BHD")
         if tracker.upper() == "THR":
+            from src.trackers.THR import THR
             if meta['unattended']:
                 upload_to_thr = True
             else:
