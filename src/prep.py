@@ -1304,6 +1304,9 @@ class Prep():
         if "REPACK" in video:
             edition = ""
             repack = "REPACK"
+        if "REPACK2" in video:
+            edition = ""
+            repack = "REPACK2"
         if "PROPER" in video:
             edition = ""
             repack = "PROPER"
