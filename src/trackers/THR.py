@@ -93,7 +93,7 @@ class THR():
         submit = browser.find_element(By.XPATH, "//*[@type='submit']")
         if meta['debug'] == False:
             submit.submit()
-            asyncio.sleep(3)
+            await asyncio.sleep(3)
             print("Uploaded")
             
     
