@@ -164,16 +164,16 @@ async def do_the_thing(path, args, base_dir):
                 print("Uploading to THR")
                 thr = THR(config=config)
                 #Unable to get IMDB id/Youtube Link
-                if meta.get('imdb', '0') == '0':
+                if meta.get('imdb_id', '0') == '0':
                     imdb_id = cli_ui.ask_string("Unable to find IMDB id, please enter e.g.(tt1234567)")
                     meta['imdb'] = imdb_id.replace('tt', '')
                 if meta.get('youtube', None) == None:
                     youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                     meta['youtube'] = youtube
                 # try:
-                print("Logging in to THR")
+                cprint("Logging in to THR", 'grey', 'on_yellow')
                 thr_browser = await thr.login_and_get_cookies(meta)
-                print("Searching for Dupes")
+                cprint("Searching for Dupes", 'grey', 'on_yellow')
                 dupes = thr.search_existing(meta.get('imdb_id'), thr_browser)
                 meta = dupe_check(dupes, meta)
                 if meta['upload'] == True:

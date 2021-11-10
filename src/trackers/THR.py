@@ -85,7 +85,7 @@ class THR():
         category_dropdown = Select(browser.find_element(By.NAME, 'type'))
         category_dropdown.select_by_value(cat_id)
         imdb_link = browser.find_element(By.NAME, "url")
-        imdb_link.send_keys(f"https://www.imdb.com/title/tt{meta.get('imdb').replace('tt', '')}/")
+        imdb_link.send_keys(f"https://www.imdb.com/title/tt{meta.get('imdb_id').replace('tt', '')}/")
         yt_link = browser.find_element(By.NAME, "tube")
         yt_link.send_keys(meta.get('youtube', ""))
 
