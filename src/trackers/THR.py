@@ -56,12 +56,12 @@ class THR():
         browser.get(self.upload_url)
         upload_torrent = browser.find_element(By.NAME, "tfile")
         upload_torrent.send_keys(torrent_path)
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)
         name = browser.find_element(By.NAME, "name")
         name.send_keys(meta['name'].replace("DD+", "DDP"))
         nfo = browser.find_element(By.NAME, "nfo")
         nfo.send_keys(mi_file)
-        await asyncio.sleep(1)
+        await asyncio.sleep(3)
 
         if len(subs) >= 1:
             if 'hr' in subs:
@@ -92,8 +92,9 @@ class THR():
         #Submit
         submit = browser.find_element(By.XPATH, "//*[@type='submit']")
         if meta['debug'] == False:
-            print("Uploading Now")
             submit.submit()
+            asyncio.sleep(3)
+            print("Uploaded")
             
     
     
