@@ -168,10 +168,10 @@ class THR():
             
             desc.write("[align=center]")
             # ProNFO
-            pronfo_url = f"https://www.pronfo.com/api/v1/access/upload/{self.config['TRACKERS']['THR'].get('pronfo_api_key', "")}"
+            pronfo_url = f"https://www.pronfo.com/api/v1/access/upload/{self.config['TRACKERS']['THR'].get('pronfo_api_key', '')}"
             data = {
                 'content' : open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r').read(),
-                'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme'),
+                'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme', 'grey'),
                 'rapi' : self.config['TRACKERS']['THR'].get('pronfo_rapi_id')
             }
             response = requests.post(pronfo_url, data=data).json()
