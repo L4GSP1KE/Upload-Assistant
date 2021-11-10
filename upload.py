@@ -170,22 +170,22 @@ async def do_the_thing(path, args, base_dir):
                 if meta.get('youtube', None) == None:
                     youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                     meta['youtube'] = youtube
-                try:
-                    print("Logging in to THR")
-                    thr_browser = await thr.login_and_get_cookies(meta)
-                    print("Searching for Dupes")
-                    dupes = thr.search_existing(meta.get('imdb_id'), thr_browser)
-                    meta = dupe_check(dupes, meta)
-                    if meta['upload'] == True:
-                        await thr.upload(meta, thr_browser)
-                        await client.add_to_client(meta, "THR")
-                    else:
-                        thr_browser.close()
-                except:
-                    try:
-                        thr_browser.close()
-                    except:
-                        pass
+                # try:
+                print("Logging in to THR")
+                thr_browser = await thr.login_and_get_cookies(meta)
+                print("Searching for Dupes")
+                dupes = thr.search_existing(meta.get('imdb_id'), thr_browser)
+                meta = dupe_check(dupes, meta)
+                if meta['upload'] == True:
+                    await thr.upload(meta, thr_browser)
+                    await client.add_to_client(meta, "THR")
+                else:
+                    thr_browser.close()
+                # except:
+                #     try:
+                #         thr_browser.close()
+                #     except:
+                #         pass
 def get_confirmation(meta):
     if meta['debug'] == True:
         cprint("DEBUG: True", 'grey', 'on_red')
