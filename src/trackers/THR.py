@@ -162,9 +162,10 @@ class THR():
                     image_list.append(img_url)
                 except:
                     cprint("Failed to upload image", 'yellow')
+            desc.write("[align=center]")
             for each in image_list:
                 desc.write(f"[img]{each}[/img]")
-            # desc.write("\n[center]Created by L4G's Upload Assistant[/center]")
+            desc.write("\n[url=https://www.torrenthr.org/forums.php?action=viewtopic&topicid=8977]Created by L4G's Upload Assistant[/url][/align]")
             desc.close()
         return 
 
