@@ -157,14 +157,12 @@ async def do_the_thing(path, args, base_dir):
                     await bhd.upload(meta)
                     await client.add_to_client(meta, "BHD")
         if tracker.upper() == "THR":
-            from src.trackers.THR import THR
             if meta['unattended']:
                 upload_to_thr = True
             else:
                 upload_to_thr = cli_ui.ask_yes_no(f"Upload to THR? {debug}", default=meta['unattended'])
             if upload_to_thr:
                 print("Uploading to THR")
-                thr = THR(config=config)
                 #Unable to get IMDB id/Youtube Link
                 if meta.get('imdb_id', '0') == '0':
                     imdb_id = cli_ui.ask_string("Unable to find IMDB id, please enter e.g.(tt1234567)")
@@ -172,6 +170,8 @@ async def do_the_thing(path, args, base_dir):
                 if meta.get('youtube', None) == None:
                     youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                     meta['youtube'] = youtube
+                from src.trackers.THR import THR
+                thr = THR(config=config)
                 try:
                     cprint("Logging in to THR", 'grey', 'on_yellow')
                     thr_browser = await thr.login_and_get_cookies(meta)

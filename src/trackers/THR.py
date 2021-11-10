@@ -209,10 +209,10 @@ class THR():
         options = Options()
         if platform.system() == "Windows":
             if not meta['debug']:
-                options.add_argument("--headless")
             s = Service(GeckoDriverManager().install())
             browser = Firefox(service=s, options=options)
         elif platform.system() == "Linux":
+            options.add_argument("--headless")
             browser = Firefox(executable_path=GeckoDriverManager().install(), options=options)
         try:
             browser.get(self.login_url)
