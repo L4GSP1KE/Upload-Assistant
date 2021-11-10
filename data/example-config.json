@@ -22,7 +22,7 @@
     },
 
     "TRACKERS" : {
-        "default_trackers" : "BLU, BHD",
+        "default_trackers" : "BLU, BHD, THR",
         "BLU" : {
             "api_key" : "BLU api key",
             "announce_url" : "https://blutopia.xyz/announce/customannounceurl"
@@ -31,6 +31,12 @@
             "api_key" : "BHD api key",
             "announce_url" : "https://beyond-hd.me/announce/customannounceurl",
             "draft_default" : "True"
+        },
+        "THR" : {
+            "username" : "username",
+            "password" : "password",
+            "img_api" : "get this from the forum post",
+            "announce_url" : "http://www.torrenthr.org/announce.php?passkey=yourpasskeyhere"
         }
     },
 
