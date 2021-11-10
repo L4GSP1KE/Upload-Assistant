@@ -3,3 +3,4 @@ data/config.json
 .vscode/
 __pycache__/
 tmp/*
+.wdm/

@@ -5,6 +5,7 @@ from src.prep import Prep
 from src.search import Search
 from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
+from src.trackers.THR import THR
 
 import json
 from termcolor import cprint
@@ -154,9 +155,35 @@ async def do_the_thing(path, args, base_dir):
                 if meta['upload'] == True:
                     await bhd.upload(meta)
                     await client.add_to_client(meta, "BHD")
-
-
-
+        if tracker.upper() == "THR":
+            if meta['unattended']:
+                upload_to_thr = True
+            else:
+                upload_to_thr = cli_ui.ask_yes_no(f"Upload to THR? {debug}", default=meta['unattended'])
+            if upload_to_thr:
+                print("Uploading to THR")
+                thr = THR(config=config)
+                #Unable to get IMDB id/Youtube Link
+                if meta.get('imdb', '0') == '0':
+                    imdb_id = cli_ui.ask_string("Unable to find IMDB id, please enter (tt1234567)")
+                    meta['imdb'] = imdb_id.replace('tt', '')
+                if meta.get('youtube', None) == None:
+                    youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
+                    meta['youtube'] = youtube
+                try:
+                    thr_browser = await thr.login_and_get_cookies(meta)
+                    dupes = thr.search_existing(meta.get('imdb_id'), thr_browser)
+                    meta = dupe_check(dupes, meta)
+                    if meta['upload'] == True:
+                        await thr.upload(meta, thr_browser)
+                        await client.add_to_client(meta, "THR")
+                    else:
+                        thr_browser.close()
+                except:
+                    try:
+                        thr_browser.close()
+                    except:
+                        pass
 def get_confirmation(meta):
     if meta['debug'] == True:
         cprint("DEBUG: True", 'grey', 'on_red')
@@ -198,8 +225,11 @@ def dupe_check(dupes, meta):
             cprint("No dupes found", 'grey', 'on_green')
             meta['upload'] = True   
             return meta
-    else:    
+    else:
+        print()    
         dupe_text = "\n".join(dupes)
+        print()
+        cli_ui.info_section(cli_ui.bold, "Are these dupes?")
         cli_ui.info(dupe_text)
         if meta['unattended']:
             if meta.get('dupe', False) == False:
@@ -208,8 +238,6 @@ def dupe_check(dupes, meta):
             else:
                 cprint("Found potential dupes. -dupe/--dupe was passed. Uploading anyways", 'grey', 'on_yellow')
                 upload = True
-        print()
-        cli_ui.info_section(cli_ui.bold, "Are these dupes?")
         print()
         if not meta['unattended']:
             upload = cli_ui.ask_yes_no("Upload Anyways?", default=False)
