@@ -180,6 +180,7 @@ async def do_the_thing(path, args, base_dir):
                     if meta['upload'] == True:
                         await thr.upload(meta, thr_browser)
                         await client.add_to_client(meta, "THR")
+                        thr_browser.close()
                     else:
                         thr_browser.close()
                 except:
