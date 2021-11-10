@@ -18,6 +18,7 @@ import logging
 from glob import glob
 import cli_ui
 from pprint import pprint
+import traceback
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 with open(f"{base_dir}/data/config.json", 'r', encoding="utf-8-sig") as f:
@@ -170,22 +171,23 @@ async def do_the_thing(path, args, base_dir):
                 if meta.get('youtube', None) == None:
                     youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                     meta['youtube'] = youtube
-                # try:
-                cprint("Logging in to THR", 'grey', 'on_yellow')
-                thr_browser = await thr.login_and_get_cookies(meta)
-                cprint("Searching for Dupes", 'grey', 'on_yellow')
-                dupes = thr.search_existing(meta.get('imdb_id'), thr_browser)
-                meta = dupe_check(dupes, meta)
-                if meta['upload'] == True:
-                    await thr.upload(meta, thr_browser)
-                    await client.add_to_client(meta, "THR")
-                else:
-                    thr_browser.close()
-                # except:
-                #     try:
-                #         thr_browser.close()
-                #     except:
-                #         pass
+                try:
+                    cprint("Logging in to THR", 'grey', 'on_yellow')
+                    thr_browser = await thr.login_and_get_cookies(meta)
+                    cprint("Searching for Dupes", 'grey', 'on_yellow')
+                    dupes = thr.search_existing(meta.get('imdb_id'), thr_browser)
+                    meta = dupe_check(dupes, meta)
+                    if meta['upload'] == True:
+                        await thr.upload(meta, thr_browser)
+                        await client.add_to_client(meta, "THR")
+                    else:
+                        thr_browser.close()
+                except:
+                    print(traceback.format_exc())
+                    try:
+                        thr_browser.close()
+                    except:
+                        pass
 def get_confirmation(meta):
     if meta['debug'] == True:
         cprint("DEBUG: True", 'grey', 'on_red')
