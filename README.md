@@ -8,7 +8,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - Obtains TMDb/IMDb/MAL identifiers.
   - Generates custom .torrents without useless top level folders/nfos.
   - Generates proper name for your sites.
-  - Uploads via API
+  - Uploads to BLU/BHD/THR
   - Adds to your client, seeding instantly
   - ALL WITH MINIMAL INPUT!
 
@@ -35,6 +35,11 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
       - image host api keys can be obtained from their respective sites
       - discord bot token can be obtained from https://discord.com/developers/
    - Install necessary python modules `pip3 install --user -U -r requirements.txt`
+
+   - For THR: 
+      - `pip3 install --user -U -r webdriver_manager selenium`
+      - Also **REQUIRES** Firefox to be installed (check this with `firefox -v`). `apt install firefox` or ask your seedbox provider
+      
    
 
    **Additional Resources are found in the [wiki](https://github.com/L4GSP1KE/Upload-Assistant/wiki)**
