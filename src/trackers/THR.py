@@ -181,12 +181,12 @@ class THR():
             pprint(response)
             if response.get('error', True) == False:
                 mi_img = response.get('url')
-                desc.write(f"[img]{mi_img}[/img]\n\n")
+                desc.write(f"\n[img]{mi_img}[/img]\n")
                 pronfo = True
 
             for each in image_list:
-                desc.write(f"[img]{each}[/img]")
-            desc.write("\n[url=https://www.torrenthr.org/forums.php?action=viewtopic&topicid=8977]Created by L4G's Upload Assistant[/url][/align]")
+                desc.write(f"\n[img]{each}[/img]\n")
+            desc.write("\n\n[size=2][url=https://www.torrenthr.org/forums.php?action=viewtopic&topicid=8977]Created by L4G's Upload Assistant[/url][/size][/align]")
             desc.close()
         return pronfo
 
