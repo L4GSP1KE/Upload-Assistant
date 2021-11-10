@@ -17,7 +17,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
-from webdriver_manager.firefox import GeckoDriverManager
+from webdriver_manager.firefox import GeckoDriverManager #Webdriver_manager
 
 # from pprint import pprint
 
@@ -52,6 +52,7 @@ class THR():
         torrent_path = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent")
         
         #Upload Form
+        print("Filling out Upload Form")
         browser.get(self.upload_url)
         upload_torrent = browser.find_element(By.NAME, "tfile")
         upload_torrent.send_keys(torrent_path)
@@ -90,9 +91,10 @@ class THR():
 
         #Submit
         submit = browser.find_element(By.XPATH, "//*[@type='submit']")
-        if not meta['debug']:
+        if meta['debug'] == False:
+            print("Uploading Now")
             submit.submit()
-            print("DEBUG, NO SUBMITTING")
+            
     
     
     
@@ -124,7 +126,6 @@ class THR():
             if track['@type'] == "Text":
                 if track.get('Language') in ['hr', 'en', 'bs', 'sr', 'sl']:
                     subs.append(track.get('Language'))
-        print(subs)
         return subs
 
 
