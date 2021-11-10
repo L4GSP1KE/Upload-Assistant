@@ -96,7 +96,10 @@ class THR():
             submit.submit()
             await asyncio.sleep(3)
             print("Uploaded")
-            
+        else:
+            submit.submit()
+            await asyncio.sleep(30)
+            print("DEBUG Uploaded")
     
     
     
@@ -171,13 +174,14 @@ class THR():
             pronfo_url = f"https://www.pronfo.com/api/v1/access/upload/{self.config['TRACKERS']['THR'].get('pronfo_api_key', '')}"
             data = {
                 'content' : open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r').read(),
-                'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme', 'grey'),
+                'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme', 'gray'),
                 'rapi' : self.config['TRACKERS']['THR'].get('pronfo_rapi_id')
             }
             response = requests.post(pronfo_url, data=data).json()
+            pprint(response)
             if response.get('error', True) == False:
                 mi_img = response.get('url')
-                desc.write(f"[img]{mi_img}[/img]")
+                desc.write(f"[img]{mi_img}[/img]\n\n")
                 pronfo = True
 
             for each in image_list:
