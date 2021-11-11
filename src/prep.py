@@ -1407,6 +1407,7 @@ class Prep():
                     try:
                         img_url = response['data']['medium']['url']
                         web_url = response['data']['url_viewer']
+                        raw_url = response['data']['image']['url']
                     except:
                         cprint("imgbb failed, trying next image host", 'yellow')
                         newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, return_dict)
@@ -1423,6 +1424,7 @@ class Prep():
                     try:
                         img_url = response['image']['medium']['url']
                         web_url = response['image']['url_viewer']
+                        raw_url = response['image']['url']
                     except:
                         cprint("freeimage.host failed, trying next image host", 'yellow')
                         newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
@@ -1443,6 +1445,7 @@ class Prep():
                         ptpimg_ext = response[0]['ext'] 
                         img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                         web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                        raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                     except:
                         # print(traceback.format_exc())
                         cprint("ptpimg failed, trying next image host", 'yellow')
@@ -1462,6 +1465,7 @@ class Prep():
                     image_dict = {}
                     image_dict['web_url'] = web_url
                     image_dict['img_url'] = img_url
+                    image_dict['raw_url'] = raw_url
                     image_list.append(image_dict)
                     cli_ui.info_count(i, self.screens, "Uploaded")
                     i += 1
@@ -1482,9 +1486,11 @@ class Prep():
         image_glob = glob.glob("*.png")
         async with pyimgbox.Gallery(thumb_width=350, square_thumbs=False) as gallery:
             async for submission in gallery.add(image_glob):
+                pprint(submission)
                 image_dict = {}
                 image_dict['web_url'] = submission['web_url']
                 image_dict['img_url'] = submission['thumbnail_url']
+                image_dict['raw_url'] = submission['image_url']
                 image_list.append(image_dict)
         return image_list
 
