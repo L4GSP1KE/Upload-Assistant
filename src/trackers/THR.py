@@ -159,9 +159,10 @@ class THR():
                 url = "https://img2.torrenthr.org/api/1/upload"
                 data = {
                     'key' : self.config['TRACKERS']['THR'].get('img_api'),
-                    'source' : base64.b64encode(open(image, "rb").read()).decode('utf8')
+                    # 'source' : base64.b64encode(open(image, "rb").read()).decode('utf8')
                 }
-                response = requests.post(url, data = data)
+                files = {'source' : open(image, 'rb')}
+                response = requests.post(url, data = data, files=files)
                 try:
                     response = response.json()
                     # med_url = response['image']['medium']['url']
@@ -170,7 +171,7 @@ class THR():
                 except:
                     cprint("Failed to upload image", 'yellow')
                     pprint(response)
-            
+                await asyncio.sleep(1)
             desc.write("[align=center]")
             # ProNFO
             pronfo_url = f"https://www.pronfo.com/api/v1/access/upload/{self.config['TRACKERS']['THR'].get('pronfo_api_key', '')}"
