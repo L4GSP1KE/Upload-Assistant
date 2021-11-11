@@ -98,7 +98,7 @@ class AITHER():
         if not has_eng_audio:
             audio_lang = mi['media']['track'][2].get('Language_String', "").upper()
             aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
-            
+
         aither_name = aither_name.replace(meta['video_encode'], meta['video_encode'].replace('.', ''))
         return aither_name
 
@@ -162,7 +162,7 @@ class AITHER():
                         desc.write("\n")
                 desc.write("[/center]")
 
-            # desc.write("\n[center][url=https://aither.cc/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]")
+            desc.write("\n[center][url=https://aither.cc/forums/topics/1349]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
         return 
 
