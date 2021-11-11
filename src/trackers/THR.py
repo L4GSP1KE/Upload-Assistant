@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 # import discord
 import asyncio
+from json.decoder import JSONDecodeError
 from torf import Torrent
 import requests
 import json
@@ -177,8 +178,12 @@ class THR():
                 'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme', 'gray'),
                 'rapi' : self.config['TRACKERS']['THR'].get('pronfo_rapi_id')
             }
-            response = requests.post(pronfo_url, data=data).json()
-            pprint(response)
+            response = requests.post(pronfo_url, data=data)
+            try:
+                response = response.json()
+            except:
+                cprint('Error parsing pronfo response, using THR parser instead', 'grey', 'on_red')
+                pprint(response) 
             if response.get('error', True) == False:
                 mi_img = response.get('url')
                 desc.write(f"\n[img]{mi_img}[/img]\n")
