@@ -65,7 +65,7 @@ class BLU():
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
-        url = f"https://blutopia.xyz/api/torrents/upload?api_token={self.config['TRACKERS']['BLU']['api_key']}"
+        url = f"https://blutopia.xyz/api/torrents/upload?api_token={self.config['TRACKERS']['BLU']['api_key'].strip()}"
         
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
@@ -126,7 +126,7 @@ class BLU():
 
     async def edit_torrent(self, meta):
         blu_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        blu_torrent.metainfo['announce'] = self.config['TRACKERS']['BLU']['announce_url']
+        blu_torrent.metainfo['announce'] = self.config['TRACKERS']['BLU']['announce_url'].strip()
         blu_torrent.metainfo['info']['source'] = "BLU"
         blu_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
         Torrent.copy(blu_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent")
@@ -160,7 +160,7 @@ class BLU():
         # url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(meta['clean_name'])}&api_token={self.config['TRACKERS']['BLU']['api_key']}"
         url = "https://blutopia.xyz/api/torrents/filter"
         params = {
-            'api_token' : self.config['TRACKERS']['BLU']['api_key'],
+            'api_token' : self.config['TRACKERS']['BLU']['api_key'].strip(),
             'tmdbId' : meta['tmdb'],
             'categories[]' : await self.get_cat_id(meta['category']),
             'types[]' : await self.get_type_id(meta['type']),

@@ -76,7 +76,7 @@ class BHD():
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
-        url = f"https://beyond-hd.me/api/upload/{self.config['TRACKERS']['BHD']['api_key']}"
+        url = f"https://beyond-hd.me/api/upload/{self.config['TRACKERS']['BHD']['api_key'].strip()}"
         
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
@@ -157,7 +157,7 @@ class BHD():
    
     async def edit_torrent(self, meta):
         bhd_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        bhd_torrent.metainfo['announce'] = self.config['TRACKERS']['BHD']['announce_url']
+        bhd_torrent.metainfo['announce'] = self.config['TRACKERS']['BHD']['announce_url'].strip()
         bhd_torrent.metainfo['info']['source'] = "BHD"
         bhd_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
         Torrent.copy(bhd_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent")
@@ -195,7 +195,7 @@ class BHD():
             if meta.get('tv_pack', 0) == 1:
                 data['pack'] = 1
             data['search'] = f"{meta.get('season', '')}{meta.get('episode', '')}"
-        url = f"https://beyond-hd.me/api/torrents/{self.config['TRACKERS']['BHD']['api_key']}?action=search"
+        url = f"https://beyond-hd.me/api/torrents/{self.config['TRACKERS']['BHD']['api_key'].strip()}?action=search"
         response = requests.post(url=url, data=data)
         response = response.json()
         for each in response['results']:
@@ -208,7 +208,7 @@ class BHD():
         return dupes
 
     async def get_live(self, meta): 
-        draft = self.config['TRACKERS']['BHD']['draft_default']
+        draft = self.config['TRACKERS']['BHD']['draft_default'].strip()
         draft = bool(distutils.util.strtobool(draft)) #0 for send to draft, 1 for live
         if draft:
             draft_int = 0
