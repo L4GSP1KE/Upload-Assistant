@@ -22,7 +22,7 @@
     },
 
     "TRACKERS" : {
-        "default_trackers" : "BLU, BHD, THR",
+        "default_trackers" : "BLU, BHD, AITHER",
         "BLU" : {
             "api_key" : "BLU api key",
             "announce_url" : "https://blutopia.xyz/announce/customannounceurl"
@@ -31,6 +31,10 @@
             "api_key" : "BHD api key",
             "announce_url" : "https://beyond-hd.me/announce/customannounceurl",
             "draft_default" : "True"
+        },
+        "AITHER" :{
+            "api_key" : "AITHER api key",
+            "announce_url" : "https://aither.cc/announce/customannounceurl"
         },
         "THR" : {
             "username" : "username",
@@ -111,6 +115,7 @@
         "discord_emojis" : {
                 "BLU": "💙",
                 "BHD": "🎉",
+                "AITHER": "🛫",
                 "MANUAL" : "📩",
                 "UPLOAD" : "✅",
                 "CANCEL" : "🚫"

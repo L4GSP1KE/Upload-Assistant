@@ -5,6 +5,7 @@ from src.clients import Clients
 from src.search import Search
 from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
+from src.trackers.AITHER import AITHER
 
 import discord
 from discord.ext import commands
@@ -408,6 +409,9 @@ class Commands(commands.Cog):
             if "BHD" in each.replace(' ', ''):
                 await message.add_reaction(config['DISCORD']['discord_emojis']['BHD'])
                 await asyncio.sleep(0.3)
+            if "AITHER" in each.replace(' ', ''):
+                await message.add_reaction(config['DISCORD']['discord_emojis']['AITHER'])
+                await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['MANUAL'])
         await asyncio.sleep(0.3)
         await message.add_reaction(config['DISCORD']['discord_emojis']['CANCEL'])
@@ -491,6 +495,9 @@ class Commands(commands.Cog):
                     if manual_tracker.upper() == "BHD":
                         bhd = BHD(config=config)
                         await bhd.edit_desc(meta) 
+                    if manual_tracker.upper() == "AITHER":
+                        aither = AITHER(config=config)
+                        await aither.edit_desc(meta) 
                 archive_url = await prep.package(meta)
                 upload_embed_description = upload_embed_description.replace('MANUAL', '~~MANUAL~~')
                 if archive_url == False:
@@ -521,6 +528,16 @@ class Commands(commands.Cog):
                     upload_embed_description = upload_embed_description.replace('BHD', '~~BHD~~')
                     upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
                     await msg.edit(embed=upload_embed)
+            if "AITHER" in tracker_list:
+                aither = AITHER(config=config)
+                dupes = await aither.search_existing(meta)
+                meta = await self.dupe_embed(dupes, meta, tracker_emojis, channel)
+                if meta['upload'] == True:
+                    await aither.upload(meta)
+                    await client.add_to_client(meta, "Aither")
+                    upload_embed_description = upload_embed_description.replace('Aither', '~~Aither~~')
+                    upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
+                    await msg.edit(embed=upload_embed) 
             return None
     
     
