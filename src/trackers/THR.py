@@ -161,9 +161,9 @@ class THR():
                     'key' : self.config['TRACKERS']['THR'].get('img_api'),
                     'source' : base64.b64encode(open(image, "rb").read()).decode('utf8')
                 }
-                response = requests.post(url, data = data).json()
-                
+                response = requests.post(url, data = data)
                 try:
+                    response = response.json()
                     # med_url = response['image']['medium']['url']
                     img_url = response['image']['url']
                     image_list.append(img_url)
