@@ -157,16 +157,25 @@ class BLU():
     async def search_existing(self, meta):
         dupes = []
         cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
-        url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(meta['clean_name'])}&api_token={self.config['TRACKERS']['BLU']['api_key']}"
+        # url = f"https://blutopia.xyz/api/torrents/filter?name={urllib.parse.quote(meta['clean_name'])}&api_token={self.config['TRACKERS']['BLU']['api_key']}"
+        url = "https://blutopia.xyz/api/torrents/filter"
+        params = {
+            'api_token' : self.config['TRACKERS']['BLU']['api_key'],
+            'tmdbId' : meta['tmdb'],
+            'categories[]' : await self.get_cat_id(meta['category']),
+            'types[]' : await self.get_type_id(meta['type']),
+            'resolutions[]' : await self.get_res_id(meta['resolution'])
+        }
+        if meta['category'] == 'TV':
+            params['name'] = f"{meta.get('season', '')}{meta.get('episode', '')}"
         try:
-            response = requests.get(url=url)
+            response = requests.get(url=url, params=params)
             response = response.json()
             for each in response['data']:
                 result = [each][0]['attributes']['name']
-                # print(result)
-                difference = SequenceMatcher(None, meta['clean_name'], result).ratio()
-                if difference >= 0.05:
-                    dupes.append(result)
+                # difference = SequenceMatcher(None, meta['clean_name'], result).ratio()
+                # if difference >= 0.05:
+                dupes.append(result)
         except:
             cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
             await asyncio.sleep(5)
