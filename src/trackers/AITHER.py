@@ -6,6 +6,7 @@ import requests
 from difflib import SequenceMatcher
 from termcolor import cprint
 import urllib
+import json
 from pprint import pprint
 
 # from pprint import pprint
@@ -28,7 +29,7 @@ class AITHER():
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
         await self.edit_desc(meta)
-
+        aither_name = await self.edit_name(meta)
 
         if meta['bdinfo'] != None:
             mi_dump = None
@@ -40,7 +41,7 @@ class AITHER():
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[AITHER]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': open_torrent}
         data = {
-            'name' : meta['name'].replace(meta['video_encode'], meta['video_encode'].replace('.', '')),
+            'name' : aither_name,
             'description' : desc,
             'mediainfo' : mi_dump,
             'bdinfo' : bd_dump, 
@@ -84,7 +85,22 @@ class AITHER():
 
 
 
-
+    async def edit_name(self, meta):
+        aither_name = meta['name']
+        with open(f"{meta.get('base_dir')}/tmp/{meta.get('uuid')}/MediaInfo.json", 'r', encoding='utf-8') as f:
+            mi = json.load(f)
+        
+        has_eng_audio = False
+        for track in mi['media']['track']:
+            if track['@type'] == "Audio":
+                if track['Language'] == 'en':
+                    has_eng_audio = True
+        if not has_eng_audio:
+            audio_lang = mi['media']['track'][2].get('Language_String', "").upper()
+            aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
+            
+        aither_name = aither_name.replace(meta['video_encode'], meta['video_encode'].replace('.', ''))
+        return aither_name
 
     async def get_cat_id(self, category_name):
         category_id = {
