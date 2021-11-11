@@ -169,6 +169,7 @@ class THR():
                     image_list.append(img_url)
                 except:
                     cprint("Failed to upload image", 'yellow')
+                    pprint(response)
             
             desc.write("[align=center]")
             # ProNFO
