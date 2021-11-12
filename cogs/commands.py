@@ -590,7 +590,7 @@ class Commands(commands.Cog):
     async def get_missing(self, meta):
         missing = []
         if meta.get('imdb_id', '0') == '0':
-            meta['potential_missing'].append('imdb')
+            meta['potential_missing'].append('--imdb')
         if len(meta['potential_missing']) > 0:
             for each in meta['potential_missing']:
                 if meta.get(each, '').replace(' ', '') == "": 
