@@ -327,7 +327,6 @@ class Commands(commands.Cog):
         prep = Prep(path=Path(meta['path']), screens=meta['screens'], img_host=meta['imghost'], config=config)
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         
-        
         if meta.get('uploaded_screens', False) == False:
             if meta.get('embed_msg_id', '0') != '0':
                 message = await ctx.fetch_message(meta['embed_msg_id'])
@@ -385,11 +384,11 @@ class Commands(commands.Cog):
             res = meta['resolution']
         missing = await self.get_missing(meta)
 
-
         embed=discord.Embed(title=f"Upload: {meta['title']}", url=f"https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}", description=meta['overview'], color=0x0080ff, timestamp=datetime.utcnow())
         embed.add_field(name="Links", value=f"[TMDB](https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}){imdb}{tvdb}")
         embed.add_field(name=f"{res} / {meta['type']}{tag}", value=f"```{meta['name']}```", inline=False)
-        embed.add_field(name=f"POTENTIALLY MISSING INFORMATION:", value="\n".join(missing), inline=False)
+        if missing != []:
+            embed.add_field(name=f"POTENTIALLY MISSING INFORMATION:", value="\n".join(missing), inline=False)
         embed.set_thumbnail(url=f"https://image.tmdb.org/t/p/original{meta['poster']}")
         embed.set_footer(text=meta['uuid'])
         embed.set_author(name="L4G's Upload Assistant", url="https://github.com/L4GSP1KE/Upload-Assistant", icon_url="https://images2.imgbox.com/6e/da/dXfdgNYs_o.png")
@@ -590,8 +589,8 @@ class Commands(commands.Cog):
     async def get_missing(self, meta):
         missing = []
         if meta.get('imdb_id', '0') == '0':
-            meta['potential_missing'].append('--imdb')
-        if len(meta['potential_missing']) > 0:
+            missing.append('--imdb')
+        if isinstance(meta['potential_missing'], list) and len(meta['potential_missing']) > 0:
             for each in meta['potential_missing']:
                 if meta.get(each, '').replace(' ', '') == "": 
                     missing.append(f"--{each}")
