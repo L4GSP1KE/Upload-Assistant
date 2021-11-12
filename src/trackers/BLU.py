@@ -164,10 +164,14 @@ class BLU():
             'tmdbId' : meta['tmdb'],
             'categories[]' : await self.get_cat_id(meta['category']),
             'types[]' : await self.get_type_id(meta['type']),
-            'resolutions[]' : await self.get_res_id(meta['resolution'])
+            'resolutions[]' : await self.get_res_id(meta['resolution']),
+            'name' : ""
         }
         if meta['category'] == 'TV':
-            params['name'] = f"{meta.get('season', '')}{meta.get('episode', '')}"
+            params['name'] + f"{meta.get('season', '')}{meta.get('episode', '')}"
+        if meta.get('edition', "") != "":
+            params['name'] + meta['edition']
+        params['name'] + meta['audio']
         try:
             response = requests.get(url=url, params=params)
             response = response.json()
