@@ -282,13 +282,18 @@ def get_missing(meta):
         'region' : "Disc Region",
         'imdb' : 'IMDb ID (tt1234567)'
     }
+    missing = []
     if meta.get('imdb_id', '0') == '0':
         meta['potential_missing'].append('imdb')
     if len(meta['potential_missing']) > 0:
-        cli_ui.info_section(cli_ui.yellow, "Potentially missing information:")
         for each in meta['potential_missing']:
             if meta.get(each, '').replace(' ', '') == "": 
-                cli_ui.info(f"--{each} | {info_notes.get(each)}")
+                missing.append(f"--{each} | {info_notes.get(each)}")
+    if missing != []:
+        cli_ui.info_section(cli_ui.yellow, "Potentially missing information:")
+        for each in missing:
+            cli_ui.info(each)
+
     print()
     return
 
