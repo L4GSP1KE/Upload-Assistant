@@ -284,7 +284,7 @@ def get_missing(meta):
     }
     missing = []
     if meta.get('imdb_id', '0') == '0':
-        meta['potential_missing'].append('imdb')
+        meta['potential_missing'].append('imdb_id')
     if len(meta['potential_missing']) > 0:
         for each in meta['potential_missing']:
             if meta.get(each, '').replace(' ', '') == "": 
