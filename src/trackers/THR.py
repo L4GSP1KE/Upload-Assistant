@@ -219,7 +219,7 @@ class THR():
         os.environ['WDM_LOG_LEVEL'] = '0'
         options = Options()
         if platform.system() == "Windows":
-            if not meta['debug']:
+            if meta['debug'] == False or meta['no-headless'] == True:
                 options.add_argument("--headless")
             s = Service(GeckoDriverManager().install())
             browser = Firefox(service=s, options=options)
