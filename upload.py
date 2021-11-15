@@ -86,7 +86,7 @@ async def do_the_thing(path, args, base_dir):
     confirm = get_confirmation(meta)  
     while confirm == False:
         # help.print_help()
-        args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv)")
+        args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv --tmdb 12345)")
 
         meta, help, before_args = parser.parse(args.split(), meta)
         # meta = await prep.tmdb_other_meta(meta)
