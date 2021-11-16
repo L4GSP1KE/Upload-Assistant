@@ -123,6 +123,7 @@ async def do_the_thing(path, args, base_dir):
                         aither = AITHER(config=config)
                         await aither.edit_desc(meta)    
                     if manual_tracker.upper() == "THR":
+                        from src.trackers.THR import THR
                         thr = THR(config=config)
                         await thr.edit_desc(meta)
                 url = await prep.package(meta)
