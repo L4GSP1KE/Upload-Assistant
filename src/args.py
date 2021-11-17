@@ -28,6 +28,7 @@ class Args():
         parser.add_argument('-imdb', '--imdb', nargs='*', required=False, help="IMDb ID", type=str)
         parser.add_argument('-g', '--tag', nargs='?', required=False, help="Group Tag", type=str, const="")
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
+        parser.add_argument('-dist', '--distributor', nargs='*', required=False, help="Disc Distributor e.g.(Criterion, BFI, etc.)", type=str)
         parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str)
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
