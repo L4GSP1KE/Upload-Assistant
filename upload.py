@@ -284,14 +284,15 @@ def get_missing(meta):
         'description' : "Please include Remux/Encode Notes if possible (either here or edit your upload)",
         'service' : "WEB Service e.g.(AMZN, NF)",
         'region' : "Disc Region",
-        'imdb' : 'IMDb ID (tt1234567)'
+        'imdb_id' : 'IMDb ID (tt1234567)'
     }
     missing = []
     if meta.get('imdb_id', '0') == '0':
+        meta['imdb_id'] = '0'
         meta['potential_missing'].append('imdb_id')
     if len(meta['potential_missing']) > 0:
         for each in meta['potential_missing']:
-            if meta.get(each, '').replace(' ', '') == "": 
+            if str(meta.get(each, '')).replace(' ', '') in ["", "None", "0"]: 
                 missing.append(f"--{each} | {info_notes.get(each)}")
     if missing != []:
         cli_ui.info_section(cli_ui.yellow, "Potentially missing information:")
