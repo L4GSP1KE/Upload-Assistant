@@ -1088,7 +1088,7 @@ class Prep():
             tag = ""
         if tag == "-":
             tag = ""
-        if tag[1:].lower() in ["nogroup"]:
+        if tag[1:].lower() in ["nogroup", 'nogrp']:
             tag = ""
         return tag
 
