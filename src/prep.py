@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from src.args import Args
-
-from math import dist, exp
 import nest_asyncio
-import imdb
 from src.discparse import DiscParse
 import multiprocessing
 import os
