@@ -175,7 +175,7 @@ async def do_the_thing(path, args, base_dir):
                 meta = dupe_check(dupes, meta)
                 if meta['upload'] == True:
                     await aither.upload(meta)
-                    await client.add_to_client(meta, "Aither")
+                    await client.add_to_client(meta, "AITHER")
         if tracker.upper() == "THR":
             if meta['unattended']:
                 upload_to_thr = True
