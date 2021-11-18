@@ -534,7 +534,7 @@ class Commands(commands.Cog):
                 if meta['upload'] == True:
                     await aither.upload(meta)
                     await client.add_to_client(meta, "AITHER")
-                    upload_embed_description = upload_embed_description.replace('Aither', '~~Aither~~')
+                    upload_embed_description = upload_embed_description.replace('AITHER', '~~AITHER~~')
                     upload_embed = discord.Embed(title=f"Uploaded `{meta['name']}` to:", description=upload_embed_description, color=0x00ff40)
                     await msg.edit(embed=upload_embed) 
             return None
