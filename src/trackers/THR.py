@@ -102,9 +102,9 @@ class THR():
                 await asyncio.sleep(3)
                 print("Uploaded")
             else:
-                submit.submit()
+                # submit.submit()
+                print("DEBUG: Not pushing submit")
                 await asyncio.sleep(30)
-                print("DEBUG Uploaded")
         
     
     
