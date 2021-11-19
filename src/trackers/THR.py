@@ -53,8 +53,15 @@ class THR():
         torrent_path = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent")
         
         #Upload Form
+        upload_page = False
+        while upload_page == False:
+            if browser.getCurrentUrl() != self.upload_url:
+                browser.get(self.upload_url)
+                await asyncio.sleep(3)
+            else:
+                upload_page = True
+
         print("Filling out Upload Form")
-        browser.get(self.upload_url)
         upload_torrent = browser.find_element(By.NAME, "tfile")
         upload_torrent.send_keys(torrent_path)
         await asyncio.sleep(3)
