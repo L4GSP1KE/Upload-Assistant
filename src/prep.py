@@ -230,7 +230,7 @@ class Prep():
         if meta['tag'][1:].startswith(meta['channels']):
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
         meta['3D'] = self.is_3d(mi, bdinfo)
-        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'])
+        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
         if meta.get('service', None) == None:
             meta['service'] = self.get_service(video)
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
@@ -1091,7 +1091,7 @@ class Prep():
         return tag
 
 
-    def get_source(self, type, video, path, mi, is_disc):
+    def get_source(self, type, video, path, mi, is_disc, meta):
         try:
             try:
                 source = guessit(video)['source']
@@ -1108,7 +1108,8 @@ class Prep():
                     source = "BluRay"
             if is_disc == "DVD" or source in ("DVD", "dvd"):
                 try:
-                   system = mi['media']['track'][1]['Standard']
+                   mediainfo = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO", output="JSON")
+                   system = mediainfo['media']['track'][1]['Standard']
                    if system not in ("PAL", "NTSC"):
                        raise WeirdSystem
                 except:

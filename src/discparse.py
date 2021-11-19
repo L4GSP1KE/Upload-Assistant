@@ -211,7 +211,7 @@ class DiscParse():
             size = sum(os.path.getsize(f) for f in os.listdir('.') if os.path.isfile(f))/float(1<<30)
             if size < 9:
                 dvd_size = "DVD9"
-                if size < 5:
+                if size < 4.7:
                     dvd_size = "DVD5"
             each['size'] = dvd_size
         return discs
