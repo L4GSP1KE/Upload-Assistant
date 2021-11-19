@@ -174,7 +174,7 @@ class THR():
                     image_list.append(img_url)
                 except:
                     cprint("Failed to upload image", 'yellow')
-                    pprint(response)
+                    pprint(response.text)
                 await asyncio.sleep(1)
             desc.write("[align=center]")
             # ProNFO
