@@ -58,7 +58,7 @@ class THR():
         try: 
             elem = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.NAME, "tfile")))
         finally:
-            with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/THR_Upload_page.txt", 'w') as f:
+            with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/Tuna_dumb_check.txt", 'w') as f:
                 f.write(browser.page_source)
                 f.close()
             print("Filling out Upload Form")
