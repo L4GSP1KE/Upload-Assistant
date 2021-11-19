@@ -17,7 +17,8 @@ from selenium.webdriver import Firefox
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select
+from selenium.webdriver.support.ui import Select, WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.firefox import GeckoDriverManager #Webdriver_manager
 
 # from pprint import pprint
@@ -53,62 +54,58 @@ class THR():
         torrent_path = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent")
         
         #Upload Form
-        upload_page = False
-        while upload_page == False:
-            if browser.getCurrentUrl() != self.upload_url:
-                browser.get(self.upload_url)
+        browser.get(self.upload_url)
+        try: 
+            elem = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.NAME, "tfile")))
+        finally:
+            print("Filling out Upload Form")
+            upload_torrent = browser.find_element(By.NAME, "tfile")
+            upload_torrent.send_keys(torrent_path)
+            await asyncio.sleep(3)
+            name = browser.find_element(By.NAME, "name")
+            name.send_keys(meta['name'].replace("DD+", "DDP"))
+            if pronfo == False:
+                nfo = browser.find_element(By.NAME, "nfo")
+                nfo.send_keys(mi_file)
                 await asyncio.sleep(3)
+
+            if len(subs) >= 1:
+                if 'hr' in subs:
+                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Hrvatski')]")
+                    checkboxes.find_element(By.NAME, 'subs[]').click()
+                if 'en' in subs:
+                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Engleski')]")
+                    checkboxes.find_element(By.NAME, 'subs[]').click()
+                if 'bs' in subs:
+                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Bosanski')]")
+                    checkboxes.find_element(By.NAME, 'subs[]').click()
+                if 'sr' in subs:
+                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Srpski')]")
+                    checkboxes.find_element(By.NAME, 'subs[]').click()
+                if 'sl' in subs:
+                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Slovenski')]")
+                    checkboxes.find_element(By.NAME, 'subs[]').click()
+                
+            description = browser.find_element(By.NAME, "descr")
+            description.send_keys(desc)
+            category_dropdown = Select(browser.find_element(By.NAME, 'type'))
+            category_dropdown.select_by_value(cat_id)
+            imdb_link = browser.find_element(By.NAME, "url")
+            imdb_link.send_keys(f"https://www.imdb.com/title/tt{meta.get('imdb_id').replace('tt', '')}/")
+            yt_link = browser.find_element(By.NAME, "tube")
+            yt_link.send_keys(meta.get('youtube', ""))
+
+            #Submit
+            submit = browser.find_element(By.XPATH, "//*[@type='submit']")
+            if meta['debug'] == False:
+                submit.submit()
+                await asyncio.sleep(3)
+                print("Uploaded")
             else:
-                upload_page = True
-
-        print("Filling out Upload Form")
-        upload_torrent = browser.find_element(By.NAME, "tfile")
-        upload_torrent.send_keys(torrent_path)
-        await asyncio.sleep(3)
-        name = browser.find_element(By.NAME, "name")
-        name.send_keys(meta['name'].replace("DD+", "DDP"))
-        if pronfo == False:
-            nfo = browser.find_element(By.NAME, "nfo")
-            nfo.send_keys(mi_file)
-            await asyncio.sleep(3)
-
-        if len(subs) >= 1:
-            if 'hr' in subs:
-                checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Hrvatski')]")
-                checkboxes.find_element(By.NAME, 'subs[]').click()
-            if 'en' in subs:
-                checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Engleski')]")
-                checkboxes.find_element(By.NAME, 'subs[]').click()
-            if 'bs' in subs:
-                checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Bosanski')]")
-                checkboxes.find_element(By.NAME, 'subs[]').click()
-            if 'sr' in subs:
-                checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Srpski')]")
-                checkboxes.find_element(By.NAME, 'subs[]').click()
-            if 'sl' in subs:
-                checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Slovenski')]")
-                checkboxes.find_element(By.NAME, 'subs[]').click()
-            
-        description = browser.find_element(By.NAME, "descr")
-        description.send_keys(desc)
-        category_dropdown = Select(browser.find_element(By.NAME, 'type'))
-        category_dropdown.select_by_value(cat_id)
-        imdb_link = browser.find_element(By.NAME, "url")
-        imdb_link.send_keys(f"https://www.imdb.com/title/tt{meta.get('imdb_id').replace('tt', '')}/")
-        yt_link = browser.find_element(By.NAME, "tube")
-        yt_link.send_keys(meta.get('youtube', ""))
-
-        #Submit
-        submit = browser.find_element(By.XPATH, "//*[@type='submit']")
-        if meta['debug'] == False:
-            submit.submit()
-            await asyncio.sleep(3)
-            print("Uploaded")
-        else:
-            submit.submit()
-            await asyncio.sleep(30)
-            print("DEBUG Uploaded")
-    
+                submit.submit()
+                await asyncio.sleep(30)
+                print("DEBUG Uploaded")
+        
     
     
     async def get_cat_id(self, meta):
