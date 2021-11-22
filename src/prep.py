@@ -242,7 +242,7 @@ class Prep():
         else:
             meta['video_encode'], meta['video_codec'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
-            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), video, bdinfo, meta['filelist'])
+            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), self.path, bdinfo, meta['filelist'])
 
         
         
@@ -1338,14 +1338,14 @@ class Prep():
             cprint("More than one edition detected, please edit --edition", 'grey', 'on_yellow')
             time.sleep(2)
             edition = ""
-        if len(filelist) >= 2:
-            video = os.path.dirname(video)
+        if len(filelist) == 1:
+            video = os.path.basename(video)
         if "open matte" in video.replace('.', ' ').lower():
             edition = edition + "Open Matte"
-        if "REPACK" in video:
+        if "REPACK" in video.upper():
             edition = ""
             repack = "REPACK"
-        if "REPACK2" in video:
+        if "REPACK2" in video.upper():
             edition = ""
             repack = "REPACK2"
         if "PROPER" in video:
