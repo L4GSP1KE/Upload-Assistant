@@ -6,6 +6,7 @@ import requests
 from difflib import SequenceMatcher
 from termcolor import cprint
 import urllib
+import distutils.util
 from pprint import pprint
 
 # from pprint import pprint
@@ -30,7 +31,10 @@ class BLU():
         await self.edit_desc(meta)
         region_id = await self.get_region_id(meta.get('region'))
         distributor_id = await self.get_distributor_id(meta.get('distributor'))
-
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['AITHER'].get('anon', False))) == False:
+            anon = 0
+        else:
+            anon = 1
 
         if meta['bdinfo'] != None:
             mi_dump = None
@@ -54,7 +58,7 @@ class BLU():
             'tvdb' : meta['tvdb_id'],
             'mal' : meta['mal_id'],
             'igdb' : 0,
-            'anonymous' : meta['anon'],
+            'anonymous' : anon,
             'stream' : meta['stream'],
             'sd' : meta['sd'],
             'keywords' : meta['keywords'],

@@ -5,7 +5,7 @@ from torf import Torrent
 import requests
 from difflib import SequenceMatcher
 from termcolor import cprint
-import urllib
+import distutils.util
 import json
 from pprint import pprint
 
@@ -30,7 +30,10 @@ class AITHER():
         resolution_id = await self.get_res_id(meta['resolution'])
         await self.edit_desc(meta)
         aither_name = await self.edit_name(meta)
-
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['AITHER'].get('anon', False))) == False:
+            anon = 0
+        else:
+            anon = 1
         if meta['bdinfo'] != None:
             mi_dump = None
             bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
@@ -53,7 +56,7 @@ class AITHER():
             'tvdb' : meta['tvdb_id'],
             'mal' : meta['mal_id'],
             'igdb' : 0,
-            'anonymous' : meta['anon'],
+            'anonymous' : anon,
             'stream' : meta['stream'],
             'sd' : meta['sd'],
             'keywords' : meta['keywords'],

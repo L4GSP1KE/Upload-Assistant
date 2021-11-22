@@ -32,7 +32,11 @@ class BHD():
         await self.edit_desc(meta)
         custom, edition = await self.get_edition(meta)
         tags = await self.get_tags(meta)
-
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['AITHER'].get('anon', False))) == False:
+            anon = 0
+        else:
+            anon = 1
+            
         if meta['bdinfo'] != None:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8')
         else:
@@ -52,7 +56,7 @@ class BHD():
             'imdb_id' : meta['imdb_id'].replace('tt', ''),    
             'tmdb_id' : meta['tmdb'],
             'description' : desc,
-            'anon' : meta['anon'],
+            'anon' : anon,
             'sd' : meta.get('sd', 0),
             'live' : draft 
             # 'internal' : 0,
