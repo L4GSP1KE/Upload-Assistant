@@ -1117,10 +1117,12 @@ class Prep():
                     source = "BluRay"
             if is_disc == "DVD" or source in ("DVD", "dvd"):
                 try:
-                   mediainfo = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO", output="JSON")
-                   system = mediainfo['media']['track'][1]['Standard']
-                   if system not in ("PAL", "NTSC"):
-                       raise WeirdSystem
+                    mediainfo = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO")
+                    for track in mediainfo.tracks:
+                        if track.track_type == "Video":
+                            system = track.standard
+                    if system not in ("PAL", "NTSC"):
+                        raise WeirdSystem
                 except:
                     try:
                         other = guessit(video)['other']
