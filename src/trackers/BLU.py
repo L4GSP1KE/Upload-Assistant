@@ -31,7 +31,7 @@ class BLU():
         await self.edit_desc(meta)
         region_id = await self.get_region_id(meta.get('region'))
         distributor_id = await self.get_distributor_id(meta.get('distributor'))
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['BLU'].get('anon', False))) == False:
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['BLU'].get('anon', "False"))) == False:
             anon = 0
         else:
             anon = 1

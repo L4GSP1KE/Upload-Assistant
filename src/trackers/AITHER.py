@@ -30,7 +30,7 @@ class AITHER():
         resolution_id = await self.get_res_id(meta['resolution'])
         await self.edit_desc(meta)
         aither_name = await self.edit_name(meta)
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['AITHER'].get('anon', False))) == False:
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['AITHER'].get('anon', "False"))) == False:
             anon = 0
         else:
             anon = 1

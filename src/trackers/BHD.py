@@ -32,7 +32,7 @@ class BHD():
         await self.edit_desc(meta)
         custom, edition = await self.get_edition(meta)
         tags = await self.get_tags(meta)
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['BHD'].get('anon', False))) == False:
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['BHD'].get('anon', "False"))) == False:
             anon = 0
         else:
             anon = 1
