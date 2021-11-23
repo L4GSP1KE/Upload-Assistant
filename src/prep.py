@@ -510,14 +510,17 @@ class Prep():
         i = 0
         while i != self.screens:
             image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
-            (
-                ffmpeg
-                .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
-                .output(image, vframes=1)
-                .overwrite_output()
-                .global_args('-loglevel', 'quiet')
-                .run(quiet=True)
-            )
+            try:
+                (
+                    ffmpeg
+                    .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
+                    .output(image, vframes=1)
+                    .overwrite_output()
+                    .global_args('-loglevel', 'quiet')
+                    .run(quiet=True)
+                )
+            except:
+                print(traceback.format_exc())
             # print(os.path.getsize(image))
             # print(f'{i+1}/{self.screens}')
             cli_ui.info_count(i, self.screens, "Screens Saved")
@@ -585,15 +588,18 @@ class Prep():
             # if bool(meta.get('debug', False)):
             #     loglevel = 'verbose'
             #     debug = False
-            (
-                ffmpeg
-                .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
-                .filter('scale', int(width * w_sar), int(height * h_sar))
-                .output(image, vframes=1)
-                .overwrite_output()
-                .global_args('-loglevel', loglevel)
-                .run(quiet=debug)
-            )
+            try:
+                (
+                    ffmpeg
+                    .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
+                    .filter('scale', int(width * w_sar), int(height * h_sar))
+                    .output(image, vframes=1)
+                    .overwrite_output()
+                    .global_args('-loglevel', loglevel)
+                    .run(quiet=debug)
+                )
+            except:
+                print(traceback.format_exc())
             # print(os.path.getsize(image))
             # print(f'{i+1}/{self.screens}')
             n += 1
@@ -632,14 +638,17 @@ class Prep():
             #     debug = False
             while i != self.screens:
                 image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
-                (
-                    ffmpeg
-                    .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                    .output(image, vframes=1)
-                    .overwrite_output()
-                    .global_args('-loglevel', loglevel)
-                    .run(quiet=debug)
-                )
+                try:
+                    (
+                        ffmpeg
+                        .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
+                        .output(image, vframes=1)
+                        .overwrite_output()
+                        .global_args('-loglevel', loglevel)
+                        .run(quiet=debug)
+                    )
+                except:
+                    print(traceback.format_exc())
                 # print(os.path.getsize(image))
                 # print(f'{i+1}/{self.screens}')
                 cli_ui.info_count(i, self.screens, "Screens Saved")
