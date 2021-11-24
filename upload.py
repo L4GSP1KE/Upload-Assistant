@@ -44,6 +44,13 @@ async def do_the_thing(path, args, base_dir):
     meta = dict()
     meta['base_dir'] = base_dir
     path = os.path.abspath(path)
+    cprint(f"Gathering info for {os.path.basename(path)}", 'grey', 'on_green')
+    try:
+        with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
+            meta = json.load(f)
+            f.close()
+    except FileNotFoundError:
+        pass
     if os.path.exists(path):
             meta['path'] = path
             meta, help, before_args = parser.parse(args, meta)
@@ -83,6 +90,9 @@ async def do_the_thing(path, args, base_dir):
         trackers = config['TRACKERS']['default_trackers']
     if "," in trackers:
         trackers = trackers.split(',')
+    with open (f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
+        json.dump(meta, f, indent=4)
+        f.close()
     confirm = get_confirmation(meta)  
     while confirm == False:
         # help.print_help()
