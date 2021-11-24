@@ -27,7 +27,7 @@ class DiscParse():
                 if file == f"BD_SUMMARY_{str(i).zfill(2)}.txt":
                     bdinfo_text = save_dir + "/" + file
             if bdinfo_text == None:
-                if sys.platform.startswith('linux'):
+                if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
                     try:
                         # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
                         cprint(f"Scanning {path}", 'grey', 'on_yellow')
@@ -42,6 +42,8 @@ class DiscParse():
                     proc = await asyncio.create_subprocess_exec(f"{base_dir}/bin/BDInfo/BDInfo.exe", "-w", path, save_dir)
                     await proc.wait()
                     await asyncio.sleep(1)
+                else:
+                    cprint("Not sure how to run bdinfo on your platform, get support please thanks.", 'grey', 'on_red')
                 while True:
                     try:
                         for file in os.listdir(save_dir):
