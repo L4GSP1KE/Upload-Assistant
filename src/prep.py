@@ -652,7 +652,6 @@ class Prep():
                 cprint("Saving Screens...", "grey", "on_yellow")
                 while i != self.screens:
                     image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
-                    cprint(self.path, 'magenta')
                     try:
                         (
                             ffmpeg
