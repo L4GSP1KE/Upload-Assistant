@@ -45,7 +45,6 @@ class DiscParse():
                 else:
                     cprint("Not sure how to run bdinfo on your platform, get support please thanks.", 'grey', 'on_red')
                 while True:
-                    print("hi")
                     try:
                         for file in os.listdir(save_dir):
                             if file.startswith(f"BDINFO"):
