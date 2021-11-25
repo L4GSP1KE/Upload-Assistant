@@ -334,9 +334,8 @@ class Prep():
     def get_video(self, videoloc):
         filelist = []
         if os.path.isdir(videoloc):
-            os.chdir(videoloc)
-            filelist = glob.glob('*.mkv') + glob.glob('*.mp4') + glob.glob('*.ts')
-            video = sorted(filelist)[0]        
+            filelist = glob.glob(f'{videoloc}/*.mkv') + glob.glob(f'{videoloc}/*.mp4') + glob.glob(f'{videoloc}/*.ts')
+            video = sorted(filelist)[0]       
         else:
             video = videoloc
             filelist.append(videoloc)
@@ -356,7 +355,7 @@ class Prep():
             #MediaInfo to text
             if isdir == False:
                 os.chdir(os.path.dirname(video))
-            media_info = MediaInfo.parse(os.path.basename(video), output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
+            media_info = MediaInfo.parse(video, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
             export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
             export.write(media_info)
             export.close()
@@ -647,7 +646,8 @@ class Prep():
                 #     debug = False
                 cprint("Saving Screens...", "grey", "on_yellow")
                 while i != self.screens:
-                    image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
+                    image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
+                    cprint(self.path, 'magenta')
                     try:
                         (
                             ffmpeg
