@@ -591,9 +591,9 @@ class Prep():
                 img_time = random.randint(round(length/5) , round(length - length/5))
                 loglevel = 'quiet'
                 debug = True
-                if bool(meta.get('debug', False)):
-                    loglevel = 'verbose'
-                    debug = False
+                # if bool(meta.get('debug', False)):
+                #     loglevel = 'verbose'
+                #     debug = False
                 try:
                     (
                         ffmpeg
@@ -642,9 +642,9 @@ class Prep():
             else:
                 loglevel = 'quiet'
                 debug = True
-                if bool(meta.get('debug', False)):
-                    loglevel = 'verbose'
-                    debug = False
+                # if bool(meta.get('debug', False)):
+                #     loglevel = 'verbose'
+                #     debug = False
                 cprint("Saving Screens...", "grey", "on_yellow")
                 while i != self.screens:
                     image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
