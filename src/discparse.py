@@ -16,7 +16,7 @@ class DiscParse():
     """
     Get and parse bdinfo
     """
-    async def get_bdinfo(self, discs, folder_id, base_dir):
+    async def get_bdinfo(self, discs, folder_id, base_dir, meta_discs):
         save_dir = f"{base_dir}/tmp/{folder_id}"
         if not os.path.exists(save_dir):
             os.mkdir(save_dir)
@@ -26,7 +26,7 @@ class DiscParse():
             for file in os.listdir(save_dir):
                 if file == f"BD_SUMMARY_{str(i).zfill(2)}.txt":
                     bdinfo_text = save_dir + "/" + file
-            if bdinfo_text == None:
+            if bdinfo_text == None or meta_discs == []:
                 if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
                     try:
                         # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
@@ -45,6 +45,7 @@ class DiscParse():
                 else:
                     cprint("Not sure how to run bdinfo on your platform, get support please thanks.", 'grey', 'on_red')
                 while True:
+                    print("hi")
                     try:
                         for file in os.listdir(save_dir):
                             if file.startswith(f"BDINFO"):
@@ -72,6 +73,8 @@ class DiscParse():
                 discs[i]['summary'] = bd_summary
                 discs[i]['bdinfo'] = bdinfo
             # shutil.rmtree(f"{base_dir}/tmp")
+            else:
+                discs = meta_discs
         
         return discs, discs[0]['bdinfo']
         

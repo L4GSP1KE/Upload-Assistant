@@ -309,7 +309,7 @@ class Prep():
 
         if is_disc == "BDMV":
             if meta.get('edit', False) == False:
-                discs, bdinfo = await parse.get_bdinfo(discs, meta['uuid'], meta['base_dir'])
+                discs, bdinfo = await parse.get_bdinfo(discs, meta['uuid'], meta['base_dir'], meta.get('discs', []))
             else:
                 discs, bdinfo = await parse.get_bdinfo(meta['discs'], meta['uuid'], meta['base_dir'])
         elif is_disc == "DVD":
@@ -485,7 +485,6 @@ class Prep():
     def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir):
         if self.screens == 0:
             return
-        cprint("Saving Screens...", "grey", "on_yellow")
         #Get longest m2ts
         length = 0 
         for each in bdinfo['files']:
@@ -506,11 +505,14 @@ class Prep():
             # print("VC-1")
         else:
             keyframe = 'none'
-            
+
+        os.chdir(f"{base_dir}/tmp/{folder_id}")    
         i = len(glob.glob("*.png"))        
         if i >= self.screens:
             i = self.screens
+            cprint('Reusing screenshots', 'grey', 'on_green')
         else:
+            cprint("Saving Screens...", "grey", "on_yellow")
             while i != self.screens:
                 image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
                 try:
@@ -546,7 +548,6 @@ class Prep():
     def dvd_screenshots(self, meta, discs):
         if self.screens == 0:
             return
-        cprint("Saving Screens...", "grey", "on_yellow")
         ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", mediainfo_options={'inform_version' : '1'})
         sar = 1
         for track in ifo_mi.tracks:
@@ -577,10 +578,13 @@ class Prep():
         else:
             main_set = meta['discs'][0]['main_set'][1:]
         n = 0
+        os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         i = len(glob.glob("*.png"))        
         if i >= self.screens:
             i = self.screens
+            cprint('Reusing screenshots', 'grey', 'on_green')
         else:
+            cprint("Saving Screens...", "grey", "on_yellow")
             while i != self.screens:
                 if n >= len(main_set):
                     n = 0
@@ -638,6 +642,7 @@ class Prep():
             i = len(glob.glob("*.png"))
             if i >= self.screens:
                 i = self.screens
+                cprint('Reusing screenshots', 'grey', 'on_green')
             else:
                 loglevel = 'quiet'
                 debug = True
