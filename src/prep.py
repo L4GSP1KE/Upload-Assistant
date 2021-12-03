@@ -1469,8 +1469,9 @@ class Prep():
                             'key': self.config['DEFAULT']['imgbb_api'],
                             'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
                         }
-                        response = requests.post(url, data = data).json()
+                        response = requests.post(url, data = data)
                         try:
+                            response = response.json()
                             img_url = response['data']['medium']['url']
                             web_url = response['data']['url_viewer']
                             raw_url = response['data']['image']['url']
@@ -1486,8 +1487,9 @@ class Prep():
                         }
                         headers = {'content-type' : 'image/png'}
                         files= {open(image, 'rb')}
-                        response = requests.post(url, data = data).json()
+                        response = requests.post(url, data = data)
                         try:
+                            response = response.json()
                             img_url = response['image']['medium']['url']
                             web_url = response['image']['url_viewer']
                             raw_url = response['image']['url']
