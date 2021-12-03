@@ -147,7 +147,7 @@ class AITHER():
         AITHER_torrent.metainfo['announce'] = self.config['TRACKERS']['AITHER']['announce_url'].strip()
         AITHER_torrent.metainfo['info']['source'] = "Aither"
         AITHER_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
-        Torrent.copy(AITHER_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[AITHER]{meta['clean_name']}.torrent")
+        Torrent.copy(AITHER_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[AITHER]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):

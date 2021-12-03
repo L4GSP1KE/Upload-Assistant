@@ -150,7 +150,7 @@ class THR():
         THR_torrent.metainfo['announce'] = self.config['TRACKERS']['THR']['announce_url']
         THR_torrent.metainfo['info']['source'] = "[https://www.torrenthr.org] TorrentHR.org"
         THR_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
-        Torrent.copy(THR_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent")
+        Torrent.copy(THR_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):
