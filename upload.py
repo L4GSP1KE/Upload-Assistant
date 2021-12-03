@@ -78,7 +78,7 @@ async def do_the_thing(path, args, base_dir):
             pprint(meta['image_list'])
         # meta['uploaded_screens'] = True
 
-    if len(glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) == 0:
+    if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
         if meta['nohash'] == False:
             prep.create_torrent(meta, Path(meta['path']))
         else:
