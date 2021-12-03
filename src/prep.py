@@ -1439,7 +1439,7 @@ class Prep():
     Upload Screenshots
     """
     def upload_screens(self, meta, screens, img_host_num, i, return_dict):
-        if self.screens != 0:
+        if self.screens != 0 or len(meta.get('image_list', [])) >= self.screens:
             cprint('Uploading Screens', 'grey', 'on_yellow')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
@@ -1457,93 +1457,95 @@ class Prep():
         image_list = []
         newhost_list = []
         image_glob = glob.glob("*.png")
-        if img_host == 'imgbox':
-            nest_asyncio.apply()
-            image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
+        if len(meta.get('image_list', [])) >= self.screens:
+            if img_host == 'imgbox':
+                nest_asyncio.apply()
+                image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
+            else:
+                for image in image_glob[-screens:]:        
+                    if img_host == "imgbb":
+                        url = "https://api.imgbb.com/1/upload"
+                        data = {
+                            'key': self.config['DEFAULT']['imgbb_api'],
+                            'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
+                        }
+                        response = requests.post(url, data = data).json()
+                        try:
+                            img_url = response['data']['medium']['url']
+                            web_url = response['data']['url_viewer']
+                            raw_url = response['data']['image']['url']
+                        except:
+                            cprint("imgbb failed, trying next image host", 'yellow')
+                            newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, return_dict)
+                    elif img_host == "freeimage.host":
+                        url = "https://freeimage.host/api/1/upload"
+                        data = {
+                            'key': '6d207e02198a847aa98d0a2a901485a5',
+                            'action' : 'upload',
+                            'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
+                        }
+                        headers = {'content-type' : 'image/png'}
+                        files= {open(image, 'rb')}
+                        response = requests.post(url, data = data).json()
+                        try:
+                            img_url = response['image']['medium']['url']
+                            web_url = response['image']['url_viewer']
+                            raw_url = response['image']['url']
+                        except:
+                            cprint("freeimage.host failed, trying next image host", 'yellow')
+                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
+                    elif img_host == "ptpimg":
+                        payload = {
+                            'format' : 'json',
+                            'api_key' : self.config['DEFAULT']['ptpimg_api'] # API key is obtained from inspecting element on the upload page. 
+                        }
+                        files = [('file-upload[0]', open(image, 'rb'))] 
+                        headers = { 'referer': 'https://ptpimg.me/index.php'} 
+                        url = "https://ptpimg.me/upload.php"
+
+                        # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
+                        response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
+                        try:
+                            response = response.json()
+                            ptpimg_code = response[0]['code'] 
+                            ptpimg_ext = response[0]['ext'] 
+                            img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                            web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                            raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                        except:
+                            # print(traceback.format_exc())
+                            cprint("ptpimg failed, trying next image host", 'yellow')
+                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
+                    else:
+                        cprint("Please choose a supported image host in your config", 'grey', 'on_red')
+                        exit()
+
+
+                
+                # description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
+                # if i % 3 == 0:
+                #     description.write("\n")
+                    if len(newhost_list) >=1:
+                        image_list.extend(newhost_list)
+                    else:
+                        image_dict = {}
+                        image_dict['web_url'] = web_url
+                        image_dict['img_url'] = img_url
+                        image_dict['raw_url'] = raw_url
+                        image_list.append(image_dict)
+                        cli_ui.info_count(i, self.screens, "Uploaded")
+                        i += 1
+                    time.sleep(0.5)
+                    if i >= self.screens:
+                        break
+            # description.write("[/center]")
+            # description.write("\n")
+                
+            # description.close()
+            return_dict['image_list'] = image_list
+            return image_list, i
         else:
-            for image in image_glob[-screens:]:        
-                if img_host == "imgbb":
-                    url = "https://api.imgbb.com/1/upload"
-                    data = {
-                        'key': self.config['DEFAULT']['imgbb_api'],
-                        'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
-                    }
-                    response = requests.post(url, data = data).json()
-                    try:
-                        img_url = response['data']['medium']['url']
-                        web_url = response['data']['url_viewer']
-                        raw_url = response['data']['image']['url']
-                    except:
-                        cprint("imgbb failed, trying next image host", 'yellow')
-                        newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, return_dict)
-                elif img_host == "freeimage.host":
-                    url = "https://freeimage.host/api/1/upload"
-                    data = {
-                        'key': '6d207e02198a847aa98d0a2a901485a5',
-                        'action' : 'upload',
-                        'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
-                    }
-                    headers = {'content-type' : 'image/png'}
-                    files= {open(image, 'rb')}
-                    response = requests.post(url, data = data).json()
-                    try:
-                        img_url = response['image']['medium']['url']
-                        web_url = response['image']['url_viewer']
-                        raw_url = response['image']['url']
-                    except:
-                        cprint("freeimage.host failed, trying next image host", 'yellow')
-                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
-                elif img_host == "ptpimg":
-                    payload = {
-                        'format' : 'json',
-                        'api_key' : self.config['DEFAULT']['ptpimg_api'] # API key is obtained from inspecting element on the upload page. 
-                    }
-                    files = [('file-upload[0]', open(image, 'rb'))] 
-                    headers = { 'referer': 'https://ptpimg.me/index.php'} 
-                    url = "https://ptpimg.me/upload.php"
-
-                    # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
-                    response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
-                    try:
-                        response = response.json()
-                        ptpimg_code = response[0]['code'] 
-                        ptpimg_ext = response[0]['ext'] 
-                        img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                        web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                        raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                    except:
-                        # print(traceback.format_exc())
-                        cprint("ptpimg failed, trying next image host", 'yellow')
-                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
-                else:
-                    cprint("Please choose a supported image host in your config", 'grey', 'on_red')
-                    exit()
-
-
-            
-            # description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
-            # if i % 3 == 0:
-            #     description.write("\n")
-                if len(newhost_list) >=1:
-                    image_list.extend(newhost_list)
-                else:
-                    image_dict = {}
-                    image_dict['web_url'] = web_url
-                    image_dict['img_url'] = img_url
-                    image_dict['raw_url'] = raw_url
-                    image_list.append(image_dict)
-                    cli_ui.info_count(i, self.screens, "Uploaded")
-                    i += 1
-                time.sleep(0.5)
-                if i >= self.screens:
-                    break
-        # description.write("[/center]")
-        # description.write("\n")
-            
-        # description.close()
-        return_dict['image_list'] = image_list
-        return image_list, i
-
+            return meta.get('image_list'), self.screens
 
     async def imgbox_upload(self, chdir, image_glob):
         os.chdir(chdir)
@@ -1679,16 +1681,20 @@ class Prep():
                         guess_year = ""
                     if guessit(video)["season"] == guess_year:
                         if f"s{guessit(video)['season']}" in video.lower():
-                            season = "S" + str(guessit(video)["season"]).zfill(2)
+                            season_int =  str(guessit(video)["season"])
+                            season = "S" + season_int.zfill(2)
                         else:
+                            season_int = "1"
                             season = "S01"
                     else:
-                        season = "S" + str(guessit(video)["season"]).zfill(2)
+                        season_int =  str(guessit(video)["season"])
+                        season = "S" + season_int.zfill(2)
 
                 except:
                     try:
                         season = guessit(video)['date']
                     except:
+                        season_int = "1"
                         season = "S01"
                 try:
                     episodes = ""
@@ -1699,14 +1705,18 @@ class Prep():
                             for item in guessit(video)["episode"]:
                                 ep = (str(item).zfill(2))
                                 episode += f"E{ep}"
+                            episode_int = episodes[0]
                         else:
+                            episode_int = str(episodes)
                             episode = "E" + str(episodes).zfill(2)
                     else:
                         episode = ""
+                        episode_int = "0"
                         meta['tv_pack'] = 1
                 except:
                     # print(traceback.format_exc())
                     episode = ""
+                    episode_int = "0"
                     meta['tv_pack'] = 1
             else:
                 parsed = anitopy.parse(Path(video).name)
@@ -1733,16 +1743,21 @@ class Prep():
                             for item in episodes:
                                 ep = (str(item).zfill(2))
                                 episode += f"E{ep}"
+                            episode_int = episodes[0]
                         else:
+                            episode_int = str(int(episodes))
                             episode = f"E{str(int(episodes)).zfill(2)}"
                     else:
                         episode = ""
+                        episode_int = "0"
                         meta['tv_pack'] = 1
                 except:
                     episode = ""
+                    episode_int = "0"
                     meta['tv_pack'] = 1
                 try:
                     season = parsed['anime_season']
+                    season_int = season
                     season = f"S{season.zfill(2)}"
                 except:
                     try:
@@ -1757,8 +1772,10 @@ class Prep():
                             response = requests.post(url, params=params).json()
                             if response['result'] == "failure":
                                 raise XEMNotFound
+                            season_int = str(response['data']['scene']['season'])
                             season = f"S{str(response['data']['scene']['season']).zfill(2)}"
                             if len(filelist) == 1:
+                                episode_int = str(response['data']['scene']['episode'])
                                 episode = f"E{str(response['data']['scene']['episode']).zfill(2)}"
                         else:
                             #Get season from xem name map
@@ -1772,22 +1789,28 @@ class Prep():
                                             for name in names:
                                                 if re.sub("[^0-9a-zA-Z\[\]]+", " ", romaji.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", " ", name.lower().replace(' ', '')):
                                                     if season_num != "all":
+                                                        season_int = season_num
                                                         season = f"S{season_num.zfill(2)}"
                                                     else:
+                                                        season_int = "1"
                                                         season = "S01"
                                         if lang == "us":
                                             for name in names:
                                                 if re.sub("[^0-9a-zA-Z\[\]]+", " ", eng_title.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", " ", name.lower().replace(' ', '')):
                                                     if season_num != "all":
+                                                        season_int = season_num
                                                         season = f"S{season_num.zfill(2)}"
                                                     else:
+                                                        season_int = "1"
                                                         season = "S01"
                             else:
                                 raise XEMNotFound
                     except:
                         try:
                             season = guessit(video)['season']
+                            season_int = season
                         except:
+                            season_int = "1"
                             season = "S01"
                         cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
                         cprint(f"If {season} is incorrect, use --season to correct", 'grey', 'on_yellow')
@@ -1801,14 +1824,18 @@ class Prep():
             if meta.get('manual_season', None) == None:
                 meta['season'] = season
             else:
+                meta['season_int'] = meta['manual_season'].lower().replace('s', '')
                 meta['season'] = f"S{meta['manual_season'].lower().replace('s', '').zfill(2)}"
             if meta.get('manual_episode', None) == None:
                 meta['episode'] = episode
             else:
+                meta['episode_int'] = meta['manual_episode'].lower().replace('e', '')
                 meta['episode'] = f"E{meta['manual_episode'].lower().replace('e', '').zfill(2)}"
             
             if " COMPLETE " in Path(video).name.replace('.', ' '):
                 meta['season'] = "COMPLETE"
+            meta['season_int'] = season_int
+            meta['episode_int'] = episode_int
         return meta
 
 

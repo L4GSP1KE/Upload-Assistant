@@ -72,6 +72,9 @@ class BLU():
             data['region_id'] = region_id
         if distributor_id != 0:
             data['distributor_id'] = distributor_id
+        if meta.get('category') == "TV":
+            data['season_number'] = meta.get('season_int', '0')
+            data['episode_number'] = meta.get('episode_int', '0')
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
