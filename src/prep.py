@@ -1728,6 +1728,8 @@ class Prep():
                     year = parsed.get('anime_year', str(seasonYear))
                     meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
                 meta = await self.tmdb_other_meta(meta)
+                if meta['category'] != "TV":
+                    return meta
                 # meta['title'] = eng_title
                 # difference = SequenceMatcher(None, eng_title, romaji.lower()).ratio()
                 # if difference >= 0.8:
