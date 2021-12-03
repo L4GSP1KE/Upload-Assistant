@@ -1457,7 +1457,7 @@ class Prep():
         image_list = []
         newhost_list = []
         image_glob = glob.glob("*.png")
-        if len(meta.get('image_list', [])) >= self.screens:
+        if len(meta.get('image_list', [])) < self.screens:
             if img_host == 'imgbox':
                 nest_asyncio.apply()
                 image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
