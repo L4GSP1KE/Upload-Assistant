@@ -96,7 +96,7 @@ class AITHER():
         has_eng_audio = False
         for track in mi['media']['track']:
             if track['@type'] == "Audio":
-                if track['Language'] == 'en':
+                if track.get('Language', 'None') == 'en':
                     has_eng_audio = True
         if not has_eng_audio:
             audio_lang = mi['media']['track'][2].get('Language_String', "").upper()
