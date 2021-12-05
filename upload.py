@@ -34,6 +34,7 @@ except:
                 f.write(f"config = {json.dumps(json_config, indent=4)}")
                 f.close()
             cli_ui.info(cli_ui.green, "Successfully updated config from .json to .py")    
+            cli_ui.info(cli_ui.green, "It is now safe for you to delete", cli_ui.yellow, "data/config.json", "if you wish")    
             from data.config import config
         else:
             raise NotImplementedError
