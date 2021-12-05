@@ -6,6 +6,7 @@ from src.search import Search
 from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
 from src.trackers.AITHER import AITHER
+from data.config import config
 
 import discord
 from discord.ext import commands
@@ -20,13 +21,6 @@ from pprint import pprint
 from glob import glob
 from termcolor import cprint
 import argparse
-
-
-
-with open('data/config.json', 'r', encoding="utf-8") as f:
-    config = json.load(f)
-    f.close()
-
 
 
 

@@ -12,10 +12,9 @@ from discord.ext import commands
 
 
 def config_load():
-    # JSON Config
-    with open('data/config.json', 'r', encoding='utf-8') as doc:
-         #  Please make sure encoding is correct, especially after editing the config file
-        return json.load(doc)
+    # Python Config
+    from data.config import config
+    return config
 
 async def run():
     """

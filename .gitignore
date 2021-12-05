@@ -1,4 +1,5 @@
 data/config.json
+data/config.py
 *.mkv
 .vscode/
 __pycache__/
