@@ -1,4 +1,6 @@
 import os
+import shutil
+import traceback
 from termcolor import cprint
 import sys
 import asyncio
@@ -27,28 +29,33 @@ class DiscParse():
                 if file == f"BD_SUMMARY_{str(i).zfill(2)}.txt":
                     bdinfo_text = save_dir + "/" + file
             if bdinfo_text == None or meta_discs == []:
-                if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
-                    try:
-                        # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                        cprint(f"Scanning {path}", 'grey', 'on_yellow')
-                        proc = await asyncio.create_subprocess_exec('mono', f"{base_dir}/bin/BDInfo/BDInfo.exe", '-w', path, save_dir)
-                        await proc.wait()
-                    except:
-                        cprint('mono not found, please install mono', 'grey', 'on_red')
-
-                elif sys.platform.startswith('win32'):
-                    # await asyncio.subprocess.Process(["bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                    cprint(f"Scanning {path}", 'grey', 'on_yellow')
-                    proc = await asyncio.create_subprocess_exec(f"{base_dir}/bin/BDInfo/BDInfo.exe", "-w", path, save_dir)
-                    await proc.wait()
-                    await asyncio.sleep(1)
+                if os.path.exists(f"{save_dir}/BD_FULL_{str(i).zfill(2)}.txt"):
+                    bdinfo_text = os.path.abspath(f"{save_dir}/BD_FULL_{str(i).zfill(2)}.txt")
                 else:
-                    cprint("Not sure how to run bdinfo on your platform, get support please thanks.", 'grey', 'on_red')
+                    bdinfo_text = ""
+                    if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
+                        try:
+                            # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
+                            cprint(f"Scanning {path}", 'grey', 'on_yellow')
+                            proc = await asyncio.create_subprocess_exec('mono', f"{base_dir}/bin/BDInfo/BDInfo.exe", '-w', path, save_dir)
+                            await proc.wait()
+                        except:
+                            cprint('mono not found, please install mono', 'grey', 'on_red')
+
+                    elif sys.platform.startswith('win32'):
+                        # await asyncio.subprocess.Process(["bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
+                        cprint(f"Scanning {path}", 'grey', 'on_yellow')
+                        proc = await asyncio.create_subprocess_exec(f"{base_dir}/bin/BDInfo/BDInfo.exe", "-w", path, save_dir)
+                        await proc.wait()
+                        await asyncio.sleep(1)
+                    else:
+                        cprint("Not sure how to run bdinfo on your platform, get support please thanks.", 'grey', 'on_red')
                 while True:
                     try:
-                        for file in os.listdir(save_dir):
-                            if file.startswith(f"BDINFO"):
-                                bdinfo_text = save_dir + "/" + file
+                        if bdinfo_text == "":
+                            for file in os.listdir(save_dir):
+                                if file.startswith(f"BDINFO"):
+                                    bdinfo_text = save_dir + "/" + file
                         with open(bdinfo_text, 'r') as f:
                             text = f.read()
                             result = text.split("QUICK SUMMARY:", 2)
@@ -57,9 +64,13 @@ class DiscParse():
                             result = result2.split("********************", 1)
                             bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
                             f.close()
-                        os.remove(bdinfo_text)
+                        try:
+                            shutil.copyfile(bdinfo_text, f"{save_dir}/BD_FULL_{str(i).zfill(2)}.txt")
+                            os.remove(bdinfo_text)
+                        except shutil.SameFileError:
+                            pass
                     except Exception:
-                        # print(e)
+                        print(traceback.format_exc())
                         await asyncio.sleep(5)
                         continue
                     break
@@ -71,7 +82,7 @@ class DiscParse():
         
                 discs[i]['summary'] = bd_summary
                 discs[i]['bdinfo'] = bdinfo
-            # shutil.rmtree(f"{base_dir}/tmp")
+                # shutil.rmtree(f"{base_dir}/tmp")
             else:
                 discs = meta_discs
         
