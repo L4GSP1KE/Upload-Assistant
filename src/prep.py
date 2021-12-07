@@ -21,7 +21,7 @@ import requests
 import pyimgbox
 from pymediainfo import MediaInfo
 import tmdbsimple as tmdb
-from datetime import datetime
+from datetime import datetime, date
 from difflib import SequenceMatcher
 from torf import Torrent
 from termcolor import colored, cprint
@@ -1675,6 +1675,7 @@ class Prep():
         if meta['category'] == 'TV':
             filelist = meta['filelist']
             meta['tv_pack'] = 0
+            is_daily = False
             if meta['anime'] == False:
                 try:
                     try:
@@ -1694,29 +1695,35 @@ class Prep():
 
                 except:
                     try:
-                        season = guessit(video)['date']
+                        guess_date = guessit(video)['date']
+                        season_int, episode_int = self.daily_to_tmdb_season_episode(meta.get('tmdb'), guess_date)
+                        # season = f"S{season_int.zfill(2)}"
+                        # episode = f"E{episode_int.zfill(2)}"
+                        season = str(guess_date)
+                        episode = ""
+                        is_daily = True
                     except:
                         season_int = "1"
                         season = "S01"
                 try:
-                    episodes = ""
-                    if len(filelist) == 1:
-                        episodes = guessit(video)['episode']
-                        if type(episodes) == list:
-                            episode = ""
-                            for item in guessit(video)["episode"]:
-                                ep = (str(item).zfill(2))
-                                episode += f"E{ep}"
-                            episode_int = episodes[0]
+                    if is_daily != True:
+                        episodes = ""
+                        if len(filelist) == 1:
+                            episodes = guessit(video)['episode']
+                            if type(episodes) == list:
+                                episode = ""
+                                for item in guessit(video)["episode"]:
+                                    ep = (str(item).zfill(2))
+                                    episode += f"E{ep}"
+                                episode_int = episodes[0]
+                            else:
+                                episode_int = str(episodes)
+                                episode = "E" + str(episodes).zfill(2)
                         else:
-                            episode_int = str(episodes)
-                            episode = "E" + str(episodes).zfill(2)
-                    else:
-                        episode = ""
-                        episode_int = "0"
-                        meta['tv_pack'] = 1
+                            episode = ""
+                            episode_int = "0"
+                            meta['tv_pack'] = 1
                 except:
-                    # print(traceback.format_exc())
                     episode = ""
                     episode_int = "0"
                     meta['tv_pack'] = 1
@@ -2100,9 +2107,19 @@ class Prep():
         return category, tmdbid, imdbid
 
 
-
-
-
+    def daily_to_tmdb_season_episode(self, tmdbid, date):
+        show = tmdb.TV(tmdbid)
+        seasons = show.info().get('seasons')
+        season = '1'
+        for each in seasons:
+            air_date = date.fromisoformat(each['air_date'])
+            if air_date <= date:
+                season = str(each['season_number'])
+        season_info = tmdb.TV_Seasons(tmdbid, season).info().get('episodes')
+        for each in season_info:
+            if str(each['air_date']) == str(date):
+                episode = str(each['episode_number'])
+        return season, episode
 
 
 
