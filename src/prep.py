@@ -785,8 +785,12 @@ class Prep():
                 if meta['tmdb'] == "0":
                     meta = await self.get_tmdb_id(title, "", meta, meta['category'])
             except:
-                cprint("Unable to find tmdb entry", 'grey', 'on_red')
-                return meta
+                if meta.get('mode', 'discord') == 'cli':
+                    cprint("Unable to find tmdb entry. Exiting.", 'grey', 'on_red')
+                    exit()
+                else:
+                    cprint("Unable to find tmdb entry", 'grey', 'on_red')
+                    return meta
         if meta['category'] == "MOVIE":
             movie = tmdb.Movies(meta['tmdb'])
             response = movie.info()
