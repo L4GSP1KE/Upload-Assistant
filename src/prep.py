@@ -109,7 +109,7 @@ class Prep():
                     await asyncio.sleep(1)
 
             if meta.get('resolution', None) == None:
-                meta['resolution'] = self.mi_resolution(bdinfo['video'][0]['res'], guessit(video))
+                meta['resolution'] = self.mi_resolution(bdinfo['video'][0]['res'], guessit(video), width="OTHER", scan="p")
             # if meta.get('sd', None) == None:
             meta['sd'] = self.is_sd(meta['resolution'])
 
@@ -404,7 +404,7 @@ class Prep():
             width = self.closest(width_list, int(width))
             height = self.closest(height_list, int(height))
             res = f"{width}x{height}{scan}"
-            resolution = self.mi_resolution(res, guess)
+            resolution = self.mi_resolution(res, guess, width, scan)
         return resolution
 
     def closest(self, lst, K):
@@ -421,7 +421,7 @@ class Prep():
             
         # return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
 
-    def mi_resolution(self, res, guess):
+    def mi_resolution(self, res, guess, width, scan):
         res_map = {
             "3840x2160p" : "2160p", "2160p" : "2160p",
             "2560x1440p" : "1440p", "1440p" : "1440p",
@@ -436,9 +436,23 @@ class Prep():
             "7680x4320p" : "4320p", "4320p" : "4320p",
             "OTHER" : "OTHER"}
         resolution = res_map.get(res, None)
-        if resolution == None:     
-            resolution = guess['screen_size']
-            resolution = self.mi_resolution(resolution, guess)
+        if resolution == None:
+            try:     
+                resolution = guess['screen_size']
+            except:
+                width_map = {
+                    '3840p' : '2160p',
+                    '2560p' : '1550p',
+                    '1920p' : '1080p',
+                    '1920i' : '1080i',
+                    '1280p' : '720p',
+                    '720p' : '576p',
+                    '720i' : '576i',
+                    '15360p' : '4320p',
+                    'OTHERp' : 'OTHER'
+                }
+                resolution = width_map.get(f"{width}{scan}", "OTHER")
+            resolution = self.mi_resolution(resolution, guess, width, scan)
         
         return resolution
            
