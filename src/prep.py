@@ -395,7 +395,7 @@ class Prep():
                 scan = "Progressive"
             if scan == "Progressive":
                 scan = "p"
-            elif  framerate == "25.000":
+            elif framerate == "25.000" or mi['media']['track'][1].get('FrameRate_Original', '') == "25.000":
                 scan = "p"
             else:
                 scan = "i"
@@ -514,7 +514,7 @@ class Prep():
         # length = sum(int(x) * 60 ** i for i, x in enumerate(reversed(length.split(':'))))
         # for i in range(screens):
         # pprint(bdinfo)
-        if "VC-1" in bdinfo['video'][0]['codec']:
+        if "VC-1" in bdinfo['video'][0]['codec'] or bdinfo['video'][0]['hdr_dv'] != "":
             keyframe = 'nokey'
             # print("VC-1")
         else:
