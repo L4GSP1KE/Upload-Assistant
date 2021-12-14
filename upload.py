@@ -221,7 +221,7 @@ async def do_the_thing(path, args, base_dir):
                 dupes = await stc.search_existing(meta)
                 meta = dupe_check(dupes, meta)
                 if meta['upload'] == True:
-                    await aither.upload(meta)
+                    await stc.upload(meta)
                     await client.add_to_client(meta, "STC")
         if tracker.upper() == "THR":
             if meta['unattended']:
