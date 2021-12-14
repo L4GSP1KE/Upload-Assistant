@@ -6,6 +6,7 @@ from src.search import Search
 from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
 from src.trackers.AITHER import AITHER
+from src.trackers.STC import STC
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -64,7 +65,6 @@ async def do_the_thing(path, args, base_dir):
     meta = dict()
     meta['base_dir'] = base_dir
     path = os.path.abspath(path)
-    cprint(f"Gathering info for {os.path.basename(path)}", 'grey', 'on_green')
     try:
         with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
             meta = json.load(f)
@@ -77,6 +77,7 @@ async def do_the_thing(path, args, base_dir):
     else:
         cprint("Path does not exist", 'grey', 'on_red')
         exit()
+    cprint(f"Gathering info for {os.path.basename(path)}", 'grey', 'on_green')
     if meta['imghost'] == None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
     if not meta['unattended']:
@@ -152,6 +153,9 @@ async def do_the_thing(path, args, base_dir):
                     if manual_tracker.upper() == "AITHER":
                         aither = AITHER(config=config)
                         await aither.edit_desc(meta)    
+                    if manual_tracker.upper() == "STC":
+                        stc = STC(config=config)
+                        await aither.edit_desc(meta)    
                     if manual_tracker.upper() == "THR":
                         from src.trackers.THR import THR
                         thr = THR(config=config)
@@ -206,6 +210,19 @@ async def do_the_thing(path, args, base_dir):
                 if meta['upload'] == True:
                     await aither.upload(meta)
                     await client.add_to_client(meta, "AITHER")
+        if tracker.upper() == "STC":
+            if meta['unattended']:
+                upload_to_stc = True
+            else:
+                upload_to_stc = cli_ui.ask_yes_no(f"Upload to STC? {debug}", default=meta['unattended'])
+            if upload_to_stc:
+                print("Uploading to STC")
+                stc = STC(config=config)
+                dupes = await stc.search_existing(meta)
+                meta = dupe_check(dupes, meta)
+                if meta['upload'] == True:
+                    await aither.upload(meta)
+                    await client.add_to_client(meta, "STC")
         if tracker.upper() == "THR":
             if meta['unattended']:
                 upload_to_thr = True
@@ -336,6 +353,7 @@ def get_missing(meta):
     return
 
 if __name__ == '__main__':
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(do_the_thing(path, args, base_dir))
+    # loop = asyncio.get_event_loop()
+    # loop.run_until_complete(do_the_thing(path, args, base_dir))
+    asyncio.run(do_the_thing(path, args, base_dir))
         
