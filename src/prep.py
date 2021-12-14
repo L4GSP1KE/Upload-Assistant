@@ -1207,7 +1207,7 @@ class Prep():
             hdr_mi = bdinfo['video'][0]['hdr_dv']
             if "HDR10+" in hdr_mi:
                 hdr = "HDR10+"
-            elif hdr == "HDR10":
+            elif hdr_mi == "HDR10":
                 hdr = "HDR"
             try:
                 if bdinfo['video'][1]['hdr_dv'] == "Dolby Vision":
