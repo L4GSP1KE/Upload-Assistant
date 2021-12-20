@@ -40,8 +40,8 @@ class Clients():
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_client = client['torrent_client']
         
-        local_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['local_path']
-        remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client]['remote_path']
+        local_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('local_path','/LocalPath')
+        remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('remote_path', '/RemotePath')
         cprint(f"Adding to {torrent_client}", 'grey', 'on_yellow')
         if torrent_client.lower() == "rtorrent":
             self.rtorrent(meta['path'], torrent_path, torrent, meta, local_path, remote_path, client)
@@ -94,7 +94,7 @@ class Clients():
         #     path = os.path.dirname(path)
         #Remote path mount
         modified_fr = False
-        if local_path in path:
+        if local_path in path and local_path != remote_path:
             path_dir = os.path.dirname(path)
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
@@ -124,7 +124,7 @@ class Clients():
         #     path = os.path.dirname(path)
         if is_disc != "":
             path = os.path.dirname(path)
-        if local_path in path:
+        if local_path in path and local_path != remote_path:
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
         
@@ -154,7 +154,7 @@ class Clients():
             print("Deluge connected")    
             isdir = os.path.isdir(path)
             #Remote path mount
-            if local_path in path:
+            if local_path in path and local_path != remote_path:
                 path = path.replace(local_path, remote_path)
                 path = path.replace(os.sep, '/')
             # if isdir == False:
