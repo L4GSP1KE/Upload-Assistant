@@ -333,8 +333,11 @@ class Prep():
     """
     def get_video(self, videoloc):
         filelist = []
+        videoloc = os.path.abspath(videoloc)
         if os.path.isdir(videoloc):
-            filelist = glob.glob(f'{videoloc}/*.mkv') + glob.glob(f'{videoloc}/*.mp4') + glob.glob(f'{videoloc}/*.ts')
+            globlist = glob.glob1(videoloc, "*.mkv") + glob.glob1(videoloc, "*.mp4") + glob.glob1(videoloc, "*.ts")
+            for file in globlist:
+                filelist.append(os.path.abspath(f"{videoloc}{os.sep}{file}"))
             video = sorted(filelist)[0]       
         else:
             video = videoloc
