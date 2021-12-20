@@ -1457,7 +1457,7 @@ class Prep():
     Upload Screenshots
     """
     def upload_screens(self, meta, screens, img_host_num, i, return_dict):
-        if self.screens != 0 or len(meta.get('image_list', [])) >= self.screens:
+        if int(self.screens) != 0 or len(meta.get('image_list', [])) > self.screens:
             cprint('Uploading Screens', 'grey', 'on_yellow')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
@@ -1565,7 +1565,7 @@ class Prep():
             return_dict['image_list'] = image_list
             return image_list, i
         else:
-            return meta.get('image_list'), self.screens
+            return meta.get('image_list', []), self.screens
 
     async def imgbox_upload(self, chdir, image_glob):
         os.chdir(chdir)
