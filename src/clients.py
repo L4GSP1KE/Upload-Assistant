@@ -117,12 +117,13 @@ class Clients():
 
 
     async def qbittorrent(self, path, torrent, local_path, remote_path, client, is_disc):
+        cprint(path, 'magenta')
         # infohash = torrent.infohash
         #Remote path mount
         isdir = os.path.isdir(path)
-        # if not isdir:
-        #     path = os.path.dirname(path)
-        if is_disc != "":
+        if not isdir:
+            path = os.path.dirname(path)
+        if is_disc in ['BDMV', 'DVD', 'HDDVD']:
             path = os.path.dirname(path)
         if local_path in path and local_path != remote_path:
             path = path.replace(local_path, remote_path)
