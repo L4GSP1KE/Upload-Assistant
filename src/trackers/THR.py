@@ -21,6 +21,8 @@ from selenium.webdriver.support.ui import Select, WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.firefox import GeckoDriverManager #Webdriver_manager
 
+from unidecode import unidecode
+
 # from pprint import pprint
 
 class THR():
@@ -66,7 +68,7 @@ class THR():
             upload_torrent.send_keys(torrent_path)
             await asyncio.sleep(3)
             name = browser.find_element(By.NAME, "name")
-            name.send_keys(meta['name'].replace("DD+", "DDP"))
+            name.send_keys(unidecode(meta['name'].replace("DD+", "DDP")))
             if pronfo == False:
                 nfo = browser.find_element(By.NAME, "nfo")
                 nfo.send_keys(mi_file)

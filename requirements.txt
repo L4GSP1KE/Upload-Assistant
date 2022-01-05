@@ -16,3 +16,4 @@ imdbpy
 pyimgbox
 nest_asyncio
 bencode.py
+unidecode
