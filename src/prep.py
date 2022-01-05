@@ -1938,9 +1938,6 @@ class Prep():
         return stream
 
     def is_anon(self, anon_in):
-        anon = self.config['DEFAULT']['anon']
-        if anon.lower() == "true":
-            anon_in = True
         if anon_in == True:
             anon_out = 1
         else:
