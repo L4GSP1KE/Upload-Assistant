@@ -1431,11 +1431,12 @@ class Prep():
             exclude = ["*.*", "sample.mkv"] 
             include = ["*.mkv", "*.mp4", "*.ts"]
         torrent = Torrent(path,
-            # trackers = [announce],
+            trackers = ["https://fake.tracker"],
             # source = "",
             private = True,
             exclude_globs = exclude or [],
             include_globs = include or [],
+            comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
         cprint("Creating .torrent", 'grey', 'on_yellow')
         torrent.piece_size_max = 16777216
@@ -2069,14 +2070,25 @@ class Prep():
                     generic.write(f"{each['img_url']}\n")
         title = re.sub("[^0-9a-zA-Z\[\]]+", "", meta['title'])
         archive = f"{meta['base_dir']}/tmp/{meta['uuid']}/{title}"
-        shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
-        files = {
-            "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
+        torrent_files = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}","*.torrent")
+        if isinstance(torrent_files, list) and len(torrent_files) > 1:
+            for each in torrent_files:
+                if each != "BASE.torrent":
+                    os.remove(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{each}"))
+                else:
+                    shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{each}"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['uuid']}.torrent").replace(' ', '.'))
         try:
-            response = requests.post("https://uguu.se/upload.php", files=files).json()
-            if meta['debug']:
-                cprint(response, 'cyan')
-            url = response['files'][0]['url']
+            filebrowser = self.config['TRACKERS'].get('MANUAL', {}).get('filebrowser', None)
+            if filebrowser != None:
+                url = urllib.parse.urljoin(filebrowser, f"/tmp/{meta['uuid']}")
+            else:
+                shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
+                files = {
+                    "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
+                response = requests.post("https://uguu.se/upload.php", files=files).json()
+                if meta['debug']:
+                    cprint(response, 'cyan')
+                url = response['files'][0]['url']
             return url
         except:
             return False

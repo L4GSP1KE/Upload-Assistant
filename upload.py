@@ -162,10 +162,10 @@ async def do_the_thing(path, args, base_dir):
                         await thr.edit_desc(meta)
                 url = await prep.package(meta)
                 if url == False:
-                    cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['title']}-{meta['uuid']}.tar", 'grey', 'on_yellow')
+                    cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['uuid']}", 'grey', 'on_yellow')
                 else:
                     cprint(meta['name'], 'grey', 'on_green')
-                    cprint(f"Files can be found at {url} or `tmp/{meta['uuid']}/{meta['title']}.tar`", 'grey', 'on_green')  
+                    cprint(f"Files can be found at {url}", 'grey', 'on_green')  
         if tracker.upper() == "BLU":
             if meta['unattended']:
                 upload_to_blu = True
