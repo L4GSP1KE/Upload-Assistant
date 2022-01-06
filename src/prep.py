@@ -1939,6 +1939,10 @@ class Prep():
         return stream
 
     def is_anon(self, anon_in):
+        anon = self.config['DEFAULT'].get("Anon", "False")
+        if anon.lower() == "true":
+            cprint("Global ANON has been removed for per-tracker settings. Please update your config accordingly.", "grey", "on_red")
+            time.sleep(10)
         if anon_in == True:
             anon_out = 1
         else:
