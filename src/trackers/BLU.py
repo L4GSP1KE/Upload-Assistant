@@ -201,7 +201,6 @@ class BLU():
         blu_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
         blu_torrent.metainfo['announce'] = self.config['TRACKERS']['BLU']['announce_url'].strip()
         blu_torrent.metainfo['info']['source'] = "BLU"
-        blu_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
         Torrent.copy(blu_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent", overwrite=True)
         return 
         

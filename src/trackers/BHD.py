@@ -163,7 +163,6 @@ class BHD():
         bhd_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
         bhd_torrent.metainfo['announce'] = self.config['TRACKERS']['BHD']['announce_url'].strip()
         bhd_torrent.metainfo['info']['source'] = "BHD"
-        bhd_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
         Torrent.copy(bhd_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", overwrite=True)
         return 
         

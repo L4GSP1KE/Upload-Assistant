@@ -136,7 +136,6 @@ class STC():
         STC_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
         STC_torrent.metainfo['announce'] = self.config['TRACKERS']['STC']['announce_url'].strip()
         STC_torrent.metainfo['info']['source'] = "STC"
-        STC_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
         Torrent.copy(STC_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[STC]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
