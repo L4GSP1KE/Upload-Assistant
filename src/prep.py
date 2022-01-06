@@ -1626,13 +1626,13 @@ class Prep():
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {distributor} {uhd} {source} {hdr} {video_codec} {audio}"
+                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
                 elif meta['is_disc'] == 'DVD': 
-                    name = f"{title} {alt_title} {year} {edition} {repack} {distributor} {source} {dvd_size} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition', 'distributor']
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} {alt_title} {year} {edition} {repack} {distributor} {source} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
@@ -1655,13 +1655,13 @@ class Prep():
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {distributor} {uhd} {source} {hdr} {video_codec} {audio}"
+                    name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
                 if meta['is_disc'] == 'DVD':
-                    name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {distributor} {source} {dvd_size} {audio}"
+                    name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition', 'distributor']
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} {alt_title} {year} {edition} {repack} {distributor} {source} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
