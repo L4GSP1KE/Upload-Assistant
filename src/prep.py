@@ -2084,7 +2084,8 @@ class Prep():
         try:
             filebrowser = self.config['TRACKERS'].get('MANUAL', {}).get('filebrowser', None)
             if filebrowser != None:
-                url = urllib.parse.urljoin(filebrowser, f"/tmp/{meta['uuid']}")
+                fb_url = urllib.parse.urlparse(filebrowser)
+                url = '/'.join(s.strip('/') for s in (fb_url.path, f"tmp/{meta['uuid']}"))
             else:
                 shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
                 files = {
