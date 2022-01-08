@@ -2086,6 +2086,7 @@ class Prep():
             if filebrowser != None:
                 fb_url = urllib.parse.urlparse(filebrowser)
                 url = '/'.join(s.strip('/') for s in (fb_url.path, f"tmp/{meta['uuid']}"))
+                url = urllib.parse.urljoin(filebrowser, url)
             else:
                 shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
                 files = {
