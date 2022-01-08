@@ -2080,7 +2080,7 @@ class Prep():
                 if each != "BASE.torrent":
                     os.remove(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{each}"))
         try:
-            shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['uuid']}.torrent").replace(' ', '.'))
+            shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['name'].replace(' ', '.')}.torrent").replace(' ', '.'))
             filebrowser = self.config['TRACKERS'].get('MANUAL', {}).get('filebrowser', None)
             if filebrowser != None:
                 url = '/'.join(s.strip('/') for s in (filebrowser, f"/tmp/{meta['uuid']}"))
