@@ -191,13 +191,13 @@ class THR():
             response = requests.post(pronfo_url, data=data)
             try:
                 response = response.json()
+                if response.get('error', True) == False:
+                    mi_img = response.get('url')
+                    desc.write(f"\n[img]{mi_img}[/img]\n")
+                    pronfo = True
             except:
                 cprint('Error parsing pronfo response, using THR parser instead', 'grey', 'on_red')
                 pprint(response) 
-            if response.get('error', True) == False:
-                mi_img = response.get('url')
-                desc.write(f"\n[img]{mi_img}[/img]\n")
-                pronfo = True
 
             for each in image_list:
                 desc.write(f"\n[img]{each}[/img]\n")
