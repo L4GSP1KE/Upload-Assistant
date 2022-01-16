@@ -197,7 +197,9 @@ class THR():
                     pronfo = True
             except:
                 cprint('Error parsing pronfo response, using THR parser instead', 'grey', 'on_red')
-                pprint(response) 
+                if meta['debug']:
+                    cprint(response, 'grey', 'on_red')
+                    pprint(response.text) 
 
             for each in image_list:
                 desc.write(f"\n[img]{each}[/img]\n")
