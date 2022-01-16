@@ -202,14 +202,18 @@ class BHD():
         try:
             response = requests.post(url=url, data=data)
             response = response.json()
-            for each in response['results']:
-                result = each['name']
-                # print(result)
-                difference = SequenceMatcher(None, meta['clean_name'].replace('DD+', 'DDP'), result).ratio()
-                if difference >= 0.05:
-                    dupes.append(result)
+            if response.get('status_code') == 1:
+                for each in response['results']:
+                    result = each['name']
+                    # print(result)
+                    difference = SequenceMatcher(None, meta['clean_name'].replace('DD+', 'DDP'), result).ratio()
+                    if difference >= 0.05:
+                        dupes.append(result)
+            else:
+                cprint(response.get('status_message'), 'grey', 'on_yellow')
+                await asyncio.sleep(5) 
         except:
-            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            cprint('Unable to search for existing torrents on site. Most likely the site is down.', 'grey', 'on_red')
             await asyncio.sleep(5)
 
         return dupes
