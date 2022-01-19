@@ -332,7 +332,7 @@ class Commands(commands.Cog):
             
             channel = message.channel.id
             return_dict = multiprocessing.Manager().dict()
-            u = multiprocessing.Process(target = prep.upload_screens, args=(meta, meta['screens'], 1, 0, return_dict))
+            u = multiprocessing.Process(target = prep.upload_screens, args=(meta, meta['screens'], 1, 0, meta['screens'], return_dict))
             u.start()
             while u.is_alive() == True:
                 await asyncio.sleep(3)

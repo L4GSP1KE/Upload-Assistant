@@ -1460,8 +1460,8 @@ class Prep():
     """
     Upload Screenshots
     """
-    def upload_screens(self, meta, screens, img_host_num, i, return_dict):
-        if int(self.screens) != 0 or len(meta.get('image_list', [])) > self.screens:
+    def upload_screens(self, meta, screens, img_host_num, i, total_screens, return_dict):
+        if int(total_screens) != 0 or len(meta.get('image_list', [])) > total_screens:
             cprint('Uploading Screens', 'grey', 'on_yellow')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
@@ -1479,7 +1479,7 @@ class Prep():
         image_list = []
         newhost_list = []
         image_glob = glob.glob("*.png")
-        if len(meta.get('image_list', [])) < self.screens:
+        if len(meta.get('image_list', [])) < total_screens:
             if img_host == 'imgbox':
                 nest_asyncio.apply()
                 image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
@@ -1499,7 +1499,7 @@ class Prep():
                             raw_url = response['data']['image']['url']
                         except:
                             cprint("imgbb failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, return_dict)
+                            newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, return_dict)
                     elif img_host == "freeimage.host":
                         url = "https://freeimage.host/api/1/upload"
                         data = {
@@ -1517,7 +1517,7 @@ class Prep():
                             raw_url = response['image']['url']
                         except:
                             cprint("freeimage.host failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
+                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, return_dict)
                     elif img_host == "ptpimg":
                         payload = {
                             'format' : 'json',
@@ -1539,7 +1539,7 @@ class Prep():
                         except:
                             # print(traceback.format_exc())
                             cprint("ptpimg failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, return_dict)
+                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, return_dict)
                     else:
                         cprint("Please choose a supported image host in your config", 'grey', 'on_red')
                         exit()
@@ -1557,10 +1557,10 @@ class Prep():
                         image_dict['img_url'] = img_url
                         image_dict['raw_url'] = raw_url
                         image_list.append(image_dict)
-                        cli_ui.info_count(i, self.screens, "Uploaded")
+                        cli_ui.info_count(i, total_screens, "Uploaded")
                         i += 1
                     time.sleep(0.5)
-                    if i >= self.screens:
+                    if i >= total_screens:
                         break
             # description.write("[/center]")
             # description.write("\n")
@@ -1569,7 +1569,7 @@ class Prep():
             return_dict['image_list'] = image_list
             return image_list, i
         else:
-            return meta.get('image_list', []), self.screens
+            return meta.get('image_list', []), total_screens
 
     async def imgbox_upload(self, chdir, image_glob):
         os.chdir(chdir)
@@ -2062,9 +2062,13 @@ class Prep():
             generic.write(f"{res} / {meta['type']}{tag}\n\n")
             generic.write(f"Category: {meta['category']}\n")
             generic.write(f"TMDB: https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}\n")
-            generic.write(f"IMDb: https://www.imdb.com/title/tt{meta['imdb_id']}\n")
-            generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
-            generic.write(f"TMDB Poster: {meta['poster']}\n")
+            if meta['imdb_id'] != "0":
+                generic.write(f"IMDb: https://www.imdb.com/title/tt{meta['imdb_id']}\n")
+            if meta['tvdb_id'] != "0":
+                generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
+            cprint("Rehosting Poster", 'grey', 'on_yellow')
+            poster, dummy = self.upload_screens(meta, 1, 1, 0, 1, {})
+            generic.write(f"TMDB Poster: {poster.get('raw_url', poster.get('img_url'))}\n")
             if len(meta['image_list']) > 0:
                 generic.write(f"\nImage Webpage:\n")
                 for each in meta['image_list']:
