@@ -2068,6 +2068,7 @@ class Prep():
                 generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
             cprint("Rehosting Poster", 'grey', 'on_yellow')
             poster, dummy = self.upload_screens(meta, 1, 1, 0, 1, {})
+            poster = poster[0]
             generic.write(f"TMDB Poster: {poster.get('raw_url', poster.get('img_url'))}\n")
             if len(meta['image_list']) > 0:
                 generic.write(f"\nImage Webpage:\n")
