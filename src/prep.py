@@ -581,13 +581,12 @@ class Prep():
         else:
             sar = par
         
-        if sar < 1:
+        if par < 1:
             w_sar = 1
             h_sar = sar
         else:
             w_sar = sar
             h_sar = 1
-    
         length = round(float(length))
         main_set_length = len(meta['discs'][0]['main_set'])
         if main_set_length >= 3:
