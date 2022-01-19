@@ -23,7 +23,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   
 
 ## **Setup:**
-   - **REQUIRES AT LEAST PYTHON 3.6 AND PIP3**
+   - **REQUIRES AT LEAST PYTHON 3.7 AND PIP3**
    - Needs [mono](https://www.mono-project.com/) on linux systems for BDInfo
    - Also needs MediaInfo and ffmpeg installed on your system
       - On Windows systems, ffmpeg must be added to PATH (https://windowsloop.com/install-ffmpeg-windows-10/)
