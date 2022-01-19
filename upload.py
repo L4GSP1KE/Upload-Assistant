@@ -13,6 +13,7 @@ from pathlib import Path
 import asyncio
 import os
 import sys
+import platform
 import multiprocessing
 import logging
 from glob import glob
@@ -94,7 +95,7 @@ async def do_the_thing(path, args, base_dir):
 
     if meta.get('image_list', False) == False:
         return_dict = {}
-        meta['image_list'], dummy_var = prep.upload_screens(meta, meta['screens'], 1, 0, return_dict)
+        meta['image_list'], dummy_var = prep.upload_screens(meta, meta['screens'], 1, 0, meta['screens'], return_dict)
         if meta['debug']:
             pprint(meta['image_list'])
         # meta['uploaded_screens'] = True
@@ -353,7 +354,14 @@ def get_missing(meta):
     return
 
 if __name__ == '__main__':
-    # loop = asyncio.get_event_loop()
-    # loop.run_until_complete(do_the_thing(path, args, base_dir))
-    asyncio.run(do_the_thing(path, args, base_dir))
+    pyver = platform.python_version_tuple()
+    if int(pyver[0]) != 3:
+        cprint("Python2 Detected, please use python3")
+        exit()
+    else:
+        if int(pyver[1]) <= 6:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(do_the_thing(path, args, base_dir))
+        else:
+            asyncio.run(do_the_thing(path, args, base_dir))
         
