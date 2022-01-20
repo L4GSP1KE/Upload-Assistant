@@ -613,9 +613,11 @@ class Prep():
                     vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}")
                     for track in vob_mi.tracks:
                         if track.track_type == "Video":
-                            length = float(track.duration)/1000
-                    length = round(float(length))
-                    img_time = random.randint(round(length/5) , round(length - length/5))
+                            try:
+                                voblength = float(track.duration)/1000
+                            except:
+                                voblength = 300
+                    img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
                     (
                         ffmpeg
                         .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
