@@ -627,7 +627,7 @@ class Prep():
                                         loops = loops + 1
                                         is_vob_good(n, loops)
                                     else:
-                                        return 300, 0
+                                        return 300, n
                     voblength, n = is_vob_good(n, loops=0)    
                     img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
                     (
