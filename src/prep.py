@@ -273,7 +273,7 @@ class Prep():
         bd_summary = None
         discs = []
         parse = DiscParse()
-        for path, directories, files in os.walk(meta['path']):
+        for path, directories, files in os. walk(meta['path']):
             for each in directories:
                 if each.upper() == "BDMV": #BDMVs
                     is_disc = "BDMV"
@@ -565,7 +565,7 @@ class Prep():
     def dvd_screenshots(self, meta, discs):
         if self.screens == 0:
             return
-        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", mediainfo_options={'inform_version' : '1'})
+        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO", mediainfo_options={'inform_version' : '1'})
         sar = 1
         for track in ifo_mi.tracks:
             if track.track_type == "Video":
@@ -578,16 +578,13 @@ class Prep():
             # multiply that dar by the height and then do a simple width / height
             new_height = dar * height
             sar = width / new_height
-        else:
-            sar = par
-        
-        if par < 1:
             w_sar = 1
             h_sar = sar
         else:
+            sar = par
             w_sar = sar
             h_sar = 1
-        length = round(float(length))
+        
         main_set_length = len(meta['discs'][0]['main_set'])
         if main_set_length >= 3:
             main_set = meta['discs'][0]['main_set'][1:-1]
@@ -607,13 +604,18 @@ class Prep():
                 if n >= self.screens:
                     n -= self.screens
                 image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][0]['name']}-{i}.png"
-                img_time = random.randint(round(length/5) , round(length - length/5))
                 loglevel = 'quiet'
                 debug = True
                 # if bool(meta.get('debug', False)):
                 #     loglevel = 'verbose'
                 #     debug = False
                 try:
+                    vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}")
+                    for track in vob_mi.tracks:
+                        if track.track_type == "Video":
+                            length = float(track.duration)/1000
+                    length = round(float(length))
+                    img_time = random.randint(round(length/5) , round(length - length/5))
                     (
                         ffmpeg
                         .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
@@ -1459,7 +1461,7 @@ class Prep():
     """
     Upload Screenshots
     """
-    def upload_screens(self, meta, screens, img_host_num, i, total_screens, return_dict):
+    def upload_screens(self, meta, screens, img_host_num, i, total_screens, custom_img_list, return_dict):
         if int(total_screens) != 0 or len(meta.get('image_list', [])) > total_screens:
             cprint('Uploading Screens', 'grey', 'on_yellow')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
@@ -1477,8 +1479,13 @@ class Prep():
         # description.write('[center]')
         image_list = []
         newhost_list = []
-        image_glob = glob.glob("*.png")
-        if len(meta.get('image_list', [])) < total_screens:
+        if custom_img_list != []:
+            image_glob = custom_img_list
+            existing_images = []
+        else:
+            image_glob = glob.glob("*.png")
+            existing_images = meta.get('image_list', [])
+        if len(existing_images) < total_screens:
             if img_host == 'imgbox':
                 nest_asyncio.apply()
                 image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
@@ -1498,7 +1505,7 @@ class Prep():
                             raw_url = response['data']['image']['url']
                         except:
                             cprint("imgbb failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, return_dict)
+                            newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                     elif img_host == "freeimage.host":
                         url = "https://freeimage.host/api/1/upload"
                         data = {
@@ -1516,7 +1523,7 @@ class Prep():
                             raw_url = response['image']['url']
                         except:
                             cprint("freeimage.host failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, return_dict)
+                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                     elif img_host == "ptpimg":
                         payload = {
                             'format' : 'json',
@@ -1538,7 +1545,7 @@ class Prep():
                         except:
                             # print(traceback.format_exc())
                             cprint("ptpimg failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, return_dict)
+                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                     else:
                         cprint("Please choose a supported image host in your config", 'grey', 'on_red')
                         exit()
@@ -1573,10 +1580,9 @@ class Prep():
     async def imgbox_upload(self, chdir, image_glob):
         os.chdir(chdir)
         image_list = []
-        image_glob = glob.glob("*.png")
+        # image_glob = glob.glob("*.png")
         async with pyimgbox.Gallery(thumb_width=350, square_thumbs=False) as gallery:
             async for submission in gallery.add(image_glob):
-                pprint(submission)
                 image_dict = {}
                 image_dict['web_url'] = submission['web_url']
                 image_dict['img_url'] = submission['thumbnail_url']
@@ -2065,10 +2071,19 @@ class Prep():
                 generic.write(f"IMDb: https://www.imdb.com/title/tt{meta['imdb_id']}\n")
             if meta['tvdb_id'] != "0":
                 generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
-            cprint("Rehosting Poster", 'grey', 'on_yellow')
-            poster, dummy = self.upload_screens(meta, 1, 1, 0, 1, {})
-            poster = poster[0]
-            generic.write(f"TMDB Poster: {poster.get('raw_url', poster.get('img_url'))}\n")
+            if meta.get('poster', '') != '':
+                r = requests.get(meta['poster'], stream=True)
+                if r.status_code == 200:
+                    cprint("Rehosting Poster", 'grey', 'on_yellow')
+                    r.raw.decode_content = True
+                    poster_img = f"{meta['base_dir']}/tmp/{meta['uuid']}/POSTER.png"
+                    with open(poster_img, 'wb') as f:
+                        shutil.copyfileobj(r.raw, f)
+                    poster, dummy = self.upload_screens(meta, 1, 1, 0, 1, [poster_img], {})
+                    poster = poster[0]
+                    generic.write(f"TMDB Poster: {poster.get('raw_url', poster.get('img_url'))}\n")
+                else:
+                    cprint("Poster could not be retrieved", 'grey', 'on_yellow')
             if len(meta['image_list']) > 0:
                 generic.write(f"\nImage Webpage:\n")
                 for each in meta['image_list']:
