@@ -610,13 +610,25 @@ class Prep():
                 #     loglevel = 'verbose'
                 #     debug = False
                 try:
-                    vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}")
-                    for track in vob_mi.tracks:
-                        if track.track_type == "Video":
-                            try:
-                                voblength = float(track.duration)/1000
-                            except:
-                                voblength = 300
+                    def is_vob_good(n, loops):
+                        vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}")
+                        for track in vob_mi.tracks:
+                            if track.track_type == "Video":
+                                try:
+                                    voblength = float(track.duration)/1000
+                                    return voblength, n
+                                except:
+                                    n += 1
+                                    if n >= len(main_set):
+                                        n = 0
+                                    if n >= self.screens:
+                                        n -= self.screens
+                                    if loops < 6:
+                                        loops = loops + 1
+                                        is_vob_good(n, loops)
+                                    else:
+                                        return 300, 0
+                    voblength, n = is_vob_good(n, loops=0)    
                     img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
                     (
                         ffmpeg
