@@ -629,8 +629,7 @@ class Prep():
                                         return voblength, n
                                     else:
                                         return 300, n
-                    voblength, n = is_vob_good(n, 0)
-                    print(voblength)    
+                    voblength, n = is_vob_good(n, 0)    
                     img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
                     (
                         ffmpeg
