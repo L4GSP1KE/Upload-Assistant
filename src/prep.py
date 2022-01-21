@@ -625,10 +625,12 @@ class Prep():
                                         n -= self.screens
                                     if loops < 6:
                                         loops = loops + 1
-                                        is_vob_good(n, loops)
+                                        voblength, n = is_vob_good(n, loops)
+                                        return voblength, n
                                     else:
                                         return 300, n
-                    voblength, n = is_vob_good(n, loops=0)    
+                    voblength, n = is_vob_good(n, 0)
+                    print(voblength)    
                     img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
                     (
                         ffmpeg
