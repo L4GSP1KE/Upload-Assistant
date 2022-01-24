@@ -63,7 +63,7 @@ class UHDHEAVEN():
             'internal' : 0,
             'featured' : 0,
             'free' : 0,
-            'double_up' : 0,
+            'doubleup' : 0,
             'sticky' : 0,
         }
         headers = {
