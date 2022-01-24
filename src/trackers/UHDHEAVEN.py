@@ -60,11 +60,11 @@ class UHDHEAVEN():
             'stream' : meta['stream'],
             'sd' : meta['sd'],
             'keywords' : meta['keywords'],
-            # 'internal' : 0,
-            # 'featured' : 0,
-            # 'free' : 0,
-            # 'double_up' : 0,
-            # 'sticky' : 0,
+            'internal' : 0,
+            'featured' : 0,
+            'free' : 0,
+            'double_up' : 0,
+            'sticky' : 0,
         }
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
