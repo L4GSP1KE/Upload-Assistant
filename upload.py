@@ -7,6 +7,7 @@ from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
 from src.trackers.AITHER import AITHER
 from src.trackers.STC import STC
+from src.trackers.UHDHEAVEN import UHDHEAVEN
 import json
 from termcolor import cprint
 from pathlib import Path
