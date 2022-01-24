@@ -20,7 +20,6 @@ import logging
 from glob import glob
 import cli_ui
 
-from trackers.UHDHEAVEN import UHDHEAVEN
 cli_ui.setup(color='always', title="L4G's Upload Assistant")
 from pprint import pprint
 import traceback
