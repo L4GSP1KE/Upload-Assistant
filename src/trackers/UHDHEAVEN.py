@@ -107,25 +107,25 @@ class UHDHEAVEN():
             'REMUX': '2',
             'WEBDL': '4', 
             'WEBRIP': '5', 
-            'HDTV': '6',
+            'FANRES': '6',
             'ENCODE': '3'
             }.get(type, '0')
         return type_id
 
     async def get_res_id(self, resolution):
         resolution_id = {
-            '8640p':'10', 
+            # '8640p':'10', 
             '4320p': '1', 
             '2160p': '2', 
-            '1440p' : '3',
-            '1080p': '3',
-            '1080i':'4', 
-            '720p': '5',  
-            '576p': '6', 
-            '576i': '7',
-            '480p': '8', 
-            '480i': '9'
-            }.get(resolution, '10')
+            # '1440p' : '3',
+            '1080p': '11',
+            # '1080i':'4', 
+            # '720p': '5',  
+            # '576p': '6', 
+            # '576i': '7',
+            # '480p': '8', 
+            # '480i': '9'
+            }.get(resolution, '11')
         return resolution_id
 
 
