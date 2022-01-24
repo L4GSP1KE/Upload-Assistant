@@ -2115,7 +2115,8 @@ class Prep():
                     os.remove(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{each}"))
         try:
             base_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-            Torrent.copy(base_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/{title}.torrent", overwrite=True)
+            manual_name = re.sub("[^0-9a-zA-Z\[\]\']+", "", meta['name'])
+            Torrent.copy(base_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/{manual_name}.torrent", overwrite=True)
             # shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['name'].replace(' ', '.')}.torrent").replace(' ', '.'))
             filebrowser = self.config['TRACKERS'].get('MANUAL', {}).get('filebrowser', None)
             if filebrowser != None:
