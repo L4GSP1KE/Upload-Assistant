@@ -13,6 +13,7 @@ from guessit import guessit
 import ntpath
 from pathlib import Path
 import urllib
+import urllib.parse
 import ffmpeg
 import random
 import json
@@ -2115,12 +2116,13 @@ class Prep():
                     os.remove(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{each}"))
         try:
             base_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-            manual_name = re.sub("[^0-9a-zA-Z\[\]\']+", "", meta['name'])
+            manual_name = re.sub("[^0-9a-zA-Z\[\]\']+", ".", meta['name'])
             Torrent.copy(base_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/{manual_name}.torrent", overwrite=True)
             # shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['name'].replace(' ', '.')}.torrent").replace(' ', '.'))
             filebrowser = self.config['TRACKERS'].get('MANUAL', {}).get('filebrowser', None)
             if filebrowser != None:
                 url = '/'.join(s.strip('/') for s in (filebrowser, f"/tmp/{meta['uuid']}"))
+                url = urllib.parse.quote(url, safe="https://")
             else:
                 shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
                 files = {
