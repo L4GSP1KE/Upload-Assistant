@@ -1,4 +1,3 @@
-from cv2 import trace
 from requests import NullHandler
 from src.args import Args
 from src.clients import Clients
