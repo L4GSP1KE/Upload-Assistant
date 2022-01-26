@@ -44,21 +44,13 @@ class Clients():
         remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('remote_path', '/RemotePath')
         if isinstance(local_path, list):
             for i in range(len(local_path)):
-                print(f"{i=}")
-                print(f"{local_path[i]=}")
-                print(f"{remote_path[i]=}")
-                print(f"{meta['path']=}")
-                print(f"{os.path.normpath(local_path[i])=}")
                 if os.path.normpath(local_path[i]) in meta['path']:
-                    cprint('SUCCESS', 'cyan')
                     local_path = local_path[i]
                     remote_path = remote_path[i]
         local_path = os.path.normpath(local_path)
         remote_path = os.path.normpath(remote_path)
         if local_path.endswith(os.sep):
             remote_path = remote_path + os.sep
-        cprint(f"{local_path=}", 'magenta')
-        cprint(f"{remote_path=}", 'magenta')
         
         cprint(f"Adding to {torrent_client}", 'grey', 'on_yellow')
         if torrent_client.lower() == "rtorrent":
@@ -142,9 +134,6 @@ class Clients():
             path = os.path.dirname(path)
         if len(filelist) != 1:
             path = os.path.dirname(path)
-        cprint(f"{local_path=}")
-        cprint(f"{remote_path=}")
-        cprint(f"{path=}")
         if local_path in path and local_path != remote_path:
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
