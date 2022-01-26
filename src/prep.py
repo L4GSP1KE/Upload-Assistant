@@ -607,9 +607,9 @@ class Prep():
                 image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][0]['name']}-{i}.png"
                 loglevel = 'quiet'
                 debug = True
-                # if bool(meta.get('debug', False)):
-                #     loglevel = 'verbose'
-                #     debug = False
+                if bool(meta.get('debug', False)):
+                    loglevel = 'error'
+                    debug = False
                 try:
                     def is_vob_good(n, loops):
                         vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}")
@@ -630,7 +630,7 @@ class Prep():
                                         return voblength, n
                                     else:
                                         return 300, n
-                    voblength, n = is_vob_good(n, 0)    
+                    voblength, n = is_vob_good(n, 0)
                     img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
                     (
                         ffmpeg
@@ -646,22 +646,24 @@ class Prep():
                 # print(os.path.getsize(image))
                 # print(f'{i+1}/{self.screens}')
                 n += 1
-                # print(Path(image))
-                if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                    i += 1
-                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                    i += 1
-                elif os.path.getsize(Path(image)) <= 10000:
-                    cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
-                    time.sleep(1)
-                elif self.img_host == "ptpimg":
-                    i += 1
-                elif self.img_host == "freeimage.host":
-                    i += 1
-                else:
-                    cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                    time.sleep(1)
-                cli_ui.info_count(i-1, self.screens, "Screens Saved")
+                try: 
+                    if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                        i += 1
+                    elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                        i += 1
+                    elif os.path.getsize(Path(image)) <= 10000:
+                        cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
+                        time.sleep(1)
+                    elif self.img_host == "ptpimg":
+                        i += 1
+                    elif self.img_host == "freeimage.host":
+                        i += 1
+                    else:
+                        cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                        time.sleep(1)
+                    cli_ui.info_count(i-1, self.screens, "Screens Saved")
+                except:
+                    pass
 
 
     def screenshots(self, path, filename, folder_id, base_dir, meta):
