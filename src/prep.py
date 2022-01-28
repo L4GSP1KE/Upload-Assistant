@@ -599,6 +599,7 @@ class Prep():
             cprint('Reusing screenshots', 'grey', 'on_green')
         else:
             cprint("Saving Screens...", "grey", "on_yellow")
+            looped = 0
             while i != self.screens:
                 if n >= len(main_set):
                     n = 0
@@ -610,27 +611,31 @@ class Prep():
                 if bool(meta.get('debug', False)):
                     loglevel = 'error'
                     debug = False
+                def _is_vob_good(n, loops):
+                    voblength = 300
+                    vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", output='JSON')
+                    vob_mi = json.loads(vob_mi)
+                    try:
+                        voblength = float(vob_mi['media']['track'][1]['Duration'])
+                        return voblength, n
+                    except:
+                        try:
+                            voblength = float(vob_mi['media']['track'][2]['Duration'])
+                            return voblength, n
+                        except:
+                            n += 1
+                            if n >= len(main_set):
+                                n = 0
+                            if n >= self.screens:
+                                n -= self.screens
+                            if loops < 6:
+                                loops = loops + 1
+                                voblength, n = _is_vob_good(n, loops)
+                                return voblength, n
+                            else:
+                                return 300, n
                 try:
-                    def is_vob_good(n, loops):
-                        vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}")
-                        for track in vob_mi.tracks:
-                            if track.track_type == "Video":
-                                try:
-                                    voblength = float(track.duration)/1000
-                                    return voblength, n
-                                except:
-                                    n += 1
-                                    if n >= len(main_set):
-                                        n = 0
-                                    if n >= self.screens:
-                                        n -= self.screens
-                                    if loops < 6:
-                                        loops = loops + 1
-                                        voblength, n = is_vob_good(n, loops)
-                                        return voblength, n
-                                    else:
-                                        return 300, n
-                    voblength, n = is_vob_good(n, 0)
+                    voblength, n = _is_vob_good(n, 0)
                     img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
                     (
                         ffmpeg
@@ -662,8 +667,12 @@ class Prep():
                         cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                         time.sleep(1)
                     cli_ui.info_count(i-1, self.screens, "Screens Saved")
+                    looped = 0
                 except:
-                    pass
+                    if looped >= 25:
+                        cprint('Failed to take screenshots', 'grey', 'on_red')
+                        exit()
+                    looped += 1
 
 
     def screenshots(self, path, filename, folder_id, base_dir, meta):
