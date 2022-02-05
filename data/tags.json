@@ -13,6 +13,9 @@
     },
     "Golumpa" : {
         "type" : "WEBDL"
+    },
+    "NanDesuKa" : {
+        "in_name" : "NanDesuKa"
     }
 
 }
