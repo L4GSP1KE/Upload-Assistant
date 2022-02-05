@@ -2066,7 +2066,7 @@ class Prep():
         
         for tag in tags:
             value = tags.get(tag)
-            if value.get('in_name', "") == tag:
+            if value.get('in_name', "") == tag and tag in meta['path']:
                 meta['tag'] = f"-{tag}"
             if meta['tag'][1:] == tag:
                 for key in value:
