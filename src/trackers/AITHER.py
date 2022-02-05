@@ -60,6 +60,7 @@ class AITHER():
             'stream' : meta['stream'],
             'sd' : meta['sd'],
             'keywords' : meta['keywords'],
+            'personal_release' : int(meta.get('personalrelease', False)),
             # 'internal' : 0,
             # 'featured' : 0,
             # 'free' : 0,

@@ -41,6 +41,7 @@ class Args():
         parser.add_argument('-reg', '--region', nargs='*', required=False, help="Region for discs")
         parser.add_argument('-a', '--anon', action='store_true', required=False, help="Upload anonymously")
         parser.add_argument('-st', '--stream', action='store_true', required=False, help="Stream Optimized Upload")
+        parser.add_argument('-pr', '--personalrelease', action='store_true', required=False, help="Personal Release")
         parser.add_argument('-dupe', '--dupe', action='store_true', required=False, help="Pass if you know this is a dupe")
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode, will run through all the motions providing extra info, but will not upload to trackers.")
         parser.add_argument('--nohead', action='store_true', required=False, help="Run selenium not in headless mode")
