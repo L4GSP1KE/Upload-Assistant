@@ -233,7 +233,7 @@ class Prep():
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
         meta['3D'] = self.is_3d(mi, bdinfo)
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
-        if meta.get('service', None) == None:
+        if meta.get('service', None) in (None, ''):
             meta['service'] = self.get_service(video)
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
         meta['hdr'] = self.get_hdr(mi, bdinfo)
@@ -1926,7 +1926,7 @@ class Prep():
             'EPIX': 'EPIX', 'ePix': 'EPIX', 'ESPN': 'ESPN', 'ESQ': 'ESQ', 'Esquire': 'ESQ', 'ETTV': 'ETTV', 'El Trece': 'ETTV', 
             'ETV': 'ETV', 'E!': 'ETV', 'FAM': 'FAM', 'Family': 'FAM', 'Fandor': 'FANDOR', 'Facebook Watch': 'FBWatch', 'FJR': 'FJR', 
             'Family Jr': 'FJR', 'FOOD': 'FOOD', 'Food Network': 'FOOD', 'FOX': 'FOX', 'Fox': 'FOX', 'Fox Premium': 'FOXP', 
-            'UFC Fight Pass': 'FP', 'FPT': 'FPT', 'FREE': 'FREE', 'Freeform': 'FREE', 'FTV': 'FTV', 'FUNI': 'FUNI', 
+            'UFC Fight Pass': 'FP', 'FPT': 'FPT', 'FREE': 'FREE', 'Freeform': 'FREE', 'FTV': 'FTV', 'FUNI': 'FUNI', 'FUNi' : 'FUNI',
             'Foxtel': 'FXTL', 'FYI': 'FYI', 'FYI Network': 'FYI', 'GC': 'GC', 'NHL GameCenter': 'GC', 'GLBL': 'GLBL', 
             'Global': 'GLBL', 'GLOB': 'GLOB', 'GloboSat Play': 'GLOB', 'GO90': 'GO90', 'GagaOOLala': 'Gaga', 'HBO': 'HBO', 
             'HBO Go': 'HBO', 'HGTV': 'HGTV', 'HIDI': 'HIDI', 'HIST': 'HIST', 'History': 'HIST', 'HLMK': 'HLMK', 'Hallmark': 'HLMK', 
@@ -1953,9 +1953,10 @@ class Prep():
             'YT': 'YT', 'ZDF': 'ZDF', 'iP': 'iP', 'BBC iPlayer': 'iP', 'iQIYI': 'iQIYI', 'iT': 'iT', 'iTunes': 'iT'
             }
         
-        video_name = video.replace('.', ' ')
+        
+        video_name = re.sub("[.()]", " ", video)
         for key, value in services.items():
-            if (' ' + value + ' ') in (' ' + video_name + ' '):
+            if (' ' + key + ' ') in (' ' + video_name + ' '):
                 service = value
             elif key == service:
                 service = value
@@ -2065,6 +2066,8 @@ class Prep():
         
         for tag in tags:
             value = tags.get(tag)
+            if value.get('in_name', "") == tag:
+                meta['tag'] = f"-{tag}"
             if meta['tag'][1:] == tag:
                 for key in value:
                     if key == 'type':
@@ -2074,7 +2077,7 @@ class Prep():
                             pass
                     else:
                         meta[key] = value.get(key)
-                # print(f"Tag: {meta['tag']} | Key: {key} | Value: {meta[key]}")
+                # print(f"Tag: {meta['tag']} | Key: {key} | Value: {meta[key]}"
         return meta
     
 
