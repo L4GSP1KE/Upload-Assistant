@@ -32,6 +32,7 @@ class BHD():
         await self.edit_desc(meta)
         custom, edition = await self.get_edition(meta)
         tags = await self.get_tags(meta)
+        bhd_name = await self.edit_name(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['BHD'].get('anon', "False"))) == False:
             anon = 0
         else:
@@ -49,7 +50,7 @@ class BHD():
             'mediainfo' : mi_dump,
             }
         data = {
-            'name' : meta['name'].replace("DD+", "DDP"),
+            'name' : bhd_name,
             'category_id' : cat_id,
             'type' : type_id,
             'source': source_id,
@@ -258,3 +259,12 @@ class BHD():
         if meta.get('scene', False) == True:
             tags.append("Scene")
         return tags
+
+    async def edit_name(self, meta):
+        name = meta.get('name')
+        if meta.get('source', '') in ('PAL DVD', 'NTSC DVD', 'DVD', 'NTSC', 'PAL'):
+            audio = meta.get('audio', '')
+            audio = ' '.join(audio.split())
+            name = name.replace(audio, f"{meta.get('video_codec')} {audio}")
+        name = name.replace("DD+", "DDP")
+        return name
