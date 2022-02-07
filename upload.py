@@ -8,6 +8,7 @@ from src.trackers.BHD import BHD
 from src.trackers.AITHER import AITHER
 from src.trackers.STC import STC
 from src.trackers.UHDHEAVEN import UHDHEAVEN
+from src.trackers.R4E import R4E
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -247,6 +248,20 @@ async def do_the_thing(path, args, base_dir):
                 if meta['upload'] == True:
                     await uhdh.upload(meta)
                     await client.add_to_client(meta, "UHDHEAVEN")
+        if tracker.upper() == "R4E":
+            if meta['unattended']:
+                upload_to_r4e = True
+            else:
+                upload_to_r4e = cli_ui.ask_yes_no(f"Upload to R4E? {debug}", default=meta['unattended'])
+            if upload_to_r4e:
+                print("Uploading to R4E")
+                cprint("WARNING: THIS SCRIPT MAKES NO ATTEMPT AT ENSURING THIS UPLOAD IS MOTORSPORTS RELATED")
+                r4e = R4E(config=config)
+                dupes = await r4e.search_existing(meta)
+                meta = dupe_check(dupes, meta)
+                if meta['upload'] == True:
+                    await r4e.upload(meta)
+                    await client.add_to_client(meta, "R4E")
         if tracker.upper() == "THR":
             if meta['unattended']:
                 upload_to_thr = True
