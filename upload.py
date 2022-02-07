@@ -145,7 +145,10 @@ async def do_the_thing(path, args, base_dir):
             debug = ""
         
         if tracker.upper() == "MANUAL":
-            do_manual = cli_ui.ask_yes_no(f"Get files for manual upload?", default=True)
+            if meta['unattended']:                
+                do_manual = True
+            else:
+                do_manual = cli_ui.ask_yes_no(f"Get files for manual upload?", default=True)
             if do_manual:
                 for manual_tracker in trackers:
                     manual_tracker = manual_tracker.replace(" ", "")
