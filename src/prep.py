@@ -1490,7 +1490,8 @@ class Prep():
     """
     def upload_screens(self, meta, screens, img_host_num, i, total_screens, custom_img_list, return_dict):
         if int(total_screens) != 0 or len(meta.get('image_list', [])) > total_screens:
-            cprint('Uploading Screens', 'grey', 'on_yellow')   
+            if custom_img_list == []:
+                cprint('Uploading Screens', 'grey', 'on_yellow')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
         if img_host != self.img_host and meta.get('imghost', None) == None:
@@ -2101,12 +2102,12 @@ class Prep():
                 generic.write(f"IMDb: https://www.imdb.com/title/tt{meta['imdb_id']}\n")
             if meta['tvdb_id'] != "0":
                 generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
-            if meta.get('poster', '') != '':
+            poster_img = f"{meta['base_dir']}/tmp/{meta['uuid']}/POSTER.png"
+            if meta.get('poster', '') != '' and not os.path.exists(poster_img):
                 r = requests.get(meta['poster'], stream=True)
                 if r.status_code == 200:
                     cprint("Rehosting Poster", 'grey', 'on_yellow')
                     r.raw.decode_content = True
-                    poster_img = f"{meta['base_dir']}/tmp/{meta['uuid']}/POSTER.png"
                     with open(poster_img, 'wb') as f:
                         shutil.copyfileobj(r.raw, f)
                     poster, dummy = self.upload_screens(meta, 1, 1, 0, 1, [poster_img], {})
