@@ -267,4 +267,6 @@ class BHD():
             audio = ' '.join(audio.split())
             name = name.replace(audio, f"{meta.get('video_codec')} {audio}")
         name = name.replace("DD+", "DDP")
+        if meta['type'] == 'WEBDL' and meta.get('has_encode_settings', False) == True:
+            name = name.replace('H.264', 'x264')
         return name

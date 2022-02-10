@@ -242,7 +242,7 @@ class Prep():
             meta['region'] = self.get_region(bdinfo, meta.get('region', None))
             meta['video_codec'] = self.get_video_codec(bdinfo)
         else:
-            meta['video_encode'], meta['video_codec'] = self.get_video_encode(mi, meta['type'], bdinfo)
+            meta['video_encode'], meta['video_codec'], meta['has_encode_settings'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
             meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), self.path, bdinfo, meta['filelist'])
 
@@ -1392,7 +1392,11 @@ class Prep():
         video_codec = format
         if video_codec == "MPEG Video":
             video_codec = f"MPEG-{mi['media']['track'][1].get('Format_Version')}"
-        return video_encode, video_codec
+        if mi['media']['track'][1].get('Encoded_Library_Settings', None):
+            has_encode_settings = True
+        else:
+            has_encode_settings = False
+        return video_encode, video_codec, has_encode_settings
 
 
     def get_edition(self, guess, video, bdinfo, filelist):
