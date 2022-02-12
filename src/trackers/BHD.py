@@ -195,6 +195,10 @@ class BHD():
             'categories' : meta['category'],
             'types' : await self.get_type(meta),
         }
+        # Search all releases if SD
+        if meta['sd'] == 1:
+            data['categories'] = None
+            data['types'] = None
         if meta['category'] == 'TV':
             if meta.get('tv_pack', 0) == 1:
                 data['pack'] = 1
