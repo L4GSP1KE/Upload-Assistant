@@ -782,6 +782,12 @@ class Prep():
         else:
             cprint("TMDb was unable to find anything with that IMDb, searching TMDb normally", 'grey', 'on_yellow')
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'])
+            if meta.get('tmdb') in ('None', '', None, 0, '0'):
+                if meta.get('mode', 'discord') == 'cli':
+                    cprint('Unable to find a matching TMDb entry', 'grey', 'on_yellow')
+                    tmdb_id = cli_ui.ask_string("Please enter tmdb id:")
+                    parser = Args(config=self.config)
+                    meta['category'], meta['tmdb'] = parser.parse_tmdb_id(id=tmdb_id, category=meta.get('category'))
         await asyncio.sleep(3)
         return meta
 
