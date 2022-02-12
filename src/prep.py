@@ -589,8 +589,10 @@ class Prep():
         main_set_length = len(meta['discs'][0]['main_set'])
         if main_set_length >= 3:
             main_set = meta['discs'][0]['main_set'][1:-1]
-        else:
+        elif main_set_length == 2:
             main_set = meta['discs'][0]['main_set'][1:]
+        elif main_set_length == 1:
+            main_set = meta['discs'][0]['main_set']
         n = 0
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         i = len(glob.glob("*.png"))        
@@ -904,7 +906,8 @@ class Prep():
             meta['poster'] = response.get('poster_path', '')
             meta['overview'] = response['overview']
             meta['original_language'] = response['original_language']
-        meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
+        if meta['poster'] not in (None, ''):
+            meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
         if difference >= 0.8 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():
@@ -2108,17 +2111,24 @@ class Prep():
                 generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
             poster_img = f"{meta['base_dir']}/tmp/{meta['uuid']}/POSTER.png"
             if meta.get('poster', '') != '' and not os.path.exists(poster_img):
-                r = requests.get(meta['poster'], stream=True)
-                if r.status_code == 200:
-                    cprint("Rehosting Poster", 'grey', 'on_yellow')
-                    r.raw.decode_content = True
-                    with open(poster_img, 'wb') as f:
-                        shutil.copyfileobj(r.raw, f)
-                    poster, dummy = self.upload_screens(meta, 1, 1, 0, 1, [poster_img], {})
-                    poster = poster[0]
-                    generic.write(f"TMDB Poster: {poster.get('raw_url', poster.get('img_url'))}\n")
+                if meta.get('rehosted_poster', None) == None:
+                    r = requests.get(meta['poster'], stream=True)
+                    if r.status_code == 200:
+                        cprint("Rehosting Poster", 'grey', 'on_yellow')
+                        r.raw.decode_content = True
+                        with open(poster_img, 'wb') as f:
+                            shutil.copyfileobj(r.raw, f)
+                        poster, dummy = self.upload_screens(meta, 1, 1, 0, 1, [poster_img], {})
+                        poster = poster[0]
+                        generic.write(f"TMDB Poster: {poster.get('raw_url', poster.get('img_url'))}\n")
+                        meta['rehosted_poster'] = poster.get('raw_url', poster.get('img_url'))
+                        with open (f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as metafile:
+                            json.dump(meta, metafile, indent=4)
+                            metafile.close()
+                    else:
+                        cprint("Poster could not be retrieved", 'grey', 'on_yellow')
                 else:
-                    cprint("Poster could not be retrieved", 'grey', 'on_yellow')
+                    generic.write(f"TMDB Poster: {meta.get('rehosted_poster')}\n")
             if len(meta['image_list']) > 0:
                 generic.write(f"\nImage Webpage:\n")
                 for each in meta['image_list']:
@@ -2134,10 +2144,11 @@ class Prep():
                 if each != "BASE.torrent":
                     os.remove(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{each}"))
         try:
-            base_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-            manual_name = re.sub("[^0-9a-zA-Z\[\]\'\-]+", ".", os.path.basename(meta['path']))
-            Torrent.copy(base_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/{manual_name}.torrent", overwrite=True)
-            # shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['name'].replace(' ', '.')}.torrent").replace(' ', '.'))
+            if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+                base_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+                manual_name = re.sub("[^0-9a-zA-Z\[\]\'\-]+", ".", os.path.basename(meta['path']))
+                Torrent.copy(base_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/{manual_name}.torrent", overwrite=True)
+                # shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['name'].replace(' ', '.')}.torrent").replace(' ', '.'))
             filebrowser = self.config['TRACKERS'].get('MANUAL', {}).get('filebrowser', None)
             if filebrowser != None:
                 url = '/'.join(s.strip('/') for s in (filebrowser, f"/tmp/{meta['uuid']}"))
