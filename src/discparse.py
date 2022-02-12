@@ -7,6 +7,7 @@ import asyncio
 from glob import glob
 from pprint import pprint
 from pymediainfo import MediaInfo
+import json
     
     
 class DiscParse():
@@ -214,6 +215,16 @@ class DiscParse():
             for vob_set in filesdict:
                 if len(vob_set) > len(main_set):
                     main_set = vob_set
+                elif len(vob_set) == len(main_set):
+                    vob_set_mi = MediaInfo.parse(f"VTS_{vob_set[0][:2]}_0.IFO", output='JSON')
+                    vob_set_mi = json.loads(vob_set_mi)
+                    vob_set_duration = vob_set_mi['media']['track'][1]['Duration']
+                    
+                    main_set_mi = MediaInfo.parse(f"VTS_{main_set[0][:2]}_0.IFO", output='JSON')
+                    main_set_mi = json.loads(main_set_mi)
+                    main_set_duration = vob_set_mi['media']['track'][1]['Duration']
+                    if vob_set_duration > main_set_duration:
+                        main_set = vob_set
             each['main_set'] = main_set
             set = main_set[0][:2]
             # print(main_set[1:len(main_set)-1]) #For Screens #if len > 3
