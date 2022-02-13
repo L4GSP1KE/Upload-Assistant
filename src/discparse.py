@@ -222,7 +222,7 @@ class DiscParse():
                     
                     main_set_mi = MediaInfo.parse(f"VTS_{main_set[0][:2]}_0.IFO", output='JSON')
                     main_set_mi = json.loads(main_set_mi)
-                    main_set_duration = vob_set_mi['media']['track'][1]['Duration']
+                    main_set_duration = main_set_mi['media']['track'][1]['Duration']
                     if vob_set_duration > main_set_duration:
                         main_set = vob_set
             each['main_set'] = main_set
