@@ -2133,8 +2133,8 @@ class Prep():
                             metafile.close()
                     else:
                         cprint("Poster could not be retrieved", 'grey', 'on_yellow')
-                else:
-                    generic.write(f"TMDB Poster: {meta.get('rehosted_poster')}\n")
+            elif os.path.exists(poster_img) and meta.get('rehosted_poster') != None:
+                generic.write(f"TMDB Poster: {meta.get('rehosted_poster')}\n")
             if len(meta['image_list']) > 0:
                 generic.write(f"\nImage Webpage:\n")
                 for each in meta['image_list']:
