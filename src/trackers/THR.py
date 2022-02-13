@@ -148,10 +148,11 @@ class THR():
 
 
     async def edit_torrent(self, meta):
-        THR_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        THR_torrent.metainfo['announce'] = self.config['TRACKERS']['THR']['announce_url']
-        THR_torrent.metainfo['info']['source'] = "[https://www.torrenthr.org] TorrentHR.org"
-        Torrent.copy(THR_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent", overwrite=True)
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+            THR_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            THR_torrent.metainfo['announce'] = self.config['TRACKERS']['THR']['announce_url']
+            THR_torrent.metainfo['info']['source'] = "[https://www.torrenthr.org] TorrentHR.org"
+            Torrent.copy(THR_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):

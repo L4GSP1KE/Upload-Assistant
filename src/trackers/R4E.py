@@ -9,7 +9,7 @@ import distutils.util
 import json
 from pprint import pprint
 import tmdbsimple as tmdb
-
+import os
 # from pprint import pprint
 
 class R4E():
@@ -137,10 +137,11 @@ class R4E():
         return is_docu 
 
     async def edit_torrent(self, meta):
-        R4E_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        R4E_torrent.metainfo['announce'] = self.config['TRACKERS']['R4E']['announce_url'].strip()
-        R4E_torrent.metainfo['info']['source'] = "R4E"
-        Torrent.copy(R4E_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[R4E]{meta['clean_name']}.torrent", overwrite=True)
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+            R4E_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            R4E_torrent.metainfo['announce'] = self.config['TRACKERS']['R4E']['announce_url'].strip()
+            R4E_torrent.metainfo['info']['source'] = "R4E"
+            Torrent.copy(R4E_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[R4E]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):

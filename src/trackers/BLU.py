@@ -8,6 +8,7 @@ from termcolor import cprint
 import urllib
 import distutils.util
 from pprint import pprint
+import os
 
 # from pprint import pprint
 
@@ -199,10 +200,11 @@ class BLU():
 
 
     async def edit_torrent(self, meta):
-        blu_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        blu_torrent.metainfo['announce'] = self.config['TRACKERS']['BLU']['announce_url'].strip()
-        blu_torrent.metainfo['info']['source'] = "BLU"
-        Torrent.copy(blu_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent", overwrite=True)
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+            blu_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            blu_torrent.metainfo['announce'] = self.config['TRACKERS']['BLU']['announce_url'].strip()
+            blu_torrent.metainfo['info']['source'] = "BLU"
+            Torrent.copy(blu_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):

@@ -8,7 +8,7 @@ from termcolor import cprint
 import distutils.util
 import json
 from pprint import pprint
-
+import os
 # from pprint import pprint
 
 class AITHER():
@@ -146,10 +146,11 @@ class AITHER():
 
 
     async def edit_torrent(self, meta):
-        AITHER_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        AITHER_torrent.metainfo['announce'] = self.config['TRACKERS']['AITHER']['announce_url'].strip()
-        AITHER_torrent.metainfo['info']['source'] = "Aither"
-        Torrent.copy(AITHER_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[AITHER]{meta['clean_name']}.torrent", overwrite=True)
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+            AITHER_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            AITHER_torrent.metainfo['announce'] = self.config['TRACKERS']['AITHER']['announce_url'].strip()
+            AITHER_torrent.metainfo['info']['source'] = "Aither"
+            Torrent.copy(AITHER_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[AITHER]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):

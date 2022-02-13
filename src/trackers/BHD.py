@@ -8,7 +8,7 @@ from termcolor import cprint
 import distutils.util
 import urllib
 from pprint import pprint
-
+import os
 # from pprint import pprint
 
 class BHD():
@@ -161,10 +161,11 @@ class BHD():
 
    
     async def edit_torrent(self, meta):
-        bhd_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        bhd_torrent.metainfo['announce'] = self.config['TRACKERS']['BHD']['announce_url'].strip()
-        bhd_torrent.metainfo['info']['source'] = "BHD"
-        Torrent.copy(bhd_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", overwrite=True)
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+            bhd_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            bhd_torrent.metainfo['announce'] = self.config['TRACKERS']['BHD']['announce_url'].strip()
+            bhd_torrent.metainfo['info']['source'] = "BHD"
+            Torrent.copy(bhd_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):

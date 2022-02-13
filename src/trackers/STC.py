@@ -7,7 +7,7 @@ from termcolor import cprint
 import distutils.util
 import json
 from pprint import pprint
-
+import os
 # from pprint import pprint
 
 class STC():
@@ -134,10 +134,11 @@ class STC():
 
 
     async def edit_torrent(self, meta):
-        STC_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        STC_torrent.metainfo['announce'] = self.config['TRACKERS']['STC']['announce_url'].strip()
-        STC_torrent.metainfo['info']['source'] = "STC"
-        Torrent.copy(STC_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[STC]{meta['clean_name']}.torrent", overwrite=True)
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+            STC_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            STC_torrent.metainfo['announce'] = self.config['TRACKERS']['STC']['announce_url'].strip()
+            STC_torrent.metainfo['info']['source'] = "STC"
+            Torrent.copy(STC_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[STC]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):

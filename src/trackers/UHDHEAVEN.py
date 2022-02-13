@@ -8,8 +8,7 @@ from termcolor import cprint
 import distutils.util
 import json
 from pprint import pprint
-
-# from pprint import pprint
+import os
 
 class UHDHEAVEN():
     """
@@ -133,10 +132,11 @@ class UHDHEAVEN():
 
 
     async def edit_torrent(self, meta):
-        UHDHEAVEN_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        UHDHEAVEN_torrent.metainfo['announce'] = self.config['TRACKERS']['UHDHEAVEN']['announce_url'].strip()
-        UHDHEAVEN_torrent.metainfo['info']['source'] = "UHDHEAVEN"
-        Torrent.copy(UHDHEAVEN_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[UHDHEAVEN]{meta['clean_name']}.torrent", overwrite=True)
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
+            UHDHEAVEN_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            UHDHEAVEN_torrent.metainfo['announce'] = self.config['TRACKERS']['UHDHEAVEN']['announce_url'].strip()
+            UHDHEAVEN_torrent.metainfo['info']['source'] = "UHDHEAVEN"
+            Torrent.copy(UHDHEAVEN_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[UHDHEAVEN]{meta['clean_name']}.torrent", overwrite=True)
         return 
         
     async def edit_desc(self, meta):
