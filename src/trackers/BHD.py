@@ -44,11 +44,14 @@ class BHD():
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8')
             
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'r').read()
-        open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", 'rb')
+        torrent_file = f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent"
         files = {
-            'file': open_torrent,
             'mediainfo' : mi_dump,
             }
+        if os.path.exists(torrent_file):
+            open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", 'rb')
+            files['file'] = open_torrent
+        
         data = {
             'name' : bhd_name,
             'category_id' : cat_id,
