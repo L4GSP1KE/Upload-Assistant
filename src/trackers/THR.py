@@ -1,27 +1,17 @@
 # -*- coding: utf-8 -*-
-# import discord
 import asyncio
-from json.decoder import JSONDecodeError
 from torf import Torrent
 import requests
 import json
 import glob
 from difflib import SequenceMatcher
-from termcolor import cprint
-from pprint import pprint
-import platform
+from unidecode import unidecode
 import base64
 import os
-import pickle
-from selenium.webdriver import Firefox
-from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.firefox.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import Select, WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from webdriver_manager.firefox import GeckoDriverManager #Webdriver_manager
+from termcolor import cprint
+from bs4 import BeautifulSoup
 
-from unidecode import unidecode
+from pprint import pprint
 
 # from pprint import pprint
 
@@ -35,81 +25,73 @@ class THR():
     """
     def __init__(self, config):
         self.config = config
-        self.login_url = "https://www.torrenthr.org/login.php"
-        self.upload_url = "https://www.torrenthr.org/upload.php"
+        self.username = config['TRACKERS']['THR'].get('username')
+        self.password = config['TRACKERS']['THR'].get('password')
         pass
     
-    async def upload(self, meta, browser):
+    async def upload(self, session, meta):
         await self.edit_torrent(meta)
         cat_id = await self.get_cat_id(meta)
         subs = self.get_subtitles(meta)
         pronfo = await self.edit_desc(meta)
 
 
-        if meta['bdinfo'] != None:
+        if meta.get('is_disc', '') == 'BDMV':
             mi_file = None
             # bd_file = f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8'
         else:
             mi_file = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt")
-            # bd_file = None
-        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]DESCRIPTION.txt", 'r').read()
-        torrent_path = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent")
-        
-        #Upload Form
-        browser.get(self.upload_url)
-        try: 
-            elem = WebDriverWait(browser, 10).until(EC.presence_of_element_located((By.NAME, "tfile")))
-        finally:
-            with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/Tuna_dumb_check.txt", 'w') as f:
-                f.write(browser.page_source)
+            with open(mi_file, 'r') as f:
+                mi_file = f.read()
                 f.close()
-            print("Filling out Upload Form")
-            upload_torrent = browser.find_element(By.NAME, "tfile")
-            upload_torrent.send_keys(torrent_path)
-            await asyncio.sleep(3)
-            name = browser.find_element(By.NAME, "name")
-            name.send_keys(unidecode(meta['name'].replace("DD+", "DDP")))
-            if pronfo == False:
-                nfo = browser.find_element(By.NAME, "nfo")
-                nfo.send_keys(mi_file)
-                await asyncio.sleep(3)
+            # bd_file = None
 
-            if len(subs) >= 1:
-                if 'hr' in subs:
-                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Hrvatski')]")
-                    checkboxes.find_element(By.NAME, 'subs[]').click()
-                if 'en' in subs:
-                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Engleski')]")
-                    checkboxes.find_element(By.NAME, 'subs[]').click()
-                if 'bs' in subs:
-                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Bosanski')]")
-                    checkboxes.find_element(By.NAME, 'subs[]').click()
-                if 'sr' in subs:
-                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Srpski')]")
-                    checkboxes.find_element(By.NAME, 'subs[]').click()
-                if 'sl' in subs:
-                    checkboxes = browser.find_element(By.XPATH, "//td[contains(text(),'Slovenski')]")
-                    checkboxes.find_element(By.NAME, 'subs[]').click()
-                
-            description = browser.find_element(By.NAME, "descr")
-            description.send_keys(desc)
-            category_dropdown = Select(browser.find_element(By.NAME, 'type'))
-            category_dropdown.select_by_value(cat_id)
-            imdb_link = browser.find_element(By.NAME, "url")
-            imdb_link.send_keys(f"https://www.imdb.com/title/tt{meta.get('imdb_id').replace('tt', '')}/")
-            yt_link = browser.find_element(By.NAME, "tube")
-            yt_link.send_keys(meta.get('youtube', ""))
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]DESCRIPTION.txt", 'r') as f:
+            desc = f.read()
+            f.close()
+        
+        torrent_path = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]{meta['clean_name']}.torrent")
+        with open(torrent_path, 'rb') as f:
+            tfile = f.read()
+            f.close()
+        
+        thr_name = unidecode(meta['name'].replace('DD+', 'DDP'))
+        #Upload Form
+        url = 'https://www.torrenthr.org/takeupload.php'
+        files = {
+            'tfile' : (f"{thr_name}.torrent", tfile)
+        }
+        payload = {
+            'name' : thr_name,
+            'descr' : desc,
+            'type' : cat_id,
+            'url' : f"https://www.imdb.com/title/tt{meta.get('imdb_id').replace('tt', '')}/",
+            'tube' : meta.get('youtube', '')
+        }
+        headers = {
+            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
+        }
+        #If pronfo fails, put mediainfo into THR parser
+        if pronfo == False and meta.get('is_disc', '') != 'BDMV':
+            files['nfo'] = ("MEDIAINFO.txt", mi_file)
+        if subs != []:
+            payload['subs[]'] = tuple(subs)
 
-            #Submit
-            submit = browser.find_element(By.XPATH, "//*[@type='submit']")
-            if meta['debug'] == False:
-                submit.submit()
-                await asyncio.sleep(3)
-                print("Uploaded")
-            else:
-                # submit.submit()
-                print("DEBUG: Not pushing submit")
-                await asyncio.sleep(30)
+
+        if meta['debug'] == False:
+            response = session.post(url=url, files=files, data=payload, headers=headers)
+            try:
+                if response.url.endswith('uploaded=1'):
+                    cprint(f'Successfully Uploaded at: {response.url}', 'grey', 'on_green')
+                #Check if actually uploaded
+            except:
+                cprint("It may have uploaded, go check")
+                # cprint(f"Request Data:", 'cyan')
+                # pprint(data)
+                return 
+        else:
+            cprint(f"Request Data:", 'cyan')
+            pprint(payload)
         
     
     
@@ -134,13 +116,25 @@ class THR():
         return cat
 
     def get_subtitles(self, meta):
-        with open(f"{meta.get('base_dir')}/tmp/{meta.get('uuid')}/MediaInfo.json", 'r', encoding='utf-8') as f:
-            mi = json.load(f)
         subs = []
-        for track in mi['media']['track']:
-            if track['@type'] == "Text":
-                if track.get('Language') in ['hr', 'en', 'bs', 'sr', 'sl']:
-                    subs.append(track.get('Language'))
+        sub_langs = []
+        if meta.get('is_disc', '') != 'BDMV':
+            with open(f"{meta.get('base_dir')}/tmp/{meta.get('uuid')}/MediaInfo.json", 'r', encoding='utf-8') as f:
+                mi = json.load(f)
+            for track in mi['media']['track']:
+                if track['@type'] == "Text":
+                    if track.get('Language') in ['hr', 'en', 'bs', 'sr', 'sl']:
+                        sub_langs.append(track.get('Language'))
+        else:
+            sub_langs = meta['bdinfo']['subtitles']
+        if sub_langs != []:
+            subs = []
+            sub_lang_map = {
+                'hr' : 1, 'en' : 2, 'bs' : 3, 'sr' : 4, 'sl' : 5,
+                'Croatian' : 1, 'English' : 2, 'Bosnian' : 3, 'Serbian' : 4, 'Slovenian' : 5
+            }
+            for sub in sub_langs:
+                subs.append(sub_lang_map.get(sub))
         return subs
 
 
@@ -182,25 +176,30 @@ class THR():
                     pprint(response.text)
                 await asyncio.sleep(1)
             desc.write("[align=center]")
-            # ProNFO
-            pronfo_url = f"https://www.pronfo.com/api/v1/access/upload/{self.config['TRACKERS']['THR'].get('pronfo_api_key', '')}"
-            data = {
-                'content' : open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r').read(),
-                'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme', 'gray'),
-                'rapi' : self.config['TRACKERS']['THR'].get('pronfo_rapi_id')
-            }
-            response = requests.post(pronfo_url, data=data)
-            try:
-                response = response.json()
-                if response.get('error', True) == False:
-                    mi_img = response.get('url')
-                    desc.write(f"\n[img]{mi_img}[/img]\n")
-                    pronfo = True
-            except:
-                cprint('Error parsing pronfo response, using THR parser instead', 'grey', 'on_red')
-                if meta['debug']:
-                    cprint(response, 'grey', 'on_red')
-                    pprint(response.text) 
+            if meta.get('is_disc', '') == 'BDMV':
+                with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt") as bd_file:
+                    desc.write(f"[nfo]{bd_file.read()}[/nfo]")
+                    bd_file.close()
+            else:
+                # ProNFO
+                pronfo_url = f"https://www.pronfo.com/api/v1/access/upload/{self.config['TRACKERS']['THR'].get('pronfo_api_key', '')}"
+                data = {
+                    'content' : open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r').read(),
+                    'theme' : self.config['TRACKERS']['THR'].get('pronfo_theme', 'gray'),
+                    'rapi' : self.config['TRACKERS']['THR'].get('pronfo_rapi_id')
+                }
+                response = requests.post(pronfo_url, data=data)
+                try:
+                    response = response.json()
+                    if response.get('error', True) == False:
+                        mi_img = response.get('url')
+                        desc.write(f"\n[img]{mi_img}[/img]\n")
+                        pronfo = True
+                except:
+                    cprint('Error parsing pronfo response, using THR parser instead', 'grey', 'on_red')
+                    if meta['debug']:
+                        cprint(response, 'grey', 'on_red')
+                        pprint(response.text) 
 
             for each in image_list:
                 desc.write(f"\n[img]{each}[/img]\n")
@@ -211,52 +210,31 @@ class THR():
    
 
 
-    def search_existing(self, imdb_id, browser):
+    def search_existing(self, session, imdb_id):
+        imdb_id = imdb_id.replace('tt', '')
         search_url = f"https://www.torrenthr.org/browse.php?search={imdb_id}&blah=2&incldead=1"
-        browser.get(search_url)
-        results = browser.find_elements(By.XPATH, "//*[starts-with(@href, 'details.php')]")
+        search = session.get(search_url)
+        soup = BeautifulSoup(search.text, 'html.parser')
         dupes = []
-        if isinstance(results, list) and len(results) >= 1:
-            for result in results:
-                result = result.get_attribute('onmousemove')
-                if result != None:
-                    dupe = result.split("','/images")
-                    dupe = dupe[0].replace("return overlibImage('", "")        
+        for link in soup.find_all('a', href=True):
+            if link['href'].startswith('details.php'):
+                if link.get('onmousemove', False):
+                    dupe = link['onmousemove'].split("','/images")
+                    dupe = dupe[0].replace("return overlibImage('", "")
                     dupes.append(dupe)
         return dupes
 
-    async def login_and_get_cookies(self, meta):
-        os.environ['WDM_LOCAL'] = '1'
-        os.environ['WDM_LOG_LEVEL'] = '0'
-        options = Options()
-        if platform.system() == "Windows":
-            if meta['debug'] == False and meta['nohead'] == False:
-                options.add_argument("--headless")
-            s = Service(GeckoDriverManager().install())
-            browser = Firefox(service=s, options=options)
-        elif platform.system() == "Linux":
-            if meta['nohead'] == False:
-                options.add_argument("--headless")
-            browser = Firefox(executable_path=GeckoDriverManager().install(), options=options)
-        try:
-            browser.get(self.login_url)
-            username_input = browser.find_element(By.NAME, "username")
-            password_input = browser.find_element(By.NAME, "password")
-            username_input.send_keys(self.config['TRACKERS']['THR'].get('username'))
-            password_input.send_keys(self.config['TRACKERS']['THR'].get('password'))
-            login_attempt = browser.find_element(By.XPATH, "//*[@type='submit']")
-            login_attempt.submit()
-            await asyncio.sleep(2)
-            #Check If login information is good
-            logincheck = browser.find_element(By.CLASS_NAME, 'glavni_txt')
-            if "Unijeli ste pogrešno korisničko ime ili lozinku!" in logincheck.text:
-                raise NotImplementedError
-            # Get and Save Cookies and Load cookies
-            cookiepath = os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/THR_cookies.pkl")
-            pickle.dump(browser.get_cookies(), open(cookiepath, "wb"))
-            cookies = pickle.load(open(cookiepath, "rb"))
-            for cookie in cookies:
-                browser.add_cookie(cookie)
-        except NotImplementedError:
-            cprint("INCORRECT LOGIN (Unijeli ste pogrešno korisničko ime ili lozinku!)", 'grey', 'on_red')
-        return browser
+    def login(self, session):
+        url = 'https://www.torrenthr.org/takelogin.php'
+        payload = {
+            'username' : self.username,
+            'password' : self.password,
+            'ssl' : 'yes'
+        }
+        headers = {
+            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
+        }
+        resp = session.post(url, headers=headers, data=payload)
+        if resp.url == "https://www.torrenthr.org/index.php":
+            cprint('Successfully logged in', 'grey', 'on_green')
+        return session

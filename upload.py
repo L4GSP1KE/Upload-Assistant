@@ -1,4 +1,4 @@
-from requests import NullHandler
+import requests
 from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
@@ -281,23 +281,17 @@ async def do_the_thing(path, args, base_dir):
                 from src.trackers.THR import THR
                 thr = THR(config=config)
                 try:
-                    cprint("Logging in to THR", 'grey', 'on_yellow')
-                    thr_browser = await thr.login_and_get_cookies(meta)
-                    cprint("Searching for Dupes", 'grey', 'on_yellow')
-                    dupes = thr.search_existing(meta.get('imdb_id'), thr_browser)
-                    meta = dupe_check(dupes, meta)
-                    if meta['upload'] == True:
-                        await thr.upload(meta, thr_browser)
-                        await client.add_to_client(meta, "THR")
-                        thr_browser.close()
-                    else:
-                        thr_browser.close()
+                    with requests.Session() as session:
+                        cprint("Logging in to THR", 'grey', 'on_yellow')
+                        session = thr.login(session)
+                        cprint("Searching for Dupes", 'grey', 'on_yellow')
+                        dupes = thr.search_existing(session, meta.get('imdb_id'))
+                        meta = dupe_check(dupes, meta)
+                        if meta['upload'] == True:
+                            await thr.upload(session, meta)
+                            await client.add_to_client(meta, "THR")
                 except:
-                    print(traceback.format_exc())
-                    try:
-                        thr_browser.close()
-                    except:
-                        pass
+                    print(traceback.print_exc())
 def get_confirmation(meta):
     if meta['debug'] == True:
         cprint("DEBUG: True", 'grey', 'on_red')

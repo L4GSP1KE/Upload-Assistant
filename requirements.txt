@@ -17,3 +17,4 @@ pyimgbox
 nest_asyncio
 bencode.py
 unidecode
+beautifulsoup4
