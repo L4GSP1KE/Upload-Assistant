@@ -50,7 +50,7 @@ class Args():
         parser.add_argument('-dr', '--draft', action='store_true', required=False, help="Send to drafts (BHD)")
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Use this torrent client instead of default")
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
-        parser.add_argument('-rt', '--randomized', nargs='*', required=False, help="Number of extra, torrents with random infohash", default=0, type=int)
+        parser.add_argument('-rt', '--randomized', nargs='*', required=False, help="Number of extra, torrents with random infohash", default=0)
         parser.add_argument('-ua', '--unattended', action='store_true', required=False, help=argparse.SUPPRESS)
         
         args, before_args = parser.parse_known_args(input)
