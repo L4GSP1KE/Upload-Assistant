@@ -1473,7 +1473,7 @@ class Prep():
             include = ["*.mkv", "*.mp4", "*.ts"]
         torrent = Torrent(path,
             trackers = ["https://fake.tracker"],
-            # source = "",
+            source = "L4G",
             private = True,
             exclude_globs = exclude or [],
             include_globs = include or [],
@@ -1492,7 +1492,12 @@ class Prep():
         # print(f'{pieces_done/pieces_total*100:3.0f} % done')
         cli_ui.info_progress("Hashing...", pieces_done, pieces_total)
 
-
+    def create_random_torrents(self, base_dir, uuid, num):
+        base_torrent = Torrent.read(f"{base_dir}/tmp/{uuid}/BASE.torrent")
+        for i in range(1, int(num) + 1):
+            new_torrent = base_torrent
+            new_torrent.metainfo['info']['entropy'] = random.randint(1, 999999)
+            Torrent.copy(new_torrent).write(f"{base_dir}/tmp/{uuid}/[RAND-{i}]BASE.torrent", overwrite=True)
 
 
 
@@ -2147,7 +2152,7 @@ class Prep():
         torrent_files = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}","*.torrent")
         if isinstance(torrent_files, list) and len(torrent_files) > 1:
             for each in torrent_files:
-                if each != "BASE.torrent":
+                if not each.startswith(('BASE', '[RAND')):
                     os.remove(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{each}"))
         try:
             if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):

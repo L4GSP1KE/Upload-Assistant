@@ -110,6 +110,8 @@ async def do_the_thing(path, args, base_dir):
             prep.create_torrent(meta, Path(meta['path']))
         else:
             meta['client'] = "none"
+    if int(meta.get('randomized', 0)) >= 1:
+        prep.create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'])
            
     if meta.get('trackers', None) != None:
         trackers = meta['trackers']

@@ -356,6 +356,9 @@ class Commands(commands.Cog):
                 p.start()
                 while p.is_alive() == True:
                     await asyncio.sleep(5)
+
+                if int(meta.get('randomized', 0)) >= 1:
+                    prep.create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'])
             else:
                 meta['client'] = 'none'
 
