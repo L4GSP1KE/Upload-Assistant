@@ -28,7 +28,10 @@ class Clients():
 
     async def add_to_client(self, meta, tracker):
         torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent"
-        torrent = Torrent.read(torrent_path)
+        if os.path.exists(torrent_path):
+            torrent = Torrent.read(torrent_path)
+        else:
+            return
         if meta.get('client', None) == None:
             default_torrent_client = self.config['DEFAULT']['default_torrent_client']
         else:
@@ -63,7 +66,7 @@ class Clients():
             self.deluge(meta['path'], torrent_path, torrent, local_path, remote_path, client, meta)
         elif torrent_client.lower() == "watch":
             shutil.copy(torrent_path, client['watch_folder'])
-        pass
+        return
    
         
 
