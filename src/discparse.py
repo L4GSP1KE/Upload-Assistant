@@ -95,6 +95,7 @@ class DiscParse():
         bdinfo = dict()
         bdinfo['video'] = list()
         bdinfo['audio'] = list()
+        bdinfo['subtitles'] = list()
         bdinfo['path'] = path
         lines = bdinfo_input.splitlines()
         for l in lines:
@@ -172,6 +173,10 @@ class DiscParse():
             elif line.startswith("disc label:"):
                 label = l.split(':', 1)[1]
                 bdinfo['label'] = label
+            elif line.startswith('subtitle:'):
+                split1 = l.split(':', 1)[1]
+                split2 = split1.split('/')
+                bdinfo['subtitles'].append(split2[0].strip())
         # pprint(bdinfo)
         files = files.splitlines()
         bdinfo['files'] = []
