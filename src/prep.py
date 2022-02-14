@@ -1492,12 +1492,13 @@ class Prep():
         # print(f'{pieces_done/pieces_total*100:3.0f} % done')
         cli_ui.info_progress("Hashing...", pieces_done, pieces_total)
 
-    def create_random_torrents(self, base_dir, uuid, num):
+    def create_random_torrents(self, base_dir, uuid, num, path):
+        manual_name = re.sub("[^0-9a-zA-Z\[\]\'\-]+", ".", os.path.basename(path))
         base_torrent = Torrent.read(f"{base_dir}/tmp/{uuid}/BASE.torrent")
         for i in range(1, int(num) + 1):
             new_torrent = base_torrent
             new_torrent.metainfo['info']['entropy'] = random.randint(1, 999999)
-            Torrent.copy(new_torrent).write(f"{base_dir}/tmp/{uuid}/[RAND-{i}]BASE.torrent", overwrite=True)
+            Torrent.copy(new_torrent).write(f"{base_dir}/tmp/{uuid}/[RAND-{i}]{manual_name}.torrent", overwrite=True)
 
 
 
