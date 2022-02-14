@@ -50,7 +50,8 @@ class BHD():
             }
         if os.path.exists(torrent_file):
             open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", 'rb')
-            files['file'] = open_torrent
+            files['file'] = open_torrent.read()
+            open_torrent.close()
         
         data = {
             'name' : bhd_name,
@@ -99,7 +100,8 @@ class BHD():
         else:
             cprint(f"Request Data:", 'cyan')
             pprint(data)
-        open_torrent.close()
+        
+        
 
 
 
