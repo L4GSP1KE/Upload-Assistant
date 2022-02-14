@@ -123,10 +123,14 @@ class THR():
                 mi = json.load(f)
             for track in mi['media']['track']:
                 if track['@type'] == "Text":
-                    if track.get('Language') in ['hr', 'en', 'bs', 'sr', 'sl']:
-                        sub_langs.append(track.get('Language'))
+                    language = track.get('Language')
+                    if language in ['hr', 'en', 'bs', 'sr', 'sl']:
+                        if language not in sub_langs:
+                            sub_langs.append(language)
         else:
-            sub_langs = meta['bdinfo']['subtitles']
+            for sub in meta['bdinfo']['subtitles']:
+                if sub not in sub_langs:
+                    sub_langs.append(sub)
         if sub_langs != []:
             subs = []
             sub_lang_map = {
