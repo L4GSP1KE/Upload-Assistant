@@ -361,7 +361,7 @@ class Prep():
                 os.chdir(os.path.dirname(video))
             media_info = MediaInfo.parse(video, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
             export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
-            export.write(media_info)
+            export.write(media_info.replace(video, os.path.basename(video)))
             export.close()
             mi_dump = media_info
 
