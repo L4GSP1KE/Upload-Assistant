@@ -1541,6 +1541,8 @@ class Prep():
             existing_images = []
         else:
             image_glob = glob.glob("*.png")
+            if 'POSTER.png' in image_glob:
+                image_glob.remove('POSTER.png')
             existing_images = meta.get('image_list', [])
         if len(existing_images) < total_screens:
             if img_host == 'imgbox':
