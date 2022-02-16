@@ -98,9 +98,7 @@ class BHD():
             try:
                 # pprint(data)
                 response = response.json()
-                if int(response['status_code']) in [1, 2]:
-                    cprint(response['status_message'], 'green')
-                elif int(response['status_code']) == 0:
+                if int(response['status_code']) == 0:
                     cprint(response['status_message'], 'red')
                     if response['status_message'] == 'Invalid imdb_id value: Field must be a 0, 1, or a valid IMDb id value.':
                         cprint('RETRYING UPLOAD', 'grey', 'on_yellow')
