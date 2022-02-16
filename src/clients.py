@@ -99,7 +99,7 @@ class Clients():
                 elif len(torrent.files) == len(meta['filelist']):
                     torrent_filepath = os.path.commonpath(torrent.files)
                     actual_filepath = os.path.commonpath(meta['filelist'])
-                    if torrent_filepath in meta['filelist']:
+                    if torrent_filepath in actual_filepath:
                         cprint('REUSING .torrent', 'grey', 'on_green')
                         return torrent_path
                 cprint('Unwanted Files/Folders Identified', 'grey', 'on_yellow')
