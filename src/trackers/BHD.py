@@ -94,7 +94,7 @@ class BHD():
         
         url = self.upload_url + self.config['TRACKERS'][self.tracker]['api_key'].strip()
         if meta['debug'] == False:
-            response = requests.post(url=url, files=files, data=data, headers=headers, params=params)
+            response = requests.post(url=url, files=files, data=data, headers=headers)
             try:
                 # pprint(data)
                 print(response.json())
