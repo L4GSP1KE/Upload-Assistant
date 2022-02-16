@@ -84,7 +84,7 @@ class UHDHEAVEN():
             data['season_number'] = meta.get('season_int', '0')
             data['episode_number'] = meta.get('episode_int', '0')
         if meta['debug'] == False:
-            response = requests.post(url=self.upload_url, files=files, data=data, headers=headers)
+            response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
             try:
                 # pprint(data)
                 print(response.json())
