@@ -1506,7 +1506,7 @@ class Prep():
             base_torrent = Torrent.read(torrentpath)
             base_torrent.metainfo['announce'] = 'https://fake.tracker'
             base_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
-            base_torrent.metainfo['created_by'] = "Created by L4G's Upload Assistant"
+            base_torrent.metainfo['created by'] = "Created by L4G's Upload Assistant"
             base_torrent.metainfo['info']['source'] = 'L4G'
             base_torrent.metainfo['info']['private'] = 1
             Torrent.copy(base_torrent).write(f"{base_dir}/tmp/{uuid}/BASE.torrent", overwrite=True)
