@@ -10,6 +10,7 @@ import urllib
 from pprint import pprint
 import os
 # from pprint import pprint
+from src.trackers.COMMON import COMMON
 
 class BHD():
     """
@@ -21,10 +22,15 @@ class BHD():
     """
     def __init__(self, config):
         self.config = config
+        self.tracker = 'BHD'
+        self.source_flag = 'BHD'
+        self.upload_url = 'https://beyond-hd.me/api/upload/'
+        self.forum_link = 'https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456'
         pass
     
     async def upload(self, meta):
-        await self.edit_torrent(meta)
+        common = COMMON(config=self.config)
+        await common.edit_torrent(meta, self.tracker, self.source_flag)
         cat_id = await self.get_cat_id(meta['category'])
         source_id = await self.get_source(meta['source'])
         type_id = await self.get_type(meta)
@@ -33,7 +39,7 @@ class BHD():
         custom, edition = await self.get_edition(meta)
         tags = await self.get_tags(meta)
         bhd_name = await self.edit_name(meta)
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['BHD'].get('anon', "False"))) == False:
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:
             anon = 0
         else:
             anon = 1
@@ -43,13 +49,13 @@ class BHD():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8')
             
-        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'r').read()
-        torrent_file = f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent"
+        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
+        torrent_file = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
         files = {
             'mediainfo' : mi_dump,
             }
         if os.path.exists(torrent_file):
-            open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", 'rb')
+            open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
             files['file'] = open_torrent.read()
             open_torrent.close()
         
@@ -85,10 +91,12 @@ class BHD():
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
-        url = f"https://beyond-hd.me/api/upload/{self.config['TRACKERS']['BHD']['api_key'].strip()}"
+        params = {
+            'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()
+        }
         
         if meta['debug'] == False:
-            response = requests.post(url=url, files=files, data=data, headers=headers)
+            response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
             try:
                 # pprint(data)
                 print(response.json())
@@ -164,18 +172,10 @@ class BHD():
         return type_id
 
 
-   
-    async def edit_torrent(self, meta):
-        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
-            bhd_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-            bhd_torrent.metainfo['announce'] = self.config['TRACKERS']['BHD']['announce_url'].strip()
-            bhd_torrent.metainfo['info']['source'] = "BHD"
-            Torrent.copy(bhd_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]{meta['clean_name']}.torrent", overwrite=True)
-        return 
         
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BHD]DESCRIPTION.txt", 'w') as desc:
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as desc:
             desc.write(base.replace("[img=250]", "[img=250x250]"))
             images = meta['image_list']
             if len(images) > 0: 
@@ -187,7 +187,7 @@ class BHD():
                     if (each + 1) % 2 == 0:
                         desc.write("\n")
                 desc.write("[/center]")
-            desc.write("\n[center][url=https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456]Created by L4G's Upload Assistant[/url][/center]")
+            desc.write(f"\n[center][url={self.forum_link}]Created by L4G's Upload Assistant[/url][/center]")
             desc.close()
         return
    
@@ -230,7 +230,7 @@ class BHD():
         return dupes
 
     async def get_live(self, meta): 
-        draft = self.config['TRACKERS']['BHD']['draft_default'].strip()
+        draft = self.config['TRACKERS'][self.tracker]['draft_default'].strip()
         draft = bool(distutils.util.strtobool(draft)) #0 for send to draft, 1 for live
         if draft:
             draft_int = 0

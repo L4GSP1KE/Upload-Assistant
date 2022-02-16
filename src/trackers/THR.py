@@ -5,11 +5,10 @@ import requests
 import json
 import glob
 from difflib import SequenceMatcher
-from unidecode import unidecode
+
 import base64
 import os
 from termcolor import cprint
-from bs4 import BeautifulSoup
 
 from pprint import pprint
 
@@ -30,6 +29,7 @@ class THR():
         pass
     
     async def upload(self, session, meta):
+        from unidecode import unidecode
         await self.edit_torrent(meta)
         cat_id = await self.get_cat_id(meta)
         subs = self.get_subtitles(meta)
@@ -220,6 +220,7 @@ class THR():
 
 
     def search_existing(self, session, imdb_id):
+        from bs4 import BeautifulSoup
         imdb_id = imdb_id.replace('tt', '')
         search_url = f"https://www.torrenthr.org/browse.php?search={imdb_id}&blah=2&incldead=1"
         search = session.get(search_url)

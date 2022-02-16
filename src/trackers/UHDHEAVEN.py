@@ -10,6 +10,8 @@ import json
 from pprint import pprint
 import os
 
+from src.trackers.COMMON import COMMON
+
 class UHDHEAVEN():
     """
     Edit for Tracker:
@@ -20,16 +22,22 @@ class UHDHEAVEN():
     """
     def __init__(self, config):
         self.config = config
+        self.tracker = 'UHDHEAVEN'
+        self.source_flag = 'UHDHEAVEN'
+        self.search_url = 'https://uhd-heaven.xyz/api/torrents/filter'
+        self.upload_url = 'https://uhd-heaven.xyz/api/torrents/upload'
+        self.forum_link = 'https://github.com/L4GSP1KE/Upload-Assistant'
         pass
     
     async def upload(self, meta):
-        await self.edit_torrent(meta)
+        common = COMMON(config=self.config)
+        await common.edit_torrent(meta, self.tracker, self.source_flag)
+        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
-        await self.edit_desc(meta)
         uhdheaven_name = await self.edit_name(meta)
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['UHDHEAVEN'].get('anon', "False"))) == False:
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:
             anon = 0
         else:
             anon = 1
@@ -39,8 +47,8 @@ class UHDHEAVEN():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
             bd_dump = None
-        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[UHDHEAVEN]DESCRIPTION.txt", 'r').read()
-        open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[UHDHEAVEN]{meta['clean_name']}.torrent", 'rb')
+        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
+        open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': open_torrent}
         data = {
             'name' : uhdheaven_name,
@@ -69,12 +77,14 @@ class UHDHEAVEN():
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
-        url = f"https://uhd-heaven.xyz/api/torrents/upload?api_token={self.config['TRACKERS']['UHDHEAVEN']['api_key'].strip()}"
+        params = {
+            'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()
+        }
         if meta.get('category') == "TV":
             data['season_number'] = meta.get('season_int', '0')
             data['episode_number'] = meta.get('episode_int', '0')
         if meta['debug'] == False:
-            response = requests.post(url=url, files=files, data=data, headers=headers)
+            response = requests.post(url=self.upload_url, files=files, data=data, headers=headers)
             try:
                 # pprint(data)
                 print(response.json())
@@ -131,32 +141,6 @@ class UHDHEAVEN():
 
 
 
-    async def edit_torrent(self, meta):
-        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
-            UHDHEAVEN_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-            UHDHEAVEN_torrent.metainfo['announce'] = self.config['TRACKERS']['UHDHEAVEN']['announce_url'].strip()
-            UHDHEAVEN_torrent.metainfo['info']['source'] = "UHDHEAVEN"
-            Torrent.copy(UHDHEAVEN_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[UHDHEAVEN]{meta['clean_name']}.torrent", overwrite=True)
-        return 
-        
-    async def edit_desc(self, meta):
-        base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[UHDHEAVEN]DESCRIPTION.txt", 'w') as desc:
-            desc.write(base)
-            images = meta['image_list']
-            if len(images) > 0: 
-                desc.write("[center]")
-                for each in range(len(images)):
-                    web_url = images[each]['web_url']
-                    img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
-                    if (each + 1) % 3 == 0:
-                        desc.write("\n")
-                desc.write("[/center]")
-
-            desc.write("\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by L4G's Upload Assistant[/url][/center]")
-            desc.close()
-        return 
 
    
 
@@ -164,9 +148,8 @@ class UHDHEAVEN():
     async def search_existing(self, meta):
         dupes = []
         cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
-        url = "https://uhd-heaven.xyz/api/torrents/filter"
         params = {
-            'api_token' : self.config['TRACKERS']['UHDHEAVEN']['api_key'].strip(),
+            'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'tmdbId' : meta['tmdb'],
             'categories[]' : await self.get_cat_id(meta['category']),
             'types[]' : await self.get_type_id(meta['type']),
@@ -179,7 +162,7 @@ class UHDHEAVEN():
             params['name'] = params['name'] + meta['edition']
         params['name'] + meta['audio']
         try:
-            response = requests.get(url=url, params=params)
+            response = requests.get(url=self.search_url, params=params)
             response = response.json()
             for each in response['data']:
                 result = [each][0]['attributes']['name']

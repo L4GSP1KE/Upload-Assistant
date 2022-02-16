@@ -8,6 +8,7 @@ from os.path import basename
 import re
 import sys
 import shortuuid
+import distutils.util
 import asyncio
 from guessit import guessit
 import ntpath
@@ -2095,6 +2096,8 @@ class Prep():
                             meta[key] = value.get(key)
                         else:
                             pass
+                    elif key == 'personalrelease':
+                        meta[key] = bool(distutils.util.strtobool(value.get(key, 'False')))
                     else:
                         meta[key] = value.get(key)
                 # print(f"Tag: {meta['tag']} | Key: {key} | Value: {meta[key]}"

@@ -3,12 +3,14 @@ from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
 from src.search import Search
+from src.trackers.COMMON import COMMON
 from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
 from src.trackers.AITHER import AITHER
 from src.trackers.STC import STC
 from src.trackers.UHDHEAVEN import UHDHEAVEN
 from src.trackers.R4E import R4E
+from src.trackers.THR import THR
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -119,6 +121,7 @@ async def do_the_thing(path, args, base_dir):
         trackers = config['TRACKERS']['default_trackers']
     if "," in trackers:
         trackers = trackers.split(',')
+    trackers = [s.strip().upper() for s in trackers]
     with open (f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
         json.dump(meta, f, indent=4)
         f.close()
@@ -140,60 +143,69 @@ async def do_the_thing(path, args, base_dir):
         trackers.insert(0, "MANUAL")
     
 
+
+    ####################################
+    #######  Upload to Trackers  #######
+    ####################################
+    common = COMMON(config=config)
+    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'UHDHEAVEN', 'R4E']
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'UHDHEAVEN' : UHDHEAVEN, 'R4E' : R4E, 'THR' : THR, }
+
     for tracker in trackers:
-        tracker = tracker.replace(" ", "")
+        tracker = tracker.replace(" ", "").upper().strip()
         if meta['debug']:
             debug = "(DEBUG)"
         else:
             debug = ""
         
-        if tracker.upper() == "MANUAL":
+        if tracker in unit3d_trackers:
+            tracker_class = tracker_class_map[tracker](config=config)
+            if meta['unattended']:
+                upload_to_tracker = True
+            else:
+                upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker_class.tracker}? {debug}", default=meta['unattended'])
+            if upload_to_tracker:
+                print(f"Uploading to {tracker_class.tracker}")
+                dupes = await tracker_class.search_existing(meta)
+                meta = dupe_check(dupes, meta)
+                if meta['upload'] == True:
+                    await tracker_class.upload(meta)
+                    await client.add_to_client(meta, tracker_class.tracker)
+        
+        if tracker == "MANUAL":
             if meta['unattended']:                
                 do_manual = True
             else:
                 do_manual = cli_ui.ask_yes_no(f"Get files for manual upload?", default=True)
             if do_manual:
                 for manual_tracker in trackers:
-                    manual_tracker = manual_tracker.replace(" ", "")
-                    if manual_tracker.upper() == "BLU":
-                        blu = BLU(config=config) 
-                        await blu.edit_desc(meta)
-                    if manual_tracker.upper() == "BHD":
-                        bhd = BHD(config=config)
-                        await bhd.edit_desc(meta)
-                    if manual_tracker.upper() == "AITHER":
-                        aither = AITHER(config=config)
-                        await aither.edit_desc(meta)    
-                    if manual_tracker.upper() == "STC":
-                        stc = STC(config=config)
-                        await stc.edit_desc(meta)    
-                    if manual_tracker.upper() == "UHDHEAVEN":
-                        uhdheaven = UHDHEAVEN(config=config)
-                        await uhdheaven.edit_desc(meta)    
-                    if manual_tracker.upper() == "THR":
-                        from src.trackers.THR import THR
-                        thr = THR(config=config)
-                        await thr.edit_desc(meta)
+                    if manual_tracker != 'MANUAL':
+                        manual_tracker = manual_tracker.replace(" ", "").upper().strip()
+                        tracker_class = tracker_class_map[manual_tracker](config=config)
+                        if manual_tracker in unit3d_trackers:
+                            await common.unit3d_edit_desc(meta, tracker_class.tracker, tracker_class.forum_link)
+                        else:
+                            await tracker_class.edit_desc(meta)
                 url = await prep.package(meta)
                 if url == False:
                     cprint(f"Unable to upload prep files, they can be found at `tmp/{meta['uuid']}", 'grey', 'on_yellow')
                 else:
                     cprint(meta['name'], 'grey', 'on_green')
                     cprint(f"Files can be found at {url}", 'grey', 'on_green')  
-        if tracker.upper() == "BLU":
-            if meta['unattended']:
-                upload_to_blu = True
-            else:
-                upload_to_blu = cli_ui.ask_yes_no(f"Upload to BLU? {debug}", default=meta['unattended'])
-            if upload_to_blu:
-                print("Uploading to BLU")
-                blu = BLU(config=config)
-                dupes = await blu.search_existing(meta)
-                meta = dupe_check(dupes, meta)
-                if meta['upload'] == True:
-                    await blu.upload(meta)
-                    await client.add_to_client(meta, "BLU")
-        if tracker.upper() == "BHD":
+        # if tracker.upper() == "BLU":
+        #     if meta['unattended']:
+        #         upload_to_blu = True
+        #     else:
+        #         upload_to_blu = cli_ui.ask_yes_no(f"Upload to BLU? {debug}", default=meta['unattended'])
+        #     if upload_to_blu:
+        #         print("Uploading to BLU")
+        #         blu = BLU(config=config)
+        #         dupes = await blu.search_existing(meta)
+        #         meta = dupe_check(dupes, meta)
+        #         if meta['upload'] == True:
+        #             await blu.upload(meta)
+        #             await client.add_to_client(meta, "BLU")
+        if tracker == "BHD":
             bhd = BHD(config=config)
             draft_int = await bhd.get_live(meta)
             if draft_int == 0:
@@ -211,60 +223,60 @@ async def do_the_thing(path, args, base_dir):
                 if meta['upload'] == True:
                     await bhd.upload(meta)
                     await client.add_to_client(meta, "BHD")
-        if tracker.upper() == "AITHER":
-            if meta['unattended']:
-                upload_to_aither = True
-            else:
-                upload_to_aither = cli_ui.ask_yes_no(f"Upload to Aither? {debug}", default=meta['unattended'])
-            if upload_to_aither:
-                print("Uploading to Aither")
-                aither = AITHER(config=config)
-                dupes = await aither.search_existing(meta)
-                meta = dupe_check(dupes, meta)
-                if meta['upload'] == True:
-                    await aither.upload(meta)
-                    await client.add_to_client(meta, "AITHER")
-        if tracker.upper() == "STC":
-            if meta['unattended']:
-                upload_to_stc = True
-            else:
-                upload_to_stc = cli_ui.ask_yes_no(f"Upload to STC? {debug}", default=meta['unattended'])
-            if upload_to_stc:
-                print("Uploading to STC")
-                stc = STC(config=config)
-                dupes = await stc.search_existing(meta)
-                meta = dupe_check(dupes, meta)
-                if meta['upload'] == True:
-                    await stc.upload(meta)
-                    await client.add_to_client(meta, "STC")
-        if tracker.upper() == "UHDHEAVEN":
-            if meta['unattended']:
-                upload_to_uhdh = True
-            else:
-                upload_to_uhdh = cli_ui.ask_yes_no(f"Upload to UHDHEAVEN? {debug}", default=meta['unattended'])
-            if upload_to_uhdh:
-                print("Uploading to UHDHEAVEN")
-                uhdh = UHDHEAVEN(config=config)
-                dupes = await uhdh.search_existing(meta)
-                meta = dupe_check(dupes, meta)
-                if meta['upload'] == True:
-                    await uhdh.upload(meta)
-                    await client.add_to_client(meta, "UHDHEAVEN")
-        if tracker.upper() == "R4E":
-            if meta['unattended']:
-                upload_to_r4e = True
-            else:
-                upload_to_r4e = cli_ui.ask_yes_no(f"Upload to R4E? {debug}", default=meta['unattended'])
-            if upload_to_r4e:
-                print("Uploading to R4E")
-                cprint("WARNING: THIS SCRIPT MAKES NO ATTEMPT AT ENSURING THIS UPLOAD IS MOTORSPORTS RELATED")
-                r4e = R4E(config=config)
-                dupes = await r4e.search_existing(meta)
-                meta = dupe_check(dupes, meta)
-                if meta['upload'] == True:
-                    await r4e.upload(meta)
-                    await client.add_to_client(meta, "R4E")
-        if tracker.upper() == "THR":
+        # if tracker.upper() == "AITHER":
+        #     tracker = AITHER(config=config)
+        #     if meta['unattended']:
+        #         upload_to_tracker = True
+        #     else:
+        #         upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker.tracker}? {debug}", default=meta['unattended'])
+        #     if upload_to_tracker:
+        #         print(f"Uploading to {tracker.tracker}")
+        #         dupes = await tracker.search_existing(meta)
+        #         meta = dupe_check(dupes, meta)
+        #         if meta['upload'] == True:
+        #             await tracker.upload(meta)
+        #             await client.add_to_client(meta, tracker.tracker)
+        # if tracker.upper() == "STC":
+        #     if meta['unattended']:
+        #         upload_to_stc = True
+        #     else:
+        #         upload_to_stc = cli_ui.ask_yes_no(f"Upload to STC? {debug}", default=meta['unattended'])
+        #     if upload_to_stc:
+        #         print("Uploading to STC")
+        #         stc = STC(config=config)
+        #         dupes = await stc.search_existing(meta)
+        #         meta = dupe_check(dupes, meta)
+        #         if meta['upload'] == True:
+        #             await stc.upload(meta)
+        #             await client.add_to_client(meta, "STC")
+        # if tracker.upper() == "UHDHEAVEN":
+        #     if meta['unattended']:
+        #         upload_to_uhdh = True
+        #     else:
+        #         upload_to_uhdh = cli_ui.ask_yes_no(f"Upload to UHDHEAVEN? {debug}", default=meta['unattended'])
+        #     if upload_to_uhdh:
+        #         print("Uploading to UHDHEAVEN")
+        #         uhdh = UHDHEAVEN(config=config)
+        #         dupes = await uhdh.search_existing(meta)
+        #         meta = dupe_check(dupes, meta)
+        #         if meta['upload'] == True:
+        #             await uhdh.upload(meta)
+        #             await client.add_to_client(meta, "UHDHEAVEN")
+        # if tracker.upper() == "R4E":
+        #     if meta['unattended']:
+        #         upload_to_r4e = True
+        #     else:
+        #         upload_to_r4e = cli_ui.ask_yes_no(f"Upload to R4E? {debug}", default=meta['unattended'])
+        #     if upload_to_r4e:
+        #         print("Uploading to R4E")
+        #         cprint("WARNING: THIS SCRIPT MAKES NO ATTEMPT AT ENSURING THIS UPLOAD IS MOTORSPORTS RELATED")
+        #         r4e = R4E(config=config)
+        #         dupes = await r4e.search_existing(meta)
+        #         meta = dupe_check(dupes, meta)
+        #         if meta['upload'] == True:
+        #             await r4e.upload(meta)
+        #             await client.add_to_client(meta, "R4E")
+        if tracker == "THR":
             if meta['unattended']:
                 upload_to_thr = True
             else:
@@ -278,7 +290,6 @@ async def do_the_thing(path, args, base_dir):
                 if meta.get('youtube', None) == None:
                     youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                     meta['youtube'] = youtube
-                from src.trackers.THR import THR
                 thr = THR(config=config)
                 try:
                     with requests.Session() as session:
