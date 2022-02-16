@@ -97,6 +97,16 @@ class BHD():
             response = requests.post(url=url, files=files, data=data, headers=headers)
             try:
                 # pprint(data)
+                response = response.json()
+                if int(response['status_code']) == 1:
+                    cprint(response['status_message'], 'green')
+                elif int(response['status_code']) == 0:
+                    cprint(response['status_message'], 'red')
+                    if response['status_message'] == 'Invalid imdb_id value: Field must be a 0, 1, or a valid IMDb id value.':
+                        cprint('RETRYING UPLOAD', 'grey', 'on_yellow')
+                        data['imdb_id'] = 0
+                        response = requests.post(url=url, files=files, data=data, headers=headers)
+
                 print(response.json())
             except:
                 cprint("It may have uploaded, go check")
