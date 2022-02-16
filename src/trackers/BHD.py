@@ -202,9 +202,12 @@ class BHD():
     async def search_existing(self, meta):
         dupes = []
         cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        category = meta['category']
+        if category == 'MOVIE':
+            category = "Movies"
         data = {
             'tmdb_id' : meta['tmdb'],
-            'categories' : meta['category'],
+            'categories' : category,
             'types' : await self.get_type(meta),
         }
         # Search all releases if SD
