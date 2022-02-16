@@ -1466,7 +1466,7 @@ class Prep():
             os.chdir(path)
             globs = glob.glob("*.mkv") + glob.glob("*.mp4") + glob.glob("*.ts")
             if len(globs) == 1:
-                path = video
+                path = meta['filelist'][0]
         if meta['is_disc']:
             include, exclude = "", ""
         else:
