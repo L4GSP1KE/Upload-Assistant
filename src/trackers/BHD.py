@@ -98,7 +98,7 @@ class BHD():
             try:
                 # pprint(data)
                 response = response.json()
-                if int(response['status_code']) == 1:
+                if int(response['status_code']) in [1, 2]:
                     cprint(response['status_message'], 'green')
                 elif int(response['status_code']) == 0:
                     cprint(response['status_message'], 'red')
