@@ -91,12 +91,10 @@ class BHD():
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
-        params = {
-            'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()
-        }
         
+        url = self.upload_url + self.config['TRACKERS'][self.tracker]['api_key'].strip()
         if meta['debug'] == False:
-            response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
+            response = requests.post(url=url, files=files, data=data, headers=headers, params=params)
             try:
                 # pprint(data)
                 print(response.json())
