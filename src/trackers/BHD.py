@@ -100,7 +100,7 @@ class BHD():
                 response = response.json()
                 if int(response['status_code']) == 0:
                     cprint(response['status_message'], 'red')
-                    if response['status_message'] == 'Invalid imdb_id value: Field must be a 0, 1, or a valid IMDb id value.':
+                    if response['status_message'].startswith('Invalid imdb_id'):
                         cprint('RETRYING UPLOAD', 'grey', 'on_yellow')
                         data['imdb_id'] = 0
                         response = requests.post(url=url, files=files, data=data, headers=headers)
