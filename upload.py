@@ -107,6 +107,11 @@ async def do_the_thing(path, args, base_dir):
             pprint(meta['image_list'])
         # meta['uploaded_screens'] = True
 
+    if meta.get('torrenthash', None) != None:
+        reuse_torrent = await client.find_existing_torrent(meta)
+        if reuse_torrent != None:
+            prep.create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
+
     if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
         if meta['nohash'] == False:
             prep.create_torrent(meta, Path(meta['path']))
@@ -121,7 +126,6 @@ async def do_the_thing(path, args, base_dir):
         trackers = config['TRACKERS']['default_trackers']
     if "," in trackers:
         trackers = trackers.split(',')
-    trackers = [s.strip().upper() for s in trackers]
     with open (f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
         json.dump(meta, f, indent=4)
         f.close()
@@ -139,6 +143,7 @@ async def do_the_thing(path, args, base_dir):
     
     if isinstance(trackers, list) == False:
         trackers = [trackers]
+    trackers = [s.strip().upper() for s in trackers]
     if meta.get('manual', False):
         trackers.insert(0, "MANUAL")
     

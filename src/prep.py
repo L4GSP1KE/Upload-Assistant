@@ -1501,6 +1501,15 @@ class Prep():
             new_torrent.metainfo['info']['entropy'] = random.randint(1, 999999)
             Torrent.copy(new_torrent).write(f"{base_dir}/tmp/{uuid}/[RAND-{i}]{manual_name}.torrent", overwrite=True)
 
+    def create_base_from_existing_torrent(self, torrentpath, base_dir, uuid):
+        if os.path.exists(torrentpath):
+            base_torrent = Torrent.read(torrentpath)
+            base_torrent.metainfo['announce'] = 'https://fake.tracker'
+            base_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
+            base_torrent.metainfo['created_by'] = "Created by L4G's Upload Assistant"
+            base_torrent.metainfo['info']['source'] = 'L4G'
+            base_torrent.metainfo['info']['private'] = 1
+            Torrent.copy(base_torrent).write(f"{base_dir}/tmp/{uuid}/BASE.torrent", overwrite=True)
 
 
 

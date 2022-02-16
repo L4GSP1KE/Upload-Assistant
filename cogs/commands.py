@@ -352,6 +352,11 @@ class Commands(commands.Cog):
                 meta['embed_msg_id'] = message.id
             channel = message.channel
             if meta['nohash'] == False:
+                if meta.get('torrenthash', None) != None:
+                    reuse_torrent = await client.find_existing_torrent(meta)
+                    if reuse_torrent != None:
+                        prep.create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
+
                 p = multiprocessing.Process(target = prep.create_torrent, args=(meta, Path(meta['path'])))
                 p.start()
                 while p.is_alive() == True:

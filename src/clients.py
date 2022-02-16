@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from email.policy import default
 from pprint import pprint
 from torf import Torrent
 import xmlrpc.client
@@ -70,6 +71,40 @@ class Clients():
    
         
 
+    async def find_existing_torrent(self, meta):
+        if meta.get('client', None) == None:
+            default_torrent_client = self.config['DEFAULT']['default_torrent_client']
+        else:
+            default_torrent_client = meta['client']
+        if meta.get('client', None) == 'none':
+            return None
+        client = self.config['TORRENT_CLIENTS'][default_torrent_client]
+        torrent_storage_dir = client.get('torrent_storage_dir', None)
+        if torrent_storage_dir != None and meta.get('torrenthash', None) != None:
+            torrent_path = f"{torrent_storage_dir}/{meta['torrenthash']}.torrent"
+            if os.path.exists(torrent_path):
+                # Reuse if disc
+                if meta.get('is_disc', None) != None:
+                    cprint('REUSING .torrent', 'grey', 'on_green')
+                    return torrent_path
+                torrent = Torrent.read(torrent_path)
+                # If one file, check for folder
+                if len(torrent.files) == len(meta['filelist']) == 1:
+                    if str(torrent.files[0]) == os.path.basename(torrent.files[0]):
+                        cprint('REUSING .torrent', 'grey', 'on_green')
+                        return torrent_path
+                # Check if number of files matches number of videos
+                elif len(torrent.files) == len(meta['filelist']):
+                    torrent_filepath = os.path.commonpath(torrent.files)
+                    actual_filepath = os.path.commonpath(meta['filelist'])
+                    if torrent_filepath in meta['filelist']:
+                        cprint('REUSING .torrent', 'grey', 'on_green')
+                        return torrent_path
+                cprint('Unwanted Files/Folders Identified', 'grey', 'on_yellow')
+                return None
+            else:
+                cprint(f'NO .torrent WITH INFOHASH {meta.get("torrenthash")} FOUND')
+        return None
 
 
 
