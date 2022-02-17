@@ -339,7 +339,8 @@ class Prep():
         if os.path.isdir(videoloc):
             globlist = glob.glob1(videoloc, "*.mkv") + glob.glob1(videoloc, "*.mp4") + glob.glob1(videoloc, "*.ts")
             for file in globlist:
-                filelist.append(os.path.abspath(f"{videoloc}{os.sep}{file}"))
+                if not file.lower().endswith('sample.mkv'):
+                    filelist.append(os.path.abspath(f"{videoloc}{os.sep}{file}"))
             video = sorted(filelist)[0]       
         else:
             video = videoloc
