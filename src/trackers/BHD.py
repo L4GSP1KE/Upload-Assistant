@@ -105,7 +105,7 @@ class BHD():
                         data['imdb_id'] = 0
                         response = requests.post(url=url, files=files, data=data, headers=headers)
 
-                print(response.json())
+                print(response)
             except:
                 cprint("It may have uploaded, go check")
                 # cprint(f"Request Data:", 'cyan')
