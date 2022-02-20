@@ -1890,7 +1890,7 @@ class Prep():
                                     for lang, names in values.items():
                                         if lang == "jp":
                                             for name in names:
-                                                if re.sub("[^0-9a-zA-Z\[\]]+", " ", romaji.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", " ", name.lower().replace(' ', '')):
+                                                if re.sub("[^0-9a-zA-Z\[\]]+", "", romaji.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", "", name.lower().replace(' ', '')):
                                                     if season_num != "all":
                                                         season_int = season_num
                                                         season = f"S{season_num.zfill(2)}"
@@ -1899,7 +1899,7 @@ class Prep():
                                                         season = "S01"
                                         if lang == "us":
                                             for name in names:
-                                                if re.sub("[^0-9a-zA-Z\[\]]+", " ", eng_title.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", " ", name.lower().replace(' ', '')):
+                                                if re.sub("[^0-9a-zA-Z\[\]]+", "", eng_title.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", "", name.lower().replace(' ', '')):
                                                     if season_num != "all":
                                                         season_int = season_num
                                                         season = f"S{season_num.zfill(2)}"
