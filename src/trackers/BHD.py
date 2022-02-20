@@ -277,6 +277,8 @@ class BHD():
             tags.append("OpenMatte")
         if meta.get('scene', False) == True:
             tags.append("Scene")
+        if meta.get('personalrelease', False) == True:
+            tags.append('Personal')
         return tags
 
     async def edit_name(self, meta):
