@@ -1815,6 +1815,7 @@ class Prep():
                     episode_int = "0"
                     meta['tv_pack'] = 1
             else:
+                #If Anime
                 parsed = anitopy.parse(Path(video).name)
                 # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
                 romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(parsed['anime_title'])
@@ -1824,6 +1825,7 @@ class Prep():
                 meta = await self.tmdb_other_meta(meta)
                 if meta['category'] != "TV":
                     return meta
+
                 # meta['title'] = eng_title
                 # difference = SequenceMatcher(None, eng_title, romaji.lower()).ratio()
                 # if difference >= 0.8:
@@ -1854,7 +1856,10 @@ class Prep():
                     episode_int = "0"
                     meta['tv_pack'] = 1
                 try:
-                    season = parsed['anime_season']
+                    if meta.get('season'):
+                        season_int = season
+                    else:
+                        season = parsed['anime_season']
                     season_int = season
                     season = f"S{season.zfill(2)}"
                 except:
@@ -1922,12 +1927,12 @@ class Prep():
             if meta.get('manual_season', None) == None:
                 meta['season'] = season
             else:
-                meta['season_int'] = meta['manual_season'].lower().replace('s', '')
+                season_int = meta['manual_season'].lower().replace('s', '')
                 meta['season'] = f"S{meta['manual_season'].lower().replace('s', '').zfill(2)}"
             if meta.get('manual_episode', None) == None:
                 meta['episode'] = episode
             else:
-                meta['episode_int'] = meta['manual_episode'].lower().replace('e', '')
+                episode_int = meta['manual_episode'].lower().replace('e', '')
                 meta['episode'] = f"E{meta['manual_episode'].lower().replace('e', '').zfill(2)}"
             
             if " COMPLETE " in Path(video).name.replace('.', ' '):
