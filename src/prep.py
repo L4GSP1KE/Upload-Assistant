@@ -1145,6 +1145,8 @@ class Prep():
                             orig = True
                 if eng and orig == True:
                     dual = "Dual-Audio"
+                elif eng == False and orig == True:
+                    dual = "Dubbed"
             except:
                 pass
         audio = f"{dual} {codec} {format_settings} {chan}{extra}"
