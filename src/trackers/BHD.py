@@ -272,6 +272,7 @@ class BHD():
             tags.append('3D')
         if "Dual-Audio" in meta.get('audio', ""):
             tags.append('DualAudio')
+        if "Dubbed" in meta.get('audio', ""):
             tags.append('EnglishDub')
         if "Open Matte" in meta.get('edition', ""):
             tags.append("OpenMatte")
