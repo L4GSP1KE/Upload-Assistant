@@ -40,7 +40,7 @@ from pprint import pprint
 import itertools
 import cli_ui
 
-
+# from src.trackers.PTP import PTP
 
 
 
@@ -202,6 +202,16 @@ class Prep():
 
         meta['bdinfo'] = bdinfo
         
+        # if meta.get('ptp', None) != None:
+        #     # Get ptp info from arg
+        #     pass
+        # elif self.config['TRACKERS']['PTP'].get('ApiUser') != None and self.config['TRACKERS']['PTP'].get('ApiKey') != None:
+        #     ptp = PTP(config=self.config)
+        #     ptp_imdb, ptp_id = ptp.get_ptp_id_imdb(meta['path'])
+        #     if ptp_imdb != None:
+        #         meta['imdb'] = ptp_imdb
+        #     if ptp_id != None:
+        #         meta['ptp_id'] = ptp_id
         
         meta['tmdb'] = meta.get('tmdb_manual', None)
         if meta.get('type', None) == None:
@@ -1148,7 +1158,7 @@ class Prep():
                             time.sleep(5)
                 if eng and orig == True:
                     dual = "Dual-Audio"
-                elif eng == False and orig == True:
+                elif eng == True and orig == False:
                     dual = "Dubbed"
             except:
                 pass
