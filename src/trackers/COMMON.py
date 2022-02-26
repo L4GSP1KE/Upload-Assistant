@@ -28,8 +28,6 @@ class COMMON():
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
                     desc.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
-                    if (each + 1) % 3 == 0:
-                        desc.write("\n")
                 desc.write("[/center]")
 
             desc.write(f"\n[center][url={forum_link}]Created by L4G's Upload Assistant[/url][/center]")
