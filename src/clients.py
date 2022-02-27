@@ -85,9 +85,10 @@ class Clients():
             cprint(f'Missing torrent_storage_dir for {default_torrent_client}', 'grey', 'on_red')
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
-                torrent_path = f"{torrent_storage_dir}/{meta['torrenthash']}.torrent"
+                torrenthash = meta['torrenthash']
             elif meta.get('ptp_torrenthash', None) != None:
-                torrent_path = f"{torrent_storage_dir}/{meta['ptp_torrenthash']}.torrent"
+                torrenthash = meta['ptp_torrenthash']
+            torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
             if os.path.exists(torrent_path):
                 # Reuse if disc
                 if meta.get('is_disc', None) != None:
@@ -109,7 +110,7 @@ class Clients():
                 cprint('Unwanted Files/Folders Identified', 'grey', 'on_yellow')
                 return None
             else:
-                cprint(f'NO .torrent WITH INFOHASH {meta.get("torrenthash")} FOUND')
+                cprint(f'NO .torrent WITH INFOHASH {torrenthash} FOUND')
         return None
 
 
