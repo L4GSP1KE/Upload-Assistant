@@ -44,13 +44,14 @@ class Clients():
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_client = client['torrent_client']
         
-        local_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('local_path','/LocalPath')
-        remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('remote_path', '/RemotePath')
+        local_path = list_local_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('local_path','/LocalPath')
+        remote_path = list_remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('remote_path', '/RemotePath')
         if isinstance(local_path, list):
             for i in range(len(local_path)):
                 if os.path.normpath(local_path[i]) in meta['path']:
                     list_local_path = local_path[i]
                     list_remote_path = remote_path[i]
+            
         local_path = os.path.normpath(list_local_path)
         remote_path = os.path.normpath(list_remote_path)
         if local_path.endswith(os.sep):
