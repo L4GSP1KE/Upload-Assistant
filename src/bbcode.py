@@ -37,7 +37,7 @@ class BBCODE:
         # End my suffering
         desc = desc.replace('\r\n', '\n')
         # Remove links to PTP
-        desc = desc.replace('http://passthepopcorn.me', '').replace('https://passthepopcorn.me', '')
+        desc = desc.replace('http://passthepopcorn.me', 'PTP').replace('https://passthepopcorn.me', 'PTP')
 
         # Remove Mediainfo Tags / Attempt to regex out mediainfo
         mediainfo_tags = re.findall("\[mediainfo\][\s\S]*?\[\/mediainfo\]",  desc)
