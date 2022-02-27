@@ -205,7 +205,7 @@ class Prep():
         if self.config['TRACKERS'].get('PTP', {}).get('ApiUser') != None and self.config['TRACKERS'].get('PTP', {}).get('ApiKey') != None:
             ptp = PTP(config=self.config)
             if meta.get('ptp', None) != None:
-                meta['imdb'] = ptp.get_imdb_from_torrent_id(meta['ptp'])
+                meta['imdb'], meta['ptp_torrenthash'] = ptp.get_imdb_from_torrent_id(meta['ptp'])
             else:
                 if meta['is_disc'] in [None, ""]:
                     ptp_search_term = meta['filelist'][0]
@@ -213,7 +213,7 @@ class Prep():
                 else:
                     search_file_folder = 'folder'
                     ptp_search_term = meta['path']
-                ptp_imdb, ptp_id = ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
+                ptp_imdb, ptp_id, meta['ptp_torrenthash'] = ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
                 if ptp_imdb != None:
                     meta['imdb'] = ptp_imdb
                 if ptp_id != None:
