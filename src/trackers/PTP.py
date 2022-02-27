@@ -1,4 +1,3 @@
-from httpx import head
 import requests
 import asyncio
 import re
