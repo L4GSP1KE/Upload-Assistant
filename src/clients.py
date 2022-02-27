@@ -49,10 +49,10 @@ class Clients():
         if isinstance(local_path, list):
             for i in range(len(local_path)):
                 if os.path.normpath(local_path[i]) in meta['path']:
-                    local_path = local_path[i]
-                    remote_path = remote_path[i]
-        local_path = os.path.normpath(local_path)
-        remote_path = os.path.normpath(remote_path)
+                    list_local_path = local_path[i]
+                    list_remote_path = remote_path[i]
+        local_path = os.path.normpath(list_local_path)
+        remote_path = os.path.normpath(list_remote_path)
         if local_path.endswith(os.sep):
             remote_path = remote_path + os.sep
         
