@@ -4,6 +4,8 @@ from termcolor import cprint
 import asyncio
 import requests
 
+from src.bbcode import BBCODE
+
 class COMMON():
     def __init__(self, config):
         self.config = config
@@ -19,19 +21,24 @@ class COMMON():
     
     async def unit3d_edit_desc(self, meta, tracker, forum_link):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]DESCRIPTION.txt", 'w') as desc:
-            desc.write(base)
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]DESCRIPTION.txt", 'w') as descfile:
+            bbcode = BBCODE()
+            desc = base
+            desc = bbcode.convert_pre_to_code(desc)
+            desc = bbcode.convert_hide_to_spoiler(desc)
+            desc = bbcode.convert_comparison_to_collapse(desc, 1200)
+            descfile.write(desc)
             images = meta['image_list']
             if len(images) > 0: 
-                desc.write("[center]")
+                descfile.write("[center]")
                 for each in range(len(images)):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
-                desc.write("[/center]")
+                    descfile.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
+                descfile.write("[/center]")
 
-            desc.write(f"\n[center][url={forum_link}]Created by L4G's Upload Assistant[/url][/center]")
-            desc.close()
+            descfile.write(f"\n[center][url={forum_link}]Created by L4G's Upload Assistant[/url][/center]")
+            descfile.close()
         return 
     
 

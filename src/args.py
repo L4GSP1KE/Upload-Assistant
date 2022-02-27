@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import argparse
+import urllib.parse
 from pprint import pprint
 import time
 from termcolor import cprint
@@ -32,6 +33,7 @@ class Args():
         parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str)
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
+        parser.add_argument('-ptp', '--ptp', nargs='*', required=False, help="PTP torrent id/permalink", type=str)
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
         parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'freeimage.host', 'imgbox'])
         parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
@@ -76,6 +78,16 @@ class Args():
                         meta['manual_episode'] = meta[key]
                     elif key == 'tmdb_manual':
                         meta['category'], meta['tmdb_manual'] = self.parse_tmdb_id(meta[key], meta.get('category'))
+                    elif key == 'ptp':
+                        if meta[key].startswith('http'):
+                            parsed = urllib.parse.urlparse(meta[key])
+                            try:
+                                meta['ptp'] = urllib.parse.parse_qs(parsed.query)['torrentid'][0]
+                            except:
+                                cprint('Your terminal ate  part of the url, please surround in quotes next time, or pass only the torrentid', 'grey', 'on_red')
+                                cprint('Continuing without -ptp', 'grey', 'on_red')
+                        else:
+                            meta['ptp'] = meta[key]
                 else:
                     meta[key] = value
             else:

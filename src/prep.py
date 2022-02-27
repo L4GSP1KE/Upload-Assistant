@@ -40,7 +40,7 @@ from pprint import pprint
 import itertools
 import cli_ui
 
-# from src.trackers.PTP import PTP
+from src.trackers.PTP import PTP
 
 
 
@@ -202,17 +202,23 @@ class Prep():
 
         meta['bdinfo'] = bdinfo
         
-        # if meta.get('ptp', None) != None:
-        #     # Get ptp info from arg
-        #     pass
-        # elif self.config['TRACKERS']['PTP'].get('ApiUser') != None and self.config['TRACKERS']['PTP'].get('ApiKey') != None:
-        #     ptp = PTP(config=self.config)
-        #     ptp_imdb, ptp_id = ptp.get_ptp_id_imdb(meta['path'])
-        #     if ptp_imdb != None:
-        #         meta['imdb'] = ptp_imdb
-        #     if ptp_id != None:
-        #         meta['ptp_id'] = ptp_id
-        
+        if self.config['TRACKERS'].get('PTP', {}).get('ApiUser') != None and self.config['TRACKERS'].get('PTP', {}).get('ApiKey') != None:
+            ptp = PTP(config=self.config)
+            if meta.get('ptp', None) != None:
+                meta['imdb'] = ptp.get_imdb_from_torrent_id(meta['ptp'])
+            else:
+                if meta['is_disc'] in [None, ""]:
+                    ptp_search_term = meta['filelist'][0]
+                    search_file_folder = 'file'
+                else:
+                    search_file_folder = 'folder'
+                    ptp_search_term = meta['path']
+                ptp_imdb, ptp_id = ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
+                if ptp_imdb != None:
+                    meta['imdb'] = ptp_imdb
+                if ptp_id != None:
+                    meta['ptp'] = ptp_id
+            
         meta['tmdb'] = meta.get('tmdb_manual', None)
         if meta.get('type', None) == None:
             meta['type'] = self.get_type(video, meta['scene'], meta['is_disc'])
@@ -554,7 +560,7 @@ class Prep():
                         .global_args('-loglevel', 'quiet')
                         .run(quiet=True)
                     )
-                except:
+                except Exception:
                     print(traceback.format_exc())
                 # print(os.path.getsize(image))
                 # print(f'{i+1}/{self.screens}')
@@ -632,11 +638,11 @@ class Prep():
                     try:
                         voblength = float(vob_mi['media']['track'][1]['Duration'])
                         return voblength, n
-                    except:
+                    except Exception:
                         try:
                             voblength = float(vob_mi['media']['track'][2]['Duration'])
                             return voblength, n
-                        except:
+                        except Exception:
                             n += 1
                             if n >= len(main_set):
                                 n = 0
@@ -660,7 +666,7 @@ class Prep():
                         .global_args('-loglevel', loglevel)
                         .run(quiet=debug)
                     )
-                except:
+                except Exception:
                     print(traceback.format_exc())
                 # print(os.path.getsize(image))
                 # print(f'{i+1}/{self.screens}')
@@ -682,7 +688,7 @@ class Prep():
                         time.sleep(1)
                     cli_ui.info_count(i-1, self.screens, "Screens Saved")
                     looped = 0
-                except:
+                except Exception:
                     if looped >= 25:
                         cprint('Failed to take screenshots', 'grey', 'on_red')
                         exit()
@@ -720,7 +726,7 @@ class Prep():
                             .global_args('-loglevel', loglevel)
                             .run(quiet=debug)
                         )
-                    except:
+                    except Exception:
                         print(traceback.format_exc())
                     # print(os.path.getsize(image))
                     # print(f'{i+1}/{self.screens}')
@@ -2064,52 +2070,58 @@ class Prep():
     async def gen_desc(self, meta):
         desclink = meta.get('desclink', None)
         descfile = meta.get('descfile', None)
-        description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="")
-        description.seek(0)
-        if meta.get('discs', []) != []:
-            discs = meta['discs']
-            if discs[0]['type'] == "DVD":
-                description.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="") as description:
+            description.seek(0)
+            if meta.get('ptp', None) != None:
+                ptp = PTP(config=self.config)
+                ptp_desc = ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
+                if ptp_desc != "":
+                    description.write(ptp_desc)
+                    meta['description'] = 'PTP'
+            if meta.get('discs', []) != []:
+                discs = meta['discs']
+                if discs[0]['type'] == "DVD":
+                    description.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
+                    description.write("\n")
+                if len(discs) >= 2:
+                    for each in discs[1:]:
+                        if each['type'] == "BDMV":
+                            description.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
+                            description.write("\n")
+                        if each['type'] == "DVD":
+                            description.write(f"{each['name']}:\n")
+                            description.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
+                            description.write("\n")
+                meta['description'] = "CUSTOM"
+            if meta['nfo'] != False:
+                description.write("[code]")
+                nfo = glob.glob("*.nfo")[0]
+                description.write(open(nfo, 'r', encoding="utf-8").read())
+                description.write("[/code]")
                 description.write("\n")
-            if len(discs) >= 2:
-                for each in discs[1:]:
-                    if each['type'] == "BDMV":
-                        description.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
-                        description.write("\n")
-                    if each['type'] == "DVD":
-                        description.write(f"{each['name']}:\n")
-                        description.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
-                        description.write("\n")
-            meta['description'] = "CUSTOM"
-        if meta['nfo'] != False:
-            description.write("[code]")
-            nfo = glob.glob("*.nfo")[0]
-            description.write(open(nfo, 'r', encoding="utf-8").read())
-            description.write("[/code]")
+                meta['description'] = "CUSTOM"
+            if desclink != None:
+                parsed = urllib.parse.urlparse(desclink.replace('/raw/', '/'))
+                split = os.path.split(parsed.path)
+                if split[0] != '/':
+                    raw = parsed._replace(path=f"{split[0]}/raw/{split[1]}")
+                else:
+                    raw = parsed._replace(path=f"/raw{parsed.path}")
+                raw = urllib.parse.urlunparse(raw)
+                description.write(requests.get(raw).text)
+                description.write("\n")
+                meta['description'] = "CUSTOM"
+                
+            if descfile != None:
+                if os.path.isfile(descfile) == True:
+                    text = open(descfile, 'r').read()
+                    description.write(text)
+                meta['description'] = "CUSTOM"
+            if meta['desc'] != None:
+                description.write(meta['desc'])
+                description.write("\n")
+                meta['description'] = "CUSTOM"
             description.write("\n")
-            meta['description'] = "CUSTOM"
-        if desclink != None:
-            parsed = urllib.parse.urlparse(desclink.replace('/raw/', '/'))
-            split = os.path.split(parsed.path)
-            if split[0] != '/':
-                raw = parsed._replace(path=f"{split[0]}/raw/{split[1]}")
-            else:
-                raw = parsed._replace(path=f"/raw{parsed.path}")
-            raw = urllib.parse.urlunparse(raw)
-            description.write(requests.get(raw).text)
-            description.write("\n")
-            meta['description'] = "CUSTOM"
-            
-        if descfile != None:
-            if os.path.isfile(descfile) == True:
-                text = open(descfile, 'r').read()
-                description.write(text)
-            meta['description'] = "CUSTOM"
-        if meta['desc'] != None:
-            description.write(meta['desc'])
-            description.write("\n")
-            meta['description'] = "CUSTOM"
-        description.write("\n")
         return meta
         
     async def tag_override(self, meta):
