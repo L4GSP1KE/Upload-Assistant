@@ -94,6 +94,8 @@ class BBCODE:
         # Strip blank lines:
         desc = desc.rstrip()
         desc = re.sub("\n\n+", "\n\n", desc)
+        while desc.startswith('\n'):
+            desc = desc.replace('\n', '', 1)
 
         if desc.replace('\n', '') == '':
             return ""
