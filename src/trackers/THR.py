@@ -5,7 +5,7 @@ import requests
 import json
 import glob
 from difflib import SequenceMatcher
-
+import cli_ui
 import base64
 import os
 from termcolor import cprint
@@ -79,18 +79,27 @@ class THR():
 
 
         if meta['debug'] == False:
+            thr_upload_prompt = False
+        else:
+            thr_upload_prompt = cli_ui.ask_yes_no("send to takeupload.php?", default=False)
+        if thr_upload_prompt == True:
             response = session.post(url=url, files=files, data=payload, headers=headers)
             try:
+                if meta['debug']:
+                    pprint(response.text)
                 if response.url.endswith('uploaded=1'):
                     cprint(f'Successfully Uploaded at: {response.url}', 'grey', 'on_green')
                 #Check if actually uploaded
             except:
+                if meta['debug']:
+                    pprint(response.text)
                 cprint("It may have uploaded, go check")
                 # cprint(f"Request Data:", 'cyan')
                 # pprint(data)
                 return 
         else:
             cprint(f"Request Data:", 'cyan')
+            pprint(files)
             pprint(payload)
         
     
