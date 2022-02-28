@@ -115,7 +115,7 @@ class Clients():
                 cprint('Unwanted Files/Folders Identified', 'grey', 'on_yellow')
                 return None
             else:
-                cprint(f'NO .torrent WITH INFOHASH {torrenthash} FOUND')
+                cprint(f'NO .torrent WITH INFOHASH {torrenthash} FOUND', 'grey', 'on_yellow')
         return None
 
 
