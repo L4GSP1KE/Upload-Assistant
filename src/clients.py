@@ -81,6 +81,7 @@ class Clients():
             return None
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_storage_dir = client.get('torrent_storage_dir', None)
+        torrent_client = client.get('torrent_client', None)
         if torrent_storage_dir == None:
             cprint(f'Missing torrent_storage_dir for {default_torrent_client}', 'grey', 'on_red')
         if torrent_storage_dir != None:
@@ -88,6 +89,10 @@ class Clients():
                 torrenthash = meta['torrenthash']
             elif meta.get('ptp_torrenthash', None) != None:
                 torrenthash = meta['ptp_torrenthash']
+            if torrent_client == 'qbit':
+                torrenthash = torrenthash.lower()
+            elif torrent_client == 'rtorrent':
+                torrenthash = torrenthash.upper()
             torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
             if os.path.exists(torrent_path):
                 # Reuse if disc
