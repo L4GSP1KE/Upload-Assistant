@@ -36,6 +36,10 @@ class BBCODE:
     def clean_ptp_description(self, desc, is_disc):
         # End my suffering
         desc = desc.replace('\r\n', '\n')
+
+        # Remove url tags with PTP links
+        desc = re.sub("(\[url[\=\]]https?:\/\/passthepopcorn\.me[^\]]+\])", "", desc, flags=re.MULTILINE | re.IGNORECASE | re.DOTALL)
+
         # Remove links to PTP
         desc = desc.replace('http://passthepopcorn.me', 'PTP').replace('https://passthepopcorn.me', 'PTP')
 
