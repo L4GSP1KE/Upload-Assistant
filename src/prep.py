@@ -1136,7 +1136,10 @@ class Prep():
             codec = audio.get(format, "") + audio_extra.get(additional, "")
             extra = format_extra.get(additional, "")
         format_settings = format_settings_extra.get(format_settings, "")
-        
+        if format_settings == "EX" and chan == "5.1":
+            format_settings = "EX"
+        else:
+            format_settings = ""
 
         if codec == "":
             codec = format
