@@ -64,13 +64,7 @@ class BBCODE:
         desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc)
         desc = re.sub("\[img=[\s\S]*?\]", "", desc)
 
-        # Catch Stray Images
-        no_comp = re.sub("\[comparison=[\s\S]*?\[\/comparison\]", "", desc)
-        loose_images = re.findall("(https?:\/\/.*\.(?:png|jpg))", no_comp, flags=re.IGNORECASE)
-        if len(loose_images) >= 1:
-            for image in loose_images:
-                desc = desc.replace(image, '')
-
+       
         # Remove Alignments:
         desc = re.sub("\[align=.*?\]", "", desc)
         desc = desc.replace("[/align]", "")
@@ -89,7 +83,24 @@ class BBCODE:
         for each in remove_list:
             desc = desc.replace(each, '')
      
-       
+       #Catch Stray Images
+        comps = re.findall("\[comparison=[\s\S]*?\[\/comparison\]", desc)
+        nocomp = desc
+        comp_placeholders = []
+
+        # Replace comparisons with placeholder because sometimes uploaders use comp images as loose images
+        for i in range(len(comps)):
+            nocomp = nocomp.replace(comps[i], '')
+            desc = desc.replace(comps[i], f"COMPARISON_PLACEHOLDER-{i}")
+            comp_placeholders.append(comps[i])
+        loose_images = re.findall("(https?:\/\/.*\.(?:png|jpg))", nocomp, flags=re.IGNORECASE)
+        if len(loose_images) >= 1:
+            for image in loose_images:
+                desc = desc.replace(image, '')
+        # Re-place comparisons
+        if comp_placeholders != []:
+            for i, comp in enumerate(comp_placeholders):
+                desc = desc.replace(f"COMPARISON_PLACEHOLDER-{i}", comp)
 
         # Strip blank lines:
         desc = desc.rstrip()
