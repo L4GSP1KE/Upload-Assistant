@@ -38,7 +38,12 @@ class BBCODE:
         desc = desc.replace('\r\n', '\n')
 
         # Remove url tags with PTP links
-        desc = re.sub("(\[url[\=\]]https?:\/\/passthepopcorn\.me[^\]]+\])", "", desc, flags=re.MULTILINE | re.IGNORECASE | re.DOTALL)
+        ptp_url_tags = re.findall("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+)(?#[^\[]+)(\[\/url\])?", desc)
+        if ptp_url_tags != []:
+            for ptp_url_tag in ptp_url_tags:
+                url_tag_removed = re.sub("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+])", "", ptp_url_tag)
+                url_tag_removed = url_tag_removed.replace("[/url]")
+                desc = desc.replace(ptp_url_tag, url_tag_removed)
 
         # Remove links to PTP
         desc = desc.replace('http://passthepopcorn.me', 'PTP').replace('https://passthepopcorn.me', 'PTP')
