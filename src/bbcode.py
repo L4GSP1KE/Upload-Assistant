@@ -64,6 +64,13 @@ class BBCODE:
         desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc)
         desc = re.sub("\[img=[\s\S]*?\]", "", desc)
 
+        # Catch Stray Images
+        no_comp = re.sub("\[comparison=[\s\S]*?\[\/comparison\]", "", desc)
+        loose_images = re.findall("(https?:\/\/.*\.(?:png|jpg))", no_comp, flags=re.IGNORECASE)
+        if len(loose_images) >= 1:
+            for image in loose_images:
+                desc = desc.replace(image, '')
+
         # Remove Alignments:
         desc = re.sub("\[align=.*?\]", "", desc)
         desc = desc.replace("[/align]", "")
