@@ -65,7 +65,8 @@ class PTP():
                 return None, None, None
         except Exception:
             # print(traceback.print_exc())
-            return None, None, None
+            pass
+        return None, None, None
     
     def get_imdb_from_torrent_id(self, ptp_torrent_id):
         params = {
