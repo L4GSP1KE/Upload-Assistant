@@ -2080,6 +2080,7 @@ class Prep():
                 ptp_desc = ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
                 if ptp_desc != "":
                     description.write(ptp_desc)
+                    description.write("\n")
                     meta['description'] = 'PTP'
             if meta.get('discs', []) != []:
                 discs = meta['discs']
