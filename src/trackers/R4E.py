@@ -12,6 +12,8 @@ import tmdbsimple as tmdb
 import os
 # from pprint import pprint
 
+from src.trackers.COMMON import COMMON
+
 class R4E():
     """
     Edit for Tracker:
@@ -22,13 +24,17 @@ class R4E():
     """
     def __init__(self, config):
         self.config = config
+        self.tracker = 'R4E'
+        self.source_flag = 'R4E'
+        self.forum_link = 'https://github.com/L4GSP1KE/Upload-Assistant'
         pass
     
     async def upload(self, meta):
-        await self.edit_torrent(meta)
+        common = COMMON(config=self.config)
+        await common.edit_torrent(meta, self.tracker, self.source_flag)
         cat_id = await self.get_cat_id(meta['category'], meta['tmdb'])
         type_id = await self.get_type_id(meta['resolution'])
-        await self.edit_desc(meta)
+        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
         name = await self.edit_name(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['R4E'].get('anon', "False"))) == False:
             anon = 0
@@ -135,36 +141,6 @@ class R4E():
             if each['id'] == 99:
                 is_docu = True
         return is_docu 
-
-    async def edit_torrent(self, meta):
-        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
-            R4E_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-            R4E_torrent.metainfo['announce'] = self.config['TRACKERS']['R4E']['announce_url'].strip()
-            R4E_torrent.metainfo['info']['source'] = "R4E"
-            Torrent.copy(R4E_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[R4E]{meta['clean_name']}.torrent", overwrite=True)
-        return 
-        
-    async def edit_desc(self, meta):
-        base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[R4E]DESCRIPTION.txt", 'w') as desc:
-            desc.write(base)
-            images = meta['image_list']
-            if len(images) > 0: 
-                desc.write("[center]")
-                for each in range(len(images)):
-                    web_url = images[each]['web_url']
-                    img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
-                    if (each + 1) % 3 == 0:
-                        desc.write("\n")
-                desc.write("[/center]")
-
-            desc.write("\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant/]Created by L4G's Upload Assistant[/url][/center]")
-            desc.close()
-        return 
-
-   
-
 
     async def search_existing(self, meta):
         dupes = []
