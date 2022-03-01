@@ -56,7 +56,7 @@ class PTP():
                 else:
                     return None, None, None
             elif int(response.status_code) in [400, 401, 403]:
-                cprint(response.text, 'grey', 'on_red')
+                cprint(f"PTP: {response.text}", 'grey', 'on_red')
                 return None, None, None
             elif int(response.status_code) == 503:
                 cprint("PTP Unavailable (503)", 'grey', 'on_yellow')

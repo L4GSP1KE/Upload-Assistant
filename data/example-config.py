@@ -36,8 +36,9 @@ config = {
             # "anon" : "False"
         },
         "PTP" : {
-            "ApiUser" : None,
-            "ApiKey" : None,
+            "useAPI" : False,
+            "ApiUser" : "ptp api user",
+            "ApiKey" : 'ptp api key',
         },
         "AITHER" :{
             "api_key" : "AITHER api key",

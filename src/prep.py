@@ -202,7 +202,7 @@ class Prep():
 
         meta['bdinfo'] = bdinfo
         
-        if self.config['TRACKERS'].get('PTP', {}).get('ApiUser') != None and self.config['TRACKERS'].get('PTP', {}).get('ApiKey') != None:
+        if self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
             ptp = PTP(config=self.config)
             if meta.get('ptp', None) != None:
                 meta['imdb'], meta['ptp_torrenthash'] = ptp.get_imdb_from_torrent_id(meta['ptp'])
@@ -2075,7 +2075,7 @@ class Prep():
         descfile = meta.get('descfile', None)
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="") as description:
             description.seek(0)
-            if meta.get('ptp', None) != None:
+            if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
                 ptp = PTP(config=self.config)
                 ptp_desc = ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
                 if ptp_desc != "":
