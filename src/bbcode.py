@@ -133,7 +133,8 @@ class BBCODE:
             line = []
             output = []
             comp_sources = comp.split(']', 1)[0].replace('[comparison=', '').replace(' ', '').split(',')
-            comp_images = comp.split(']', 1)[1].replace('[/comparison]', '').replace(',', '\n').split('\n')
+            comp_images = comp.split(']', 1)[1].replace('[/comparison]', '').replace(',', '\n')
+            comp_images = re.findall("(https?:\/\/.*\.(?:png|jpg))", comp_images, flags=re.IGNORECASE)
             screens_per_line = len(comp_sources)
             img_size = max_width / screens_per_line
             if img_size > 350:
