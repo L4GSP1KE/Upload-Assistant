@@ -79,7 +79,7 @@ class THR():
 
 
         if meta['debug'] == False:
-            thr_upload_prompt = False
+            thr_upload_prompt = True
         else:
             thr_upload_prompt = cli_ui.ask_yes_no("send to takeupload.php?", default=False)
         if thr_upload_prompt == True:
