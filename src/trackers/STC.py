@@ -124,10 +124,14 @@ class STC():
             if sd == 1:
                 # Season SD
                 type_id = '14'
+                if type == "ENCODE":
+                    type_id = '18'
             if sd == 0:
                 # Season HD
                 type_id = '13'
-        if type == "DISC" and category == "MOVIE":
+                if type == "ENCODE":
+                    type_id = '18'
+        if type == "DISC" and category == "TV":
             if sd == 1:
                 # SD-RETAIL
                 type_id = '17'
