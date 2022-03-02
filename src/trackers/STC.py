@@ -33,7 +33,7 @@ class STC():
         await common.edit_torrent(meta, self.tracker, self.source_flag)
         await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
         cat_id = await self.get_cat_id(meta['category'])
-        type_id = await self.get_type_id(meta['type'])
+        type_id = await self.get_type_id(meta['type'], meta.get('tv_pack', 0), meta.get('sd', 0), meta.get('category', ""))
         resolution_id = await self.get_res_id(meta['resolution'])
         stc_name = await self.edit_name(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:
@@ -111,7 +111,7 @@ class STC():
             }.get(category_name, '0')
         return category_id
 
-    async def get_type_id(self, type):
+    async def get_type_id(self, type, tv_pack, sd, category):
         type_id = {
             'DISC': '1', 
             'REMUX': '2',
@@ -120,6 +120,20 @@ class STC():
             'HDTV': '6',
             'ENCODE': '3'
             }.get(type, '0')
+        if tv_pack == 1:
+            if sd == 1:
+                # Season SD
+                type_id = '14'
+            if sd == 0:
+                # Season HD
+                type_id = '13'
+        if type == "DISC" and category == "MOVIE":
+            if sd == 1:
+                # SD-RETAIL
+                type_id = '17'
+            if sd == 0:
+                # HD-RETAIL
+                type_id = '18'
         return type_id
 
     async def get_res_id(self, resolution):
