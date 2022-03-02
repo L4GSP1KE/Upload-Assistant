@@ -97,20 +97,20 @@ class Clients():
             if os.path.exists(torrent_path):
                 # Reuse if disc
                 if meta.get('is_disc', None) != None:
-                    cprint('REUSING .torrent', 'grey', 'on_green')
+                    cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
                     return torrent_path
                 torrent = Torrent.read(torrent_path)
                 # If one file, check for folder
                 if len(torrent.files) == len(meta['filelist']) == 1:
                     if str(torrent.files[0]) == os.path.basename(torrent.files[0]):
-                        cprint('REUSING .torrent', 'grey', 'on_green')
+                        cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
                         return torrent_path
                 # Check if number of files matches number of videos
                 elif len(torrent.files) == len(meta['filelist']):
                     torrent_filepath = os.path.commonpath(torrent.files)
                     actual_filepath = os.path.commonpath(meta['filelist'])
                     if torrent_filepath in actual_filepath:
-                        cprint('REUSING .torrent', 'grey', 'on_green')
+                        cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
                         return torrent_path
                 cprint('Unwanted Files/Folders Identified', 'grey', 'on_yellow')
                 return None
