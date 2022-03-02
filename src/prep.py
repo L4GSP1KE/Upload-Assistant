@@ -168,7 +168,7 @@ class Prep():
             meta['sd'] = self.is_sd(meta['resolution'])
         #If NOT BD/DVD/HDDVD
         else:
-            videopath, meta['filelist'] = self.get_video(videoloc) 
+            videopath, meta['filelist'] = self.get_video(videoloc, meta.get('mode', 'discord')) 
 
             video, meta['scene'] = self.is_scene(videopath)
             guess_name = ntpath.basename(video).replace('-',' ')
@@ -349,7 +349,7 @@ class Prep():
     Get video files
 
     """
-    def get_video(self, videoloc):
+    def get_video(self, videoloc, mode):
         filelist = []
         videoloc = os.path.abspath(videoloc)
         if os.path.isdir(videoloc):
@@ -357,7 +357,12 @@ class Prep():
             for file in globlist:
                 if not file.lower().endswith('sample.mkv'):
                     filelist.append(os.path.abspath(f"{videoloc}{os.sep}{file}"))
-            video = sorted(filelist)[0]       
+            try:
+                video = sorted(filelist)[0]       
+            except IndexError:
+                cprint("No Video files found", 'grey', 'on_red')
+                if mode == 'cli':
+                    exit()
         else:
             video = videoloc
             filelist.append(videoloc)
