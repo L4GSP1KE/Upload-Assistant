@@ -496,20 +496,23 @@ class Prep():
     Is a scene release?
     """
     def is_scene(self, video):
+        cprint("Checking srrdb for a match, this may take up to 30 seconds", 'grey', 'on_yellow')
         scene = False
         base = os.path.basename(video)
         base = os.path.splitext(base)[0]
         base = urllib.parse.quote(base)
         url = f"https://www.srrdb.com/api/search/r:{base}"
         try:
-            response = requests.get(url)
+            response = requests.get(url, timeout=30)
             response = response.json()
             if response['resultsCount'] != "0":
                 video = f"{response['results'][0]['release']}.mkv"
                 scene = True
+                cprint("Match Found!", 'grey', 'on_green')
         except:
             video = video
             scene = False
+            cprint("No match found, or request has timed out", 'grey', 'on_yellow')
         return video, scene
 
 
