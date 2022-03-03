@@ -1718,6 +1718,11 @@ class Prep():
             video_encode = meta.get('video_encode', "")
         edition = meta.get('edition', "")
 
+        if meta['category'] == "TV":
+            if meta['search_year'] != "":
+                year = meta['year']
+            else:
+                year = ""
         if meta['debug']:
             cprint("get_name meta:", 'cyan')
             pprint(meta)
@@ -1755,7 +1760,7 @@ class Prep():
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
+                    name = f"{title} {year} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {source} {hdr} {video_codec} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
                 if meta['is_disc'] == 'DVD':
                     name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
@@ -1764,22 +1769,22 @@ class Prep():
                     name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {source} REMUX {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {source} REMUX {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "ENCODE": #Encode
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "HDTV": #HDTV
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
                 potential_missing = []
 
 
