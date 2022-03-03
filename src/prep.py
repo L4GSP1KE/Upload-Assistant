@@ -821,8 +821,11 @@ class Prep():
                 search.movie(query=filename, year=search_year)
             elif category == "TV":
                 search.tv(query=filename, first_air_date_year=search_year)
-            meta['tmdb'] = search.results[0]['id']
-            meta['category'] = category
+            if meta.get('tmdb_manual') != None:
+                meta['tmdb'] = meta['tmdb_manual']
+            else:
+                meta['tmdb'] = search.results[0]['id']
+                meta['category'] = category 
         except IndexError:
             try:
                 if category == "MOVIE":
@@ -848,6 +851,8 @@ class Prep():
                         tmdb_id = cli_ui.ask_string("Please enter tmdb id:")
                         parser = Args(config=self.config)
                         meta['category'], meta['tmdb'] = parser.parse_tmdb_id(id=tmdb_id, category=meta.get('category'))
+                        meta['tmdb_manual'] = meta['tmdb']
+                        return meta
 
         return meta
     
@@ -985,7 +990,7 @@ class Prep():
         tmdb_name = ' '.join(tmdb_name.split())
         query = '''
             query ($search: String) { 
-                Media (search: $search, type: ANIME) { 
+                Media (search: $search, type: ANIME, sort: TITLE_ROMAJI) { 
                     id
                     idMal
                     title {
@@ -1885,13 +1890,13 @@ class Prep():
                     episode_int = "0"
                     meta['tv_pack'] = 1
                 try:
-                    if meta.get('season'):
-                        season_int = season
+                    if meta.get('season_int'):
+                        season = meta.get('season_int')
                     else:
                         season = parsed['anime_season']
                     season_int = season
                     season = f"S{season.zfill(2)}"
-                except:
+                except Exception:
                     try:
                         if int(parsed['episode_number']) >= anilist_episodes:
                             params = {
@@ -1914,27 +1919,38 @@ class Prep():
                             season = ""
                             names_url = f"http://thexem.de/map/names?origin=tvdb&id={str(meta['tvdb_id'])}"
                             names_response = requests.get(names_url).json()
+                            difference = 0
                             if names_response['result'] == "success":
                                 for season_num, values in names_response['data'].items():
                                     for lang, names in values.items():
                                         if lang == "jp":
                                             for name in names:
-                                                if re.sub("[^0-9a-zA-Z\[\]]+", "", romaji.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", "", name.lower().replace(' ', '')):
-                                                    if season_num != "all":
-                                                        season_int = season_num
-                                                        season = f"S{season_num.zfill(2)}"
-                                                    else:
-                                                        season_int = "1"
-                                                        season = "S01"
+                                                romaji_check = re.sub("[^0-9a-zA-Z\[\]]+", "", romaji.lower().replace(' ', ''))
+                                                name_check = re.sub("[^0-9a-zA-Z\[\]]+", "", name.lower().replace(' ', ''))
+                                                diff = SequenceMatcher(None, romaji_check, name_check).ratio()
+                                                if romaji_check in name_check:
+                                                    if diff >= difference:
+                                                        if season_num != "all":
+                                                            season_int = season_num
+                                                            season = f"S{season_num.zfill(2)}"
+                                                        else:
+                                                            season_int = "1"
+                                                            season = "S01"
+                                                        difference = diff
                                         if lang == "us":
                                             for name in names:
-                                                if re.sub("[^0-9a-zA-Z\[\]]+", "", eng_title.lower().replace(' ', '')) in re.sub("[^0-9a-zA-Z\[\]]+", "", name.lower().replace(' ', '')):
-                                                    if season_num != "all":
-                                                        season_int = season_num
-                                                        season = f"S{season_num.zfill(2)}"
-                                                    else:
-                                                        season_int = "1"
-                                                        season = "S01"
+                                                eng_check = re.sub("[^0-9a-zA-Z\[\]]+", "", eng_title.lower().replace(' ', ''))
+                                                name_check = re.sub("[^0-9a-zA-Z\[\]]+", "", name.lower().replace(' ', ''))
+                                                diff = SequenceMatcher(None, eng_check, name_check).ratio()
+                                                if eng_check in name_check:
+                                                    if diff >= difference:
+                                                        if season_num != "all":
+                                                            season_int = season_num
+                                                            season = f"S{season_num.zfill(2)}"
+                                                        else:
+                                                            season_int = "1"
+                                                            season = "S01"
+                                                        difference = diff
                             else:
                                 raise XEMNotFound
                     except:
