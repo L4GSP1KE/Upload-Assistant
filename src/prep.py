@@ -92,15 +92,15 @@ class Prep():
                 untouched_filename = bdinfo['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
-                except:
+                except Exception:
                     meta['search_year'] = ""
-            except:
+            except Exception:
                 guess_name = bdinfo['label'].replace('-',' ')
                 filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
                 untouched_filename = bdinfo['label']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
-                except:
+                except Exception:
                     meta['search_year'] = ""
             
             # await self.disc_screenshots(video, filename, bdinfo, folder_id, base_dir)
@@ -127,7 +127,7 @@ class Prep():
             untouched_filename = os.path.basename(os.path.dirname(meta['discs'][0]['path']))
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
-            except:
+            except Exception:
                 meta['search_year'] = ""
             if meta.get('edit', False) == False:
                 mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", False, meta['uuid'], meta['base_dir'], export_text=False)
@@ -152,7 +152,7 @@ class Prep():
             untouched_filename = os.path.basename(meta['discs'][0]['path'])
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
-            except:
+            except Exception:
                 meta['search_year'] = ""
             if meta.get('edit', False) == False:
                 mi = self.exportInfo(meta['largest_evo'], False, meta['uuid'], meta['base_dir'], export_text=False)
@@ -176,7 +176,7 @@ class Prep():
             untouched_filename = os.path.basename(video)
             try:
                 meta['search_year'] = guessit(video)['year']
-            except:
+            except Exception:
                 meta['search_year'] = ""
             
             if meta.get('edit', False) == False:
@@ -1706,6 +1706,7 @@ class Prep():
         uhd = meta.get('uhd', "")
         hdr = meta.get('hdr', "")
         distributor = meta.get('distributor', "")
+        episode_title = meta.get('episode_title', '')
         if meta.get('is_disc', "") == "BDMV": #Disk
             video_codec = meta.get('video_codec', "")
             region = meta.get('region', "")
@@ -1763,22 +1764,22 @@ class Prep():
                     name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {source} REMUX {audio}" #SOURCE
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {source} REMUX {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "ENCODE": #Encode
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "HDTV": #HDTV
-                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
+                name = f"{title} {meta['search_year']} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
                 potential_missing = []
 
 
@@ -1801,7 +1802,7 @@ class Prep():
                 try:
                     try:
                         guess_year = guessit(video)['year']
-                    except:
+                    except Exception:
                         guess_year = ""
                     if guessit(video)["season"] == guess_year:
                         if f"s{guessit(video)['season']}" in video.lower():
@@ -1814,7 +1815,7 @@ class Prep():
                         season_int =  str(guessit(video)["season"])
                         season = "S" + season_int.zfill(2)
 
-                except:
+                except Exception:
                     try:
                         guess_date = guessit(video)['date']
                         season_int, episode_int = self.daily_to_tmdb_season_episode(meta.get('tmdb'), guess_date)
@@ -1823,7 +1824,7 @@ class Prep():
                         season = str(guess_date)
                         episode = ""
                         is_daily = True
-                    except:
+                    except Exception:
                         season_int = "1"
                         season = "S01"
                 try:
@@ -1844,7 +1845,7 @@ class Prep():
                             episode = ""
                             episode_int = "0"
                             meta['tv_pack'] = 1
-                except:
+                except Exception:
                     episode = ""
                     episode_int = "0"
                     meta['tv_pack'] = 1
@@ -1885,7 +1886,7 @@ class Prep():
                         episode = ""
                         episode_int = "0"
                         meta['tv_pack'] = 1
-                except:
+                except Exception:
                     episode = ""
                     episode_int = "0"
                     meta['tv_pack'] = 1
@@ -1953,11 +1954,11 @@ class Prep():
                                                         difference = diff
                             else:
                                 raise XEMNotFound
-                    except:
+                    except Exception:
                         try:
                             season = guessit(video)['season']
                             season_int = season
-                        except:
+                        except Exception:
                             season_int = "1"
                             season = "S01"
                         cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
@@ -1966,7 +1967,7 @@ class Prep():
                 try:
                     version = parsed['release_version']
                     version = f"v{version}"
-                except:
+                except Exception:
                     version = ""
                 episode = episode + version
             if meta.get('manual_season', None) == None:
@@ -1984,6 +1985,9 @@ class Prep():
                 meta['season'] = "COMPLETE"
             meta['season_int'] = season_int
             meta['episode_int'] = episode_int
+
+            if meta['season'] == "S00" or meta['episode'] == "E00":
+                meta['episode_title'] = guessit(video).get('episode_title')
         return meta
 
 
@@ -2246,7 +2250,7 @@ class Prep():
                     cprint(response, 'cyan')
                 url = response['files'][0]['url']
             return url
-        except:
+        except Exception:
             return False
         return 
 
@@ -2288,7 +2292,7 @@ class Prep():
                     if each.lower().startswith('imdb'):
                         try:
                             imdbid = str(int(extra[each].replace('tt', ''))).zfill(7)
-                        except:
+                        except Exception:
                             pass
         return category, tmdbid, imdbid
 
