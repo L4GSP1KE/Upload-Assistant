@@ -1914,7 +1914,7 @@ class Prep():
                                 'absolute' : str(parsed['episode_number']),
                                 # 'destination' : 'tvdb'
                             }
-                            url = "http://thexem.de/map/single"
+                            url = "https://thexem.info/map/single"
                             response = requests.post(url, params=params).json()
                             if response['result'] == "failure":
                                 raise XEMNotFound
@@ -1926,7 +1926,7 @@ class Prep():
                         else:
                             #Get season from xem name map
                             season = ""
-                            names_url = f"http://thexem.de/map/names?origin=tvdb&id={str(meta['tvdb_id'])}"
+                            names_url = f"https://thexem.info/map/names?origin=tvdb&id={str(meta['tvdb_id'])}"
                             names_response = requests.get(names_url).json()
                             difference = 0
                             if names_response['result'] == "success":
