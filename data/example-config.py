@@ -22,7 +22,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, THR, UHDHEAVEN, R4E",
+        "default_trackers" : "BLU, BHD, AITHER, STC, THR, R4E",
 
         "BLU" : {
             "api_key" : "BLU api key",
@@ -53,11 +53,6 @@ config = {
         "STC" :{
             "api_key" : "STC",
             "announce_url" : "https://skipthecommericals.xyz/announce/customannounceurl",
-            # "anon" : "False"
-        },
-        "UHDHEAVEN" :{
-            "api_key" : "UHDHEAVEN api key",
-            "announce_url" : "https://uhd-heaven.xyz/announce/customannounceurl",
             # "anon" : "False"
         },
         "THR" : {

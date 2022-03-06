@@ -8,7 +8,6 @@ from src.trackers.BLU import BLU
 from src.trackers.BHD import BHD
 from src.trackers.AITHER import AITHER
 from src.trackers.STC import STC
-from src.trackers.UHDHEAVEN import UHDHEAVEN
 from src.trackers.R4E import R4E
 from src.trackers.THR import THR
 import json
@@ -153,8 +152,8 @@ async def do_the_thing(path, args, base_dir):
     #######  Upload to Trackers  #######
     ####################################
     common = COMMON(config=config)
-    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'UHDHEAVEN', 'R4E']
-    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'UHDHEAVEN' : UHDHEAVEN, 'R4E' : R4E, 'THR' : THR, }
+    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E']
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, }
 
     for tracker in trackers:
         tracker = tracker.replace(" ", "").upper().strip()
@@ -254,19 +253,7 @@ async def do_the_thing(path, args, base_dir):
         #         if meta['upload'] == True:
         #             await stc.upload(meta)
         #             await client.add_to_client(meta, "STC")
-        # if tracker.upper() == "UHDHEAVEN":
-        #     if meta['unattended']:
-        #         upload_to_uhdh = True
-        #     else:
-        #         upload_to_uhdh = cli_ui.ask_yes_no(f"Upload to UHDHEAVEN? {debug}", default=meta['unattended'])
-        #     if upload_to_uhdh:
-        #         print("Uploading to UHDHEAVEN")
-        #         uhdh = UHDHEAVEN(config=config)
-        #         dupes = await uhdh.search_existing(meta)
-        #         meta = dupe_check(dupes, meta)
-        #         if meta['upload'] == True:
-        #             await uhdh.upload(meta)
-        #             await client.add_to_client(meta, "UHDHEAVEN")
+    
         # if tracker.upper() == "R4E":
         #     if meta['unattended']:
         #         upload_to_r4e = True
