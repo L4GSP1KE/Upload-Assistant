@@ -422,7 +422,7 @@ class Prep():
                 scan = "Progressive"
             if scan == "Progressive":
                 scan = "p"
-            elif framerate == "25.000" or mi['media']['track'][1].get('FrameRate_Original', '') == "25.000":
+            elif framerate == "25.000":
                 scan = "p"
             else:
                 scan = "i"
