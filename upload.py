@@ -309,6 +309,8 @@ def get_confirmation(meta):
     cli_ui.info(f"TMDb: {meta['tmdb']}")
     cli_ui.info(f"IMDb: {meta['imdb_id']}")
     cli_ui.info(f"TVDb: {meta['tvdb_id']}")
+    if meta.get('mal_id', 0) != 0:
+        cli_ui.info(f"MAL : {meta['mal_id']}")
     print()
     if meta['tag'] == "":
             tag = ""

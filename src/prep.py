@@ -986,6 +986,8 @@ class Prep():
             # mal_id = mal.results[0].mal_id
         else:
             mal_id = 0
+        if meta.get('mal_id', 0) != 0:
+            mal_id = meta.get('mal_id')
         return mal_id, alt_name, anime
 
     def get_romaji(self, tmdb_name):
@@ -1862,6 +1864,8 @@ class Prep():
                 parsed = anitopy.parse(Path(video).name)
                 # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
                 romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(parsed['anime_title'])
+                if mal_id:
+                    meta['mal_id'] = mal_id
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
                     meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
