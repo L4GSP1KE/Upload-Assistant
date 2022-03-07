@@ -72,7 +72,7 @@ class THR():
             'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
         }
         #If pronfo fails, put mediainfo into THR parser
-        if pronfo == False and meta.get('is_disc', '') != 'BDMV':
+        if meta.get('is_disc', '') != 'BDMV':
             files['nfo'] = ("MEDIAINFO.txt", mi_file)
         if subs != []:
             payload['subs[]'] = tuple(subs)
@@ -216,11 +216,11 @@ class THR():
 
             for each in image_list:
                 desc.write(f"\n[img]{each}[/img]\n")
-            if pronfo:
-                with open(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt"), 'r') as mi_file:
-                    full_mi = mi_file.read()
-                    desc.write(f"[/align]\n[hide=FULL MEDIAINFO]{full_mi}[/hide][align=center]")
-                    mi_file.close()
+            # if pronfo:
+            #     with open(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt"), 'r') as mi_file:
+            #         full_mi = mi_file.read()
+            #         desc.write(f"[/align]\n[hide=FULL MEDIAINFO]{full_mi}[/hide][align=center]")
+            #         mi_file.close()
             desc.write("\n\n[size=2][url=https://www.torrenthr.org/forums.php?action=viewtopic&topicid=8977]Created by L4G's Upload Assistant[/url][/size][/align]")
             desc.close()
         return pronfo
