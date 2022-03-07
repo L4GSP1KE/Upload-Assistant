@@ -496,7 +496,6 @@ class Prep():
     Is a scene release?
     """
     def is_scene(self, video):
-        cprint("Checking srrdb for a match, this may take up to 30 seconds", 'grey', 'on_yellow')
         scene = False
         base = os.path.basename(video)
         base = os.path.splitext(base)[0]
