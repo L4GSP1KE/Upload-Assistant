@@ -1544,11 +1544,13 @@ class Prep():
     def create_base_from_existing_torrent(self, torrentpath, base_dir, uuid):
         if os.path.exists(torrentpath):
             base_torrent = Torrent.read(torrentpath)
-            base_torrent.metainfo['announce'] = 'https://fake.tracker'
-            base_torrent.metainfo['comment'] = "Created by L4G's Upload Assistant"
-            base_torrent.metainfo['created by'] = "Created by L4G's Upload Assistant"
-            base_torrent.metainfo['info']['source'] = 'L4G'
-            base_torrent.metainfo['info']['private'] = 1
+            base_torrent.trackers = ['https://fake.tracker']
+            base_torrent.comment = "Created by L4G's Upload Assistant"
+            base_torrent.created_by = "Created by L4G's Upload Assistant"
+            base_torrent.metainfo.pop('publisher', None)
+            base_torrent.metainfo.pop('publisher-url', None)
+            base_torrent.source = 'L4G'
+            base_torrent.private = True
             Torrent.copy(base_torrent).write(f"{base_dir}/tmp/{uuid}/BASE.torrent", overwrite=True)
 
 
