@@ -1,4 +1,5 @@
-import re 
+import re
+import html
 
 # Bold - KEEP
 # Italic - KEEP
@@ -34,6 +35,8 @@ class BBCODE:
         pass
 
     def clean_ptp_description(self, desc, is_disc):
+        # Unescape html
+        desc = html.unescape(desc)
         # End my suffering
         desc = desc.replace('\r\n', '\n')
 
