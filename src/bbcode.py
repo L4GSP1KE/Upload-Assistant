@@ -71,6 +71,11 @@ class BBCODE:
         # Remove Alignments:
         desc = re.sub("\[align=.*?\]", "", desc)
         desc = desc.replace("[/align]", "")
+
+        # Remove size tags
+        desc = re.sub("\[size=.*?\]", "", desc)
+        desc = desc.replace("[/size]", "")
+
         # Remove Videos
         desc = re.sub("\[video\][\s\S]*?\[\/video\]", "", desc)
 
