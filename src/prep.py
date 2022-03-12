@@ -965,7 +965,7 @@ class Prep():
         else:
             return ''
 
-    def get_anime(self, response ,meta):
+    def get_anime(self, response, meta):
         tmdb_name = meta['title']
         if meta.get('aka', "") == "":
             alt_name = ""
@@ -977,7 +977,7 @@ class Prep():
             if each['id'] == 16:
                 animation = True
         if response['original_language'] == 'ja' and animation == True:
-            romaji, mal_id, eng_title, season_year, episodes = self.get_romaji(tmdb_name)
+            romaji, mal_id, eng_title, season_year, episodes = self.get_romaji(tmdb_name, meta.get('mal', None))
             alt_name = f" AKA {romaji}"
             
             anime = True
@@ -989,29 +989,50 @@ class Prep():
             mal_id = meta.get('mal_id')
         return mal_id, alt_name, anime
 
-    def get_romaji(self, tmdb_name):
-        tmdb_name = tmdb_name.replace('-', "").replace("The Movie", "")
-        tmdb_name = ' '.join(tmdb_name.split())
-        query = '''
-            query ($search: String) { 
-                Media (search: $search, type: ANIME, sort: TITLE_ROMAJI) { 
-                    id
-                    idMal
-                    title {
-                        romaji
-                        english
-                        native
+    def get_romaji(self, tmdb_name, mal):
+        cprint(mal, 'magenta')
+        if mal == None:
+            tmdb_name = tmdb_name.replace('-', "").replace("The Movie", "")
+            tmdb_name = ' '.join(tmdb_name.split())
+            query = '''
+                query ($search: String) { 
+                    Media (search: $search, type: ANIME, sort: TITLE_ROMAJI) { 
+                        id
+                        idMal
+                        title {
+                            romaji
+                            english
+                            native
+                        }
+                        seasonYear
+                        episodes
                     }
-                    seasonYear
-                    episodes
                 }
+            '''
+            # Define our query variables and values that will be used in the query request
+            variables = {
+                'search': tmdb_name
             }
-        '''
-
-        # Define our query variables and values that will be used in the query request
-        variables = {
-            'search': tmdb_name
-        }
+        else:
+            query = '''
+                query ($search: Int) {
+                    Media (idMal: $search, type: ANIME, sort: TITLE_ROMAJI) {
+                        id
+                        idMal
+                        title {
+                            romaji
+                            english
+                            native
+                        }
+                        seasonYear
+                        episodes
+                    }
+                }
+            '''
+            # Define our query variables and values that will be used in the query request
+            variables = {
+                'search': mal
+            }
 
         url = 'https://graphql.anilist.co'
         # Make the HTTP Api request
@@ -1026,7 +1047,7 @@ class Prep():
         else:
             romaji = eng_title = season_year  = ""
             episodes = mal_id = 0
-
+        cprint(mal_id, 'magenta')
         return romaji, mal_id, eng_title, season_year, episodes
 
 
@@ -1864,7 +1885,7 @@ class Prep():
                 #If Anime
                 parsed = anitopy.parse(Path(video).name)
                 # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
-                romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(parsed['anime_title'])
+                romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(parsed['anime_title'], meta.get('mal', None))
                 if mal_id:
                     meta['mal_id'] = mal_id
                 if meta.get('tmdb_manual', None) == None:
