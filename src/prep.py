@@ -105,7 +105,11 @@ class Prep():
             
             # await self.disc_screenshots(video, filename, bdinfo, folder_id, base_dir)
             if meta.get('edit', False) == False:
-                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, meta['uuid'], base_dir))
+                if meta.get('vapoursynth', False) == True:
+                    use_vs = True
+                else:
+                    use_vs = False
+                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, meta['uuid'], base_dir, use_vs))
                 ds.start()
                 while ds.is_alive() == True:
                     await asyncio.sleep(1)
@@ -525,7 +529,7 @@ class Prep():
     Generate Screenshots
     """
 
-    def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir):
+    def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir, use_vs):
         if self.screens == 0:
             return
         #Get longest m2ts
@@ -556,19 +560,23 @@ class Prep():
             cprint('Reusing screenshots', 'grey', 'on_green')
         else:
             cprint("Saving Screens...", "grey", "on_yellow")
-            while i != self.screens:
-                image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
-                try:
-                    (
-                        ffmpeg
-                        .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
-                        .output(image, vframes=1)
-                        .overwrite_output()
-                        .global_args('-loglevel', 'quiet')
-                        .run(quiet=True)
-                    )
-                except Exception:
-                    print(traceback.format_exc())
+            if use_vs == True:
+                from src.vs import vs_screengn
+                vs_screengn(source=file, encode=None, filter_b_frames=False, num=self.screens, dir=f"{base_dir}/tmp/{folder_id}/")
+            else:
+                while i != self.screens:
+                    image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
+                    try:
+                        (
+                            ffmpeg
+                            .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
+                            .output(image, vframes=1)
+                            .overwrite_output()
+                            .global_args('-loglevel', 'quiet')
+                            .run(quiet=True)
+                        )
+                    except Exception:
+                        print(traceback.format_exc())
                 # print(os.path.getsize(image))
                 # print(f'{i+1}/{self.screens}')
                 cli_ui.info_count(i, self.screens, "Screens Saved")
@@ -722,37 +730,41 @@ class Prep():
                 #     loglevel = 'verbose'
                 #     debug = False
                 cprint("Saving Screens...", "grey", "on_yellow")
-                while i != self.screens:
-                    image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
-                    try:
-                        (
-                            ffmpeg
-                            .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                            .output(image, vframes=1)
-                            .overwrite_output()
-                            .global_args('-loglevel', loglevel)
-                            .run(quiet=debug)
-                        )
-                    except Exception:
-                        print(traceback.format_exc())
-                    # print(os.path.getsize(image))
-                    # print(f'{i+1}/{self.screens}')
-                    cli_ui.info_count(i, self.screens, "Screens Saved")
-                    # print(Path(image))
-                    if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                        i += 1
-                    elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                        i += 1
-                    elif os.path.getsize(Path(image)) <= 10000:
-                        cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
-                        time.sleep(1)
-                    elif self.img_host == "ptpimg":
-                        i += 1
-                    elif self.img_host == "freeimage.host":
-                        i += 1
-                    else:
-                        cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                        time.sleep(1) 
+                if meta.get('vapoursynth', False) == True:
+                    from src.vs import vs_screengn
+                    vs_screengn(source=path, encode=None, filter_b_frames=False, num=self.screens, dir=f"{base_dir}/tmp/{folder_id}/")
+                else:
+                    while i != self.screens:
+                        image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
+                        try:
+                            (
+                                ffmpeg
+                                .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
+                                .output(image, vframes=1)
+                                .overwrite_output()
+                                .global_args('-loglevel', loglevel)
+                                .run(quiet=debug)
+                            )
+                        except Exception:
+                            print(traceback.format_exc())
+                        # print(os.path.getsize(image))
+                        # print(f'{i+1}/{self.screens}')
+                        cli_ui.info_count(i, self.screens, "Screens Saved")
+                        # print(Path(image))
+                        if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                            i += 1
+                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                            i += 1
+                        elif os.path.getsize(Path(image)) <= 10000:
+                            cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                            time.sleep(1)
+                        elif self.img_host == "ptpimg":
+                            i += 1
+                        elif self.img_host == "freeimage.host":
+                            i += 1
+                        else:
+                            cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                            time.sleep(1) 
 
 
 

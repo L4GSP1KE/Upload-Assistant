@@ -56,6 +56,7 @@ class Args():
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers")
         parser.add_argument('-rt', '--randomized', nargs='*', required=False, help="Number of extra, torrents with random infohash", default=0)
         parser.add_argument('-ua', '--unattended', action='store_true', required=False, help=argparse.SUPPRESS)
+        parser.add_argument('-vs', '--vapoursynth', action='store_true', required=False, help="Use vapoursynth for screens (requires vs install)")
         
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
