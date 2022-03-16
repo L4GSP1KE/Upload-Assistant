@@ -36,8 +36,8 @@ class BHD():
         type_id = await self.get_type(meta)
         draft = await self.get_live(meta)
         await self.edit_desc(meta)
-        custom, edition = await self.get_edition(meta)
         tags = await self.get_tags(meta)
+        custom, edition = await self.get_edition(meta, tags)
         bhd_name = await self.edit_name(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:
             anon = 0
@@ -247,16 +247,18 @@ class BHD():
             draft_int = 0
         return draft_int
 
-    async def get_edition(self, meta):
+    async def get_edition(self, meta, tags):
         custom = False
+        edition = meta.get('edition', "")
+        if "Hybrid" in tags:
+            edition = edition.replace('Hybrid', '').strip()
         editions = ['collector', 'cirector', 'extended', 'limited', 'special', 'theatrical', 'uncut', 'unrated']
         for each in editions:
             if each in meta.get('edition'):
                 edition = each
-            elif meta.get('edition', "") == "":
+            elif edition == "":
                 edition = ""
             else:
-                edition = meta.get('edition')
                 custom = True 
         return custom, edition
 
@@ -278,6 +280,8 @@ class BHD():
             tags.append("Scene")
         if meta.get('personalrelease', False) == True:
             tags.append('Personal')
+        if "hybrid" in meta.get('edition', "").lower():
+            tags.append('Hybrid')
         return tags
 
     async def edit_name(self, meta):
