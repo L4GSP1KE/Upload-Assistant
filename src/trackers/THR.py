@@ -166,6 +166,8 @@ class THR():
         pronfo = False
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]DESCRIPTION.txt", 'w') as desc:
+            if meta.get('overview', "").strip() != "":
+                desc.write(meta['overview'])
             desc.write(base)
             # REHOST IMAGES
             os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
