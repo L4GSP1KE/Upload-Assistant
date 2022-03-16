@@ -190,6 +190,8 @@ class THR():
             # REHOST IMAGES
             os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
             image_glob = glob.glob("*.png")
+            if 'POSTER.png' in image_glob:
+                image_glob.remove('POSTER.png')
             image_list = []
             for image in image_glob:
                 url = "https://img2.torrenthr.org/api/1/upload"
