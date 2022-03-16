@@ -1552,19 +1552,19 @@ class Prep():
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
         cprint("Creating .torrent", 'grey', 'on_yellow')
-        # file_size = torrent.size
-        # if file_size < 1073741824:  # 1 GiB
-        #     torrent.piece_size = 2**19
-        # elif file_size < 2147483648:  # 2 GiB
-        #     torrent.piece_size = 2**20
-        # elif file_size < 4294967296:  # 4 GiB
-        #     torrent.piece_size = 2**21
-        # elif file_size < 8589934592:  # 8 GiB
-        #     torrent.piece_size = 2**22
-        # elif file_size < 17179869184:  # 16 GiB
-        #     torrent.piece_size = 2**23
-        # else:
-        #     torrent.piece_size = 2**24
+        file_size = torrent.size
+        if file_size < 1073741824:  # 1 GiB
+            torrent.piece_size = 2**19
+        elif file_size < 2147483648:  # 2 GiB
+            torrent.piece_size = 2**20
+        elif file_size < 4294967296:  # 4 GiB
+            torrent.piece_size = 2**21
+        elif file_size < 8589934592:  # 8 GiB
+            torrent.piece_size = 2**22
+        elif file_size < 17179869184:  # 16 GiB
+            torrent.piece_size = 2**23
+        else:
+            torrent.piece_size = 2**24
         torrent.piece_size_max = 16777216
         torrent.generate(callback=self.torf_cb, interval=5)
         torrent.write(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", overwrite=True)
