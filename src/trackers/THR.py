@@ -166,8 +166,26 @@ class THR():
         pronfo = False
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[THR]DESCRIPTION.txt", 'w') as desc:
-            if meta.get('overview', "").strip() != "":
-                desc.write(meta['overview'])
+            if meta['tag'] == "":
+                tag = ""
+            else:
+                tag = f" / {meta['tag'][1:]}"
+            if meta['is_disc'] == "DVD":
+                res = meta['source']
+            else:
+                res = meta['resolution']
+            desc.write("[quote=Info]")
+            name_aka = f"{meta['title']} {meta['aka']} {meta['year']}"
+            desc.write(f"Name: {' '.join(name_aka.split())}\n\n")
+            desc.write(f"Overview: {meta['overview']}\n\n")
+            desc.write(f"{res} / {meta['type']}{tag}\n\n")
+            desc.write(f"Category: {meta['category']}\n")
+            desc.write(f"TMDB: https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}\n")
+            if meta['imdb_id'] != "0":
+                desc.write(f"IMDb: https://www.imdb.com/title/tt{meta['imdb_id']}\n")
+            if meta['tvdb_id'] != "0":
+                desc.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
+            desc.write("[/quote]")
             desc.write(base)
             # REHOST IMAGES
             os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
