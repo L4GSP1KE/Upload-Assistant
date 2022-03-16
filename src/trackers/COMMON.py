@@ -27,6 +27,7 @@ class COMMON():
             desc = bbcode.convert_pre_to_code(desc)
             desc = bbcode.convert_hide_to_spoiler(desc)
             desc = bbcode.convert_comparison_to_collapse(desc, 1200)
+            desc = desc.replace('[img]', '[img=300]')
             descfile.write(desc)
             images = meta['image_list']
             if len(images) > 0: 

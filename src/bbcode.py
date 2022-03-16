@@ -63,9 +63,6 @@ class BBCODE:
         elif is_disc == "BDMV":
             return ""
 
-        # Remove Images in IMG tags:
-        desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc)
-        desc = re.sub("\[img=[\s\S]*?\]", "", desc)
 
        
         # Remove Alignments:
@@ -93,14 +90,26 @@ class BBCODE:
      
        #Catch Stray Images
         comps = re.findall("\[comparison=[\s\S]*?\[\/comparison\]", desc)
+        hides = re.findall("\[hide[\s\S]*?\[\/hide\]", desc)
+        from termcolor import cprint
+        cprint(comps, 'magenta')
+        cprint(hides, 'cyan')
+        comps.extend(hides)
+        cprint(comps, 'magenta')
         nocomp = desc
         comp_placeholders = []
 
-        # Replace comparisons with placeholder because sometimes uploaders use comp images as loose images
+        # Replace comparison/hide tags with placeholder because sometimes uploaders use comp images as loose images
         for i in range(len(comps)):
             nocomp = nocomp.replace(comps[i], '')
             desc = desc.replace(comps[i], f"COMPARISON_PLACEHOLDER-{i}")
             comp_placeholders.append(comps[i])
+
+
+        # Remove Images in IMG tags:
+        desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc)
+        desc = re.sub("\[img=[\s\S]*?\]", "", desc)
+        # Replace Images
         loose_images = re.findall("(https?:\/\/.*\.(?:png|jpg))", nocomp, flags=re.IGNORECASE)
         if len(loose_images) >= 1:
             for image in loose_images:
