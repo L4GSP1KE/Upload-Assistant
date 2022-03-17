@@ -1007,7 +1007,7 @@ class Prep():
             tmdb_name = ' '.join(tmdb_name.split())
             query = '''
                 query ($search: String) { 
-                    Media (search: $search, type: ANIME, sort: TITLE_ROMAJI) { 
+                    Media (search: $search, type: ANIME, sort: TYPE) { 
                         id
                         idMal
                         title {
@@ -1027,7 +1027,7 @@ class Prep():
         else:
             query = '''
                 query ($search: Int) {
-                    Media (idMal: $search, type: ANIME, sort: TITLE_ROMAJI) {
+                    Media (idMal: $search, type: ANIME, sort: TYPE) {
                         id
                         idMal
                         title {
@@ -1975,7 +1975,8 @@ class Prep():
                                 episode = f"E{str(response['data']['scene']['episode']).zfill(2)}"
                         else:
                             #Get season from xem name map
-                            season = ""
+                            season = "S01"
+                            season_int = "1"
                             names_url = f"https://thexem.info/map/names?origin=tvdb&id={str(meta['tvdb_id'])}"
                             names_response = requests.get(names_url).json()
                             difference = 0
