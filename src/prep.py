@@ -1006,8 +1006,12 @@ class Prep():
             tmdb_name = tmdb_name.replace('-', "").replace("The Movie", "")
             tmdb_name = ' '.join(tmdb_name.split())
             query = '''
-                query ($search: String) { 
-                    Media (search: $search, type: ANIME, sort: TYPE) { 
+                query ($search: String) {
+                    Page (page: 1) {
+                        pageInfo {
+                            total
+                        }
+                    media (search: $search, type: ANIME, sort: SEARCH_MATCH) {
                         id
                         idMal
                         title {
@@ -1019,6 +1023,7 @@ class Prep():
                         episodes
                     }
                 }
+            }
             '''
             # Define our query variables and values that will be used in the query request
             variables = {
@@ -1027,7 +1032,11 @@ class Prep():
         else:
             query = '''
                 query ($search: Int) {
-                    Media (idMal: $search, type: ANIME, sort: TYPE) {
+                    Page (page: 1) {
+                        pageInfo {
+                            total
+                        }
+                    media (idMal: $search, type: ANIME, sort: SEARCH_MATCH) {
                         id
                         idMal
                         title {
@@ -1039,22 +1048,35 @@ class Prep():
                         episodes
                     }
                 }
+            }
             '''
             # Define our query variables and values that will be used in the query request
             variables = {
                 'search': mal
             }
 
-        url = 'https://graphql.anilist.co'
         # Make the HTTP Api request
+        url = 'https://graphql.anilist.co'
         response = requests.post(url, json={'query': query, 'variables': variables})
         json = response.json()
-        if json['data']['Media'] != None:
-            romaji = json['data']['Media']['title']['romaji']
-            mal_id = json['data']['Media']['idMal']
-            eng_title = json['data']['Media']['title']['english']
-            season_year = json['data']['Media']['seasonYear']
-            episodes = json['data']['Media']['episodes']
+        media = json['data']['Page']['media']
+        if media != None:
+            difference = 0
+            for anime in media:
+                search_name = re.sub("[^0-9a-zA-Z\[\]]+", "", tmdb_name.lower().replace(' ', ''))
+                for title in anime['title'].values():
+                    if title != None:
+                        title = re.sub("[^0-9a-zA-Z\[\]]+", "", title.lower().replace(' ', ''))
+                        diff = SequenceMatcher(None, title, search_name).ratio()
+                        if diff >= difference:
+                            result = anime
+                            difference = diff
+
+            romaji = result['title'].get('romaji', result['title'].get('english', ""))
+            mal_id = result.get('idMal', 0)
+            eng_title = result['title'].get('english', result['title'].get('romaji', ""))
+            season_year = result.get('season_year', "")
+            episodes = result.get('episodes', 0)
         else:
             romaji = eng_title = season_year  = ""
             episodes = mal_id = 0
