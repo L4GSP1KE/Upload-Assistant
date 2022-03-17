@@ -1085,26 +1085,34 @@ class Prep():
 
 
         else: 
-            format = mi['media']['track'][2]['Format']
-            commercial = mi['media']['track'][2].get('Format_Commercial', '')
+            track_num = 2
+            for t in mi['media']['track']:
+                if t['@type'] != "Audio":
+                    pass
+                else: 
+                    if t['Language'] == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
+                        track_num = int(t['ID'])
+                        break
+            format = mi['media']['track'][track_num]['Format']
+            commercial = mi['media']['track'][track_num].get('Format_Commercial', '')
             try:
-                additional = mi['media']['track'][2]['Format_AdditionalFeatures']
+                additional = mi['media']['track'][track_num]['Format_AdditionalFeatures']
                 # format = f"{format} {additional}"
             except:
                 additional = ""
             try:
-                format_settings = mi['media']['track'][2]['Format_Settings']
+                format_settings = mi['media']['track'][track_num]['Format_Settings']
                 if format_settings in ['Explicit']:
                     format_settings = ""
             except:
                 format_settings = ""
             #Channels
-            channels = mi['media']['track'][2]['Channels']
+            channels = mi['media']['track'][track_num]['Channels']
             try:
-                channel_layout = mi['media']['track'][2]['ChannelLayout']
+                channel_layout = mi['media']['track'][track_num]['ChannelLayout']
             except:
                 try:
-                    channel_layout = mi['media']['track'][2]['ChannelLayout_Original']
+                    channel_layout = mi['media']['track'][track_num]['ChannelLayout_Original']
                 except:
                     channel_layout = ""
             if "LFE" in channel_layout:
