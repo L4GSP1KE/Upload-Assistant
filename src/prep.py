@@ -1523,19 +1523,23 @@ class Prep():
             except:
                 edition = ""
         if isinstance(edition, list):
-            cprint("More than one edition detected, please edit --edition", 'grey', 'on_yellow')
-            time.sleep(2)
-            edition = ""
+            # cprint("More than one edition detected, please edit --edition", 'grey', 'on_yellow')
+            # time.sleep(2)
+            edition = " ".join(edition)
+        cprint(video, 'magenta')
         if len(filelist) == 1:
             video = os.path.basename(video)
         if "open matte" in video.replace('.', ' ').lower():
             edition = edition + "Open Matte"
-        if "REPACK" in video.upper():
+        if "REPACK" in video.upper() or "V2" in video.upper():
             edition = ""
             repack = "REPACK"
-        if "REPACK2" in video.upper():
+        if "REPACK2" in video.upper() or "V3" in video.upper():
             edition = ""
             repack = "REPACK2"
+        if "REPACK3" in video.upper() or "V4" in video.upper():
+            edition = ""
+            repack = "REPACK3"
         if "PROPER" in video:
             edition = ""
             repack = "PROPER"
@@ -2053,12 +2057,18 @@ class Prep():
                         cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
                         cprint(f"If {season} is incorrect, use --season to correct", 'grey', 'on_yellow')
                         await asyncio.sleep(3)
-                try:
-                    version = parsed['release_version']
-                    version = f"v{version}"
-                except Exception:
-                    version = ""
-                episode = episode + version
+                # try:
+                #     cprint(parsed, 'magenta')
+                #     version = parsed['release_version']
+                #     if int(version) == 2:
+                #         meta['repack'] = "REPACK"
+                #     elif int(version) > 2:
+                #         meta['repack'] = f"REPACK{int(version) - 1}"
+                #     # version = f"v{version}"
+                # except Exception:
+                #     # version = ""
+                #     pass
+                    
             if meta.get('manual_season', None) == None:
                 meta['season'] = season
             else:
