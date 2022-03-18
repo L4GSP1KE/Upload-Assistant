@@ -1060,7 +1060,8 @@ class Prep():
         response = requests.post(url, json={'query': query, 'variables': variables})
         json = response.json()
         media = json['data']['Page']['media']
-        if media != None:
+        if media not in (None, []):
+            result = {'title' : {}}
             difference = 0
             for anime in media:
                 search_name = re.sub("[^0-9a-zA-Z\[\]]+", "", tmdb_name.lower().replace(' ', ''))
@@ -1526,7 +1527,6 @@ class Prep():
             # cprint("More than one edition detected, please edit --edition", 'grey', 'on_yellow')
             # time.sleep(2)
             edition = " ".join(edition)
-        cprint(video, 'magenta')
         if len(filelist) == 1:
             video = os.path.basename(video)
         if "open matte" in video.replace('.', ' ').lower():
