@@ -91,11 +91,7 @@ class BBCODE:
        #Catch Stray Images
         comps = re.findall("\[comparison=[\s\S]*?\[\/comparison\]", desc)
         hides = re.findall("\[hide[\s\S]*?\[\/hide\]", desc)
-        from termcolor import cprint
-        cprint(comps, 'magenta')
-        cprint(hides, 'cyan')
         comps.extend(hides)
-        cprint(comps, 'magenta')
         nocomp = desc
         comp_placeholders = []
 
