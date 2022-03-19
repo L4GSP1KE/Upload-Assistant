@@ -1392,7 +1392,7 @@ class Prep():
     def get_region(self, bdinfo, region=None):
         label = bdinfo.get('label', bdinfo.get('title', bdinfo.get('path', ''))).replace('.', ' ')
         if region != None:
-            region = region
+            region = region.upper()
         else: 
             regions = {
             'AFG': 'AFG', 'AIA': 'AIA', 'ALA': 'ALA', 'ALG': 'ALG', 'AND': 'AND', 'ANG': 'ANG', 'ARG': 'ARG', 
