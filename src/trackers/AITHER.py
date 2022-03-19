@@ -102,18 +102,25 @@ class AITHER():
 
     async def edit_name(self, meta):
         aither_name = meta['name']
-        with open(f"{meta.get('base_dir')}/tmp/{meta.get('uuid')}/MediaInfo.json", 'r', encoding='utf-8') as f:
-            mi = json.load(f)
-        
         has_eng_audio = False
-        for track in mi['media']['track']:
-            if track['@type'] == "Audio":
-                if track.get('Language', 'None') == 'en':
+        if meta['is_disc'] != "BDMV":
+            with open(f"{meta.get('base_dir')}/tmp/{meta.get('uuid')}/MediaInfo.json", 'r', encoding='utf-8') as f:
+                mi = json.load(f)
+            
+            for track in mi['media']['track']:
+                if track['@type'] == "Audio":
+                    if track.get('Language', 'None') == 'en':
+                        has_eng_audio = True
+            if not has_eng_audio:
+                audio_lang = mi['media']['track'][2].get('Language_String', "").upper()
+                aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
+        else:
+            for audio in meta['bdinfo']['audio']:
+                if audio['language'] == 'English':
                     has_eng_audio = True
-        if not has_eng_audio:
-            audio_lang = mi['media']['track'][2].get('Language_String', "").upper()
-            aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
-
+            if not has_eng_audio:
+                audio_lang = meta['bdinfo']['audio'][0]['language'].upper()
+                aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
         aither_name = aither_name.replace(meta['video_encode'], meta['video_encode'].replace('.', ''))
         return aither_name
 
