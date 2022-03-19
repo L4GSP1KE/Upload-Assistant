@@ -121,7 +121,7 @@ class AITHER():
             if not has_eng_audio:
                 audio_lang = meta['bdinfo']['audio'][0]['language'].upper()
                 aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
-        aither_name = aither_name.replace(meta['video_encode'], meta['video_encode'].replace('.', ''))
+        aither_name = aither_name.replace(meta.get('video_encode', meta.get('video_codec', "")), meta.get('video_encode', meta.get('video_codec', "")).replace('.', ''))
         return aither_name
 
     async def get_cat_id(self, category_name):
