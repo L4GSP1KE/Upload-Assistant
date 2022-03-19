@@ -577,23 +577,23 @@ class Prep():
                         )
                     except Exception:
                         print(traceback.format_exc())
-                # print(os.path.getsize(image))
-                # print(f'{i+1}/{self.screens}')
-                cli_ui.info_count(i, self.screens, "Screens Saved")
-                if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                    i += 1
-                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                    i += 1
-                elif os.path.getsize(Path(image)) <= 10000:
-                    cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
-                    time.sleep(1)
-                elif self.img_host == "ptpimg":
-                    i += 1
-                elif self.img_host == "freeimage.host":
-                    i += 1
-                else:
-                    cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                    time.sleep(1)
+                    # print(os.path.getsize(image))
+                    # print(f'{i+1}/{self.screens}')
+                    cli_ui.info_count(i, self.screens, "Screens Saved")
+                    if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                        i += 1
+                    elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                        i += 1
+                    elif os.path.getsize(Path(image)) <= 10000:
+                        cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                        time.sleep(1)
+                    elif self.img_host == "ptpimg":
+                        i += 1
+                    elif self.img_host == "freeimage.host":
+                        i += 1
+                    else:
+                        cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                        time.sleep(1)
                 
         
     def dvd_screenshots(self, meta, discs):
