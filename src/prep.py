@@ -381,25 +381,26 @@ class Prep():
     Get and parse mediainfo
     """
     def exportInfo(self, video, isdir, folder_id, base_dir, export_text):
-        cprint("Exporting MediaInfo...", "grey", "on_yellow")
-        if export_text:
-            #MediaInfo to text
-            if isdir == False:
-                os.chdir(os.path.dirname(video))
-            media_info = MediaInfo.parse(video, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
-            export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
-            export.write(media_info.replace(video, os.path.basename(video)))
-            export.close()
-            mi_dump = media_info
+        if os.path.exists(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt") == False and os.path.exists(f"{base_dir}/tmp/{folder_id}/MediaInfo.json.txt") == False:
+            cprint("Exporting MediaInfo...", "grey", "on_yellow")
+            if export_text:
+                #MediaInfo to text
+                if isdir == False:
+                    os.chdir(os.path.dirname(video))
+                media_info = MediaInfo.parse(video, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
+                export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
+                export.write(media_info.replace(video, os.path.basename(video)))
+                export.close()
+                mi_dump = media_info
 
-        #MediaInfo to JSON
-        media_info = MediaInfo.parse(video, output="JSON", mediainfo_options={'inform_version' : '1'})
-        export = open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", 'w', encoding='utf-8')
-        export.write(media_info)
-        export.close()
+            #MediaInfo to JSON
+            media_info = MediaInfo.parse(video, output="JSON", mediainfo_options={'inform_version' : '1'})
+            export = open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", 'w', encoding='utf-8')
+            export.write(media_info)
+            export.close()
+            cprint("MediaInfo Exported.", "grey", "on_green")
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", 'r', encoding='utf-8') as f:
             mi = json.load(f)
-        cprint("MediaInfo Exported.", "grey", "on_green")
         
         return mi
 
