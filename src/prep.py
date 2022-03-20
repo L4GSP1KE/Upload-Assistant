@@ -266,7 +266,9 @@ class Prep():
             meta['video_encode'], meta['video_codec'], meta['has_encode_settings'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
             meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), self.path, bdinfo, meta['filelist'])
-
+        if "REPACK" in meta.get('edition', ""):
+            meta['repack'] = re.search("REPACK[\d]?", meta['edition'])[0]
+            meta['edition'] = re.sub("REPACK[\d]?", "", meta['edition']).strip().replace('  ', ' ')
         
         
         
@@ -1060,26 +1062,17 @@ class Prep():
         url = 'https://graphql.anilist.co'
         response = requests.post(url, json={'query': query, 'variables': variables})
         json = response.json()
-        print()
-        print()
-        print()
-        print()
-        print()
-        pprint(json)
         media = json['data']['Page']['media']
         if media not in (None, []):
             result = {'title' : {}}
             difference = 0
             for anime in media:
                 search_name = re.sub("[^0-9a-zA-Z\[\]]+", "", tmdb_name.lower().replace(' ', ''))
-                cprint(search_name, 'cyan')
                 for title in anime['title'].values():
                     if title != None:
                         title = re.sub(u'[\u3000-\u303f\u3040-\u309f\u30a0-\u30ff\uff00-\uff9f\u4e00-\u9faf\u3400-\u4dbf]+ (?=[A-Za-z ]+–)', "", title.lower().replace(' ', ''), re.U)
-                        cprint(title, 'magenta')
                         diff = SequenceMatcher(None, title, search_name).ratio()
                         if diff >= difference:
-                            cprint(anime, 'green')
                             result = anime
                             difference = diff
 
