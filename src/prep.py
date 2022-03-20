@@ -2298,7 +2298,7 @@ class Prep():
             if meta['tvdb_id'] != "0":
                 generic.write(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series\n")
             poster_img = f"{meta['base_dir']}/tmp/{meta['uuid']}/POSTER.png"
-            if meta.get('poster', '') != '' and not os.path.exists(poster_img):
+            if meta.get('poster', None) not in ['', None] and not os.path.exists(poster_img):
                 if meta.get('rehosted_poster', None) == None:
                     r = requests.get(meta['poster'], stream=True)
                     if r.status_code == 200:
