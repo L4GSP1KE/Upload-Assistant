@@ -1116,7 +1116,7 @@ class Prep():
                 if t['@type'] != "Audio":
                     pass
                 else: 
-                    if t['Language'] == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
+                    if t.get('Language', "") == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
                         track_num = int(t['ID'])
                         break
             format = mi['media']['track'][track_num]['Format']
