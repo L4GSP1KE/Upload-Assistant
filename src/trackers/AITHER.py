@@ -113,14 +113,16 @@ class AITHER():
                         has_eng_audio = True
             if not has_eng_audio:
                 audio_lang = mi['media']['track'][2].get('Language_String', "").upper()
-                aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
+                if audio_lang != "":
+                    aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
         else:
             for audio in meta['bdinfo']['audio']:
                 if audio['language'] == 'English':
                     has_eng_audio = True
             if not has_eng_audio:
                 audio_lang = meta['bdinfo']['audio'][0]['language'].upper()
-                aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
+                if audio_lang != "":
+                    aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
         aither_name = aither_name.replace(meta.get('video_encode', meta.get('video_codec', "")), meta.get('video_encode', meta.get('video_codec', "")).replace('.', ''))
         return aither_name
 
