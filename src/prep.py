@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pyparsing import OneOrMore
 from src.args import Args
 import nest_asyncio
 from src.discparse import DiscParse
@@ -916,13 +917,17 @@ class Prep():
                     meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
                     break
             
-            meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
+            meta['aka'], original_language = await self.get_imdb_aka(meta['imdb_id'])
+            if original_language != None:
+                meta['original_language'] = original_language
+            else:
+                meta['original_language'] = response['original_language']
+
             meta['keywords'] = self.get_keywords(movie)
             if meta.get('anime', False) == False:
                 meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response.get('poster_path', "")
             meta['overview'] = response['overview']
-            meta['original_language'] = response['original_language']
         elif meta['category'] == "TV":
             tv = tmdb.TV(meta['tmdb'])
             response = tv.info()
@@ -951,12 +956,15 @@ class Prep():
                     break
             
             # meta['aka'] = f" AKA {response['original_name']}"
-            meta['aka'] = await self.get_imdb_aka(meta['imdb_id'])
+            meta['aka'], original_language = await self.get_imdb_aka(meta['imdb_id'])
+            if original_language != None:
+                meta['original_language'] = original_language
+            else:
+                meta['original_language'] = response['original_language']
             meta['keywords'] = self.get_keywords(tv)
             meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response.get('poster_path', '')
             meta['overview'] = response['overview']
-            meta['original_language'] = response['original_language']
         if meta['poster'] not in (None, ''):
             meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
@@ -2364,11 +2372,17 @@ class Prep():
             return ""
         ia = IMDb()
         result = ia.get_movie(imdb_id.replace('tt', ''))
-                
+        
+        original_language = result.get('language codes')
+        if isinstance(original_language, list):
+            if len(original_language) > 1:
+                original_language = None
+            elif len(original_language) == 1:
+                original_language = original_language[0]
         aka = result.get('original title', result.get('localized title', ""))
         if aka != "":
             aka = f" AKA {aka}"
-        return aka
+        return aka, original_language
 
     async def get_dvd_size(self, discs):
         sizes = []
