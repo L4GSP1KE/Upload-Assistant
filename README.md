@@ -8,7 +8,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - Obtains TMDb/IMDb/MAL identifiers.
   - Generates custom .torrents without useless top level folders/nfos.
   - Generates proper name for your sites.
-  - Uploads to BLU/BHD/Aither/THR/STC/R4E(limited)/STT
+  - Uploads to BLU/BHD/Aither/THR/STC/R4E(limited)/STT/HP
   - Adds to your client, seeding instantly
   - ALL WITH MINIMAL INPUT!
 
