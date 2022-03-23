@@ -2,13 +2,13 @@
 
 A simple tool to take the work out of uploading. Now with a Discord Bot interface for people who don't like command line!
 
-## What It Does:
+## What It Can Do:
   - Generates and Parses MediaInfo/BDInfo.
   - Generates and Uploads screenshots.
   - Obtains TMDb/IMDb/MAL identifiers.
   - Generates custom .torrents without useless top level folders/nfos.
   - Generates proper name for your sites.
-  - Uploads to BLU/BHD/Aither/THR/STC/R4E(limited)
+  - Uploads to BLU/BHD/Aither/THR/STC/R4E(limited)/STT
   - Adds to your client, seeding instantly
   - ALL WITH MINIMAL INPUT!
 
@@ -17,7 +17,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
 
 
 ## Coming Soon:
-  - Hit me with feature requests
+  - Features
 
 
   
