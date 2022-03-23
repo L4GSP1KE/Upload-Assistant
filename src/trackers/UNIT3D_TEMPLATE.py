@@ -24,6 +24,9 @@ class UNIT3D_TEMPLATE():
     ###############################################################
     ########                    EDIT ME                    ########
     ###############################################################
+
+    # ALSO EDIT CLASS NAME ABOVE
+
     def __init__(self, config):
         self.config = config
         self.tracker = 'Abbreviated'
