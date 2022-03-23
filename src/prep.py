@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pyparsing import OneOrMore
 from src.args import Args
 import nest_asyncio
 from src.discparse import DiscParse
