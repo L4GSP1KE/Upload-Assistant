@@ -10,6 +10,7 @@ from src.trackers.AITHER import AITHER
 from src.trackers.STC import STC
 from src.trackers.R4E import R4E
 from src.trackers.THR import THR
+from src.trackers.STT import STT
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -153,8 +154,8 @@ async def do_the_thing(path, args, base_dir):
     #######  Upload to Trackers  #######
     ####################################
     common = COMMON(config=config)
-    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E']
-    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, }
+    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT']
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT}
 
     for tracker in trackers:
         tracker = tracker.replace(" ", "").upper().strip()
@@ -197,19 +198,7 @@ async def do_the_thing(path, args, base_dir):
                 else:
                     cprint(meta['name'], 'grey', 'on_green')
                     cprint(f"Files can be found at {url}", 'grey', 'on_green')  
-        # if tracker.upper() == "BLU":
-        #     if meta['unattended']:
-        #         upload_to_blu = True
-        #     else:
-        #         upload_to_blu = cli_ui.ask_yes_no(f"Upload to BLU? {debug}", default=meta['unattended'])
-        #     if upload_to_blu:
-        #         print("Uploading to BLU")
-        #         blu = BLU(config=config)
-        #         dupes = await blu.search_existing(meta)
-        #         meta = dupe_check(dupes, meta)
-        #         if meta['upload'] == True:
-        #             await blu.upload(meta)
-        #             await client.add_to_client(meta, "BLU")
+
         if tracker == "BHD":
             bhd = BHD(config=config)
             draft_int = await bhd.get_live(meta)
@@ -228,47 +217,7 @@ async def do_the_thing(path, args, base_dir):
                 if meta['upload'] == True:
                     await bhd.upload(meta)
                     await client.add_to_client(meta, "BHD")
-        # if tracker.upper() == "AITHER":
-        #     tracker = AITHER(config=config)
-        #     if meta['unattended']:
-        #         upload_to_tracker = True
-        #     else:
-        #         upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker.tracker}? {debug}", default=meta['unattended'])
-        #     if upload_to_tracker:
-        #         print(f"Uploading to {tracker.tracker}")
-        #         dupes = await tracker.search_existing(meta)
-        #         meta = dupe_check(dupes, meta)
-        #         if meta['upload'] == True:
-        #             await tracker.upload(meta)
-        #             await client.add_to_client(meta, tracker.tracker)
-        # if tracker.upper() == "STC":
-        #     if meta['unattended']:
-        #         upload_to_stc = True
-        #     else:
-        #         upload_to_stc = cli_ui.ask_yes_no(f"Upload to STC? {debug}", default=meta['unattended'])
-        #     if upload_to_stc:
-        #         print("Uploading to STC")
-        #         stc = STC(config=config)
-        #         dupes = await stc.search_existing(meta)
-        #         meta = dupe_check(dupes, meta)
-        #         if meta['upload'] == True:
-        #             await stc.upload(meta)
-        #             await client.add_to_client(meta, "STC")
-    
-        # if tracker.upper() == "R4E":
-        #     if meta['unattended']:
-        #         upload_to_r4e = True
-        #     else:
-        #         upload_to_r4e = cli_ui.ask_yes_no(f"Upload to R4E? {debug}", default=meta['unattended'])
-        #     if upload_to_r4e:
-        #         print("Uploading to R4E")
-        #         cprint("WARNING: THIS SCRIPT MAKES NO ATTEMPT AT ENSURING THIS UPLOAD IS MOTORSPORTS RELATED")
-        #         r4e = R4E(config=config)
-        #         dupes = await r4e.search_existing(meta)
-        #         meta = dupe_check(dupes, meta)
-        #         if meta['upload'] == True:
-        #             await r4e.upload(meta)
-        #             await client.add_to_client(meta, "R4E")
+        
         if tracker == "THR":
             if meta['unattended']:
                 upload_to_thr = True

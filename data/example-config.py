@@ -55,6 +55,11 @@ config = {
             "announce_url" : "https://skipthecommericals.xyz/announce/customannounceurl",
             # "anon" : "False"
         },
+        "STT" :{
+            "api_key" : "STC",
+            "announce_url" : "https://stt.xyz/announce/customannounceurl",
+            # "anon" : "False"
+        },
         "THR" : {
             "username" : "username",
             "password" : "password",
