@@ -22,7 +22,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, THR, R4E",
+        "default_trackers" : "BLU, BHD, AITHER, STC, THR, R4E, HP",
 
         "BLU" : {
             "api_key" : "BLU api key",
@@ -58,6 +58,11 @@ config = {
         "STT" :{
             "api_key" : "STC",
             "announce_url" : "https://stt.xyz/announce/customannounceurl",
+            # "anon" : "False"
+        },
+        "HP" :{
+            "api_key" : "HP",
+            "announce_url" : "https://hidden-palace.net/announce/customannounceurl",
             # "anon" : "False"
         },
         "THR" : {
