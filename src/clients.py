@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from email.policy import default
 from pprint import pprint
 from torf import Torrent
 import xmlrpc.client
