@@ -26,13 +26,13 @@ class AITHER():
         self.source_flag = 'Aither'
         self.search_url = 'https://aither.cc/api/torrents/filter'
         self.upload_url = 'https://aither.cc/api/torrents/upload'
-        self.forum_link = 'https://aither.cc/forums/topics/1349'
+        self.signature = f"\n[center][url=https://aither.cc/forums/topics/1349]Created by L4Gs Upload Assistant[/url][/center]"
         pass
     
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])

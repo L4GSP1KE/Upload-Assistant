@@ -30,7 +30,7 @@ class UNIT3D_TEMPLATE():
         self.source_flag = 'Source flag for .torrent'
         self.upload_url = 'https://domain.tld/api/torrents/upload'
         self.search_url = 'https://domain.tld/api/torrents/filter'
-        self.forum_link = 'https://github.com/L4GSP1KE/Upload-Assistant'
+        self.signature = None
         pass
     
     async def get_cat_id(self, category_name):
@@ -77,7 +77,7 @@ class UNIT3D_TEMPLATE():
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         region_id = await common.unit3d_region_ids(meta.get('region'))
         distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:

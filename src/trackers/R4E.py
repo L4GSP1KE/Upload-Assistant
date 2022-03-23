@@ -26,7 +26,8 @@ class R4E():
         self.config = config
         self.tracker = 'R4E'
         self.source_flag = 'R4E'
-        self.forum_link = 'https://github.com/L4GSP1KE/Upload-Assistant'
+        # self.signature = f"\n[center][url='https://github.com/L4GSP1KE/Upload-Assistant']Created by L4G's Upload Assistant[/url][/center]"
+        self.signature = None
         pass
     
     async def upload(self, meta):
@@ -34,7 +35,7 @@ class R4E():
         await common.edit_torrent(meta, self.tracker, self.source_flag)
         cat_id = await self.get_cat_id(meta['category'], meta['tmdb'])
         type_id = await self.get_type_id(meta['resolution'])
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         name = await self.edit_name(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['R4E'].get('anon', "False"))) == False:
             anon = 0

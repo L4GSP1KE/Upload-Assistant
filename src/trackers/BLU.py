@@ -26,13 +26,14 @@ class BLU():
         self.source_flag = 'BLU'
         self.search_url = 'https://blutopia.xyz/api/torrents/filter'
         self.upload_url = 'https://blutopia.xyz/api/torrents/upload' 
-        self.forum_link = 'https://blutopia.xyz/forums/topics/3087'
+        self.signature = f"\n[center][url='https://blutopia.xyz/forums/topics/3087']Created by L4G's Upload Assistant[/url][/center]"
+        
         pass
     
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])

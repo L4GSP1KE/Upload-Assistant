@@ -26,13 +26,13 @@ class STT():
         self.source_flag = 'STT'
         self.search_url = 'https://skipthetrailers.xyz/api/torrents/filter'
         self.upload_url = 'https://skipthetrailers.xyz/api/torrents/upload'
-        self.forum_link = 'https://skipthetrailers.xyz/pages/1'
+        self.signature = '\n[center][url=https://skipthetrailers.xyz/pages/1]Please Seed[/url][/center]'
         pass
     
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])

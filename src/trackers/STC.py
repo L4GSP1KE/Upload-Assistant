@@ -25,13 +25,13 @@ class STC():
         self.source_flag = 'STC'
         self.upload_url = 'https://skipthecommericals.xyz/api/torrents/upload'
         self.search_url = 'https://skipthecommericals.xyz/api/torrents/filter'
-        self.forum_link = 'https://github.com/L4GSP1KE/Upload-Assistant'
+        self.signature = '\n[center][url=https://skipthecommericals.xyz/pages/1]Please Seed[/url][/center]'
         pass
     
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'], meta.get('tv_pack', 0), meta.get('sd', 0), meta.get('category', ""))
         resolution_id = await self.get_res_id(meta['resolution'])

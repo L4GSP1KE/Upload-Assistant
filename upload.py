@@ -189,7 +189,7 @@ async def do_the_thing(path, args, base_dir):
                         manual_tracker = manual_tracker.replace(" ", "").upper().strip()
                         tracker_class = tracker_class_map[manual_tracker](config=config)
                         if manual_tracker in unit3d_trackers:
-                            await common.unit3d_edit_desc(meta, tracker_class.tracker, tracker_class.forum_link)
+                            await common.unit3d_edit_desc(meta, tracker_class.tracker, tracker_class.signature)
                         else:
                             await tracker_class.edit_desc(meta)
                 url = await prep.package(meta)

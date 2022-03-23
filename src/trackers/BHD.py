@@ -25,7 +25,7 @@ class BHD():
         self.tracker = 'BHD'
         self.source_flag = 'BHD'
         self.upload_url = 'https://beyond-hd.me/api/upload/'
-        self.forum_link = 'https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456'
+        self.signature = f"\n[center][url=https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456]Created by L4Gs Upload Assistant[/url][/center]"
         pass
     
     async def upload(self, meta):
@@ -191,7 +191,7 @@ class BHD():
                     img_url = images[each]['img_url']
                     desc.write(f"[url={web_url}][img=350x350]{img_url}[/img][/url]")
                 desc.write("[/center]")
-            desc.write(f"\n[center][url={self.forum_link}]Created by L4G's Upload Assistant[/url][/center]")
+            desc.write(self.signature)
             desc.close()
         return
    

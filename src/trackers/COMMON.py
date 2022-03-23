@@ -19,7 +19,7 @@ class COMMON():
             Torrent.copy(new_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent", overwrite=True)
 
     
-    async def unit3d_edit_desc(self, meta, tracker, forum_link):
+    async def unit3d_edit_desc(self, meta, tracker, signature):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]DESCRIPTION.txt", 'w') as descfile:
             bbcode = BBCODE()
@@ -37,8 +37,8 @@ class COMMON():
                     img_url = images[each]['img_url']
                     descfile.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
                 descfile.write("[/center]")
-
-            descfile.write(f"\n[center][url={forum_link}]Created by L4G's Upload Assistant[/url][/center]")
+            if signature != None:
+                descfile.write(signature)
             descfile.close()
         return 
     
