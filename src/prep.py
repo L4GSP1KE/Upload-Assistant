@@ -35,7 +35,7 @@ import shutil
 from imdb import IMDb
 import traceback
 from subprocess import Popen
-import cli_ui
+import subprocess
 from pprint import pprint
 import itertools
 import cli_ui
@@ -1595,23 +1595,32 @@ class Prep():
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
         cprint("Creating .torrent", 'grey', 'on_yellow')
-        # file_size = torrent.size
-        # if file_size < 1073741824:  # 1 GiB
-        #     torrent.piece_size = 2**19
-        # elif file_size < 2147483648:  # 2 GiB
-        #     torrent.piece_size = 2**20
-        # elif file_size < 4294967296:  # 4 GiB
-        #     torrent.piece_size = 2**21
-        # elif file_size < 8589934592:  # 8 GiB
-        #     torrent.piece_size = 2**22
-        # elif file_size < 17179869184:  # 16 GiB
-        #     torrent.piece_size = 2**23
-        # else:
-        #     torrent.piece_size = 2**24
-        torrent.piece_size_max = 16777216
-        torrent.generate(callback=self.torf_cb, interval=5)
-        torrent.write(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", overwrite=True)
-        torrent.verify_filesize(path)
+        file_size = torrent.size
+        if file_size < 1073741824:  # 1 GiB
+            piece_size = 19
+        elif file_size < 2147483648:  # 2 GiB
+            piece_size = 20
+        elif file_size < 4294967296:  # 4 GiB
+            piece_size = 21
+        elif file_size < 8589934592:  # 8 GiB
+            piece_size = 22
+        elif file_size < 17179869184:  # 16 GiB
+            piece_size = 23
+        else:
+            piece_size = 24
+        torrent_creation = self.config['DEFAULT'].get('torrent_creation', 'torf')
+        if torrent_creation == 'mktorrent':
+            args = ['mktorrent', '-a', ' https://fake.tracker', '-p', f'-l {piece_size}', '-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", path]
+            err = subprocess.call()
+            if err != 0:
+                args[2] = "OMITTED"
+                cprint(f"Process execution {args} returned with error code {err}.", 'grey', 'on_red')
+        else:
+            torrent.piece_size = 2**piece_size
+            torrent.piece_size_max = 16777216
+            torrent.generate(callback=self.torf_cb, interval=5)
+            torrent.write(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", overwrite=True)
+            torrent.verify_filesize(path)
         cprint(".torrent created", 'grey', 'on_green')
         return torrent
 
