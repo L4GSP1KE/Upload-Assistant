@@ -1611,7 +1611,7 @@ class Prep():
         torrent_creation = self.config['DEFAULT'].get('torrent_creation', 'torf')
         if torrent_creation == 'mktorrent':
             args = ['mktorrent', '-a', ' https://fake.tracker', '-p', f'-l {piece_size}', '-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", path]
-            err = subprocess.call()
+            err = subprocess.call(args)
             if err != 0:
                 args[2] = "OMITTED"
                 cprint(f"Process execution {args} returned with error code {err}.", 'grey', 'on_red')
