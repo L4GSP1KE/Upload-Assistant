@@ -165,7 +165,7 @@ class HP():
             params['name'] = params['name'] + meta['edition']
         params['name'] + meta['audio']
         try:
-            response = requests.get(url=self.filter_url, params=params)
+            response = requests.get(url=self.search_url, params=params)
             response = response.json()
             for each in response['data']:
                 result = [each][0]['attributes']['name']
