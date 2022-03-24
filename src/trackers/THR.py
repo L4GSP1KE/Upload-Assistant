@@ -59,7 +59,7 @@ class THR():
         #Upload Form
         url = 'https://www.torrenthr.org/takeupload.php'
         files = {
-            'tfile' : (f"{thr_name}.torrent", tfile)
+            'tfile' : (f"THR_TORRENT.torrent", tfile)
         }
         payload = {
             'name' : thr_name,
