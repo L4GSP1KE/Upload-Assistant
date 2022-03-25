@@ -60,7 +60,7 @@ class THR():
         #Upload Form
         url = 'https://www.torrenthr.org/takeupload.php'
         files = {
-            'tfile' : (f'{re.sub("[^0-9a-zA-Z\[\]]+", ".", thr_name)}.torrent', tfile)
+            'tfile' : (f'{re.sub("[^0-9a-zA-Z. \-\[\]]+", " ", thr_name)}.torrent', tfile)
         }
         payload = {
             'name' : thr_name,
