@@ -57,10 +57,11 @@ class THR():
             f.close()
         
         thr_name = unidecode(meta['name'].replace('DD+', 'DDP'))
+        torrent_name = re.sub("[^0-9a-zA-Z. \-\[\]]+", " ", thr_name)
         #Upload Form
         url = 'https://www.torrenthr.org/takeupload.php'
         files = {
-            'tfile' : (f'{re.sub("[^0-9a-zA-Z. \-\[\]]+", " ", thr_name)}.torrent', tfile)
+            'tfile' : (f'{torrent_name}.torrent', tfile)
         }
         payload = {
             'name' : thr_name,
