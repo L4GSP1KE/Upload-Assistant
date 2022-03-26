@@ -678,7 +678,7 @@ class Prep():
                     (
                         ffmpeg
                         .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
-                        .filter('scale', int(width * w_sar), int(height * h_sar))
+                        .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                         .output(image, vframes=1)
                         .overwrite_output()
                         .global_args('-loglevel', loglevel)
@@ -759,7 +759,7 @@ class Prep():
                             (
                                 ffmpeg
                                 .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                                .filter('scale', int(width * w_sar), int(height * h_sar))
+                                .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                 .output(image, vframes=1)
                                 .overwrite_output()
                                 .global_args('-loglevel', loglevel)
