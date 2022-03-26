@@ -718,7 +718,23 @@ class Prep():
             return
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
-            length = mi['media']['track'][1]['Duration']
+            video_track = mi['media']['track'][1]
+            length = video_track['Duration']
+            width = float(video_track.get('Width'))
+            height = float(video_track.get('Height'))
+            par = float(video_track.get('PixelAspectRatio', 1))
+            dar = float(video_track.get('DisplayAspectRatio'))
+
+            if par == 1:
+                sar = w_sar = h_sar = 1
+            elif par < 1:
+                new_height = dar * height
+                sar = width / new_height
+                w_sar = 1
+                h_sar = sar
+            else:
+                sar = w_sar = par 
+                h_sar = 1
             length = round(float(length))
             # for i in range(screens):
             os.chdir(f"{base_dir}/tmp/{folder_id}")
@@ -743,6 +759,7 @@ class Prep():
                             (
                                 ffmpeg
                                 .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
+                                .filter('scale', int(width * w_sar), int(height * h_sar))
                                 .output(image, vframes=1)
                                 .overwrite_output()
                                 .global_args('-loglevel', loglevel)
