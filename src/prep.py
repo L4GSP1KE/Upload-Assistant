@@ -1158,7 +1158,6 @@ class Prep():
             except:
                 format_settings = ""
             #Channels
-            cprint(track_num, 'magenta')
             channels = mi['media']['track'][track_num]['Channels']
             try:
                 channel_layout = mi['media']['track'][track_num]['ChannelLayout']
