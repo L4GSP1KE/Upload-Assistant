@@ -1136,12 +1136,13 @@ class Prep():
 
         else: 
             track_num = 2
-            for t in mi['media']['track']:
+            for i in range(len(mi['media']['track'])):
+                t = mi['media']['track'][i]
                 if t['@type'] != "Audio":
                     pass
                 else: 
                     if t.get('Language', "") == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
-                        track_num = int(t['ID'])
+                        track_num = i
                         break
             format = mi['media']['track'][track_num]['Format']
             commercial = mi['media']['track'][track_num].get('Format_Commercial', '')
@@ -1157,6 +1158,7 @@ class Prep():
             except:
                 format_settings = ""
             #Channels
+            cprint(track_num, 'magenta')
             channels = mi['media']['track'][track_num]['Channels']
             try:
                 channel_layout = mi['media']['track'][track_num]['ChannelLayout']
