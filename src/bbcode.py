@@ -61,7 +61,7 @@ class BBCODE:
             desc = re.sub("(^(Format[\s]{2,}:))(.*?)^$", "", desc, flags=re.MULTILINE | re.IGNORECASE | re.DOTALL)
             desc = re.sub("(^(video|audio|text)( #\d+)?\nid)(.*?)^$", "", desc, flags=re.MULTILINE | re.IGNORECASE | re.DOTALL)
             desc = re.sub("(^(menu)( #\d+)?\n)(.*?)^$", "", desc, flags=re.MULTILINE | re.IGNORECASE | re.DOTALL)
-        elif is_disc == "BDMV":
+        elif is_disc in ["BDMV", "DVD"]:
             return ""
 
 
