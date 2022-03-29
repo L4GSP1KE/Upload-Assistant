@@ -777,6 +777,9 @@ class Prep():
                             time.sleep(1)
                         elif self.img_host == "ptpimg":
                             i += 1
+                        elif self.img_host == "freeimage.host":
+                            cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
+                            exit()
                         else:
                             cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                             time.sleep(1) 
