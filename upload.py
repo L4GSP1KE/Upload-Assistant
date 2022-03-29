@@ -349,10 +349,11 @@ def get_missing(meta):
 if __name__ == '__main__':
     pyver = platform.python_version_tuple()
     if int(pyver[0]) != 3:
-        cprint("Python2 Detected, please use python3")
+        cprint("Python2 Detected, please use python3", 'grey', 'on_red')
         exit()
     else:
         if int(pyver[1]) <= 6:
+            cprint("Python <= 3.6 Detected, please use Python >=3.7", 'grey', 'on_red')
             loop = asyncio.get_event_loop()
             loop.run_until_complete(do_the_thing(path, args, base_dir))
         else:
