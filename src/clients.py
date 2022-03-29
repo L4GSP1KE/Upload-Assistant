@@ -47,7 +47,7 @@ class Clients():
         remote_path = list_remote_path = self.config['TORRENT_CLIENTS'][default_torrent_client].get('remote_path', '/RemotePath')
         if isinstance(local_path, list):
             for i in range(len(local_path)):
-                if os.path.normpath(local_path[i]) in meta['path']:
+                if os.path.normpath(local_path[i]).lower() in meta['path'].lower():
                     list_local_path = local_path[i]
                     list_remote_path = remote_path[i]
             
@@ -153,7 +153,7 @@ class Clients():
         #     path = os.path.dirname(path)
         #Remote path mount
         modified_fr = False
-        if local_path in path and local_path != remote_path:
+        if local_path.lower() in path.lower() and local_path.lower() != remote_path.lower():
             path_dir = os.path.dirname(path)
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
@@ -183,7 +183,7 @@ class Clients():
             path = os.path.dirname(path)
         if len(filelist) != 1:
             path = os.path.dirname(path)
-        if local_path in path and local_path != remote_path:
+        if local_path.lower() in path.lower() and local_path.lower() != remote_path.lower():
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
         
@@ -215,7 +215,7 @@ class Clients():
             print("Deluge connected")    
             isdir = os.path.isdir(path)
             #Remote path mount
-            if local_path in path and local_path != remote_path:
+            if local_path.lower() in path.lower() and local_path.lower() != remote_path.lower():
                 path = path.replace(local_path, remote_path)
                 path = path.replace(os.sep, '/')
             # if isdir == False:
