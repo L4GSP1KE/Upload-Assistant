@@ -92,7 +92,7 @@ config = {
             "qbit_user" : "username",
             "qbit_pass" : "password",
 
-            # Remote path mapping (docker/etc.)
+            # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "/LocalPath",
             # "remote_path" : "/RemotePath"
         },
@@ -105,7 +105,7 @@ config = {
             # "qbit_tag" : "tag",
             # "torrent_storage_dir" : "path/to/BT_backup folder"
             
-            # Remote path mapping (docker/etc.)
+            # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "E:\\downloads\\tv",
             # "remote_path" : "/remote/downloads/tv"
         },
@@ -114,7 +114,8 @@ config = {
             "torrent_client" : "rtorrent",
             "rtorrent_url" : "https://user:password@server.host.tld:443/username/rutorrent/plugins/httprpc/action.php",
             # "torrent_storage_dir" : "path/to/session folder"
-            # Remote path mapping (docker/etc.)
+
+            # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "/LocalPath",
             # "remote_path" : "/RemotePath"
 
@@ -126,7 +127,7 @@ config = {
             "deluge_user" : "username",
             "deluge_pass" : "password",
             
-            # Remote path mapping (docker/etc.)
+            # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "/LocalPath",
             # "remote_path" : "/RemotePath"
         },
