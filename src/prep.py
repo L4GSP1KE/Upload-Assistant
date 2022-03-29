@@ -434,7 +434,7 @@ class Prep():
             else:
                 scan = "i"
             width_list = [3840, 2560, 1920, 1280, 1024, 15360, 7680, 0]
-            height_list = [2160, 1440, 1080, 720, 576, 480, 8640, 4320, 0]
+            height_list = [2160, 1440, 1080, 720, 576, 540, 480, 8640, 4320, 0]
             width = self.closest(width_list, int(width))
             height = self.closest(height_list, int(height))
             res = f"{width}x{height}{scan}"
@@ -464,6 +464,7 @@ class Prep():
             "1280x720p" : "720p", "720p" : "720p",
             "1024x576p" : "576p", "576p" : "576p",
             "1024x576i" : "576i", "576i" : "576i",
+            "1024x540p" : "540p", "540p" : "540p",
             "1024x480p" :  "480p", "480p" : "480p",
             "1024x480i" : "480i", "480i" : "480i",
             "15360x8640p" : "8640p", "8640p" : "8640p",
@@ -493,7 +494,7 @@ class Prep():
                
 
     def is_sd(self, resolution):
-        if resolution in ("480i", "480p", "576i", "576p"):
+        if resolution in ("480i", "480p", "576i", "576p", "540p"):
             sd = 1
         else:
             sd = 0
