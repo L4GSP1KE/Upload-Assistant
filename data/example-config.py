@@ -2,14 +2,13 @@ config = {
     "DEFAULT" : {
         "tmdb_api" : "tmdb_api key",
         "imgbb_api" : "imgbb api key",
-        "freeimage_api" : "6d207e02198a847aa98d0a2a901485a5",
         "ptpimg_api" : "ptpimg api key",
 
         # Order of image hosts, and backup image hosts
         "img_host_1": "imgbb",
-        "img_host_2": "freeimage.host",
-        "img_host_3": "ptpimg",
-        "img_host_4": "imgbox",
+        "img_host_2": "ptpimg",
+        "img_host_3": "imgbox",
+        # "img_host_4": "",
 
         "screens" : "6",
 

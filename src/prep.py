@@ -592,8 +592,6 @@ class Prep():
                         time.sleep(1)
                     elif self.img_host == "ptpimg":
                         i += 1
-                    elif self.img_host == "freeimage.host":
-                        i += 1
                     else:
                         cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                         time.sleep(1)
@@ -699,8 +697,6 @@ class Prep():
                         time.sleep(1)
                     elif self.img_host == "ptpimg":
                         i += 1
-                    elif self.img_host == "freeimage.host":
-                        i += 1
                     else:
                         cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                         time.sleep(1)
@@ -779,8 +775,6 @@ class Prep():
                             cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                             time.sleep(1)
                         elif self.img_host == "ptpimg":
-                            i += 1
-                        elif self.img_host == "freeimage.host":
                             i += 1
                         else:
                             cprint("Image too large for your image host, retaking", 'grey', 'on_red')
@@ -1722,23 +1716,26 @@ class Prep():
                             cprint("imgbb failed, trying next image host", 'yellow')
                             newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                     elif img_host == "freeimage.host":
-                        url = "https://freeimage.host/api/1/upload"
-                        data = {
-                            'key': '6d207e02198a847aa98d0a2a901485a5',
-                            'action' : 'upload',
-                            'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
-                        }
-                        headers = {'content-type' : 'image/png'}
-                        files= {open(image, 'rb')}
-                        response = requests.post(url, data = data)
-                        try:
-                            response = response.json()
-                            img_url = response['image']['medium']['url']
-                            web_url = response['image']['url_viewer']
-                            raw_url = response['image']['url']
-                        except:
-                            cprint("freeimage.host failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
+                        cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
+                        print("continuing in 30 seconds")
+                        time.sleep(30)
+                    #     url = "https://freeimage.host/api/1/upload"
+                    #     data = {
+                    #         'key': '6d207e02198a847aa98d0a2a901485a5',
+                    #         'action' : 'upload',
+                    #         'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
+                    #     }
+                    #     headers = {'content-type' : 'image/png'}
+                    #     files= {open(image, 'rb')}
+                    #     response = requests.post(url, data = data)
+                    #     try:
+                    #         response = response.json()
+                    #         img_url = response['image']['medium']['url']
+                    #         web_url = response['image']['url_viewer']
+                    #         raw_url = response['image']['url']
+                    #     except:
+                    #         cprint("freeimage.host failed, trying next image host", 'yellow')
+                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                     elif img_host == "ptpimg":
                         payload = {
                             'format' : 'json',
