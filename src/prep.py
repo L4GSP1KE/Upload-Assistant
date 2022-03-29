@@ -1,45 +1,51 @@
 # -*- coding: utf-8 -*-
+try:
+    import traceback
+    import nest_asyncio
+    from src.discparse import DiscParse
+    import multiprocessing
+    import os
+    from os.path import basename
+    import re
+    import sys
+    import shortuuid
+    import distutils.util
+    import asyncio
+    from guessit import guessit
+    import ntpath
+    from pathlib import Path
+    import urllib
+    import urllib.parse
+    import ffmpeg
+    import random
+    import json
+    import glob
+    import requests
+    import pyimgbox
+    from pymediainfo import MediaInfo
+    import tmdbsimple as tmdb
+    from datetime import datetime, date
+    from difflib import SequenceMatcher
+    from torf import Torrent
+    from termcolor import colored, cprint
+    # from pprint import pprint
+    import base64
+    import time
+    import anitopy
+    import shutil
+    from imdb import IMDb
+    from subprocess import Popen
+    import subprocess
+    from pprint import pprint
+    import itertools
+    import cli_ui
+    import oxipng 
+except ModuleNotFoundError:
+    print(traceback.print_exc())
+    cprint('Missing Module Found. Please reinstall required dependancies.', 'grey', 'on_red')
+    cprint('pip3 install --user -U -r requirements.txt', 'grey', 'on_red')
+    exit()
 from src.args import Args
-import nest_asyncio
-from src.discparse import DiscParse
-import multiprocessing
-import os
-from os.path import basename
-import re
-import sys
-import shortuuid
-import distutils.util
-import asyncio
-from guessit import guessit
-import ntpath
-from pathlib import Path
-import urllib
-import urllib.parse
-import ffmpeg
-import random
-import json
-import glob
-import requests
-import pyimgbox
-from pymediainfo import MediaInfo
-import tmdbsimple as tmdb
-from datetime import datetime, date
-from difflib import SequenceMatcher
-from torf import Torrent
-from termcolor import colored, cprint
-# from pprint import pprint
-import base64
-import time
-import anitopy
-import shutil
-from imdb import IMDb
-import traceback
-from subprocess import Popen
-import subprocess
-from pprint import pprint
-import itertools
-import cli_ui
-
 from src.trackers.PTP import PTP
 
 
@@ -583,6 +589,7 @@ class Prep():
                         print(traceback.format_exc())
                     # print(os.path.getsize(image))
                     # print(f'{i+1}/{self.screens}')
+                    self.optimize_images(image)
                     cli_ui.info_count(i, self.screens, "Screens Saved")
                     if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                         i += 1
@@ -687,6 +694,7 @@ class Prep():
                     print(traceback.format_exc())
                 # print(os.path.getsize(image))
                 # print(f'{i+1}/{self.screens}')
+                self.optimize_images(image)
                 n += 1
                 try: 
                     if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
@@ -767,6 +775,7 @@ class Prep():
                         # print(os.path.getsize(image))
                         # print(f'{i+1}/{self.screens}')
                         cli_ui.info_count(i, self.screens, "Screens Saved")
+                        self.optimize_images(image)
                         # print(Path(image))
                         if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                             i += 1
@@ -784,8 +793,11 @@ class Prep():
                             cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                             time.sleep(1) 
 
-
-
+    def optimize_images(self, image):
+        if os.path.exists(image):
+            oxipng.optimize(image, level=6)
+           
+        return
     """
     Get type and category
     """

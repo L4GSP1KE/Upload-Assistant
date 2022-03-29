@@ -18,3 +18,4 @@ nest_asyncio
 bencode.py
 unidecode
 beautifulsoup4
+pyoxipng
