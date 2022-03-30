@@ -1,5 +1,6 @@
 import re
 import html
+import urllib.parse
 
 # Bold - KEEP
 # Italic - KEEP
@@ -121,12 +122,103 @@ class BBCODE:
         desc = re.sub("\n\n+", "\n\n", desc)
         while desc.startswith('\n'):
             desc = desc.replace('\n', '', 1)
+        desc = desc.rstrip()
 
         if desc.replace('\n', '') == '':
             return ""
         return desc
 
     
+    def clean_unit3d_description(self, desc, site):
+        # Unescape html
+        desc = html.unescape(desc)
+        # End my suffering
+        desc = desc.replace('\r\n', '\n')
+
+        # Remove links to site
+        site_netloc = urllib.parse.urlparse(site).netloc
+        site_regex = f"(\[url[\=\]]https?:\/\/{site_netloc}/[^\]]+])([^\[]+)(\[\/url\])?"
+        site_url_tags = re.findall(site_regex, desc)
+        if site_url_tags != []:
+            for site_url_tag in site_url_tags:
+                site_url_tag = ''.join(site_url_tag)
+                url_tag_regex = f"(\[url[\=\]]https?:\/\/{site_netloc}[^\]]+])"
+                url_tag_removed = re.sub(url_tag_regex, "", site_url_tag)
+                url_tag_removed = url_tag_removed.replace("[/url]", "")
+                desc = desc.replace(site_url_tag, url_tag_removed)
+
+        desc = desc.replace(site_netloc, site_netloc.split('.')[0])
+
+        # Temporarily hide spoiler tags
+        spoilers = re.findall("\[spoiler[\s\S]*?\[\/spoiler\]", desc)
+        nospoil = desc
+        spoiler_placeholders = []
+        for i in range(len(spoilers)):
+            nospoil = nospoil.replace(spoilers[i], '')
+            desc = desc.replace(spoilers[i], f"SPOILER_PLACEHOLDER-{i}")
+            spoiler_placeholders.append(spoilers[i])
+        
+        # Get Images from outside spoilers
+        images = []
+        image_dict = {}
+        url_tags = re.findall("\[url=[\s\S]*?\[\/url\]", desc)
+        if url_tags != []:
+            for tag in url_tags:
+                image = re.findall("\[img[\s\S]*?\[\/img\]", tag)
+                if len(image) == 1:
+                    img_url = image[0].lower().replace('[img]', '').replace('[/img]', '')
+                    image_dict['img_url'] = image_dict['raw_url'] = re.sub("\[img[\s\S]*\]", "", img_url)
+                    url_tag = tag.replace(image[0], '')
+                    image_dict['web_url'] = re.match("\[url=[\s\S]*?\]", url_tag, flags=re.IGNORECASE)[0].lower().replace('[url=', '')[:-1]
+                    images.append(image_dict)
+                    desc = desc.replace(tag, '')
+
+        # Convert Comparison spoilers to [comparison=]
+
+        # Replace spoiler tags
+        if spoiler_placeholders != []:
+            for i, spoiler in enumerate(spoiler_placeholders):
+                desc = desc.replace(f"SPOILER_PLACEHOLDER-{i}", spoiler)
+
+        # Check for empty [center] tags
+        centers = re.findall("\[center[\s\S]*?\[\/center\]", desc)
+        if centers != []:
+            for center in centers:
+                full_center = center
+                replace = ['[center]', ' ', '\n', '[/center]']
+                for each in replace:
+                    center = center.replace(each, '')
+                if center == "":
+                    desc = desc.replace(full_center, '')
+
+        # Strip blank lines:
+        desc = desc.rstrip()
+        desc = re.sub("\n\n+", "\n\n", desc)
+        while desc.startswith('\n'):
+            desc = desc.replace('\n', '', 1)
+        desc = desc.rstrip()
+
+        if desc.replace('\n', '') == '':
+            return ""
+
+        return desc, images
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     def convert_pre_to_code(self, desc):
         desc = desc.replace('[pre]', '[code]')
         desc = desc.replace('[/pre]', '[/code]')

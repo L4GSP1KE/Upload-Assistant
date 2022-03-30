@@ -45,9 +45,11 @@ except ModuleNotFoundError:
     cprint('Missing Module Found. Please reinstall required dependancies.', 'grey', 'on_red')
     cprint('pip3 install --user -U -r requirements.txt', 'grey', 'on_red')
     exit()
+
 from src.args import Args
 from src.trackers.PTP import PTP
-
+from src.trackers.BLU import BLU
+from src.trackers.COMMON import COMMON
 
 
 
@@ -83,11 +85,9 @@ class Prep():
         if meta['debug']:
             cprint(f"ID: {meta['uuid']}", 'cyan')
 
-        # if meta.get('edit', False) == False:
+        
         meta['is_disc'], videoloc, bdinfo, meta['discs'] = await self.get_disc(meta)
-        # elif meta.get('edit', False) == True and meta.get('is_disc', ):
-        #     parse = DiscParse()
-        #     discs, bdinfo = await parse.get_bdinfo(meta['discs'], meta['uuid'], meta['base_dir'])
+        
         # If BD:
         if meta['is_disc'] == "BDMV":
             video, meta['scene'] = self.is_scene(self.path)
@@ -108,17 +108,6 @@ class Prep():
                     meta['search_year'] = guessit(bdinfo['label'])['year']
                 except Exception:
                     meta['search_year'] = ""
-            
-            # await self.disc_screenshots(video, filename, bdinfo, folder_id, base_dir)
-            if meta.get('edit', False) == False:
-                if meta.get('vapoursynth', False) == True:
-                    use_vs = True
-                else:
-                    use_vs = False
-                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, meta['uuid'], base_dir, use_vs))
-                ds.start()
-                while ds.is_alive() == True:
-                    await asyncio.sleep(1)
 
             if meta.get('resolution', None) == None:
                 meta['resolution'] = self.mi_resolution(bdinfo['video'][0]['res'], guessit(video), width="OTHER", scan="p")
@@ -144,12 +133,7 @@ class Prep():
                 meta['mediainfo'] = mi
             else:
                 mi = meta['mediainfo']
-            #screenshots
-            if meta.get('edit', False) == False:
-                ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, meta['discs']))
-                ds.start()
-                while ds.is_alive() == True:
-                    await asyncio.sleep(1)
+            
             #NTSC/PAL
             meta['dvd_size'] = await self.get_dvd_size(meta['discs'])
             meta['resolution'] = self.get_resolution(guessit(video), meta['uuid'], base_dir)
@@ -200,22 +184,24 @@ class Prep():
             # if meta.get('sd', None) == None:
             meta['sd'] = self.is_sd(meta['resolution'])
 
-            # await self.screenshots(videopath, filename, folder_id, base_dir)
-            if meta.get('edit', False) == False:
-                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, meta['uuid'], base_dir, meta))
-                s.start()
-                while s.is_alive() == True:
-                    await asyncio.sleep(3)
+            
         
         if " AKA " in filename.replace('.',' '):
             filename = filename.split('AKA')[0]
 
         meta['bdinfo'] = bdinfo
         
+
+
+
+
+        # Reuse information from other trackers
+
         if self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
             ptp = PTP(config=self.config)
             if meta.get('ptp', None) != None:
-                meta['imdb'], meta['ptp_torrenthash'] = ptp.get_imdb_from_torrent_id(meta['ptp'])
+                meta['ptp_manual'] = meta['ptp']
+                meta['imdb'], meta['ext_torrenthash'] = ptp.get_imdb_from_torrent_id(meta['ptp'])
             else:
                 if meta['is_disc'] in [None, ""]:
                     ptp_search_term = meta['filelist'][0]
@@ -223,12 +209,69 @@ class Prep():
                 else:
                     search_file_folder = 'folder'
                     ptp_search_term = meta['path']
-                ptp_imdb, ptp_id, meta['ptp_torrenthash'] = ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
+                ptp_imdb, ptp_id, meta['ext_torrenthash'] = ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
                 if ptp_imdb != None:
                     meta['imdb'] = ptp_imdb
                 if ptp_id != None:
                     meta['ptp'] = ptp_id
-            
+        
+        if self.config['TRACKERS'].get('BLU', {}).get('useAPI') == True:
+            blu = BLU(config=self.config)
+            if meta.get('blu', None) != None:
+                blu_tmdb, blu_imdb, blu_tvdb, blu_mal, blu_desc, blu_category, meta['ext_torrenthash'], blu_imagelist = await COMMON(self.config).unit3d_torrent_info("BLU", blu.torrent_url, meta['blu'])
+                if blu_tmdb not in [None, '0']:
+                    meta['tmdb_manual'] = blu_tmdb
+                if blu_imdb not in [None, '0']:
+                    meta['imdb'] = blu_imdb
+                if blu_tvdb not in [None, '0']:
+                    meta['tmdb_id'] = blu_tvdb
+                if blu_mal not in [None, '0']:
+                    meta['mal'] = blu_mal
+                if blu_desc not in [None, '0', '']:
+                    meta['blu_desc'] = blu_desc
+                if blu_category.upper() in ['MOVIE', 'TV SHOW', 'FANRES']:
+                    if blu_category.upper == 'TV SHOW':
+                        meta['category'] = 'TV'
+                    else:
+                        meta['category'] = blu_category.upper()
+                if meta.get('image_list', []) == []:
+                    meta['image_list'] = blu_imagelist
+            else:
+                # Seach automatically
+                pass
+
+
+
+
+
+        # Take Screenshots
+        if meta['is_disc'] == "BDMV":
+            # await self.disc_screenshots(video, filename, bdinfo, folder_id, base_dir)
+            if meta.get('edit', False) == False:
+                if meta.get('vapoursynth', False) == True:
+                    use_vs = True
+                else:
+                    use_vs = False
+                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, meta['uuid'], base_dir, use_vs, meta.get('image_list', [])))
+                ds.start()
+                while ds.is_alive() == True:
+                    await asyncio.sleep(1)
+        elif meta['is_disc'] == "DVD":
+            if meta.get('edit', False) == False:
+                ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, meta['discs']))
+                ds.start()
+                while ds.is_alive() == True:
+                    await asyncio.sleep(1)
+        else:
+            if meta.get('edit', False) == False:
+                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, meta['uuid'], base_dir, meta))
+                s.start()
+                while s.is_alive() == True:
+                    await asyncio.sleep(3)
+
+
+
+
         meta['tmdb'] = meta.get('tmdb_manual', None)
         if meta.get('type', None) == None:
             meta['type'] = self.get_type(video, meta['scene'], meta['is_disc'])
@@ -539,8 +582,8 @@ class Prep():
     Generate Screenshots
     """
 
-    def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir, use_vs):
-        if self.screens == 0:
+    def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir, use_vs, image_list):
+        if self.screens == 0 or len(image_list) >= self.screens:
             return
         #Get longest m2ts
         length = 0 
@@ -606,7 +649,7 @@ class Prep():
                 
         
     def dvd_screenshots(self, meta, discs):
-        if self.screens == 0:
+        if self.screens == 0 or len(meta.get('image_list', [])) >= self.screens:
             return
         ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO", mediainfo_options={'inform_version' : '1'})
         sar = 1
@@ -719,7 +762,7 @@ class Prep():
 
 
     def screenshots(self, path, filename, folder_id, base_dir, meta):
-        if self.screens == 0:
+        if self.screens == 0 or len(meta.get('image_list', [])) >= self.screens:
             return
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
@@ -934,9 +977,10 @@ class Prep():
                     meta['imdb_id'] = str(int(imdb_id.replace('tt', ''))).zfill(7)
             else:
                 meta['imdb_id'] = str(int(meta['imdb'].replace('tt', ''))).zfill(7)
-            meta['tvdb_id'] = external.get('tvdb_id', '0')
-            if meta['tvdb_id'] in ["", None, " ", "None"]:
-                meta['tvdb_id'] = '0'
+            if meta.get('tvdb_id', '0') in ['', ' ', None, 'None', '0']:
+                meta['tvdb_id'] = external.get('tvdb_id', '0')
+                if meta['tvdb_id'] in ["", None, " ", "None"]:
+                    meta['tvdb_id'] = '0'
             videos = movie.videos()
             for each in videos.get('results', []):
                 if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
@@ -972,9 +1016,10 @@ class Prep():
                     meta['imdb_id'] = str(int(imdb_id.replace('tt', ''))).zfill(7)
             else:
                 meta['imdb_id'] = str(int(meta['imdb'].replace('tt', ''))).zfill(7)
-            meta['tvdb_id'] = external.get('tvdb_id', '0')
-            if meta['tvdb_id'] in ["", None, " ", "None"]:
-                meta['tvdb_id'] = '0'
+            if meta.get('tvdb_id', '0') in ['', ' ', None, 'None', '0']:
+                meta['tvdb_id'] = external.get('tvdb_id', '0')
+                if meta['tvdb_id'] in ["", None, " ", "None"]:
+                    meta['tvdb_id'] = '0'
             videos = tv.videos()
             for each in videos.get('results', []):
                 if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
@@ -2249,6 +2294,7 @@ class Prep():
     async def gen_desc(self, meta):
         desclink = meta.get('desclink', None)
         descfile = meta.get('descfile', None)
+        ptp_desc = blu_desc = ""
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="") as description:
             description.seek(0)
             if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
@@ -2258,6 +2304,10 @@ class Prep():
                     description.write(ptp_desc)
                     description.write("\n")
                     meta['description'] = 'PTP'
+
+            if ptp_desc == "" and meta.get('blu_desc', '') not in [None, '']:
+                description.write(meta['blu_desc'])
+
             if meta.get('discs', []) != []:
                 discs = meta['discs']
                 if discs[0]['type'] == "DVD":

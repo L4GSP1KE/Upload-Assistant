@@ -18,6 +18,7 @@ class PTP():
         self.tracker = 'PTP'
         self.api_user = config['TRACKERS']['PTP'].get('ApiUser', '').strip()
         self.api_key = config['TRACKERS']['PTP'].get('ApiKey', '').strip()
+        # self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip()
     
     def get_ptp_id_imdb(self, search_term, search_file_folder):
         imdb_id = ptp_torrent_id = None

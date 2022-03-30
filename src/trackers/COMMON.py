@@ -1,7 +1,7 @@
 from torf import Torrent
 import os
 from termcolor import cprint
-import asyncio
+import traceback
 import requests
 
 from src.bbcode import BBCODE
@@ -106,3 +106,29 @@ class COMMON():
             'WICKED-VISION MEDIA': 943, 'WICKED VISION MEDIA': 943, 'WICKEDVISION MEDIA': 943, 'WICKED-VISION': 943, 'WICKED VISION': 943, 'WICKEDVISION': 943, 'WIENERWORLD': 944, 'WILD BUNCH': 945, 'WILD EYE RELEASING': 946, 'WILD EYE': 946, 'WILD SIDE VIDEO': 947, 'WILD SIDE': 947, 'WME': 948, 'WOLFE VIDEO': 949, 'WOLFE': 949, 'WORD ON FIRE': 950, 'WORKS FILM GROUP': 951, 'WORLD WRESTLING': 952, 'WVG MEDIEN': 953, 'WWE STUDIOS': 954, 'WWE': 954, 'X RATED KULT': 955, 'X-RATED KULT': 955, 'X RATED CULT': 955, 'X-RATED CULT': 955, 'X RATED': 955, 'X-RATED': 955, 'XCESS': 956, 'XLRATOR': 957, 'XT VIDEO': 958, 'XT': 958, 'YAMATO VIDEO': 959, 'YAMATO': 959, 'YASH RAJ FILMS': 960, 'YASH RAJS': 960, 'ZEITGEIST FILMS': 961, 'ZEITGEIST': 961, 'ZENITH PICTURES': 962, 'ZENITH': 962, 'ZIMA': 963, 'ZYLO': 964, 'ZYX MUSIC': 965, 'ZYX': 965
         }.get(distributor, 0)
         return distributor_id
+
+    async def unit3d_torrent_info(self, tracker, torrent_url, id):
+        tmdb = imdb = tvdb = description = category = infohash = mal = None
+        imagelist = []
+        params = {'api_token' : self.config['TRACKERS'][tracker].get('api_key', '')}
+        url = f"{torrent_url}{id}"
+        response = requests.get(url=url, params=params)
+        try:
+            response = response.json()
+            attributes = response['attributes']
+            category = attributes.get('category')
+            description = attributes.get('description')
+            tmdb = attributes.get('tmdb_id')
+            tvdb = attributes.get('tvdb_id')
+            mal = attributes.get('mal_id')
+            imdb = attributes.get('imdb_id')
+            # infohash = attributes.get('infohash')
+            
+            bbcode = BBCODE()
+            description, imagelist = bbcode.clean_unit3d_description(description, torrent_url)
+        except Exception:
+            print(traceback.print_exc())
+            cprint(f"Invalid Response from {tracker} API.", 'grey', 'on_yellow')
+            
+
+        return tmdb, imdb, tvdb, mal, description, category, infohash, imagelist

@@ -35,6 +35,7 @@ class Args():
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
         parser.add_argument('-ptp', '--ptp', nargs='*', required=False, help="PTP torrent id/permalink", type=str)
+        parser.add_argument('-blu', '--blu', nargs='*', required=False, help="BLU torrent id/link", type=str)
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
         parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'imgbox'])
         parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
@@ -91,6 +92,19 @@ class Args():
                                 cprint('Continuing without -ptp', 'grey', 'on_red')
                         else:
                             meta['ptp'] = meta[key]
+                    elif key == 'blu':
+                        if meta[key].startswith('http'):
+                            parsed = urllib.parse.urlparse(meta[key])
+                            try:
+                                blupath = parsed.path
+                                if blupath.endswith('/'):
+                                    blupath = blupath[:-1]
+                                meta['blu'] = blupath.split('/')[-1]
+                            except:
+                                cprint('Unable to parse id from url', 'grey', 'on_red')
+                                cprint('Continuing without --blu', 'grey', 'on_red')
+                        else:
+                            meta['blu'] = meta[key]
                 else:
                     meta[key] = value
             else:

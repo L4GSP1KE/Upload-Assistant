@@ -108,7 +108,7 @@ async def do_the_thing(path, args, base_dir):
             pprint(meta['image_list'])
         # meta['uploaded_screens'] = True
 
-    if meta.get('torrenthash', None) != None or meta.get('ptp_torrenthash', None) != None:
+    if meta.get('torrenthash', None) != None or meta.get('ext_torrenthash', None) != None:
         if meta.get('rehash', False) == False:
             reuse_torrent = await client.find_existing_torrent(meta)
             if reuse_torrent != None:

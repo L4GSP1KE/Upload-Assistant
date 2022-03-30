@@ -86,8 +86,8 @@ class Clients():
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
                 torrenthash = meta['torrenthash']
-            elif meta.get('ptp_torrenthash', None) != None:
-                torrenthash = meta['ptp_torrenthash']
+            elif meta.get('ext_torrenthash', None) != None:
+                torrenthash = meta['ext_torrenthash']
             if torrent_client == 'qbit':
                 torrenthash = torrenthash.lower()
             elif torrent_client == 'rtorrent':
