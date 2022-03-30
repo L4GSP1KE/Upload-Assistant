@@ -173,12 +173,10 @@ class BBCODE:
                     images.append(image_dict)
                     desc = desc.replace(tag, '')
 
-        # Convert Comparison spoilers to [comparison=]
-
         # Remove bot signatures
         desc = desc.replace("[img=35]https://blutopia/favicon.ico[/img] [b]Uploaded Using [url=https://github.com/HDInnovations/UNIT3D]UNIT3D[/url] Auto Uploader[/b] [img=35]https://blutopia/favicon.ico[/img]", '')
-        desc = desc.replace("[center]Created by L4G's Upload Assistant[/center]", '')
-        
+        desc = re.sub("\[center\].*Created by L4G's Upload Assistant.*\[\/center\]", "", desc, flags=re.IGNORECASE)
+
         # Replace spoiler tags
         if spoiler_placeholders != []:
             for i, spoiler in enumerate(spoiler_placeholders):
@@ -194,6 +192,30 @@ class BBCODE:
                     center = center.replace(each, '')
                 if center == "":
                     desc = desc.replace(full_center, '')
+
+        # Convert Comparison spoilers to [comparison=]
+        if spoilers != []:
+            for i in range(len(spoilers)):
+                tag = spoilers[i]
+                images = re.findall("\[img[\s\S]*?\[\/img\]", tag)
+                if len(images) >= 6:
+                    comp_images = []
+                    final_sources = []
+                    for image in images:
+                        image_url = re.sub("\[img[\s\S]*\]", "", image.replace('[/img]', ''))
+                        comp_images.append(image_url)
+                    sources = re.match("\[spoiler=[\s\S]*?\]", tag)[0].replace('[spoiler=', '')[:-1]
+                    sources = re.sub("comparison", "", sources, flags=re.IGNORECASE)
+                    for each in ['vs', ',', '|']:
+                        sources = sources.split(each)
+                        sources = "$".join(sources)
+                    sources = sources.split("$")
+                    for source in sources:
+                        final_sources.append(source.strip())
+                    comp_images = '\n'.join(comp_images)
+                    final_sources = ', '.join(final_sources)
+                    spoil2comp = f"[comparison={final_sources}]{comp_images}[/comparison]"
+                    desc = desc.replace(tag, spoil2comp)
 
         # Strip blank lines:
         desc = desc.rstrip()
