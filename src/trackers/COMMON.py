@@ -122,7 +122,7 @@ class COMMON():
             tvdb = attributes.get('tvdb_id')
             mal = attributes.get('mal_id')
             imdb = attributes.get('imdb_id')
-            # infohash = attributes.get('infohash')
+            infohash = attributes.get('info_hash')
             
             bbcode = BBCODE()
             description, imagelist = bbcode.clean_unit3d_description(description, torrent_url)
