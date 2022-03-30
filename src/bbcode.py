@@ -175,6 +175,10 @@ class BBCODE:
 
         # Convert Comparison spoilers to [comparison=]
 
+        # Remove bot signatures
+        desc = desc.replace("[img=35]https://blutopia/favicon.ico[/img] [b]Uploaded Using [url=https://github.com/HDInnovations/UNIT3D]UNIT3D[/url] Auto Uploader[/b] [img=35]https://blutopia/favicon.ico[/img]", '')
+        desc = desc.replace("[center]Created by L4G's Upload Assistant[/center]", '')
+        
         # Replace spoiler tags
         if spoiler_placeholders != []:
             for i, spoiler in enumerate(spoiler_placeholders):
@@ -199,7 +203,7 @@ class BBCODE:
         desc = desc.rstrip()
 
         if desc.replace('\n', '') == '':
-            return ""
+            return "", []
 
         return desc, images
 
