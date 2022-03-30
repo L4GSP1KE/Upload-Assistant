@@ -24,7 +24,7 @@ config = {
         "default_trackers" : "BLU, BHD, AITHER, STC, THR, R4E, HP",
 
         "BLU" : {
-            "useAPI" : True,
+            "useAPI" : False,
             "api_key" : "BLU api key",
             "announce_url" : "https://blutopia.xyz/announce/customannounceurl",
             # "anon" : "False"
