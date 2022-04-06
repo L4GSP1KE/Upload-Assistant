@@ -1,5 +1,6 @@
 data/config.json
 data/config.py
+data/tags.json
 *.mkv
 .vscode/
 __pycache__/
