@@ -542,27 +542,31 @@ class PTP():
                 "file_input" : ("placeholder.torrent", torrentFile, "application/x-bittorent")
             }
             headers = {
-            'ApiUser' : self.api_user,
-            'ApiKey' : self.api_key
-        }
-            response = requests.post(url=url, data=data, headers=headers, files=files)
-            cprint(response, 'cyan')
-            responsetext = response.text
-            # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
-            if responsetext.find(self.announce_url) != -1:
-                # Get the error message.
-                # <div class="alert alert--error text--center">No torrent file uploaded, or file is empty.</div>
-                errorMessage = ""
-                match = re.search(r"""<div class="alert alert--error.*?>(.+?)</div>""", responsetext)
-                if match is not None:
-                    errorMessage = match.group(1)
+                'ApiUser' : self.api_user,
+                'ApiKey' : self.api_key
+            }
+            if meta['debug']:
+                pprint(url)
+                pprint(data)
+            else:
+                response = requests.post(url=url, data=data, headers=headers, files=files)
+                cprint(response, 'cyan')
+                responsetext = response.text
+                # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
+                if responsetext.find(self.announce_url) != -1:
+                    # Get the error message.
+                    # <div class="alert alert--error text--center">No torrent file uploaded, or file is empty.</div>
+                    errorMessage = ""
+                    match = re.search(r"""<div class="alert alert--error.*?>(.+?)</div>""", responsetext)
+                    if match is not None:
+                        errorMessage = match.group(1)
 
-                raise UploadException(f"Upload to PTP failed: {errorMessage} ({response.status_code}). (We are still on the upload page.)")
+                    raise UploadException(f"Upload to PTP failed: {errorMessage} ({response.status_code}). (We are still on the upload page.)")
 
-               
-            # URL format in case of successful upload: https://passthepopcorn.me/torrents.php?id=9329&torrentid=91868
-            match = re.match(r".*?passthepopcorn\.me/torrents\.php\?id=(\d+)&torrentid=(\d+)", response.url)
-            if match is None:
-                raise UploadException(f"Upload to PTP failed: result URL {response.url} ({response.status_code}) is not the expected one.")
+                
+                # URL format in case of successful upload: https://passthepopcorn.me/torrents.php?id=9329&torrentid=91868
+                match = re.match(r".*?passthepopcorn\.me/torrents\.php\?id=(\d+)&torrentid=(\d+)", response.url)
+                if match is None:
+                    raise UploadException(f"Upload to PTP failed: result URL {response.url} ({response.status_code}) is not the expected one.")
 
         
