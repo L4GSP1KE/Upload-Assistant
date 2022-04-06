@@ -33,13 +33,16 @@ try:
     import time
     import anitopy
     import shutil
-    from imdb import IMDb
+    from imdb import Cinemagoer
     from subprocess import Popen
     import subprocess
     from pprint import pprint
     import itertools
     import cli_ui
-    import oxipng 
+    import platform
+    pyver = platform.python_version_tuple()
+    if int(pyver[0]) == 3 and int(pyver[1]) <= 7:
+        import oxipng 
 except ModuleNotFoundError:
     print(traceback.print_exc())
     cprint('Missing Module Found. Please reinstall required dependancies.', 'grey', 'on_red')
@@ -47,6 +50,7 @@ except ModuleNotFoundError:
     exit()
 
 from src.args import Args
+from src.exceptions import *
 from src.trackers.PTP import PTP
 from src.trackers.BLU import BLU
 from src.trackers.COMMON import COMMON
@@ -201,7 +205,7 @@ class Prep():
             ptp = PTP(config=self.config)
             if meta.get('ptp', None) != None:
                 meta['ptp_manual'] = meta['ptp']
-                meta['imdb'], meta['ext_torrenthash'] = ptp.get_imdb_from_torrent_id(meta['ptp'])
+                meta['imdb'], meta['ext_torrenthash'] = await ptp.get_imdb_from_torrent_id(meta['ptp'])
             else:
                 if meta['is_disc'] in [None, ""]:
                     ptp_search_term = meta['filelist'][0]
@@ -209,7 +213,7 @@ class Prep():
                 else:
                     search_file_folder = 'folder'
                     ptp_search_term = meta['path']
-                ptp_imdb, ptp_id, meta['ext_torrenthash'] = ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
+                ptp_imdb, ptp_id, meta['ext_torrenthash'] = await ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
                 if ptp_imdb != None:
                     meta['imdb'] = ptp_imdb
                 if ptp_id != None:
@@ -298,7 +302,7 @@ class Prep():
         meta = await self.tag_override(meta)
 
         meta['video'] = video
-        meta['audio'], meta['channels'] = self.get_audio_v2(mi, meta, bdinfo)
+        meta['audio'], meta['channels'], meta['has_commentary'] = self.get_audio_v2(mi, meta, bdinfo)
         if meta['tag'][1:].startswith(meta['channels']):
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
         meta['3D'] = self.is_3d(mi, bdinfo)
@@ -482,12 +486,12 @@ class Prep():
                 scan = "p"
             else:
                 scan = "i"
-            width_list = [3840, 2560, 1920, 1280, 1024, 15360, 7680, 0]
+            width_list = [3840, 2560, 1920, 1280, 720, 15360, 7680, 0]
             height_list = [2160, 1440, 1080, 720, 576, 540, 480, 8640, 4320, 0]
             width = self.closest(width_list, int(width))
             height = self.closest(height_list, int(height))
             res = f"{width}x{height}{scan}"
-            resolution = self.mi_resolution(res, guess, width, scan)
+            resolution = self.mi_resolution(res, guess, width, scan, height)
         return resolution
 
     def closest(self, lst, K):
@@ -504,22 +508,23 @@ class Prep():
             
         # return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
 
-    def mi_resolution(self, res, guess, width, scan):
+    def mi_resolution(self, res, guess, width, scan, height):
         res_map = {
             "3840x2160p" : "2160p", "2160p" : "2160p",
             "2560x1440p" : "1440p", "1440p" : "1440p",
             "1920x1080p" : "1080p", "1080p" : "1080p",
             "1920x1080i" : "1080i", "1080i" : "1080i", 
             "1280x720p" : "720p", "720p" : "720p",
-            "1024x576p" : "576p", "576p" : "576p",
-            "1024x576i" : "576i", "576i" : "576i",
-            "1024x540p" : "540p", "540p" : "540p",
-            "1024x480p" :  "480p", "480p" : "480p",
-            "1024x480i" : "480i", "480i" : "480i",
+            "720x576p" : "576p", "576p" : "576p",
+            "720x576i" : "576i", "576i" : "576i",
+            "720x480p" :  "480p", "480p" : "480p",
+            "720x480i" : "480i", "480i" : "480i",
             "15360x8640p" : "8640p", "8640p" : "8640p",
             "7680x4320p" : "4320p", "4320p" : "4320p",
             "OTHER" : "OTHER"}
         resolution = res_map.get(res, None)
+        if height == 540:
+            resolution = "OTHER"
         if resolution == None:
             try:     
                 resolution = guess['screen_size']
@@ -557,18 +562,18 @@ class Prep():
         base = os.path.basename(video)
         base = os.path.splitext(base)[0]
         base = urllib.parse.quote(base)
-        url = f"https://www.srrdb.com/api/search/r:{base}"
+        url = f"https://api.srrdb.com/v1/search/r:{base}"
         try:
             response = requests.get(url, timeout=30)
             response = response.json()
-            if response['resultsCount'] != "0":
+            if int(response.get('resultsCount', 0)) != 0:
                 video = f"{response['results'][0]['release']}.mkv"
                 scene = True
-                cprint("Match Found!", 'grey', 'on_green')
-        except:
+                cprint("SRRDB: Match Found!", 'grey', 'on_green')
+        except Exception:
             video = video
             scene = False
-            cprint("No match found, or request has timed out", 'grey', 'on_yellow')
+            cprint("SRRDB: No match found, or request has timed out", 'grey', 'on_yellow')
         return video, scene
 
 
@@ -838,8 +843,10 @@ class Prep():
 
     def optimize_images(self, image):
         if os.path.exists(image):
-            oxipng.optimize(image, level=6)
-           
+            try:
+                oxipng.optimize(image, level=6)
+            except NameError:
+                pass
         return
     """
     Get type and category
@@ -878,6 +885,9 @@ class Prep():
         return category
 
     async def get_tmdb_from_imdb(self, meta, filename):
+        if meta.get('tmdb_manual') != None:
+            meta['tmdb'] = meta['tmdb_manual']
+            return meta
         imdb_id = meta['imdb']
         if str(imdb_id)[:2].lower() != "tt":
             imdb_id = f"tt{imdb_id}"
@@ -890,8 +900,15 @@ class Prep():
             meta['category'] = "TV"
             meta['tmdb'] =  info['tv_results'][0]['id']
         else:
-            cprint("TMDb was unable to find anything with that IMDb, searching TMDb normally", 'grey', 'on_yellow')
-            meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'])
+            imdb_info = await self.get_imdb_info(imdb_id.replace('tt', ''))
+            title = imdb_info.get("title")
+            if title == None:
+                title = filename
+            year = imdb_info.get('year')
+            if year == None:
+                year = meta['search_year']
+            cprint(f"TMDb was unable to find anything with that IMDb, searching TMDb for {title}", 'grey', 'on_yellow')
+            meta = await self.get_tmdb_id(title, year, meta, meta['category'])
             if meta.get('tmdb') in ('None', '', None, 0, '0'):
                 if meta.get('mode', 'discord') == 'cli':
                     cprint('Unable to find a matching TMDb entry', 'grey', 'on_yellow')
@@ -1331,8 +1348,17 @@ class Prep():
             except Exception:
                 print(traceback.print_exc())
                 pass
+        
+        has_commentary = False
+        for t in mi['media']['track']:
+            if t['@type'] != "Audio":
+                pass
+            else: 
+                if "commentary" in t.get('Title', '').lower():
+                    has_commentary = True
+
         audio = f"{dual} {codec} {format_settings} {chan}{extra}"
-        return audio, chan
+        return audio, chan, has_commentary
 
 
     def is_3d(self, mi, bdinfo):
@@ -1396,8 +1422,11 @@ class Prep():
             if source in ("Web"):
                 if type == "ENCODE":
                     type = "WEBRIP"
-            if is_disc == "HDDVD":
-                source = "HDDVD"
+            if source in ("HD-DVD", "HD DVD", "HDDVD"):
+                if is_disc == "HDDVD":
+                    source = "HD DVD"
+                if type == "ENCODE":
+                    source = "HDDVD"
             if type in ("WEBDL", 'WEBRIP'):
                 source = "Web"
         except Exception:
@@ -1536,7 +1565,8 @@ class Prep():
             'ROUNDER', 'SAFFRON HILL FILMS', 'SAFFRON HILL', 'SAFFRON', 'SAMUEL GOLDWYN FILMS', 'SAMUEL GOLDWYN', 'SAN FRANCISCO SYMPHONY', 'SANDREW METRONOME', 'SAPHRANE', 'SAVOR', 'SCANBOX ENTERTAINMENT', 'SCANBOX', 'SCENIC LABS', 'SCHRÖDERMEDIA', 'SCHRODERMEDIA', 'SCHRODER MEDIA', 'SCORPION RELEASING', 'SCORPION', 'SCREAM TEAM RELEASING', 'SCREAM TEAM', 'SCREEN MEDIA', 'SCREEN', 'SCREENBOUND PICTURES', 'SCREENBOUND', 'SCREENWAVE MEDIA', 'SCREENWAVE', 'SECOND RUN', 'SECOND SIGHT', 'SEEDSMAN GROUP', 'SELECT VIDEO', 'SELECTA VISION', 'SENATOR', 'SENTAI FILMWORKS', 'SENTAI', 'SEVEN7', 'SEVERIN FILMS', 'SEVERIN', 'SEVILLE', 'SEYONS ENTERTAINMENT', 'SEYONS', 'SF STUDIOS', 'SGL ENTERTAINMENT', 'SGL', 'SHAMELESS', 'SHAMROCK MEDIA', 'SHAMROCK', 'SHANGHAI EPIC MUSIC ENTERTAINMENT', 'SHANGHAI EPIC ENTERTAINMENT', 'SHANGHAI EPIC MUSIC', 'SHANGHAI MUSIC ENTERTAINMENT', 'SHANGHAI ENTERTAINMENT', 'SHANGHAI MUSIC', 'SHANGHAI', 'SHEMAROO', 'SHOCHIKU', 'SHOCK', 'SHOGAKU KAN', 'SHOUT FACTORY', 'SHOUT! FACTORY', 'SHOUT', 'SHOUT!', 'SHOWBOX', 'SHOWTIME ENTERTAINMENT', 'SHOWTIME', 'SHRIEK SHOW', 'SHUDDER', 'SIDONIS', 'SIDONIS CALYSTA', 'SIGNAL ONE ENTERTAINMENT', 'SIGNAL ONE', 'SIGNATURE ENTERTAINMENT', 'SIGNATURE', 'SILVER VISION', 'SINISTER FILM', 'SINISTER', 'SIREN VISUAL ENTERTAINMENT', 'SIREN VISUAL', 'SIREN ENTERTAINMENT', 'SIREN', 'SKANI', 'SKY DIGI', 
             'SLASHER // VIDEO', 'SLASHER / VIDEO', 'SLASHER VIDEO', 'SLASHER', 'SLOVAK FILM INSTITUTE', 'SLOVAK FILM', 'SFI', 'SM LIFE DESIGN GROUP', 'SMOOTH PICTURES', 'SMOOTH', 'SNAPPER MUSIC', 'SNAPPER', 'SODA PICTURES', 'SODA', 'SONO LUMINUS', 'SONY MUSIC', 'SONY PICTURES', 'SONY', 'SONY PICTURES CLASSICS', 'SONY CLASSICS', 'SOUL MEDIA', 'SOUL', 'SOULFOOD MUSIC DISTRIBUTION', 'SOULFOOD DISTRIBUTION', 'SOULFOOD MUSIC', 'SOULFOOD', 'SOYUZ', 'SPECTRUM', 'SPENTZOS FILM', 'SPENTZOS', 'SPIRIT ENTERTAINMENT', 'SPIRIT', 'SPIRIT MEDIA GMBH', 'SPIRIT MEDIA', 'SPLENDID ENTERTAINMENT', 'SPLENDID FILM', 'SPO', 'SQUARE ENIX', 'SRI BALAJI VIDEO', 'SRI BALAJI', 'SRI', 'SRI VIDEO', 'SRS CINEMA', 'SRS', 'SSO RECORDINGS', 'SSO', 'ST2 MUSIC', 'ST2', 'STAR MEDIA ENTERTAINMENT', 'STAR ENTERTAINMENT', 'STAR MEDIA', 'STAR', 'STARLIGHT', 'STARZ / ANCHOR BAY', 'STARZ ANCHOR BAY', 'STARZ', 'ANCHOR BAY', 'STER KINEKOR', 'STERLING ENTERTAINMENT', 'STERLING', 'STINGRAY', 'STOCKFISCH RECORDS', 'STOCKFISCH', 'STRAND RELEASING', 'STRAND', 'STUDIO 4K', 'STUDIO CANAL', 'STUDIO GHIBLI', 'GHIBLI', 'STUDIO HAMBURG ENTERPRISES', 'HAMBURG ENTERPRISES', 'STUDIO HAMBURG', 'HAMBURG', 'STUDIO S', 'SUBKULTUR ENTERTAINMENT', 'SUBKULTUR', 'SUEVIA FILMS', 'SUEVIA', 'SUMMIT ENTERTAINMENT', 'SUMMIT', 'SUNFILM ENTERTAINMENT', 'SUNFILM', 'SURROUND RECORDS', 'SURROUND', 'SVENSK FILMINDUSTRI', 'SVENSK', 'SWEN FILMES', 'SWEN FILMS', 'SWEN', 'SYNAPSE FILMS', 'SYNAPSE', 'SYNDICADO', 'SYNERGETIC', 'T- SERIES', 'T-SERIES', 'T SERIES', 'TSERIES', 'T.V.P.', 'TVP', 'TACET RECORDS', 'TACET', 'TAI SENG', 'TAI SHENG', 'TAKEONE', 'TAKESHOBO', 'TAMASA DIFFUSION', 'TC ENTERTAINMENT', 'TC', 'TDK', 'TEAM MARKETING', 'TEATRO REAL', 'TEMA DISTRIBUCIONES', 'TEMPE DIGITAL', 'TF1 VIDÉO', 'TF1 VIDEO', 'TF1', 'THE BLU', 'BLU', 'THE ECSTASY OF FILMS', 'THE FILM DETECTIVE', 'FILM DETECTIVE', 'THE JOKERS', 'JOKERS', 'THE ON', 'ON', 'THIMFILM', 'THIM FILM', 'THIM', 'THIRD WINDOW FILMS', 'THIRD WINDOW', '3RD WINDOW FILMS', '3RD WINDOW', 'THUNDERBEAN ANIMATION', 'THUNDERBEAN', 'THUNDERBIRD RELEASING', 'THUNDERBIRD', 'TIBERIUS FILM', 'TIME LIFE', 'TIMELESS MEDIA GROUP', 'TIMELESS MEDIA', 'TIMELESS GROUP', 'TIMELESS', 'TLA RELEASING', 'TLA', 'TOBIS FILM', 'TOBIS', 'TOEI', 'TOHO', 'TOKYO SHOCK', 'TOKYO', 'TONPOOL MEDIEN GMBH', 'TONPOOL MEDIEN', 'TOPICS ENTERTAINMENT', 'TOPICS', 'TOUCHSTONE PICTURES', 'TOUCHSTONE', 'TRANSMISSION FILMS', 'TRANSMISSION', 'TRAVEL VIDEO STORE', 'TRIART', 'TRIGON FILM', 'TRIGON', 'TRINITY HOME ENTERTAINMENT', 'TRINITY ENTERTAINMENT', 'TRINITY HOME', 'TRINITY', 'TRIPICTURES', 'TRI-PICTURES', 'TRI PICTURES', 'TROMA', 'TURBINE MEDIEN', 'TURTLE RECORDS', 'TURTLE', 'TVA FILMS', 'TVA', 'TWILIGHT TIME', 'TWILIGHT', 'TT', 'TWIN CO., LTD.', 'TWIN CO, LTD.', 'TWIN CO., LTD', 'TWIN CO, LTD', 'TWIN CO LTD', 'TWIN LTD', 'TWIN CO.', 'TWIN CO', 'TWIN', 'UCA', 'UDR', 'UEK', 'UFA/DVD', 'UFA DVD', 'UFADVD', 'UGC PH', 'ULTIMATE3DHEAVEN', 'ULTRA', 'UMBRELLA ENTERTAINMENT', 'UMBRELLA', 'UMC', "UNCORK'D ENTERTAINMENT", 'UNCORKD ENTERTAINMENT', 'UNCORK D ENTERTAINMENT', "UNCORK'D", 'UNCORK D', 'UNCORKD', 'UNEARTHED FILMS', 'UNEARTHED', 'UNI DISC', 'UNIMUNDOS', 'UNITEL', 'UNIVERSAL MUSIC', 'UNIVERSAL SONY PICTURES HOME ENTERTAINMENT', 'UNIVERSAL SONY PICTURES ENTERTAINMENT', 'UNIVERSAL SONY PICTURES HOME', 'UNIVERSAL SONY PICTURES', 'UNIVERSAL HOME ENTERTAINMENT', 'UNIVERSAL ENTERTAINMENT', 
             'UNIVERSAL HOME', 'UNIVERSAL STUDIOS', 'UNIVERSAL', 'UNIVERSE LASER & VIDEO CO.', 'UNIVERSE LASER AND VIDEO CO.', 'UNIVERSE LASER & VIDEO CO', 'UNIVERSE LASER AND VIDEO CO', 'UNIVERSE LASER CO.', 'UNIVERSE LASER CO', 'UNIVERSE LASER', 'UNIVERSUM FILM', 'UNIVERSUM', 'UTV', 'VAP', 'VCI', 'VENDETTA FILMS', 'VENDETTA', 'VERSÁTIL HOME VIDEO', 'VERSÁTIL VIDEO', 'VERSÁTIL HOME', 'VERSÁTIL', 'VERSATIL HOME VIDEO', 'VERSATIL VIDEO', 'VERSATIL HOME', 'VERSATIL', 'VERTICAL ENTERTAINMENT', 'VERTICAL', 'VÉRTICE 360º', 'VÉRTICE 360', 'VERTICE 360o', 'VERTICE 360', 'VERTIGO BERLIN', 'VÉRTIGO FILMS', 'VÉRTIGO', 'VERTIGO FILMS', 'VERTIGO', 'VERVE PICTURES', 'VIA VISION ENTERTAINMENT', 'VIA VISION', 'VICOL ENTERTAINMENT', 'VICOL', 'VICOM', 'VICTOR ENTERTAINMENT', 'VICTOR', 'VIDEA CDE', 'VIDEO FILM EXPRESS', 'VIDEO FILM', 'VIDEO EXPRESS', 'VIDEO MUSIC, INC.', 'VIDEO MUSIC, INC', 'VIDEO MUSIC INC.', 'VIDEO MUSIC INC', 'VIDEO MUSIC', 'VIDEO SERVICE CORP.', 'VIDEO SERVICE CORP', 'VIDEO SERVICE', 'VIDEO TRAVEL', 'VIDEOMAX', 'VIDEO MAX', 'VII PILLARS ENTERTAINMENT', 'VII PILLARS', 'VILLAGE FILMS', 'VINEGAR SYNDROME', 'VINEGAR', 'VS', 'VINNY MOVIES', 'VINNY', 'VIRGIL FILMS & ENTERTAINMENT', 'VIRGIL FILMS AND ENTERTAINMENT', 'VIRGIL ENTERTAINMENT', 'VIRGIL FILMS', 'VIRGIL', 'VIRGIN RECORDS', 'VIRGIN', 'VISION FILMS', 'VISION', 'VISUAL ENTERTAINMENT GROUP', 
-            'VISUAL GROUP', 'VISUAL ENTERTAINMENT', 'VISUAL', 'VIVENDI VISUAL ENTERTAINMENT', 'VIVENDI VISUAL', 'VIVENDI', 'VIZ PICTURES', 'VIZ', 'VLMEDIA', 'VL MEDIA', 'VL', 'VOLGA', 'VVS FILMS', 'VVS', 'VZ HANDELS GMBH', 'VZ HANDELS', 'WARD RECORDS', 'WARD', 'WARNER BROS.', 'WARNER BROS', 'WARNER ARCHIVE', 'WARNER ARCHIVE COLLECTION', 'WAC', 'WARNER', 'WARNER MUSIC', 'WEA', 'WEINSTEIN COMPANY', 'WEINSTEIN', 'WELL GO USA', 'WELL GO', 'WELTKINO FILMVERLEIH', 'WEST VIDEO', 'WEST', 'WHITE PEARL MOVIES', 'WHITE PEARL', 'WICKED-VISION MEDIA', 'WICKED VISION MEDIA', 'WICKEDVISION MEDIA', 'WICKED-VISION', 'WICKED VISION', 'WICKEDVISION', 'WIENERWORLD', 'WILD BUNCH', 'WILD EYE RELEASING', 'WILD EYE', 'WILD SIDE VIDEO', 'WILD SIDE', 'WME', 'WOLFE VIDEO', 'WOLFE', 'WORD ON FIRE', 'WORKS FILM GROUP', 'WORLD WRESTLING', 'WVG MEDIEN', 'WWE STUDIOS', 'WWE', 'X RATED KULT', 'X-RATED KULT', 'X RATED CULT', 'X-RATED CULT', 'X RATED', 'X-RATED', 'XCESS', 'XLRATOR', 'XT VIDEO', 'XT', 'YAMATO VIDEO', 'YAMATO', 'YASH RAJ FILMS', 'YASH RAJS', 'ZEITGEIST FILMS', 'ZEITGEIST', 'ZENITH PICTURES', 'ZENITH', 'ZIMA', 'ZYLO', 'ZYX MUSIC', 'ZYX'
+            'VISUAL GROUP', 'VISUAL ENTERTAINMENT', 'VISUAL', 'VIVENDI VISUAL ENTERTAINMENT', 'VIVENDI VISUAL', 'VIVENDI', 'VIZ PICTURES', 'VIZ', 'VLMEDIA', 'VL MEDIA', 'VL', 'VOLGA', 'VVS FILMS', 'VVS', 'VZ HANDELS GMBH', 'VZ HANDELS', 'WARD RECORDS', 'WARD', 'WARNER BROS.', 'WARNER BROS', 'WARNER ARCHIVE', 'WARNER ARCHIVE COLLECTION', 'WAC', 'WARNER', 'WARNER MUSIC', 'WEA', 'WEINSTEIN COMPANY', 'WEINSTEIN', 'WELL GO USA', 'WELL GO', 'WELTKINO FILMVERLEIH', 'WEST VIDEO', 'WEST', 'WHITE PEARL MOVIES', 'WHITE PEARL', 'WICKED-VISION MEDIA', 'WICKED VISION MEDIA', 'WICKEDVISION MEDIA', 'WICKED-VISION', 'WICKED VISION', 'WICKEDVISION', 'WIENERWORLD', 'WILD BUNCH', 'WILD EYE RELEASING', 'WILD EYE', 'WILD SIDE VIDEO', 'WILD SIDE', 'WME', 'WOLFE VIDEO', 'WOLFE', 'WORD ON FIRE', 'WORKS FILM GROUP', 'WORLD WRESTLING', 'WVG MEDIEN', 'WWE STUDIOS', 'WWE', 'X RATED KULT', 'X-RATED KULT', 'X RATED CULT', 'X-RATED CULT', 'X RATED', 'X-RATED', 'XCESS', 'XLRATOR', 'XT VIDEO', 'XT', 'YAMATO VIDEO', 'YAMATO', 'YASH RAJ FILMS', 'YASH RAJS', 'ZEITGEIST FILMS', 'ZEITGEIST', 'ZENITH PICTURES', 'ZENITH', 'ZIMA', 'ZYLO', 'ZYX MUSIC', 'ZYX',
+            'MASTERS OF CINEMA', 'MOC'
         ]
         distributor_out = ""
         if distributor_in not in [None, "None", ""]:
@@ -1770,10 +1800,12 @@ class Prep():
                         response = requests.post(url, data = data)
                         try:
                             response = response.json()
-                            img_url = response['data']['medium']['url']
+                            if response.get('success') != True:
+                                cprint(response, 'red')
+                            img_url = response['data'].get('medium', response['data']['image'])['url']
                             web_url = response['data']['url_viewer']
                             raw_url = response['data']['image']['url']
-                        except:
+                        except Exception:
                             cprint("imgbb failed, trying next image host", 'yellow')
                             newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                     elif img_host == "freeimage.host":
@@ -1874,6 +1906,8 @@ class Prep():
         alt_title = meta.get('aka', "")
         year = meta.get('year', "")
         resolution = meta.get('resolution', "")
+        if resolution == "OTHER":
+            resolution = ""
         audio = meta.get('audio', "")
         service = meta.get('service', "")
         season = meta.get('season', "")
@@ -1884,7 +1918,6 @@ class Prep():
         source = meta.get('source', "")
         uhd = meta.get('uhd', "")
         hdr = meta.get('hdr', "")
-        distributor = meta.get('distributor', "")
         episode_title = meta.get('episode_title', '')
         if meta.get('is_disc', "") == "BDMV": #Disk
             video_codec = meta.get('video_codec', "")
@@ -2299,7 +2332,7 @@ class Prep():
             description.seek(0)
             if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
                 ptp = PTP(config=self.config)
-                ptp_desc = ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
+                ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
                 if ptp_desc != "":
                     description.write(ptp_desc)
                     description.write("\n")
@@ -2457,8 +2490,8 @@ class Prep():
 
     async def get_imdb_aka(self, imdb_id):
         if imdb_id == "0":
-            return ""
-        ia = IMDb()
+            return "", None
+        ia = Cinemagoer()
         result = ia.get_movie(imdb_id.replace('tt', ''))
         
         original_language = result.get('language codes')
@@ -2521,8 +2554,21 @@ class Prep():
 
 
 
+    async def get_imdb_info(self, imdbID):
+        imdb_info = {}
+        ia = Cinemagoer()
+        info = ia.get_movie(imdbID)
+        imdb_info['title'] = info.get('title')
+        imdb_info['aka'] = info.get('original title', info.get('localized title'))
+        imdb_info['type'] = info.get('kind')
+        imdb_info['imdbID'] = info.get('imdbID')
+        imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
+        imdb_info['year'] = info.get('year')
+        imdb_info['cover'] = info.get('full-size cover url')
+        if len(info.get('directors', [])) >= 1:
+            imdb_info['directors'] = []
+            for director in info.get('directors'):
+                imdb_info['directors'].append(f"nm{director.getID()}")
+        return imdb_info
+        
 
-class XEMNotFound(Exception):
-    pass
-class WeirdSystem(Exception):
-    pass

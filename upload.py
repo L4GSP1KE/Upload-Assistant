@@ -12,6 +12,7 @@ from src.trackers.R4E import R4E
 from src.trackers.THR import THR
 from src.trackers.STT import STT
 from src.trackers.HP import HP
+from src.trackers.PTP import PTP
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -156,7 +157,7 @@ async def do_the_thing(path, args, base_dir):
     ####################################
     common = COMMON(config=config)
     unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT']
-    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP}
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP}
 
     for tracker in trackers:
         tracker = tracker.replace(" ", "").upper().strip()
@@ -229,7 +230,7 @@ async def do_the_thing(path, args, base_dir):
                 #Unable to get IMDB id/Youtube Link
                 if meta.get('imdb_id', '0') == '0':
                     imdb_id = cli_ui.ask_string("Unable to find IMDB id, please enter e.g.(tt1234567)")
-                    meta['imdb'] = imdb_id.replace('tt', '')
+                    meta['imdb_id'] = imdb_id.replace('tt', '').zfill(7)
                 if meta.get('youtube', None) == None:
                     youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                     meta['youtube'] = youtube
@@ -246,6 +247,41 @@ async def do_the_thing(path, args, base_dir):
                             await client.add_to_client(meta, "THR")
                 except:
                     print(traceback.print_exc())
+        if tracker == "PTP":
+            if meta['unattended']:
+                upload_to_ptp = True
+            else:
+                upload_to_ptp = cli_ui.ask_yes_no(f"Upload to {tracker}? {debug}", default=meta['unattended'])
+            if upload_to_ptp:
+                print(f"Uploading to {tracker}")
+                if meta.get('imdb_id', '0') == '0':
+                    imdb_id = cli_ui.ask_string("Unable to find IMDB id, please enter e.g.(tt1234567)")
+                    meta['imdb_id'] = imdb_id.replace('tt', '').zfill(7)
+                ptp = PTP(config=config)
+                try:
+                    cprint("Searching for Group ID)", 'grey', 'on_yellow')
+                    groupID = await ptp.get_group_by_imdb(meta)
+                    if groupID == None:
+                        if meta.get('youtube', None) == None:
+                            youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
+                            meta['youtube'] = youtube
+                    else:
+                        cprint("Searching for Existing Releases", 'grey', 'on_yellow')
+                        dupes = await ptp.search_existing(groupID, meta)
+                        meta = dupe_check(dupes, meta)
+                        if meta.get('imdb_info', {}) == {}:
+                            meta['imdb_info'] = prep.get_imdb_info(meta['imdb_id'])
+                    if meta['upload'] == True:
+                        ptpUrl, ptpData = await ptp.fill_upload_form(groupID, meta)
+                        await ptp.upload(groupID, meta, ptpUrl, ptpData)
+                        await client.add_to_client(meta, "PTP")
+                except:
+                    print(traceback.print_exc())
+
+
+
+
+
 def get_confirmation(meta):
     if meta['debug'] == True:
         cprint("DEBUG: True", 'grey', 'on_red')
@@ -341,7 +377,10 @@ def get_missing(meta):
     if missing != []:
         cli_ui.info_section(cli_ui.yellow, "Potentially missing information:")
         for each in missing:
-            cli_ui.info(each)
+            if each.split('|')[0].replace('--', '').strip() in ["imdb"]:
+                cli_ui.info(cli_ui.red, each)
+            else:
+                cli_ui.info(each)
 
     print()
     return

@@ -57,7 +57,7 @@ class THR():
             f.close()
         
         thr_name = unidecode(meta['name'].replace('DD+', 'DDP'))
-        torrent_name = re.sub("[^0-9a-zA-Z. :'\-\[\]]+", " ", thr_name)
+        torrent_name = re.sub("[^0-9a-zA-Z. '\-\[\]]+", " ", thr_name)
         #Upload Form
         url = 'https://www.torrenthr.org/takeupload.php'
         files = {
@@ -149,7 +149,9 @@ class THR():
                 'Croatian' : 1, 'English' : 2, 'Bosnian' : 3, 'Serbian' : 4, 'Slovenian' : 5
             }
             for sub in sub_langs:
-                subs.append(sub_lang_map.get(sub))
+                language = sub_lang_map.get(sub)
+                if language != None:
+                    subs.append(language)
         return subs
 
 

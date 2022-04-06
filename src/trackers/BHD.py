@@ -132,7 +132,8 @@ class BHD():
         sources = {
             "Blu-ray" : "Blu-ray",
             "BluRay" : "Blu-ray",
-            "HD-DVD" : "HD-DVD",
+            "HDDVD" : "HD-DVD",
+            "HD DVD" : "HD-DVD",
             "Web" : "WEB",
             "HDTV" : "HDTV",
             "NTSC" : "DVD",
@@ -282,6 +283,8 @@ class BHD():
             tags.append('Personal')
         if "hybrid" in meta.get('edition', "").lower():
             tags.append('Hybrid')
+        if meta.get('has_commentary', False) == True:
+            tags.append('Commentary')
         return tags
 
     async def edit_name(self, meta):

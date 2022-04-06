@@ -12,7 +12,7 @@ qbittorrent-api
 deluge-client
 pyrobase
 requests
-imdbpy
+cinemagoer
 pyimgbox
 nest_asyncio
 bencode.py

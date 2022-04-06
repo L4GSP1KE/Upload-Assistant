@@ -78,6 +78,10 @@ class BBCODE:
         # Remove Videos
         desc = re.sub("\[video\][\s\S]*?\[\/video\]", "", desc)
 
+        # Remove Staff tags
+        desc = re.sub("\[staff[\s\S]*?\[\/staff\]", "", desc)
+
+
         #Remove Movie/Person/User/hr/Indent
         remove_list = [
             '[movie]', '[/movie]',
