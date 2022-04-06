@@ -209,7 +209,7 @@ class PTP():
         return existing
 
 
-    def ptpimg_url_rehost(self, image_url):
+    async def ptpimg_url_rehost(self, image_url):
         payload = {
             'format' : 'json',
             'api_key' : self.config["DEFAULT"]["ptpimg_api"],
@@ -226,7 +226,8 @@ class PTP():
             img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}"
         except:
             print("PTPIMG image rehost failed")
-            img_url = ptpimg_upload(image_url, ptpimg_api)
+            img_url = image_url
+            # img_url = ptpimg_upload(image_url, ptpimg_api)
         return img_url
 
 
@@ -516,7 +517,7 @@ class PTP():
             if cover == None:
                 cover = meta.get('poster')
             if cover != None and "ptpimg" not in cover:
-                ptpimg_cover = self.ptpimg_url_rehost(cover)
+                ptpimg_cover = await self.ptpimg_url_rehost(cover)
             new_data = {
                 "title": tinfo.get('title', meta['imdb_info'].get('title', meta['title'])),
                 "year": tinfo.get('year', meta['imdb_info'].get('year'), meta['year']),
