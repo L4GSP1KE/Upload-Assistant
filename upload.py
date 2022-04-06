@@ -312,6 +312,8 @@ def get_confirmation(meta):
         res = meta['resolution']
 
     cli_ui.info(f"{res} / {meta['type']}{tag}")
+    if meta.get('personalrelease', False) == True:
+        cli_ui.info("Personal Release! <3")
     print()
     if meta.get('unattended', False) == False:
         get_missing(meta)
