@@ -143,7 +143,8 @@ class PTP():
                 return None
             elif response.get('Page') == "Details": # Group Found
                 groupID = response.get('GroupId')
-                cprint(f"Matched IMDb: tt{imdb} to Group ID: {groupID}")
+                cprint(f"Matched IMDb: tt{imdb} to Group ID: {groupID}", 'grey', 'on_green')
+                cprint(f"Title: {response.get('Name')} ({response.get('Year')})", 'grey', 'on_green')
                 return groupID
         except Exception:
             cprint("An error has occured trying to find a group ID", 'grey', 'on_red')
@@ -379,7 +380,7 @@ class PTP():
         
         if sub_langs == []:
             sub_langs = [44] # No Subtitle
-        return subs
+        return sub_langs
 
 
     def get_remaster_title(self, meta):
