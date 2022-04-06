@@ -178,7 +178,7 @@ class PTP():
     async def search_existing(self, groupID, meta):
         # Map resolutions to SD / HD / UHD
         quality = None
-        if meta.get('is_sd', 0) == 1: # 1 is SD
+        if meta.get('sd', 0) == 1: # 1 is SD
             quality = "Standard Definition"
         elif meta['resolution'] in ["1440p", "1080p", "1080i", "720p"]:
             quality = "High Definition"
@@ -275,7 +275,7 @@ class PTP():
     def get_resolution(self, meta):
         other_res = None
         res = meta.get('resolution', "OTHER")
-        if meta['is_sd'] == 1 and meta['is_disc'] != "DVD":
+        if meta['sd'] == 1 and meta['is_disc'] != "DVD":
             video_mi = meta['mediainfo']['media']['track'][1]
             other_res = f"{video_mi['Width']}x{video_mi['Height']}"
             res = "Other"
