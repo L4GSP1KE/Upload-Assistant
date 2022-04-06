@@ -114,7 +114,7 @@ class Prep():
                     meta['search_year'] = ""
 
             if meta.get('resolution', None) == None:
-                meta['resolution'] = self.mi_resolution(bdinfo['video'][0]['res'], guessit(video), width="OTHER", scan="p")
+                meta['resolution'] = self.mi_resolution(bdinfo['video'][0]['res'], guessit(video), width="OTHER", scan="p", height="OTHER")
             # if meta.get('sd', None) == None:
             meta['sd'] = self.is_sd(meta['resolution'])
 
