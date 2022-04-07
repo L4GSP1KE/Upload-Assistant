@@ -234,7 +234,7 @@ class Prep():
                 if blu_desc not in [None, '0', '']:
                     meta['blu_desc'] = blu_desc
                 if blu_category.upper() in ['MOVIE', 'TV SHOW', 'FANRES']:
-                    if blu_category.upper == 'TV SHOW':
+                    if blu_category.upper() == 'TV SHOW':
                         meta['category'] = 'TV'
                     else:
                         meta['category'] = blu_category.upper()
