@@ -239,6 +239,8 @@ class PTP():
                 ptpType = "Feature Film"
             else:
                 ptpType = "Short Film"
+        if imdbType == "short":
+            ptpType = "Short Film"
         elif imdbType == "tv mini series":
             ptpType = "Miniseries"
         elif imdbType == "comedy":

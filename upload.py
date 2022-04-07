@@ -259,7 +259,7 @@ async def do_the_thing(path, args, base_dir):
                     meta['imdb_id'] = imdb_id.replace('tt', '').zfill(7)
                 ptp = PTP(config=config)
                 try:
-                    cprint("Searching for Group ID)", 'grey', 'on_yellow')
+                    cprint("Searching for Group ID", 'grey', 'on_yellow')
                     groupID = await ptp.get_group_by_imdb(meta)
                     if groupID == None:
                         if meta.get('youtube', None) == None or "youtube" not in str(meta.get('youtube', '')):
