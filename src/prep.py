@@ -1193,6 +1193,7 @@ class Prep():
     Mediainfo/Bdinfo > meta
     """
     def get_audio_v2(self, mi, meta, bdinfo):
+        extra = dual = ""
         #Get formats
         if bdinfo != None: #Disks
             format_settings = ""
@@ -1248,8 +1249,36 @@ class Prep():
             else:
                 chan = f"{channels}.0"
             
+            if meta['original_language'] != 'en':
+                eng, orig = False, False
+                try:
+                    for t in mi['media']['track']:
+                        if t['@type'] != "Audio":
+                            pass
+                        else: 
+                            if t['Language'] == "en" and "commentary" not in t.get('Title', '').lower():
+                                eng = True
+                            if t['Language'] == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
+                                orig = True
+                            if t['Language'] != meta['original_language'] and t['Language'] != "en":
+                                cprint(f"This release has a(n) {t['Language']} audio track, and may be considered bloated", 'grey', 'on_red')
+                                time.sleep(5)
+                    if eng and orig == True:
+                        dual = "Dual-Audio"
+                    elif eng == True and orig == False:
+                        dual = "Dubbed"
+                except Exception:
+                    print(traceback.print_exc())
+                    pass
         
-        extra = dual = ""
+            has_commentary = False
+            for t in mi['media']['track']:
+                if t['@type'] != "Audio":
+                    pass
+                else: 
+                    if "commentary" in t.get('Title', '').lower():
+                        has_commentary = True
+        
         
         #Convert commercial name to naming conventions
         audio = {
@@ -1327,35 +1356,7 @@ class Prep():
         if format == "MPEG Audio":
             codec = mi['media']['track'][2].get('CodecID_Hint', '')
 
-        if meta['original_language'] != 'en':
-            eng, orig = False, False
-            try:
-                for t in mi['media']['track']:
-                    if t['@type'] != "Audio":
-                        pass
-                    else: 
-                        if t['Language'] == "en" and "commentary" not in t.get('Title', '').lower():
-                            eng = True
-                        if t['Language'] == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
-                            orig = True
-                        if t['Language'] != meta['original_language'] and t['Language'] != "en":
-                            cprint(f"This release has a(n) {t['Language']} audio track, and may be considered bloated", 'grey', 'on_red')
-                            time.sleep(5)
-                if eng and orig == True:
-                    dual = "Dual-Audio"
-                elif eng == True and orig == False:
-                    dual = "Dubbed"
-            except Exception:
-                print(traceback.print_exc())
-                pass
         
-        has_commentary = False
-        for t in mi['media']['track']:
-            if t['@type'] != "Audio":
-                pass
-            else: 
-                if "commentary" in t.get('Title', '').lower():
-                    has_commentary = True
 
         audio = f"{dual} {codec} {format_settings} {chan}{extra}"
         return audio, chan, has_commentary
