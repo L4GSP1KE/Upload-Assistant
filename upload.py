@@ -265,6 +265,7 @@ async def do_the_thing(path, args, base_dir):
                         if meta.get('youtube', None) == None:
                             youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                             meta['youtube'] = youtube
+                        meta['upload'] = True
                     else:
                         cprint("Searching for Existing Releases", 'grey', 'on_yellow')
                         dupes = await ptp.search_existing(groupID, meta)
@@ -313,7 +314,7 @@ def get_confirmation(meta):
 
     cli_ui.info(f"{res} / {meta['type']}{tag}")
     if meta.get('personalrelease', False) == True:
-        cli_ui.info("Personal Release! <3")
+        cli_ui.info("Personal Release!")
     print()
     if meta.get('unattended', False) == False:
         get_missing(meta)
