@@ -523,7 +523,7 @@ class PTP():
                 ptpimg_cover = await self.ptpimg_url_rehost(cover)
             new_data = {
                 "title": tinfo.get('title', meta['imdb_info'].get('title', meta['title'])),
-                "year": tinfo.get('year', meta['imdb_info'].get('year'), meta['year']),
+                "year": tinfo.get('year', meta['imdb_info'].get('year', meta['year'])),
                 "image": ptpimg_cover,
                 "tags": tinfo.get('tags', ""),
                 "album_desc": tinfo.get('plot', meta.get('overview', "")),
