@@ -270,8 +270,8 @@ async def do_the_thing(path, args, base_dir):
                         cprint("Searching for Existing Releases", 'grey', 'on_yellow')
                         dupes = await ptp.search_existing(groupID, meta)
                         meta = dupe_check(dupes, meta)
-                        if meta.get('imdb_info', {}) == {}:
-                            meta['imdb_info'] = prep.get_imdb_info(meta['imdb_id'])
+                    if meta.get('imdb_info', {}) == {}:
+                        meta['imdb_info'] = prep.get_imdb_info(meta['imdb_id'])
                     if meta['upload'] == True:
                         ptpUrl, ptpData = await ptp.fill_upload_form(groupID, meta)
                         await ptp.upload(groupID, meta, ptpUrl, ptpData)
