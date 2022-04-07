@@ -569,6 +569,7 @@ class PTP():
                 # URL format in case of successful upload: https://passthepopcorn.me/torrents.php?id=9329&torrentid=91868
                 match = re.match(r".*?passthepopcorn\.me/torrents\.php\?id=(\d+)&torrentid=(\d+)", response.url)
                 if match is None:
+                    pprint(response.text)
                     raise UploadException(f"Upload to PTP failed: result URL {response.url} ({response.status_code}) is not the expected one.")
 
         
