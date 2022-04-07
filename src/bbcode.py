@@ -229,7 +229,7 @@ class BBCODE:
         desc = desc.rstrip()
 
         if desc.replace('\n', '') == '':
-            return "", []
+            return "", images
 
         return desc, images
 
