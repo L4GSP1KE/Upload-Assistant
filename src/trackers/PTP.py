@@ -590,14 +590,19 @@ class PTP():
                 "file_input" : ("placeholder.torrent", torrentFile, "application/x-bittorent")
             }
             headers = {
-                'ApiUser' : self.api_user,
-                'ApiKey' : self.api_key
+                # 'ApiUser' : self.api_user,
+                # 'ApiKey' : self.api_key,
+                 "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.45 Safari/537.36"
             }
             if meta['debug']:
                 pprint(url)
                 pprint(data)
             else:
-                response = requests.post(url=url, data=data, headers=headers, files=files)
+                with requests.Session() as session:
+                    cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
+                    with open(cookiefile, 'rb') as cf:
+                        session.cookies.update(pickle.load(cf))
+                    response = session.post(url=url, data=data, headers=headers, files=files)
                 cprint(response, 'cyan')
                 responsetext = response.text
                 # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
