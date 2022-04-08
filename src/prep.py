@@ -1194,6 +1194,7 @@ class Prep():
     """
     def get_audio_v2(self, mi, meta, bdinfo):
         extra = dual = ""
+        has_commentary = False
         #Get formats
         if bdinfo != None: #Disks
             format_settings = ""
@@ -1272,7 +1273,7 @@ class Prep():
                     print(traceback.print_exc())
                     pass
         
-            has_commentary = False
+            
             for t in mi['media']['track']:
                 if t['@type'] != "Audio":
                     pass
