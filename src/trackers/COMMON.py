@@ -126,6 +126,7 @@ class COMMON():
             
             bbcode = BBCODE()
             description, imagelist = bbcode.clean_unit3d_description(description, torrent_url)
+            cprint(f"Successfully grabbed description from {tracker}", 'grey', 'on_green')
         except Exception:
             print(traceback.print_exc())
             cprint(f"Invalid Response from {tracker} API.", 'grey', 'on_yellow')

@@ -8,6 +8,7 @@ import os
 import time
 import traceback
 import json
+import pickle
 
 from src.trackers.COMMON import COMMON
 from src.bbcode import BBCODE
@@ -24,7 +25,9 @@ class PTP():
         self.source_flag = 'PTP'
         self.api_user = config['TRACKERS']['PTP'].get('ApiUser', '').strip()
         self.api_key = config['TRACKERS']['PTP'].get('ApiKey', '').strip()
-        self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip()
+        self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip() 
+        self.username = config['TRACKERS']['PTP'].get('username', '').strip() 
+        self.password = config['TRACKERS']['PTP'].get('password', '').strip() 
     
     async def get_ptp_id_imdb(self, search_term, search_file_folder):
         imdb_id = ptp_torrent_id = None
@@ -51,14 +54,14 @@ class PTP():
                                         if file['Path'] == filename:
                                             imdb_id = movie['ImdbId']
                                             ptp_torrent_id = torrent['Id']
-                                            dummy, ptp_torrent_hash = self.get_imdb_from_torrent_id(ptp_torrent_id)
+                                            dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
                                             cprint(f'Matched release with PTP ID: {ptp_torrent_id}', 'grey', 'on_green')
                                             return imdb_id, ptp_torrent_id, ptp_torrent_hash
                                 if search_file_folder == 'folder':
                                     if str(torrent['FilePath']) == filename:
                                         imdb_id = movie['ImdbId']
                                         ptp_torrent_id = torrent['Id']
-                                        dummy, ptp_torrent_hash = self.get_imdb_from_torrent_id(ptp_torrent_id)
+                                        dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
                                         cprint(f'Matched release with PTP ID: {ptp_torrent_id}', 'grey', 'on_green')
                                         return imdb_id, ptp_torrent_id, ptp_torrent_hash
                 else:
@@ -478,6 +481,47 @@ class PTP():
             # desc.write(self.signature)
             desc.close()
 
+    async def get_AntiCsrfToken(self, meta):
+        AntiCsrfToken = ""
+        cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
+        with requests.Session() as session:
+            loggedIn = False
+            if os.path.exists(cookiefile):
+                with open(cookiefile, 'rb') as cf:
+                    session.cookies.update(pickle.load(cf))
+                uploadresponse = session.get("https://passthepopcorn.me/upload.php")
+                loggedIn = await self.validate_login(uploadresponse)
+            if loggedIn == True:
+                AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
+            else: 
+                passKey = re.match(r"https?://please\.passthepopcorn\.me:?\d*/(.+)/announce",self.announce_url)
+                data = {
+                    "username": self.username,
+                    "password": self.password,
+                    "passkey": passKey,
+                    "keeplogged": "1",
+                }
+                loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                try:
+                    resp = loginresponse.json()
+                    if resp["Result"] != "Ok":
+                        raise LoginException("Failed to login to PTP. Probably due to the bad user name, password or announce url.")
+                    AntiCsrfToken = resp["Settings.AntiCsrfToken"]
+                    with open(cookiefile, 'wb') as cf:
+                        pickle.dump(session.cookies, cf)
+                except Exception:
+                    raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
+        return AntiCsrfToken
+
+    async def validate_login(self, response):
+        loggedIn = False
+        if response.text.find("""<a href="login.php?act=recover">""") != -1:
+            raise LoginException("Looks like you are not logged in to PTP. Probably due to the bad user name or password.")
+        elif "Your popcorn quota has been reached, come back later!" in response.text:
+            raise LoginException("Your PTP request/popcorn quota has been reached, try again later")
+        else:
+            loggedIn = True
+        return loggedIn
 
     async def fill_upload_form(self, groupID, meta):
         common = COMMON(config=self.config)
@@ -499,7 +543,8 @@ class PTP():
             "other_source": self.get_source(meta['source']),
             "release_desc": desc,
             "nfo_text": "",
-            "subtitles" : self.get_subtitles(meta)
+            "subtitles" : self.get_subtitles(meta),
+            "AntiCsrfToken" : self.get_AntiCsrfToken(meta)
             }
         if resolution == "Other":
             data["other_resolution"] = other_resolution
