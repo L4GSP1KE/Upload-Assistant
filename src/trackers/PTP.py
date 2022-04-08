@@ -489,8 +489,9 @@ class PTP():
             if os.path.exists(cookiefile):
                 with open(cookiefile, 'rb') as cf:
                     session.cookies.update(pickle.load(cf))
-                uploadresponse = session.get("https://passthepopcorn.me/upload.php")
-                loggedIn = await self.validate_login(uploadresponse)
+                if "pasthepopcorn.me" in session.cookies.list_domains():
+                    uploadresponse = session.get("https://passthepopcorn.me/upload.php")
+                    loggedIn = await self.validate_login(uploadresponse)
             if loggedIn == True:
                 AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
             else: 
