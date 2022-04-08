@@ -545,7 +545,7 @@ class PTP():
             "release_desc": desc,
             "nfo_text": "",
             "subtitles" : self.get_subtitles(meta),
-            "AntiCsrfToken" : self.get_AntiCsrfToken(meta)
+            "AntiCsrfToken" : await self.get_AntiCsrfToken(meta)
             }
         if resolution == "Other":
             data["other_resolution"] = other_resolution
