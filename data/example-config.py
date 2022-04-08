@@ -39,6 +39,8 @@ config = {
             "useAPI" : False,
             "ApiUser" : "ptp api user",
             "ApiKey" : 'ptp api key',
+            "username" : "",
+            "password" : "",
             "announce_url" : ""
         },
         "AITHER" :{
