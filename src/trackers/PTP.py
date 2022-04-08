@@ -482,36 +482,37 @@ class PTP():
             desc.close()
 
     async def get_AntiCsrfToken(self, meta):
-        AntiCsrfToken = ""
-        cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
-        with requests.Session() as session:
-            loggedIn = False
-            if os.path.exists(cookiefile):
-                with open(cookiefile, 'rb') as cf:
-                    session.cookies.update(pickle.load(cf))
-                if "pasthepopcorn.me" in session.cookies.list_domains():
-                    uploadresponse = session.get("https://passthepopcorn.me/upload.php")
-                    loggedIn = await self.validate_login(uploadresponse)
-            if loggedIn == True:
-                AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
-            else: 
-                passKey = re.match(r"https?://please\.passthepopcorn\.me:?\d*/(.+)/announce",self.announce_url)
-                data = {
-                    "username": self.username,
-                    "password": self.password,
-                    "passkey": passKey,
-                    "keeplogged": "1",
-                }
-                loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
-                try:
-                    resp = loginresponse.json()
-                    if resp["Result"] != "Ok":
-                        raise LoginException("Failed to login to PTP. Probably due to the bad user name, password or announce url.")
-                    AntiCsrfToken = resp["Settings.AntiCsrfToken"]
-                    with open(cookiefile, 'wb') as cf:
-                        pickle.dump(session.cookies, cf)
-                except Exception:
-                    raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
+        AntiCsrfToken = self.config['TRACKERS']['PTP'].get('AntiCsrfToken', '').strip()
+        if AntiCsrfToken == "":
+            cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
+            with requests.Session() as session:
+                loggedIn = False
+                if os.path.exists(cookiefile):
+                    with open(cookiefile, 'rb') as cf:
+                        session.cookies.update(pickle.load(cf))
+                    if "pasthepopcorn.me" in session.cookies.list_domains():
+                        uploadresponse = session.get("https://passthepopcorn.me/upload.php")
+                        loggedIn = await self.validate_login(uploadresponse)
+                if loggedIn == True:
+                    AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
+                else: 
+                    passKey = re.match(r"https?://please\.passthepopcorn\.me:?\d*/(.+)/announce",self.announce_url).group(1)
+                    data = {
+                        "username": self.username,
+                        "password": self.password,
+                        "passkey": passKey,
+                        "keeplogged": "1",
+                    }
+                    loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                    try:
+                        resp = loginresponse.json()
+                        if resp["Result"] != "Ok":
+                            raise LoginException("Failed to login to PTP. Probably due to the bad user name, password or announce url.")
+                        AntiCsrfToken = resp["AntiCsrfToken"]
+                        with open(cookiefile, 'wb') as cf:
+                            pickle.dump(session.cookies, cf)
+                    except Exception:
+                        raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
         return AntiCsrfToken
 
     async def validate_login(self, response):
@@ -567,7 +568,7 @@ class PTP():
                 cover = meta.get('poster')
             if cover != None and "ptpimg" not in cover:
                 ptpimg_cover = await self.ptpimg_url_rehost(cover)
-            new_data = {
+            data = {
                 "title": tinfo.get('title', meta['imdb_info'].get('title', meta['title'])),
                 "year": tinfo.get('year', meta['imdb_info'].get('year', meta['year'])),
                 "image": ptpimg_cover,
@@ -598,11 +599,7 @@ class PTP():
                 pprint(url)
                 pprint(data)
             else:
-                with requests.Session() as session:
-                    cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
-                    with open(cookiefile, 'rb') as cf:
-                        session.cookies.update(pickle.load(cf))
-                    response = session.post(url=url, data=data, headers=headers, files=files)
+                response = requests.post(url=url, data=data, headers=headers, files=files)
                 cprint(response, 'cyan')
                 responsetext = response.text
                 # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.

@@ -262,6 +262,7 @@ async def do_the_thing(path, args, base_dir):
                     cprint("Searching for Group ID", 'grey', 'on_yellow')
                     groupID = await ptp.get_group_by_imdb(meta)
                     if groupID == None:
+                        cprint("No Existing Group found")
                         if meta.get('youtube', None) == None or "youtube" not in str(meta.get('youtube', '')):
                             youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
                             meta['youtube'] = youtube
