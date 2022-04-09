@@ -10,6 +10,7 @@ from pathlib import Path
 import time
 import traceback
 import json
+import platform
 import pickle
 
 from src.trackers.COMMON import COMMON
@@ -30,7 +31,7 @@ class PTP():
         self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip() 
         self.username = config['TRACKERS']['PTP'].get('username', '').strip() 
         self.password = config['TRACKERS']['PTP'].get('password', '').strip() 
-        self.user_agent = 'Mozilla/5.0 (Upload Assistant x64) Gecko/20100101 Upload-Assistant/2.0'
+        self.user_agent = f'Upload Assistant ({platform.system()} {platform.release()})'
     
     async def get_ptp_id_imdb(self, search_term, search_file_folder):
         imdb_id = ptp_torrent_id = None
