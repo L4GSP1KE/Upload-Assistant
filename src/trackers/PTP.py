@@ -507,8 +507,9 @@ class PTP():
                 try:
                     resp = loginresponse.json()
                     if resp['Result'] == "TfaRequired":
-                        data['TfaType'] = "Normal"
+                        data['TfaType'] = "normal"
                         data['TfaCode'] = cli_ui.ask_string("2FA Required: Please enter 2FA code")
+                        session.cookies.clear()
                         loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
                         await asyncio.sleep(2)
                         resp = loginresponse.json()
@@ -610,7 +611,7 @@ class PTP():
                     cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
                     with open(cookiefile, 'rb') as cf:
                         session.cookies.update(pickle.load(cf))
-                    response = session.post(url=url, data=data, headers=headers, files=files)
+                    # response = session.post(url=url, data=data, headers=headers, files=files)
                 cprint(response, 'cyan')
                 responsetext = response.text
                 # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
