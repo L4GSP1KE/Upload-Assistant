@@ -30,6 +30,7 @@ class PTP():
         self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip() 
         self.username = config['TRACKERS']['PTP'].get('username', '').strip() 
         self.password = config['TRACKERS']['PTP'].get('password', '').strip() 
+        self.user_agent = 'Mozilla/5.0 (Upload Assistant x64) Gecko/20100101 Upload-Assistant/2.0'
     
     async def get_ptp_id_imdb(self, search_term, search_file_folder):
         imdb_id = ptp_torrent_id = None
@@ -40,7 +41,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
+            'User-Agent' : self.user_agent
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -89,7 +90,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
+            'User-Agent' : self.user_agent
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -122,7 +123,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
+            'User-Agent' : self.user_agent
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -141,7 +142,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
+            'User-Agent' : self.user_agent
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url=url, headers=headers, params=params)
@@ -169,7 +170,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
+            'User-Agent' : self.user_agent
         }
         url = "https://passthepopcorn.me/ajax.php"
         response = requests.get(url=url, params=params, headers=headers)
@@ -203,7 +204,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
+            'User-Agent' : self.user_agent
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url=url, headers=headers, params=params)
@@ -500,7 +501,7 @@ class PTP():
                     session.cookies.update(pickle.load(cf))
                 if "pasthepopcorn.me" in session.cookies.list_domains():
                     uploadresponse = session.get("https://passthepopcorn.me/upload.php")
-                loggedIn = await self.validate_login(uploadresponse)
+                    loggedIn = await self.validate_login(uploadresponse)
             if loggedIn == True:
                 AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
             else: 
@@ -511,7 +512,7 @@ class PTP():
                     "passkey": passKey,
                     "keeplogged": "1",
                 }
-                headers = {"User-Agent" : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'}
+                headers = {"User-Agent" : self.user_agent}
                 loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data, headers=headers)
                 await asyncio.sleep(2)
                 try:
@@ -611,7 +612,7 @@ class PTP():
             headers = {
                 # 'ApiUser' : self.api_user,
                 # 'ApiKey' : self.api_key,
-                 "User-Agent": 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
+                 "User-Agent": self.user_agent
             }
             if meta['debug']:
                 pprint(url)
