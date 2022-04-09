@@ -6,6 +6,7 @@ import re
 from termcolor import cprint
 import distutils.util
 import os
+from pathlib import Path
 import time
 import traceback
 import json
@@ -38,7 +39,8 @@ class PTP():
         }
         headers = {
             'ApiUser' : self.api_user,
-            'ApiKey' : self.api_key
+            'ApiKey' : self.api_key,
+            'User-Agent' : "Upload Assistant"
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -86,7 +88,8 @@ class PTP():
         }
         headers = {
             'ApiUser' : self.api_user,
-            'ApiKey' : self.api_key
+            'ApiKey' : self.api_key,
+            'User-Agent' : 'Upload Assistant'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -118,7 +121,8 @@ class PTP():
         }
         headers = {
             'ApiUser' : self.api_user,
-            'ApiKey' : self.api_key
+            'ApiKey' : self.api_key,
+            'User-Agent' : 'Upload Assistant'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -136,7 +140,8 @@ class PTP():
         }
         headers = {
             'ApiUser' : self.api_user,
-            'ApiKey' : self.api_key
+            'ApiKey' : self.api_key,
+            'User-Agent' : 'Upload Assistant'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url=url, headers=headers, params=params)
@@ -163,7 +168,8 @@ class PTP():
         }
         headers = {
             'ApiUser' : self.api_user,
-            'ApiKey' : self.api_key
+            'ApiKey' : self.api_key,
+            'User-Agent' : 'Upload Assistant'
         }
         url = "https://passthepopcorn.me/ajax.php"
         response = requests.get(url=url, params=params, headers=headers)
@@ -196,7 +202,8 @@ class PTP():
         }
         headers = {
             'ApiUser' : self.api_user,
-            'ApiKey' : self.api_key
+            'ApiKey' : self.api_key,
+            'User-Agent' : 'Upload Assistant'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url=url, headers=headers, params=params)
@@ -483,6 +490,8 @@ class PTP():
             desc.close()
 
     async def get_AntiCsrfToken(self, meta):
+        if not os.path.exists(f"{meta['base_dir']}/cookies"):
+            Path(f"{meta['base_dir']}/cookies").mkdir(parents=True, exist_ok=True)
         cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
         with requests.Session() as session:
             loggedIn = False
@@ -502,7 +511,8 @@ class PTP():
                     "passkey": passKey,
                     "keeplogged": "1",
                 }
-                loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                headers = {"User-Agent" : "Upload-Assistant"}
+                loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data, headers=headers)
                 await asyncio.sleep(2)
                 try:
                     resp = loginresponse.json()
@@ -510,7 +520,7 @@ class PTP():
                         data['TfaType'] = "normal"
                         data['TfaCode'] = cli_ui.ask_string("2FA Required: Please enter 2FA code")
                         session.cookies.clear()
-                        loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                        loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data, headers=headers)
                         await asyncio.sleep(2)
                         resp = loginresponse.json()
                     if resp["Result"] != "Ok":
@@ -601,7 +611,7 @@ class PTP():
             headers = {
                 # 'ApiUser' : self.api_user,
                 # 'ApiKey' : self.api_key,
-                 "User-Agent": "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.45 Safari/537.36"
+                 "User-Agent": "Upload Assistant"
             }
             if meta['debug']:
                 pprint(url)
@@ -611,7 +621,7 @@ class PTP():
                     cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
                     with open(cookiefile, 'rb') as cf:
                         session.cookies.update(pickle.load(cf))
-                    # response = session.post(url=url, data=data, headers=headers, files=files)
+                    response = session.post(url=url, data=data, headers=headers, files=files)
                 cprint(response, 'cyan')
                 responsetext = response.text
                 # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
