@@ -483,43 +483,42 @@ class PTP():
             desc.close()
 
     async def get_AntiCsrfToken(self, meta):
-        if AntiCsrfToken == "":
-            cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
-            with requests.Session() as session:
-                loggedIn = False
-                if os.path.exists(cookiefile):
-                    with open(cookiefile, 'rb') as cf:
-                        session.cookies.update(pickle.load(cf))
-                    if "pasthepopcorn.me" in session.cookies.list_domains():
-                        uploadresponse = session.get("https://passthepopcorn.me/upload.php")
-                    loggedIn = await self.validate_login(uploadresponse)
-                if loggedIn == True:
-                    AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
-                else: 
-                    passKey = re.match(r"https?://please\.passthepopcorn\.me:?\d*/(.+)/announce",self.announce_url).group(1)
-                    data = {
-                        "username": self.username,
-                        "password": self.password,
-                        "passkey": passKey,
-                        "keeplogged": "1",
-                    }
-                    loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
-                    await asyncio.sleep(2)
-                    try:
+        cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
+        with requests.Session() as session:
+            loggedIn = False
+            if os.path.exists(cookiefile):
+                with open(cookiefile, 'rb') as cf:
+                    session.cookies.update(pickle.load(cf))
+                if "pasthepopcorn.me" in session.cookies.list_domains():
+                    uploadresponse = session.get("https://passthepopcorn.me/upload.php")
+                loggedIn = await self.validate_login(uploadresponse)
+            if loggedIn == True:
+                AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
+            else: 
+                passKey = re.match(r"https?://please\.passthepopcorn\.me:?\d*/(.+)/announce",self.announce_url).group(1)
+                data = {
+                    "username": self.username,
+                    "password": self.password,
+                    "passkey": passKey,
+                    "keeplogged": "1",
+                }
+                loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                await asyncio.sleep(2)
+                try:
+                    resp = loginresponse.json()
+                    if resp['Result'] == "TfaRequired":
+                        data['TfaType'] = "Normal"
+                        data['TfaCode'] = cli_ui.ask_string("2FA Required: Please enter 2FA code")
+                        loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                        await asyncio.sleep(2)
                         resp = loginresponse.json()
-                        if resp['Result'] == "TfaRequired":
-                            data['TfaType'] = "Normal"
-                            data['TfaCode'] = cli_ui.ask_string("2FA Required: Please enter 2FA code")
-                            loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
-                            await asyncio.sleep(2)
-                            resp = loginresponse.json()
-                        if resp["Result"] != "Ok":
-                            raise LoginException("Failed to login to PTP. Probably due to the bad user name, password or announce url.")
-                        AntiCsrfToken = resp["AntiCsrfToken"]
-                        with open(cookiefile, 'wb') as cf:
-                            pickle.dump(session.cookies, cf)
-                    except Exception:
-                        raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
+                    if resp["Result"] != "Ok":
+                        raise LoginException("Failed to login to PTP. Probably due to the bad user name, password, announce url, or 2FA code.")
+                    AntiCsrfToken = resp["AntiCsrfToken"]
+                    with open(cookiefile, 'wb') as cf:
+                        pickle.dump(session.cookies, cf)
+                except Exception:
+                    raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
         return AntiCsrfToken
 
     async def validate_login(self, response):
