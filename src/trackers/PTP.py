@@ -40,7 +40,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : "Upload Assistant"
+            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -89,7 +89,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Upload Assistant'
+            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -122,7 +122,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Upload Assistant'
+            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
@@ -141,7 +141,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Upload Assistant'
+            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url=url, headers=headers, params=params)
@@ -169,7 +169,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Upload Assistant'
+            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
         }
         url = "https://passthepopcorn.me/ajax.php"
         response = requests.get(url=url, params=params, headers=headers)
@@ -203,7 +203,7 @@ class PTP():
         headers = {
             'ApiUser' : self.api_user,
             'ApiKey' : self.api_key,
-            'User-Agent' : 'Upload Assistant'
+            'User-Agent' : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
         }
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url=url, headers=headers, params=params)
@@ -511,7 +511,7 @@ class PTP():
                     "passkey": passKey,
                     "keeplogged": "1",
                 }
-                headers = {"User-Agent" : "Upload-Assistant"}
+                headers = {"User-Agent" : 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'}
                 loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data, headers=headers)
                 await asyncio.sleep(2)
                 try:
@@ -611,7 +611,7 @@ class PTP():
             headers = {
                 # 'ApiUser' : self.api_user,
                 # 'ApiKey' : self.api_key,
-                 "User-Agent": "Upload Assistant"
+                 "User-Agent": 'Mozilla/5.0 (Upload Assistant) Gecko/20100101 Firefox/53.0'
             }
             if meta['debug']:
                 pprint(url)
