@@ -308,7 +308,7 @@ class PTP():
                 '.mkv' : "MKV",
                 '.mp4' : 'MP4'
             }
-            container = containermap.get('ext', 'Other')
+            container = containermap.get(ext, 'Other')
         return container
 
 
@@ -556,7 +556,7 @@ class PTP():
             "remaster_title": self.get_remaster_title(meta), #Eg.: Hardcoded English
             "codec": "Other", # Sending the codec as custom.
             "other_codec": self.get_codec(meta),
-            "container": "Other", # Sending the container as custom.
+            "container": "Other",
             "other_container": self.get_container(meta),
             "resolution": resolution,
             "source": "Other", # Sending the source as custom.
