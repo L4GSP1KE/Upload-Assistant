@@ -1,4 +1,5 @@
 from tokenize import group
+import cli_ui
 import requests
 import asyncio
 import re
@@ -272,7 +273,7 @@ class PTP():
                 "HEVC" : "H.265",
                 "H.265" : "H.265",
             }
-            searchcodec = meta.get('encode', meta.get('video_encode'))
+            searchcodec = meta.get('video_codec', meta.get('video_encode'))
             codec = codecmap.get(searchcodec)
             if meta.get('has_encode_settings') == True:
                 codec = codec.replace("H.", "x")
@@ -482,7 +483,6 @@ class PTP():
             desc.close()
 
     async def get_AntiCsrfToken(self, meta):
-        AntiCsrfToken = self.config['TRACKERS']['PTP'].get('AntiCsrfToken', '').strip()
         if AntiCsrfToken == "":
             cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
             with requests.Session() as session:
@@ -492,7 +492,7 @@ class PTP():
                         session.cookies.update(pickle.load(cf))
                     if "pasthepopcorn.me" in session.cookies.list_domains():
                         uploadresponse = session.get("https://passthepopcorn.me/upload.php")
-                        loggedIn = await self.validate_login(uploadresponse)
+                    loggedIn = await self.validate_login(uploadresponse)
                 if loggedIn == True:
                     AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
                 else: 
@@ -504,8 +504,15 @@ class PTP():
                         "keeplogged": "1",
                     }
                     loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                    await asyncio.sleep(2)
                     try:
                         resp = loginresponse.json()
+                        if resp['Result'] == "TfaRequired":
+                            data['TfaType'] = "Normal"
+                            data['TfaCode'] = cli_ui.ask_string("2FA Required: Please enter 2FA code")
+                            loginresponse = session.post("https://passthepopcorn.me/ajax.php?action=login", data=data)
+                            await asyncio.sleep(2)
+                            resp = loginresponse.json()
                         if resp["Result"] != "Ok":
                             raise LoginException("Failed to login to PTP. Probably due to the bad user name, password or announce url.")
                         AntiCsrfToken = resp["AntiCsrfToken"]
@@ -568,7 +575,7 @@ class PTP():
                 cover = meta.get('poster')
             if cover != None and "ptpimg" not in cover:
                 ptpimg_cover = await self.ptpimg_url_rehost(cover)
-            data = {
+            new_data = {
                 "title": tinfo.get('title', meta['imdb_info'].get('title', meta['title'])),
                 "year": tinfo.get('year', meta['imdb_info'].get('year', meta['year'])),
                 "image": ptpimg_cover,
@@ -576,6 +583,7 @@ class PTP():
                 "album_desc": tinfo.get('plot', meta.get('overview', "")),
                 "trailer": meta.get('youtube', ""),
             }
+            data.update(new_data)
             if meta["imdb_info"].get("directors", None) != None:
                 data["artist[]"] = tuple(meta['imdb_info'].get('directors'))
                 data["importance[]"] = "1"
@@ -599,7 +607,11 @@ class PTP():
                 pprint(url)
                 pprint(data)
             else:
-                response = requests.post(url=url, data=data, headers=headers, files=files)
+                with requests.Session() as session:
+                    cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
+                    with open(cookiefile, 'rb') as cf:
+                        session.cookies.update(pickle.load(cf))
+                    response = session.post(url=url, data=data, headers=headers, files=files)
                 cprint(response, 'cyan')
                 responsetext = response.text
                 # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
