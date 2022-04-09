@@ -483,9 +483,9 @@ class PTP():
             images = meta['image_list']
             if len(images) > 0: 
                 for each in range(len(images)):
-                    web_url = images[each]['web_url']
-                    img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img]{img_url}[/img][/url]")
+                    # web_url = images[each]['web_url']
+                    raw_url = images[each]['raw_url']
+                    desc.write(f"[img]{raw_url}[/img]")
             # desc.write(self.signature)
             desc.close()
 
