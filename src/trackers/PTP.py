@@ -490,8 +490,8 @@ class PTP():
             desc.close()
 
     async def get_AntiCsrfToken(self, meta):
-        if not os.path.exists(f"{meta['base_dir']}/cookies"):
-            Path(f"{meta['base_dir']}/cookies").mkdir(parents=True, exist_ok=True)
+        if not os.path.exists(f"{meta['base_dir']}/data/cookies"):
+            Path(f"{meta['base_dir']}/data/cookies").mkdir(parents=True, exist_ok=True)
         cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
         with requests.Session() as session:
             loggedIn = False
