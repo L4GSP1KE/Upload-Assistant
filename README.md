@@ -50,4 +50,4 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   
   `python3 upload.py /downloads/path/to/content --args`
   
-  Args are OPTIONAL
+  Args are OPTIONAL, for a list of acceptable args, pass `--help`
