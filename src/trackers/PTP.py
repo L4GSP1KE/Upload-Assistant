@@ -450,13 +450,15 @@ class PTP():
         # HDR10, HDR10+, Dolby Vision, 10-bit, 
         if "Hi10P" in meta.get('video_encode', ''):
             remaster_title.append('10-bit')
-        elif "HDR" in meta.get('hdr', ''):
+        if "HDR" in meta.get('hdr', ''):
             if "HDR10+" in meta['hdr']:
                 remaster_title.append('HDR10+')
             else:
                 remaster_title.append('HDR10+')
-        elif "DV" in meta.get('hdr', ''):
+        if "DV" in meta.get('hdr', ''):
             remaster_title.append('Dolby Vision')
+        if "HLG" in meta.get('hdr', ''):
+            remaster_title.append('HLG')
 
         if remaster_title != []:
             output = " / ".join(remaster_title)
