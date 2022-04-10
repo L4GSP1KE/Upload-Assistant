@@ -51,25 +51,3 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   `python3 upload.py /downloads/path/to/content --args`
   
   Args are OPTIONAL
-
-
-## **Discord Bot Usage:** 
-  **To start the bot** `python3 discordbot.py`
-  I recommend running this in screen
-  
-  **Commands:**
-  - `!upload "/path/to/file" --args`: 
-      - Works the same as the CLI version. You will get a nice looking confirmation message after the bot has done it's prep work. React to the trackers you want to upload to and then react to the Confirmation emoji to upload.
-      - Example: `!upload "/downloads/movie.mp4"`
-  - `!edit [ID] --args`:
-      - This is used if the bot gets something wrong and needs to be manually changed. The ID can be found in the bottom left corner of the confirmation message.
-      - Example: `!edit BWYiPX5siCtUxyKLZkfjZm --group MyGroup`
-  - `!search [search terms]`:
-      - This is the lazy man's `!upload`. It searches your predefined search directory for any files that match the search term(s). If one result is found, it gives the option to upload it. If more than one result is found it returns a list so you can try again and be more specific. **Note:** This only works with single files, for directories use `!search dir [search terms]`
-  - `!search dir [search terms]`:
-      - This is `!search` for directories. Use this for things like season packs/discs/etc.
-  - `!args`:
-      - This returns a message containing all usable arguments
-
-  
-  Feel free to pester me if you need help/want features/etc.
