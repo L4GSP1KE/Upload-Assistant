@@ -49,7 +49,6 @@ class Args():
         parser.add_argument('-pr', '--personalrelease', action='store_true', required=False, help="Personal Release")
         parser.add_argument('-dupe', '--dupe', action='store_true', required=False, help="Pass if you know this is a dupe")
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode, will run through all the motions providing extra info, but will not upload to trackers.")
-        parser.add_argument('--nohead', action='store_true', required=False, help="Run selenium not in headless mode")
         parser.add_argument('-m', '--manual', action='store_true', required=False, help="Manual Mode. Returns link to ddl screens/base.torrent")
         parser.add_argument('-nh', '--nohash', action='store_true', required=False, help="Don't hash .torrent")
         parser.add_argument('-rh', '--rehash', action='store_true', required=False, help="DO hash .torrent")
