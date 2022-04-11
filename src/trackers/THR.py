@@ -210,9 +210,12 @@ class THR():
                     # med_url = response['image']['medium']['url']
                     img_url = response['image']['url']
                     image_list.append(img_url)
-                except:
+                except json.decoder.JSONDecodeError:
                     cprint("Failed to upload image", 'yellow')
                     pprint(response.text)
+                except KeyError:
+                    cprint("Failed to upload image", 'yellow')
+                    pprint(response)
                 await asyncio.sleep(1)
             desc.write("[align=center]")
             if meta.get('is_disc', '') == 'BDMV':
