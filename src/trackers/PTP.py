@@ -180,7 +180,7 @@ class PTP():
         try:
             response = response.json()
             # title, plot, art, year, tags, Countries, Languages
-            for key, value in response.items():
+            for key, value in response[0].items():
                 if value not in (None, ""):
                     tinfo[key] = value
         except Exception:
