@@ -1,6 +1,7 @@
 import re
 import html
 import urllib.parse
+from termcolor import cprint
 
 # Bold - KEEP
 # Italic - KEEP
@@ -163,18 +164,18 @@ class BBCODE:
             spoiler_placeholders.append(spoilers[i])
         
         # Get Images from outside spoilers
-        images = []
-        image_dict = {}
+        imagelist = []
         url_tags = re.findall("\[url=[\s\S]*?\[\/url\]", desc)
         if url_tags != []:
             for tag in url_tags:
                 image = re.findall("\[img[\s\S]*?\[\/img\]", tag)
                 if len(image) == 1:
+                    image_dict = {}
                     img_url = image[0].lower().replace('[img]', '').replace('[/img]', '')
                     image_dict['img_url'] = image_dict['raw_url'] = re.sub("\[img[\s\S]*\]", "", img_url)
                     url_tag = tag.replace(image[0], '')
                     image_dict['web_url'] = re.match("\[url=[\s\S]*?\]", url_tag, flags=re.IGNORECASE)[0].lower().replace('[url=', '')[:-1]
-                    images.append(image_dict)
+                    imagelist.append(image_dict)
                     desc = desc.replace(tag, '')
 
         # Remove bot signatures
@@ -221,6 +222,7 @@ class BBCODE:
                     spoil2comp = f"[comparison={final_sources}]{comp_images}[/comparison]"
                     desc = desc.replace(tag, spoil2comp)
 
+        
         # Strip blank lines:
         desc = desc.rstrip()
         desc = re.sub("\n\n+", "\n\n", desc)
@@ -229,9 +231,9 @@ class BBCODE:
         desc = desc.rstrip()
 
         if desc.replace('\n', '') == '':
-            return "", images
-
-        return desc, images
+            return "", imagelist
+        
+        return desc, imagelist
 
 
 
