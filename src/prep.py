@@ -1057,7 +1057,7 @@ class Prep():
             meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
-        if difference >= 0.8 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():
+        if difference >= 0.9 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():
             meta['aka'] = ""
             
         
