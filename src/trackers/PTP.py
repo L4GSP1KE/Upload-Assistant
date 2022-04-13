@@ -568,6 +568,8 @@ class PTP():
             "subtitles" : self.get_subtitles(meta),
             "AntiCsrfToken" : await self.get_AntiCsrfToken(meta)
             }
+        if data["remaster_year"] != "" or data["remaster_title"] != "":
+            data["remaster"] = "on"
         if resolution == "Other":
             data["other_resolution"] = other_resolution
         if meta.get('personalrelease', False) == True:
