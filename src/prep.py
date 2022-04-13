@@ -2341,7 +2341,7 @@ class Prep():
             desc_source.append('PTP')
         if meta.get('blu_manual') != None:
             desc_source.append('BLU')
-        if len(desc_source) > 1:
+        if len(desc_source) != 1:
             desc_source = None
         else:
             desc_source = desc_source[0]
