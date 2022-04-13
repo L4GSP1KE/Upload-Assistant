@@ -627,7 +627,7 @@ class PTP():
                     with open(cookiefile, 'rb') as cf:
                         session.cookies.update(pickle.load(cf))
                     response = session.post(url=url, data=data, headers=headers, files=files)
-                cprint(response, 'cyan')
+                cprint(response.url, 'cyan')
                 responsetext = response.text
                 # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
                 if responsetext.find(self.announce_url) != -1:
