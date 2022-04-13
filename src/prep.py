@@ -222,6 +222,7 @@ class Prep():
         if self.config['TRACKERS'].get('BLU', {}).get('useAPI') == True:
             blu = BLU(config=self.config)
             if meta.get('blu', None) != None:
+                meta['blu_manual'] = meta['blu']
                 blu_tmdb, blu_imdb, blu_tvdb, blu_mal, blu_desc, blu_category, meta['ext_torrenthash'], blu_imagelist = await COMMON(self.config).unit3d_torrent_info("BLU", blu.torrent_url, meta['blu'])
                 if blu_tmdb not in [None, '0']:
                     meta['tmdb_manual'] = blu_tmdb
@@ -2335,9 +2336,19 @@ class Prep():
         desclink = meta.get('desclink', None)
         descfile = meta.get('descfile', None)
         ptp_desc = blu_desc = ""
+        desc_source = []
+        if meta.get('ptp_manual') != None:
+            desc_source.append('PTP')
+        if meta.get('blu_manual') != None:
+            desc_source.append('BLU')
+        if len(desc_source) > 1:
+            desc_source = None
+        else:
+            desc_source = desc_source[0]
+
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="") as description:
             description.seek(0)
-            if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
+            if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
                 ptp = PTP(config=self.config)
                 ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
                 if ptp_desc != "":
@@ -2345,7 +2356,7 @@ class Prep():
                     description.write("\n")
                     meta['description'] = 'PTP'
 
-            if ptp_desc == "" and meta.get('blu_desc', '') not in [None, '']:
+            if ptp_desc == "" and meta.get('blu_desc', '') not in [None, ''] and desc_source in ['BLU', None]:
                 description.write(meta['blu_desc'])
 
             if meta.get('discs', []) != []:
