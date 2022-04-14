@@ -1593,22 +1593,28 @@ class Prep():
     def get_video_encode(self, mi, type, bdinfo):
         video_encode = ""
         codec = ""
+        has_encode_settings = False
         try:
             format = mi['media']['track'][1]['Format']
             format_profile = mi['media']['track'][1]['Format_Profile']
+            if mi['media']['track'][1].get('Encoded_Library_Settings', None):
+                has_encode_settings = True
         except:
             format = bdinfo['video'][0]['codec']
             format_profile = bdinfo['video'][0]['profile']
-        if type in ("ENCODE", "WEBRIP", "HDTV"): #ENCODE or WEBRIP
+        if type in ("ENCODE", "WEBRIP"): #ENCODE or WEBRIP
             if format == 'AVC':
                 codec = 'x264'
             elif format == 'HEVC':
                 codec = 'x265'
-        elif type == 'WEBDL': #WEB-DL
+        elif type in ('WEBDL', 'HDTV'): #WEB-DL
             if format == 'AVC':
                 codec = 'H.264'
             elif format == 'HEVC':
                 codec = 'H.265'
+            
+            if type == 'HDTV' and has_encode_settings == True:
+                codec = codec.replace('H.', 'x')
         elif format == "VP9":
             codec = "VP9"
         elif format == "VC-1":
@@ -1621,10 +1627,6 @@ class Prep():
         video_codec = format
         if video_codec == "MPEG Video":
             video_codec = f"MPEG-{mi['media']['track'][1].get('Format_Version')}"
-        if mi['media']['track'][1].get('Encoded_Library_Settings', None):
-            has_encode_settings = True
-        else:
-            has_encode_settings = False
         return video_encode, video_codec, has_encode_settings
 
 
