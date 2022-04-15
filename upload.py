@@ -264,7 +264,7 @@ async def do_the_thing(path, args, base_dir):
                     if groupID == None:
                         cprint("No Existing Group found", 'grey', 'on_yellow')
                         if meta.get('youtube', None) == None or "youtube" not in str(meta.get('youtube', '')):
-                            youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)")
+                            youtube = cli_ui.ask_string("Unable to find youtube trailer, please link one e.g.(https://www.youtube.com/watch?v=dQw4w9WgXcQ)", default="")
                             meta['youtube'] = youtube
                         meta['upload'] = True
                     else:
