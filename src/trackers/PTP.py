@@ -295,6 +295,8 @@ class PTP():
             video_mi = meta['mediainfo']['media']['track'][1]
             other_res = f"{video_mi['Width']}x{video_mi['Height']}"
             res = "Other"
+        if meta["is_disc"] == "DVD":
+            res = meta["source"].replace(" DVD", "")
         return res, other_res
 
     def get_container(self, meta):
