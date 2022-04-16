@@ -487,7 +487,7 @@ class Prep():
                 scan = "p"
             else:
                 scan = "i"
-            width_list = [3840, 2560, 1920, 1280, 1024, 854, 15360, 7680, 0]
+            width_list = [3840, 2560, 1920, 1280, 1024, 854, 720, 15360, 7680, 0]
             height_list = [2160, 1440, 1080, 720, 576, 540, 480, 8640, 4320, 0]
             width = self.closest(width_list, int(width))
             height = self.closest(height_list, int(height))
@@ -496,6 +496,7 @@ class Prep():
         return resolution
 
     def closest(self, lst, K):
+        # Get closest, but not over
         lst = sorted(lst)
         mi_input = K
         res = 0
@@ -520,6 +521,10 @@ class Prep():
             "1024x576i" : "576i", "576i" : "576i",
             "854x480p" :  "480p", "480p" : "480p",
             "854x480i" : "480i", "480i" : "480i",
+            "720x576p" : "576p", "576p" : "576p",
+            "720x576i" : "576i", "576i" : "576i",
+            "720x480p" :  "480p", "480p" : "480p",
+            "720x480i" : "480i", "480i" : "480i",
             "15360x8640p" : "8640p", "8640p" : "8640p",
             "7680x4320p" : "4320p", "4320p" : "4320p",
             "OTHER" : "OTHER"}
@@ -540,6 +545,8 @@ class Prep():
                     '1024i' : '576i',
                     '854p' : '480p',
                     '854i' : '480i',
+                    '720p' : '576p',
+                    '720i' : '576i',
                     '15360p' : '4320p',
                     'OTHERp' : 'OTHER'
                 }
