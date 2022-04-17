@@ -2368,8 +2368,9 @@ class Prep():
                     meta['description'] = 'PTP'
 
             if ptp_desc == "" and meta.get('blu_desc', '') not in [None, ''] and desc_source in ['BLU', None]:
-                description.write(meta['blu_desc'])
-                meta['description'] = 'BLU'
+                if blu_desc != "":
+                    description.write(meta['blu_desc'])
+                    meta['description'] = 'BLU'
 
             if meta.get('discs', []) != []:
                 discs = meta['discs']
