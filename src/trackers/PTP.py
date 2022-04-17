@@ -31,7 +31,7 @@ class PTP():
         self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip() 
         self.username = config['TRACKERS']['PTP'].get('username', '').strip() 
         self.password = config['TRACKERS']['PTP'].get('password', '').strip() 
-        self.user_agent = f'Upload Assistant ({platform.system()} {platform.release()})'
+        self.user_agent = f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
     
     async def get_ptp_id_imdb(self, search_term, search_file_folder):
         imdb_id = ptp_torrent_id = None
