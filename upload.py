@@ -276,7 +276,7 @@ async def do_the_thing(path, args, base_dir):
                     if meta['upload'] == True:
                         ptpUrl, ptpData = await ptp.fill_upload_form(groupID, meta)
                         await ptp.upload(groupID, meta, ptpUrl, ptpData)
-                        await asyncio.sleep(10)
+                        await asyncio.sleep(5)
                         await client.add_to_client(meta, "PTP")
                 except:
                     print(traceback.print_exc())
