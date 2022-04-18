@@ -653,7 +653,7 @@ class Prep():
                         i += 1
                     elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                         i += 1
-                    elif os.path.getsize(Path(image)) <= 10000:
+                    elif os.path.getsize(Path(image)) <= 15000:
                         cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                         time.sleep(1)
                     elif self.img_host == "ptpimg":
@@ -759,7 +759,7 @@ class Prep():
                         i += 1
                     elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                         i += 1
-                    elif os.path.getsize(Path(image)) <= 10000:
+                    elif os.path.getsize(Path(image)) <= 15000:
                         cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
                         time.sleep(1)
                     elif self.img_host == "ptpimg":
@@ -839,7 +839,7 @@ class Prep():
                             i += 1
                         elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                             i += 1
-                        elif os.path.getsize(Path(image)) <= 10000:
+                        elif os.path.getsize(Path(image)) <= 15000:
                             cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                             time.sleep(1)
                         elif self.img_host == "ptpimg":
