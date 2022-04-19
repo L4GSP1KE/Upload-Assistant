@@ -456,7 +456,7 @@ class PTP():
             if "HDR10+" in meta['hdr']:
                 remaster_title.append('HDR10+')
             else:
-                remaster_title.append('HDR10+')
+                remaster_title.append('HDR')
         if "DV" in meta.get('hdr', ''):
             remaster_title.append('Dolby Vision')
         if "HLG" in meta.get('hdr', ''):
