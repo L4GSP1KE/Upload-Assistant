@@ -53,7 +53,7 @@ class BLU():
             bd_dump = None
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]DESCRIPTION.txt", 'r').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent", 'rb')
-        files = {'torrent': open_torrent}
+        files = {'torrent': ("placeholder.torrent", open_torrent, "application/x-bittorrent")}
         data = {
             'name' : meta['name'],
             'description' : desc,
