@@ -606,7 +606,7 @@ class PTP():
             "other_source": self.get_source(meta['source']),
             "release_desc": desc,
             "nfo_text": "",
-            "subtitles" : self.get_subtitles(meta),
+            "subtitles[]" : self.get_subtitles(meta),
             "AntiCsrfToken" : await self.get_AntiCsrfToken(meta)
             }
         if data["remaster_year"] != "" or data["remaster_title"] != "":
