@@ -1,4 +1,5 @@
 import requests
+from src.trackers.RF import RF
 from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
@@ -156,8 +157,8 @@ async def do_the_thing(path, args, base_dir):
     #######  Upload to Trackers  #######
     ####################################
     common = COMMON(config=config)
-    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT']
-    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP}
+    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF']
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF }
 
     for tracker in trackers:
         tracker = tracker.replace(" ", "").upper().strip()
