@@ -910,7 +910,7 @@ class Prep():
             meta['category'] = "TV"
             meta['tmdb'] =  info['tv_results'][0]['id']
         else:
-            imdb_info = await self.get_imdb_info(imdb_id.replace('tt', ''))
+            imdb_info = await self.get_imdb_info(imdb_id.replace('tt', ''), meta)
             title = imdb_info.get("title")
             if title == None:
                 title = filename
@@ -1021,10 +1021,14 @@ class Prep():
                 meta['original_language'] = response['original_language']
 
             meta['keywords'] = self.get_keywords(movie)
+            meta['genres'] = self.get_genres(response)
+            meta['tmdb_directors'] = self.get_directors(movie)
             if meta.get('anime', False) == False:
                 meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response.get('poster_path', "")
             meta['overview'] = response['overview']
+            meta['tmdb_type'] = 'Movie'
+            meta['runtime'] = response.get('episode_run_time', 60)
         elif meta['category'] == "TV":
             tv = tmdb.TV(meta['tmdb'])
             response = tv.info()
@@ -1060,9 +1064,14 @@ class Prep():
             else:
                 meta['original_language'] = response['original_language']
             meta['keywords'] = self.get_keywords(tv)
+            meta['genres'] = self.get_genres(response)
+            meta['tmdb_directors'] = self.get_directors(tv)
             meta['mal_id'], meta['aka'], meta['anime'] = self.get_anime(response, meta)
             meta['poster'] = response.get('poster_path', '')
             meta['overview'] = response['overview']
+
+            meta['tmdb_type'] = response.get('type', 'Scripted')
+            meta['runtime'] = response.get('episode_run_time', [60])[0]
         if meta['poster'] not in (None, ''):
             meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
@@ -1083,6 +1092,27 @@ class Prep():
             elif tmdb_keywords.get('results') is not None:
                 keywords=[f"{keyword['name'].replace(',',' ')}" for keyword in tmdb_keywords.get('results')]
             return(', '.join(keywords))
+        else:
+            return ''
+
+    def get_genres(self, tmdb_info):
+        if tmdb_info is not None:
+            tmdb_genres = tmdb_info.get('genres', [])
+            if tmdb_genres is not []:
+                genres=[f"{genre['name'].replace(',',' ')}" for genre in tmdb_genres]
+            return(', '.join(genres))
+        else:
+            return ''
+
+    def get_directors(self, tmdb_info):
+        if tmdb_info is not None:
+            tmdb_credits = tmdb_info.credits()
+            directors = []
+            if tmdb_credits.get('cast', []) != []:
+                for each in tmdb_credits['cast']:
+                    if each.get('known_for_department', '') == "Directing":
+                        directors.append(each.get('original_name', each.get('name')))
+            return directors
         else:
             return ''
 
@@ -2585,21 +2615,34 @@ class Prep():
 
 
 
-    async def get_imdb_info(self, imdbID):
+    async def get_imdb_info(self, imdbID, meta):
         imdb_info = {}
-        ia = Cinemagoer()
-        info = ia.get_movie(imdbID)
-        imdb_info['title'] = info.get('title')
-        imdb_info['aka'] = info.get('original title', info.get('localized title'))
-        imdb_info['type'] = info.get('kind')
-        imdb_info['imdbID'] = info.get('imdbID')
-        imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
-        imdb_info['year'] = info.get('year')
-        imdb_info['cover'] = info.get('full-size cover url')
-        if len(info.get('directors', [])) >= 1:
-            imdb_info['directors'] = []
-            for director in info.get('directors'):
-                imdb_info['directors'].append(f"nm{director.getID()}")
+        if int(str(imdbID).replace('tt', '')) != 0:
+            ia = Cinemagoer()
+            info = ia.get_movie(imdbID)
+            imdb_info['title'] = info.get('title')
+            imdb_info['year'] = info.get('year')
+            imdb_info['aka'] = info.get('original title', info.get('localized title'))
+            imdb_info['type'] = info.get('kind')
+            imdb_info['imdbID'] = info.get('imdbID')
+            imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
+            imdb_info['cover'] = info.get('full-size cover url')
+            if len(info.get('directors', [])) >= 1:
+                imdb_info['directors'] = []
+                for director in info.get('directors'):
+                    imdb_info['directors'].append(f"nm{director.getID()}")
+        else:
+            imdb_info = {
+                'title' : meta['title'],
+                'year' : meta['year'],
+                'aka' : '',
+                'type' : None,
+                'runtime' : meta.get('runtime', '60'),
+                'cover' : meta.get('poster'),
+            }
+            if len(meta.get('tmdb_directors', [])) >= 1:
+                imdb_info['directors'] = meta['tmdb_directors']
+
         return imdb_info
         
 

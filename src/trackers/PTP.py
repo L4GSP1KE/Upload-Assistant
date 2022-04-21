@@ -1,5 +1,6 @@
 from tokenize import group
 import cli_ui
+from numpy import ptp
 import requests
 import asyncio
 import re
@@ -187,6 +188,24 @@ class PTP():
             pass
         return tinfo
 
+    async def get_torrent_info_tmdb(self, meta):
+        tinfo = {
+            "title" : meta.get("title", ""),
+            "year" : meta.get("year", ""),
+            "album_desc" : meta.get("overview", ""),
+        }
+        tags = []
+        ptp_tags = [
+            "action", "adventure", "animation", "arthouse", "asian", "biography", "camp", "comedy",
+            "crime", "cult", "documentary", "drama", "experimental", "exploitation", "family", "fantasy", "film.noir",
+            "history", "horror", "martial.arts", "musical", "mystery", "performance", "philosophy", "politics", "romance",
+            "sci.fi", "short", "silent", "sport", "thriller", "video.art", "war", "western"
+        ]
+        for each in ptp_tags:
+            if each in meta.get("genres", "").lower().replace(' ', '').replace('-', '') or each in meta.get("keywords", "").lower().replace(' ', '').replace('-', ''):
+                tags.append(each)
+        tinfo['tags'] = ", ".join(tags)
+        return tinfo
 
     async def search_existing(self, groupID, meta):
         # Map resolutions to SD / HD / UHD
@@ -245,21 +264,43 @@ class PTP():
         return img_url
 
 
-    def get_type(self, imdb_info):
-        imdbType = imdb_info.get('type', 'movie').lower()
-        if imdbType == "movie":
-            if int(imdb_info.get('runtime', '60')) >= 45:
-                ptpType = "Feature Film"
-            else:
+    def get_type(self, imdb_info, meta):
+        ptpType = None
+        if imdb_info['type'] is not None:
+            imdbType = imdb_info.get('type', 'movie').lower()
+            if imdbType in ("movie", "tv movie"):
+                if int(imdb_info.get('runtime', '60')) >= 45:
+                    ptpType = "Feature Film"
+                else:
+                    ptpType = "Short Film"
+            if imdbType == "short":
                 ptpType = "Short Film"
-        if imdbType == "short":
-            ptpType = "Short Film"
-        elif imdbType == "tv mini series":
-            ptpType = "Miniseries"
-        elif imdbType == "comedy":
-            ptpType = "Stand-up Comedy"
-        elif imdbType == "concert":
-            ptpType = "Concert"
+            elif imdbType == "tv mini series":
+                ptpType = "Miniseries"
+            elif imdbType == "comedy":
+                ptpType = "Stand-up Comedy"
+            elif imdbType == "concert":
+                ptpType = "Concert"
+        else:
+            keywords = meta.get("keywords", "").lower()
+            tmdb_type = meta.get("tmdb_type", "movie").lower()
+            if tmdb_type == "movie":
+                if int(meta.get('runtime', 60)) >= 45:
+                    ptpType = "Feature Film"
+                else:
+                    ptpType = "Short Film"
+            if tmdb_type == "miniseries" or "miniseries" in keywords:
+                ptpType = "Miniseries"
+            if "short" in keywords or "short film" in keywords:
+                ptpType = "Short Film"
+            elif "stand-up comedy" in keywords:
+                ptpType = "Stand-up Comedy"
+            elif "concert" in keywords:
+                ptpType = "Concert"
+        if ptpType == None:
+            if meta.get('mode', 'discord') == 'cli':
+                ptpTypeList = ["Feature Film", "Short Film", "Miniseries", "Stand-up Comedy", "Concert", "Movie Collection"]
+                ptpType = cli_ui.ask_choice("Select the proper type", choices=ptpTypeList)
         return ptpType
 
     def get_codec(self, meta):
@@ -555,7 +596,6 @@ class PTP():
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", "r").read()
         data = {
             "submit": "true",
-            "type": self.get_type(meta['imdb_info']),
             "remaster_year": "",
             "remaster_title": self.get_remaster_title(meta), #Eg.: Hardcoded English
             "codec": "Other", # Sending the codec as custom.
@@ -578,7 +618,7 @@ class PTP():
             data["internalrip"] = "on"
         # IF SPECIAL (idk how to check for this automatically)
             # data["special"] = "on"
-        if meta.get("imdb_id", "0") == "0":
+        if int(str(meta.get("imdb_id", "0")).replace('tt', '')) == 0:
             data["imdb"] = "0"
         else:
             data["imdb"] = meta["imdb_id"]
@@ -586,20 +626,29 @@ class PTP():
 
         if groupID == None: # If need to make new group
             url = "https://passthepopcorn.me/upload.php"
-            tinfo = await self.get_torrent_info(meta.get("imdb_id", "0"))
+            if data["imdb"] == "0":
+                tinfo = await self.get_torrent_info_tmdb(meta)
+            else:
+                tinfo = await self.get_torrent_info(meta.get("imdb_id", "0"))
             cover = meta["imdb_info"].get("cover")
             if cover == None:
                 cover = meta.get('poster')
             if cover != None and "ptpimg" not in cover:
                 ptpimg_cover = await self.ptpimg_url_rehost(cover)
             new_data = {
-                "title": tinfo.get('title', meta['imdb_info'].get('title', meta['title'])),
-                "year": tinfo.get('year', meta['imdb_info'].get('year', meta['year'])),
+                "title": tinfo.get("title", meta["imdb_info"].get("title", meta["title"])),
+                "year": tinfo.get("year", meta["imdb_info"].get("year", meta["year"])),
                 "image": ptpimg_cover,
-                "tags": tinfo.get('tags', ""),
-                "album_desc": tinfo.get('plot', meta.get('overview', "")),
-                "trailer": meta.get('youtube', ""),
+                "tags": tinfo.get("tags", ""),
+                "album_desc": tinfo.get("plot", meta.get("overview", "")),
+                "trailer": meta.get("youtube", ""),
+                "type": self.get_type(meta['imdb_info'], meta),
             }
+            while new_data["tags"] == "":
+                 if meta.get('mode', 'discord') == 'cli':
+                    cprint('Unable to match any tags', 'grey', 'on_yellow')
+                    print("Valid tags can be found on the PTP upload form")
+                    new_data["tags"] = cli_ui.ask_string("Please enter at least one tag. Comma seperated (action, animation, short):")
             data.update(new_data)
             if meta["imdb_info"].get("directors", None) != None:
                 data["artist[]"] = tuple(meta['imdb_info'].get('directors'))
