@@ -576,8 +576,6 @@ class PTP():
                     file = meta['filelist'][i]
                     if i == 0:
                         mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
-                        base2ptp = self.convert_bbcode(base)
-                        desc.write(base2ptp)
                     else:
                         # Export Mediainfo
                         mi_dump = MediaInfo.parse(file, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
@@ -595,7 +593,10 @@ class PTP():
                         images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})
 
                     desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
-                    desc.write("\n")    
+                    desc.write("\n")
+                    if i == 0:
+                        base2ptp = self.convert_bbcode(base)
+                        desc.write(base2ptp)    
                     if len(images) > 0: 
                         for each in range(len(images)):
                             raw_url = images[each]['raw_url']
