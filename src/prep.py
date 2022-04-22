@@ -251,19 +251,18 @@ class Prep():
 
         # Take Screenshots
         if meta['is_disc'] == "BDMV":
-            # await self.disc_screenshots(video, filename, bdinfo, folder_id, base_dir)
             if meta.get('edit', False) == False:
                 if meta.get('vapoursynth', False) == True:
                     use_vs = True
                 else:
                     use_vs = False
-                ds = multiprocessing.Process(target=self.disc_screenshots, args=(video, filename, bdinfo, meta['uuid'], base_dir, use_vs, meta.get('image_list', [])))
+                ds = multiprocessing.Process(target=self.disc_screenshots, args=(filename, bdinfo, meta['uuid'], base_dir, use_vs, meta.get('image_list', []), None))
                 ds.start()
                 while ds.is_alive() == True:
                     await asyncio.sleep(1)
         elif meta['is_disc'] == "DVD":
             if meta.get('edit', False) == False:
-                ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, meta['discs']))
+                ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, 0, None))
                 ds.start()
                 while ds.is_alive() == True:
                     await asyncio.sleep(1)
@@ -597,8 +596,10 @@ class Prep():
     Generate Screenshots
     """
 
-    def disc_screenshots(self, path, filename, bdinfo, folder_id, base_dir, use_vs, image_list):
-        if self.screens == 0 or len(image_list) >= self.screens:
+    def disc_screenshots(self, filename, bdinfo, folder_id, base_dir, use_vs, image_list, num_screens=None):
+        if num_screens == None:
+            num_screens = self.screens
+        if num_screens == 0 or len(image_list) >= num_screens:
             return
         #Get longest m2ts
         length = 0 
@@ -622,17 +623,17 @@ class Prep():
             keyframe = 'none'
 
         os.chdir(f"{base_dir}/tmp/{folder_id}")    
-        i = len(glob.glob("*.png"))        
-        if i >= self.screens:
-            i = self.screens
+        i = len(glob.glob(f"{filename}-*.png"))        
+        if i >= num_screens:
+            i = num_screens
             cprint('Reusing screenshots', 'grey', 'on_green')
         else:
             cprint("Saving Screens...", "grey", "on_yellow")
             if use_vs == True:
                 from src.vs import vs_screengn
-                vs_screengn(source=file, encode=None, filter_b_frames=False, num=self.screens, dir=f"{base_dir}/tmp/{folder_id}/")
+                vs_screengn(source=file, encode=None, filter_b_frames=False, num=num_screens, dir=f"{base_dir}/tmp/{folder_id}/")
             else:
-                while i != self.screens:
+                while i != num_screens:
                     image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
                     try:
                         (
@@ -645,10 +646,9 @@ class Prep():
                         )
                     except Exception:
                         print(traceback.format_exc())
-                    # print(os.path.getsize(image))
-                    # print(f'{i+1}/{self.screens}')
+                    
                     self.optimize_images(image)
-                    cli_ui.info_count(i, self.screens, "Screens Saved")
+                    cli_ui.info_count(i, num_screens, "Screens Saved")
                     if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                         i += 1
                     elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
@@ -663,10 +663,12 @@ class Prep():
                         time.sleep(1)
                 
         
-    def dvd_screenshots(self, meta, discs):
-        if self.screens == 0 or len(meta.get('image_list', [])) >= self.screens:
+    def dvd_screenshots(self, meta, disc_num, num_screens=None):
+        if num_screens == None:
+            num_screens = self.screens
+        if num_screens == 0 or len(meta.get('image_list', [])) >= num_screens:
             return
-        ifo_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO", mediainfo_options={'inform_version' : '1'})
+        ifo_mi = MediaInfo.parse(f"{meta['discs'][disc_num]['path']}/VTS_{meta['discs'][disc_num]['main_set'][0][:2]}_0.IFO", mediainfo_options={'inform_version' : '1'})
         sar = 1
         for track in ifo_mi.tracks:
             if track.track_type == "Video":
@@ -686,98 +688,102 @@ class Prep():
             w_sar = sar
             h_sar = 1
         
-        main_set_length = len(meta['discs'][0]['main_set'])
+        main_set_length = len(meta['discs'][disc_num]['main_set'])
         if main_set_length >= 3:
-            main_set = meta['discs'][0]['main_set'][1:-1]
+            main_set = meta['discs'][disc_num]['main_set'][1:-1]
         elif main_set_length == 2:
-            main_set = meta['discs'][0]['main_set'][1:]
+            main_set = meta['discs'][disc_num]['main_set'][1:]
         elif main_set_length == 1:
-            main_set = meta['discs'][0]['main_set']
+            main_set = meta['discs'][disc_num]['main_set']
         n = 0
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
-        i = len(glob.glob("*.png"))        
-        if i >= self.screens:
-            i = self.screens
+        i = 0        
+        if len(glob.glob("*.png")) >= num_screens:
+            i = num_screens
             cprint('Reusing screenshots', 'grey', 'on_green')
         else:
             cprint("Saving Screens...", "grey", "on_yellow")
             looped = 0
-            while i != self.screens:
+            while i != num_screens:
                 if n >= len(main_set):
                     n = 0
-                if n >= self.screens:
-                    n -= self.screens
-                image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][0]['name']}-{i}.png"
-                loglevel = 'quiet'
-                debug = True
-                if bool(meta.get('debug', False)):
-                    loglevel = 'error'
-                    debug = False
-                def _is_vob_good(n, loops):
-                    voblength = 300
-                    vob_mi = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", output='JSON')
-                    vob_mi = json.loads(vob_mi)
-                    try:
-                        voblength = float(vob_mi['media']['track'][1]['Duration'])
-                        return voblength, n
-                    except Exception:
+                if n >= num_screens:
+                    n -= num_screens
+                image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][disc_num]['name']}-{i}.png"
+                if not os.path.exists(image):
+                    loglevel = 'quiet'
+                    debug = True
+                    if bool(meta.get('debug', False)):
+                        loglevel = 'error'
+                        debug = False
+                    def _is_vob_good(n, loops, num_screens):
+                        voblength = 300
+                        vob_mi = MediaInfo.parse(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", output='JSON')
+                        vob_mi = json.loads(vob_mi)
                         try:
-                            voblength = float(vob_mi['media']['track'][2]['Duration'])
+                            voblength = float(vob_mi['media']['track'][1]['Duration'])
                             return voblength, n
                         except Exception:
-                            n += 1
-                            if n >= len(main_set):
-                                n = 0
-                            if n >= self.screens:
-                                n -= self.screens
-                            if loops < 6:
-                                loops = loops + 1
-                                voblength, n = _is_vob_good(n, loops)
+                            try:
+                                voblength = float(vob_mi['media']['track'][2]['Duration'])
                                 return voblength, n
-                            else:
-                                return 300, n
-                try:
-                    voblength, n = _is_vob_good(n, 0)
-                    img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
-                    (
-                        ffmpeg
-                        .input(f"{meta['discs'][0]['path']}/VTS_{main_set[n]}", ss=img_time)
-                        .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
-                        .output(image, vframes=1)
-                        .overwrite_output()
-                        .global_args('-loglevel', loglevel)
-                        .run(quiet=debug)
-                    )
-                except Exception:
-                    print(traceback.format_exc())
-                # print(os.path.getsize(image))
-                # print(f'{i+1}/{self.screens}')
-                self.optimize_images(image)
-                n += 1
-                try: 
-                    if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                        i += 1
-                    elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                        i += 1
-                    elif os.path.getsize(Path(image)) <= 15000:
-                        cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
-                        time.sleep(1)
-                    elif self.img_host == "ptpimg":
-                        i += 1
-                    else:
-                        cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                        time.sleep(1)
-                    cli_ui.info_count(i-1, self.screens, "Screens Saved")
-                    looped = 0
-                except Exception:
-                    if looped >= 25:
-                        cprint('Failed to take screenshots', 'grey', 'on_red')
-                        exit()
-                    looped += 1
+                            except Exception:
+                                n += 1
+                                if n >= len(main_set):
+                                    n = 0
+                                if n >= num_screens:
+                                    n -= num_screens
+                                if loops < 6:
+                                    loops = loops + 1
+                                    voblength, n = _is_vob_good(n, loops)
+                                    return voblength, n
+                                else:
+                                    return 300, n
+                    try:
+                        voblength, n = _is_vob_good(n, 0, num_screens)
+                        img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
+                        (
+                            ffmpeg
+                            .input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
+                            .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
+                            .output(image, vframes=1)
+                            .overwrite_output()
+                            .global_args('-loglevel', loglevel)
+                            .run(quiet=debug)
+                        )
+                    except Exception:
+                        print(traceback.format_exc())
+                    # print(os.path.getsize(image))
+                    # print(f'{i+1}/{self.screens}')
+                    self.optimize_images(image)
+                    n += 1
+                    try: 
+                        if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                            i += 1
+                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                            i += 1
+                        elif os.path.getsize(Path(image)) <= 15000:
+                            cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
+                            time.sleep(1)
+                        elif self.img_host == "ptpimg":
+                            i += 1
+                        else:
+                            cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                            time.sleep(1)
+                        cli_ui.info_count(i-1, num_screens, "Screens Saved")
+                        looped = 0
+                    except Exception:
+                        if looped >= 25:
+                            cprint('Failed to take screenshots', 'grey', 'on_red')
+                            exit()
+                        looped += 1
 
 
-    def screenshots(self, path, filename, folder_id, base_dir, meta):
-        if self.screens == 0 or len(meta.get('image_list', [])) >= self.screens:
+    def screenshots(self, path, filename, folder_id, base_dir, meta, num_screens=None):
+        if num_screens == None:
+            num_screens = self.screens
+        if num_screens == 0: 
+        # or len(meta.get('image_list', [])) >= num_screens:
             return
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
@@ -801,9 +807,9 @@ class Prep():
             length = round(float(length))
             # for i in range(screens):
             os.chdir(f"{base_dir}/tmp/{folder_id}")
-            i = len(glob.glob("*.png"))
-            if i >= self.screens:
-                i = self.screens
+            i = 0
+            if len(glob.glob(f"{filename}-*.png")) >= num_screens:
+                i = num_screens
                 cprint('Reusing screenshots', 'grey', 'on_green')
             else:
                 loglevel = 'quiet'
@@ -814,43 +820,45 @@ class Prep():
                 cprint("Saving Screens...", "grey", "on_yellow")
                 if meta.get('vapoursynth', False) == True:
                     from src.vs import vs_screengn
-                    vs_screengn(source=path, encode=None, filter_b_frames=False, num=self.screens, dir=f"{base_dir}/tmp/{folder_id}/")
+                    vs_screengn(source=path, encode=None, filter_b_frames=False, num=num_screens, dir=f"{base_dir}/tmp/{folder_id}/")
                 else:
-                    while i != self.screens:
+                    while i != num_screens:
                         image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
-                        try:
-                            (
-                                ffmpeg
-                                .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                                .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
-                                .output(image, vframes=1)
-                                .overwrite_output()
-                                .global_args('-loglevel', loglevel)
-                                .run(quiet=debug)
-                            )
-                        except Exception:
-                            print(traceback.format_exc())
-                        # print(os.path.getsize(image))
-                        # print(f'{i+1}/{self.screens}')
-                        cli_ui.info_count(i, self.screens, "Screens Saved")
-                        self.optimize_images(image)
-                        # print(Path(image))
-                        if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                            i += 1
-                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                            i += 1
-                        elif os.path.getsize(Path(image)) <= 15000:
-                            cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
-                            time.sleep(1)
-                        elif self.img_host == "ptpimg":
-                            i += 1
-                        elif self.img_host == "freeimage.host":
-                            cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
-                            exit()
+                        if not os.path.exists(image):
+                            try:
+                                (
+                                    ffmpeg
+                                    .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
+                                    .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
+                                    .output(image, vframes=1)
+                                    .overwrite_output()
+                                    .global_args('-loglevel', loglevel)
+                                    .run(quiet=debug)
+                                )
+                            except Exception:
+                                print(traceback.format_exc())
+                            # print(os.path.getsize(image))
+                            # print(f'{i+1}/{self.screens}')
+                            cli_ui.info_count(i, num_screens, "Screens Saved")
+                            self.optimize_images(image)
+                            # print(Path(image))
+                            if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                                i += 1
+                            elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                                i += 1
+                            elif os.path.getsize(Path(image)) <= 15000:
+                                cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                                time.sleep(1)
+                            elif self.img_host == "ptpimg":
+                                i += 1
+                            elif self.img_host == "freeimage.host":
+                                cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
+                                exit()
+                            else:
+                                cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                                time.sleep(1) 
                         else:
-                            cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                            time.sleep(1) 
-
+                            i += 1
     def optimize_images(self, image):
         if os.path.exists(image):
             try:
@@ -2402,21 +2410,7 @@ class Prep():
                     description.write(meta['blu_desc'])
                     meta['description'] = 'BLU'
 
-            if meta.get('discs', []) != []:
-                discs = meta['discs']
-                if discs[0]['type'] == "DVD":
-                    description.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
-                    description.write("\n")
-                if len(discs) >= 2:
-                    for each in discs[1:]:
-                        if each['type'] == "BDMV":
-                            description.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
-                            description.write("\n")
-                        if each['type'] == "DVD":
-                            description.write(f"{each['name']}:\n")
-                            description.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
-                            description.write("\n")
-                meta['description'] = "CUSTOM"
+            
             if meta['nfo'] != False:
                 description.write("[code]")
                 nfo = glob.glob("*.nfo")[0]

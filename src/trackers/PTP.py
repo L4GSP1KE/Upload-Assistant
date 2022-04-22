@@ -9,8 +9,12 @@ from pathlib import Path
 import time
 import traceback
 import json
+import glob
+import multiprocessing
 import platform
 import pickle
+from pymediainfo import MediaInfo
+
 
 from src.trackers.COMMON import COMMON
 from src.bbcode import BBCODE
@@ -516,23 +520,88 @@ class PTP():
         return desc
 
     async def edit_desc(self, meta):
+        from src.prep import Prep
+        prep = Prep(path=meta['path'], screens=meta['screens'], img_host=meta['imghost'], config=self.config)
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as desc:
-            if meta['bdinfo'] != None:
-                mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
-            else:
-                mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
-            desc.write(f"[mediainfo]{mi_dump}[/mediainfo]")
-            base2ptp = self.convert_bbcode(base)
-            desc.write(base2ptp)
             images = meta['image_list']
-            if len(images) > 0: 
-                for each in range(len(images)):
-                    # web_url = images[each]['web_url']
-                    raw_url = images[each]['raw_url']
-                    desc.write(f"[img]{raw_url}[/img]")
-            # desc.write(self.signature)
-            desc.close()
+            discs = meta.get('discs', [])
+            # For Discs
+            if len(discs) >= 1:
+                for i in range(len(discs)):
+                    each = discs[i]
+                    if each['type'] == "BDMV":
+                        desc.write(f"{each.get('name', 'BDINFO')}:\n[mediainfo]{each['summary']}[/mediainfo]\n")
+                        desc.write("\n")
+                        if i == 0:
+                            base2ptp = self.convert_bbcode(base)
+                            desc.write(base2ptp)
+                            mi_dump = each['summary']
+                        else:
+                            mi_dump = each['summary']
+                            if meta.get('vapoursynth', False) == True:
+                                use_vs = True
+                            else:
+                                use_vs = False
+                            ds = multiprocessing.Process(target=prep.disc_screenshots, args=(f"FILE_{i}", each['bdinfo'], meta['uuid'], meta['base_dir'], use_vs, [], 2))
+                            ds.start()
+                            while ds.is_alive() == True:
+                                await asyncio.sleep(1)
+                            new_screens = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}",f"FILE_{i}-*.png")
+                            images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})   
+
+                    if each['type'] == "DVD":
+                        desc.write(f"{each['name']}:\n")
+                        desc.write(f"{os.path.basename(each['vob'])}[mediainfo][{each['vob_mi']}[/mediainfo]\n")
+                        desc.write(f"{os.path.basename(each['ifo'])}[mediainfo][{each['ifo_mi']}[/mediainfo]\n")
+                        desc.write("\n")
+                        if i == 0:
+                            base2ptp = self.convert_bbcode(base)
+                            desc.write(base2ptp)
+                        else:
+                            ds = multiprocessing.Process(target=prep.dvd_screenshots, args=(meta, i, 2))
+                            ds.start()
+                            while ds.is_alive() == True:
+                                await asyncio.sleep(1)
+                            new_screens = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}",f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][i]['name']}-*.png")
+                            images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})  
+                        
+                    if len(images) > 0: 
+                        for each in range(len(images)):
+                            raw_url = images[each]['raw_url']
+                            desc.write(f"[img]{raw_url}[/img]")
+            # For non-discs
+            elif len(meta.get('filelist', [])) >= 1:
+                for i in range(len(meta['filelist'])):
+                    file = meta['filelist'][i]
+                    if i == 0:
+                        mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
+                        base2ptp = self.convert_bbcode(base)
+                        desc.write(base2ptp)
+                    else:
+                        # Export Mediainfo
+                        mi_dump = MediaInfo.parse(file, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
+                        mi_dump = mi_dump.replace(file, os.path.basename(file))
+                        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "w", newline="", encoding="utf-8") as f:
+                            f.write(mi_dump)
+                        mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "r", encoding="utf-8").read()
+                        cprint(mi_dump, 'magenta')
+                        # Generate and upload screens for other files
+                        s = multiprocessing.Process(target=prep.screenshots, args=(file, f"FILE_{i}", meta['uuid'], meta['base_dir'], meta, 2))
+                        s.start()
+                        while s.is_alive() == True:
+                            await asyncio.sleep(3)
+                        new_screens = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}",f"FILE_{i}-*.png")
+                        images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})
+
+                    desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
+                    desc.write("\n")    
+                    if len(images) > 0: 
+                        for each in range(len(images)):
+                            raw_url = images[each]['raw_url']
+                            desc.write(f"[img]{raw_url}[/img]")
+
+        
 
     async def get_AntiCsrfToken(self, meta):
         if not os.path.exists(f"{meta['base_dir']}/data/cookies"):

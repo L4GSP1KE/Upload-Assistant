@@ -183,6 +183,20 @@ class BHD():
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as desc:
+            if meta.get('discs', []) != []:
+                discs = meta['discs']
+                if discs[0]['type'] == "DVD":
+                    desc.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
+                    desc.write("\n")
+                if len(discs) >= 2:
+                    for each in discs[1:]:
+                        if each['type'] == "BDMV":
+                            desc.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
+                            desc.write("\n")
+                        if each['type'] == "DVD":
+                            desc.write(f"{each['name']}:\n")
+                            desc.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
+                            desc.write("\n")
             desc.write(base.replace("[img]", "[img=300x300]"))
             images = meta['image_list']
             if len(images) > 0: 
