@@ -744,7 +744,7 @@ class Prep():
                     try:
                         voblength, n = _is_vob_good(n, 0, num_screens)
                         img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
-                        
+
                         ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
                         if w_sar != 1 and h_sar != 1:
                             ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
@@ -833,8 +833,6 @@ class Prep():
                         image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
                         if not os.path.exists(image) or retake != False:
                             retake = False
-                            cprint(int(round(width * w_sar)), 'cyan')
-                            cprint(int(round(height * h_sar)), 'yellow')
                             try:
                                 ff = ffmpeg.input(path, ss=random.randint(round(length/5) , round(length - length/5)))
                                 if w_sar != 1 and h_sar != 1:
@@ -852,7 +850,6 @@ class Prep():
                             # print(f'{i+1}/{self.screens}')
                             cli_ui.info_count(i, num_screens, "Screens Saved")
                             self.optimize_images(image)
-                            cprint(os.path.getsize(Path(image)), 'magenta')
                             if os.path.getsize(Path(image)) <= 15000:
                                 cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                                 retake = True
