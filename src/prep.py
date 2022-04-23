@@ -744,10 +744,12 @@ class Prep():
                     try:
                         voblength, n = _is_vob_good(n, 0, num_screens)
                         img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
+                        
+                        ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
+                        if w_sar != 1 and h_sar != 1:
+                            ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                         (
-                            ffmpeg
-                            .input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
-                            .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
+                            ff
                             .output(image, vframes=1)
                             .overwrite_output()
                             .global_args('-loglevel', loglevel)
@@ -831,11 +833,14 @@ class Prep():
                         image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
                         if not os.path.exists(image) or retake != False:
                             retake = False
+                            cprint(int(round(width * w_sar)), 'cyan')
+                            cprint(int(round(height * h_sar)), 'yellow')
                             try:
+                                ff = ffmpeg.input(path, ss=random.randint(round(length/5) , round(length - length/5)))
+                                if w_sar != 1 and h_sar != 1:
+                                    ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                 (
-                                    ffmpeg
-                                    .input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                                    .filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
+                                    ff
                                     .output(image, vframes=1)
                                     .overwrite_output()
                                     .global_args('-loglevel', loglevel)
@@ -847,20 +852,22 @@ class Prep():
                             # print(f'{i+1}/{self.screens}')
                             cli_ui.info_count(i, num_screens, "Screens Saved")
                             self.optimize_images(image)
-                            # print(Path(image))
-                            if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                                i += 1
-                            elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                                i += 1
-                            elif os.path.getsize(Path(image)) <= 15000:
+                            cprint(os.path.getsize(Path(image)), 'magenta')
+                            if os.path.getsize(Path(image)) <= 15000:
                                 cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                                 retake = True
                                 time.sleep(1)
+                            if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb" and retake == False:
+                                i += 1
+                            elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox" and retake == False:
+                                i += 1
                             elif self.img_host == "ptpimg":
                                 i += 1
                             elif self.img_host == "freeimage.host":
                                 cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
                                 exit()
+                            elif retake == True:
+                                pass
                             else:
                                 cprint("Image too large for your image host, retaking", 'grey', 'on_red')
                                 retake = True
