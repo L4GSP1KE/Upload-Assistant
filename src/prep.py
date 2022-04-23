@@ -704,13 +704,15 @@ class Prep():
         else:
             cprint("Saving Screens...", "grey", "on_yellow")
             looped = 0
+            retake = False
             while i != num_screens:
                 if n >= len(main_set):
                     n = 0
                 if n >= num_screens:
                     n -= num_screens
                 image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][disc_num]['name']}-{i}.png"
-                if not os.path.exists(image):
+                if not os.path.exists(image) or retake != False:
+                    retake = False
                     loglevel = 'quiet'
                     debug = True
                     if bool(meta.get('debug', False)):
@@ -764,11 +766,13 @@ class Prep():
                             i += 1
                         elif os.path.getsize(Path(image)) <= 15000:
                             cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
+                            retake = True
                             time.sleep(1)
                         elif self.img_host == "ptpimg":
                             i += 1
                         else:
                             cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                            retake = True
                             time.sleep(1)
                         cli_ui.info_count(i-1, num_screens, "Screens Saved")
                         looped = 0
@@ -822,9 +826,11 @@ class Prep():
                     from src.vs import vs_screengn
                     vs_screengn(source=path, encode=None, filter_b_frames=False, num=num_screens, dir=f"{base_dir}/tmp/{folder_id}/")
                 else:
+                    retake = False
                     while i != num_screens:
                         image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
-                        if not os.path.exists(image):
+                        if not os.path.exists(image) or retake != False:
+                            retake = False
                             try:
                                 (
                                     ffmpeg
@@ -848,6 +854,7 @@ class Prep():
                                 i += 1
                             elif os.path.getsize(Path(image)) <= 15000:
                                 cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                                retake = True
                                 time.sleep(1)
                             elif self.img_host == "ptpimg":
                                 i += 1
@@ -856,6 +863,7 @@ class Prep():
                                 exit()
                             else:
                                 cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                                retake = True
                                 time.sleep(1) 
                         else:
                             i += 1
