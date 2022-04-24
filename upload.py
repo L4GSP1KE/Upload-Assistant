@@ -14,6 +14,7 @@ from src.trackers.THR import THR
 from src.trackers.STT import STT
 from src.trackers.HP import HP
 from src.trackers.PTP import PTP
+from src.trackers.SN import SN
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -158,7 +159,7 @@ async def do_the_thing(path, args, base_dir):
     ####################################
     common = COMMON(config=config)
     unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF']
-    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF }
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN}
 
     for tracker in trackers:
         tracker = tracker.replace(" ", "").upper().strip()
@@ -248,6 +249,19 @@ async def do_the_thing(path, args, base_dir):
                             await client.add_to_client(meta, "THR")
                 except:
                     print(traceback.print_exc())
+
+        if tracker == "SN":
+            if meta['unattended']:
+                upload_to_sn = True
+            else:
+                upload_to_sn = cli_ui.ask_yes_no(f"Upload to Swarmazon? {debug}", default=meta['unattended'])
+            if upload_to_sn:
+                print("Uploading to Swarmazon")
+                sn = SN(config=config)
+                if meta['upload'] == True:
+                    await sn.upload(meta)
+                    await client.add_to_client(meta, "SN")
+
         if tracker == "PTP":
             if meta['unattended']:
                 upload_to_ptp = True
