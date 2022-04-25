@@ -123,7 +123,7 @@ class AITHER():
                 audio_lang = meta['bdinfo']['audio'][0]['language'].upper()
                 if audio_lang != "":
                     aither_name = aither_name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
-        aither_name = aither_name.replace(meta.get('video_encode', meta.get('video_codec', "")), meta.get('video_encode', meta.get('video_codec', "")).replace('.', ''))
+        # aither_name = aither_name.replace(meta.get('video_encode', meta.get('video_codec', "")), meta.get('video_encode', meta.get('video_codec', "")).replace('.', ''))
         return aither_name
 
     async def get_cat_id(self, category_name):
