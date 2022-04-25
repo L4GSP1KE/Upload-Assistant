@@ -258,6 +258,8 @@ async def do_the_thing(path, args, base_dir):
             if upload_to_sn:
                 print("Uploading to Swarmazon")
                 sn = SN(config=config)
+                cprint("Dupe Search on Swarmazon, Currently not supported so assuming no Dupes", 'grey', 'on_red')
+                meta['upload'] = True
                 if meta['upload'] == True:
                     await sn.upload(meta)
                     await client.add_to_client(meta, "SN")
