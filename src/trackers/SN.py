@@ -23,7 +23,7 @@ class SN():
         self.tracker = 'SN'
         self.source_flag = 'Swarmazon'
         self.upload_url = 'https://swarmazon.club/en/upload/upload.php'
-        self.forum_link = 'https://swarmazon.club/php/forum.php?forum_page=2-swarmazon-rules'
+        self.forum_link = 'https://swarmazon.club/forum/d/2-swarmazon-rules'
         pass
 
     async def get_type_id(self, type):
@@ -110,12 +110,14 @@ class SN():
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as desc:
-            desc.write(base.replace("[img=250]", "[img=250x250]"))
+            desc.write(base)
             images = meta['image_list']
             if len(images) > 0:
                 for each in range(len(images)):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img]{img_url}[/img][/url] ")
+                    desc.write(f"[url={web_url}][img=360]{img_url}[/img][/url]")
+            desc.write(f"\n[center][url={self.forum_link}]Please Seed[/url][/center]")
             desc.close()
         return
+
