@@ -23,7 +23,7 @@ class SN():
         self.tracker = 'SN'
         self.source_flag = 'Swarmazon'
         self.upload_url = 'https://swarmazon.club/en/upload/upload.php'
-        self.forum_link = 'https://swarmazon.club/forum/d/2-swarmazon-rules'
+	self.forum_link = 'https://swarmazon.club/php/forum.php?forum_page=2-swarmazon-rules'
         pass
 
     async def get_type_id(self, type):
