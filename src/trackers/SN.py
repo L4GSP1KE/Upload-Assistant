@@ -95,7 +95,7 @@ class SN():
                 if str(response.url).__contains__("view"):
                     cprint(response.url)
                 else:
-                    cprint("No DL link in response, So unable to download torrent but It may have uploaded, go check", 'grey', 'on_red')
+                    cprint("No DL link in response, unable to download torrent. It maybe a duplicate, go check", 'grey', 'on_red')
                     pprint(data)
             except:
                 cprint("It may have uploaded, go check", 'grey', 'on_red')
@@ -111,13 +111,14 @@ class SN():
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as desc:
             desc.write(base)
+            desc.write(f"[center]")
             images = meta['image_list']
             if len(images) > 0:
                 for each in range(len(images)):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
                     desc.write(f"[url={web_url}][img=720]{img_url}[/img][/url]")
-            desc.write(f"\n[center][url={self.forum_link}]Simplicity,Socializing and Sharing![/url][/center]")
+            desc.write(f"\n[url={self.forum_link}]Simplicity,Socializing and Sharing![/url][/center]")
             desc.close()
         return
 
