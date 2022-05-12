@@ -579,7 +579,7 @@ class PTP():
                     else:
                         # Export Mediainfo
                         mi_dump = MediaInfo.parse(file, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
-                        mi_dump = mi_dump.replace(file, os.path.basename(file))
+                        # mi_dump = mi_dump.replace(file, os.path.basename(file))
                         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "w", newline="", encoding="utf-8") as f:
                             f.write(mi_dump)
                         mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "r", encoding="utf-8").read()
