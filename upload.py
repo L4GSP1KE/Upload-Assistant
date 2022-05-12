@@ -1,3 +1,4 @@
+from argparse import ArgumentParser
 import requests
 from src.trackers.RF import RF
 from src.args import Args
@@ -60,34 +61,27 @@ except:
         print(traceback.print_exc())
 client = Clients(config=config)
 parser = Args(config)
-file = sys.argv[0]
-path = sys.argv[1]
-try:
-    args = sys.argv[2:]
-except:
-    args = []
 
-if path in ['-h', '--help']:
-    meta, help, before_args = parser.parse("", dict())
-    help.print_help()
-    exit()
-
-async def do_the_thing(path, args, base_dir):
+async def do_the_thing(base_dir):
     meta = dict()
     meta['base_dir'] = base_dir
+    meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
+    path = meta['path']
     path = os.path.abspath(path)
+    if path.endswith('"'):
+        path = path[:-1]
+    if os.path.exists(path):
+            meta['path'] = path
+            # meta, help, before_args = parser.parse(args, meta)
+    else:
+        cprint("Path does not exist", 'grey', 'on_red')
+        exit()
     try:
         with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
             meta = json.load(f)
             f.close()
     except FileNotFoundError:
         pass
-    if os.path.exists(path):
-            meta['path'] = path
-            meta, help, before_args = parser.parse(args, meta)
-    else:
-        cprint("Path does not exist", 'grey', 'on_red')
-        exit()
     cprint(f"Gathering info for {os.path.basename(path)}", 'grey', 'on_green')
     if meta['imghost'] == None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
@@ -137,7 +131,7 @@ async def do_the_thing(path, args, base_dir):
     while confirm == False:
         # help.print_help()
         args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv --tmdb 12345)")
-
+        # args = (meta['path'],) + tuple(args.split())
         meta, help, before_args = parser.parse(args.split(), meta)
         # meta = await prep.tmdb_other_meta(meta)
         meta['edit'] = True
@@ -400,7 +394,7 @@ if __name__ == '__main__':
         if int(pyver[1]) <= 6:
             cprint("Python <= 3.6 Detected, please use Python >=3.7", 'grey', 'on_red')
             loop = asyncio.get_event_loop()
-            loop.run_until_complete(do_the_thing(path, args, base_dir))
+            loop.run_until_complete(do_the_thing(base_dir))
         else:
-            asyncio.run(do_the_thing(path, args, base_dir))
+            asyncio.run(do_the_thing(base_dir))
         

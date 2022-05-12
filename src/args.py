@@ -21,6 +21,7 @@ class Args():
         input = args
         parser = argparse.ArgumentParser()
         
+        parser.add_argument('path', nargs='*', help="Path to file/directory")
         parser.add_argument('-s', '--screens', nargs='*', required=False, help="Number of screenshots", default=int(self.config['DEFAULT']['screens']))
         parser.add_argument('-c', '--category', nargs='*', required=False, help="Category [MOVIE, TV, FANRES]", choices=['movie', 'tv', 'fanres'])
         parser.add_argument('-t', '--type', nargs='*', required=False, help="Type [DISC, REMUX, ENCODE, WEBDL, WEBRIP, HDTV]", choices=['disc', 'remux', 'encode', 'webdl', 'web-dl', 'webrip', 'hdtv'])
@@ -66,7 +67,7 @@ class Args():
             meta['tmdb_manual'] = meta['imdb'] = None
         for key in args:
             value = args.get(key)
-            if value != None:
+            if value not in (None, []):
                 if isinstance(value, list):
                     meta[key] = self.list_to_string(value)
                     if key == 'type':
