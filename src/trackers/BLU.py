@@ -27,7 +27,7 @@ class BLU():
         self.search_url = 'https://blutopia.xyz/api/torrents/filter'
         self.torrent_url = 'https://blutopia.xyz/api/torrents/'
         self.upload_url = 'https://blutopia.xyz/api/torrents/upload' 
-        self.signature = f"\n[center][url='https://blutopia.xyz/forums/topics/3087']Created by L4G's Upload Assistant[/url][/center]"
+        self.signature = f"\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]"
         
         pass
     

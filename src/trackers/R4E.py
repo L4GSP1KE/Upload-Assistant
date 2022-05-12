@@ -26,7 +26,7 @@ class R4E():
         self.config = config
         self.tracker = 'R4E'
         self.source_flag = 'R4E'
-        # self.signature = f"\n[center][url='https://github.com/L4GSP1KE/Upload-Assistant']Created by L4G's Upload Assistant[/url][/center]"
+        # self.signature = f"\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by L4G's Upload Assistant[/url][/center]"
         self.signature = None
         pass
     
