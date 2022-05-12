@@ -399,6 +399,7 @@ class Prep():
             export = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
             export.write(discs[0]['evo_mi'])
             export.close()
+        discs = sorted(discs, key=lambda d: d['name'])
         return is_disc, videoloc, bdinfo, discs
 
 
@@ -442,10 +443,12 @@ class Prep():
             if isdir == False:
                 os.chdir(os.path.dirname(video))
             media_info = MediaInfo.parse(video, output="STRING", full=False, mediainfo_options={'inform_version' : '1'})
-            export = open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8')
-            export.write(media_info.replace(video, os.path.basename(video)))
-            export.close()
-            mi_dump = media_info
+            with open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt", 'w', newline="", encoding='utf-8') as export:
+                export.write(media_info)
+                export.close()
+            with open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO_CLEANPATH.txt", 'w', newline="", encoding='utf-8') as export_cleanpath:
+                export_cleanpath.write(media_info.replace(video, os.path.basename(video)))
+                export_cleanpath.close()
             cprint("MediaInfo Exported.", "grey", "on_green")
 
         if os.path.exists(f"{base_dir}/tmp/{folder_id}/MediaInfo.json.txt") == False:
