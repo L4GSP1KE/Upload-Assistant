@@ -74,7 +74,7 @@ async def do_the_thing(base_dir):
             meta['path'] = path
             # meta, help, before_args = parser.parse(args, meta)
     else:
-        cprint("Path does not exist", 'grey', 'on_red')
+        cprint(f"Path: {path} does not exist", 'grey', 'on_red')
         exit()
     try:
         with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
