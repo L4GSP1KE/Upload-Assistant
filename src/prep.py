@@ -1094,7 +1094,10 @@ class Prep():
             meta['overview'] = response['overview']
 
             meta['tmdb_type'] = response.get('type', 'Scripted')
-            meta['runtime'] = response.get('episode_run_time', [60])[0]
+            runtime = response.get('episode_run_time', [60])
+            if runtime == []:
+                runtime = [60]
+            meta['runtime'] = runtime[0]
         if meta['poster'] not in (None, ''):
             meta['poster'] = f"https://image.tmdb.org/t/p/original{meta['poster']}"
 
