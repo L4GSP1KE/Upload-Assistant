@@ -552,8 +552,16 @@ class PTP():
 
                     if each['type'] == "DVD":
                         desc.write(f"{each['name']}:\n")
-                        desc.write(f"{os.path.basename(each['vob'])}[mediainfo][{each['vob_mi_full']}[/mediainfo]\n")
-                        desc.write(f"{os.path.basename(each['ifo'])}[mediainfo][{each['ifo_mi_full']}[/mediainfo]\n")
+
+                        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "w", newline="", encoding="utf-8") as f:
+                            f.write(each['ifo_mi_full'])
+                        mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "r", encoding="utf-8").read()
+                        desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
+
+                        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "w", newline="", encoding="utf-8") as f:
+                            f.write(each['vob_mi_full'])
+                        mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "r", encoding="utf-8").read()
+                        desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
                         desc.write("\n")
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
