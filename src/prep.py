@@ -749,7 +749,7 @@ class Prep():
                         img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
 
                         ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
-                        if w_sar != 1 and h_sar != 1:
+                        if w_sar != 1 or h_sar != 1:
                             ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                         (
                             ff
@@ -838,7 +838,7 @@ class Prep():
                             retake = False
                             try:
                                 ff = ffmpeg.input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                                if w_sar != 1 and h_sar != 1:
+                                if w_sar != 1 or h_sar != 1:
                                     ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                 (
                                     ff
