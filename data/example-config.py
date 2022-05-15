@@ -21,7 +21,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, THR, R4E, HP",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -62,6 +62,11 @@ config = {
             "api_key" : "STC",
             "announce_url" : "https://stt.xyz/announce/customannounceurl",
             # "anon" : "False"
+        },
+        "SN": {
+            "PHPSESSID": "GET FROM DEV TOOLS ON YOUR BROWSER",
+            "swarmazon_remember": "GET FROM DEV TOOLS ON YOUR BROWSER",
+            "announce_url": "https://tracker.swarmazon.club:8443/<YOUR_PASSKEY>/announce",
         },
         "HP" :{
             "api_key" : "HP",
