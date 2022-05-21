@@ -70,18 +70,18 @@ async def do_the_thing(base_dir):
     path = os.path.abspath(path)
     if path.endswith('"'):
         path = path[:-1]
-    if os.path.exists(path):
-            meta['path'] = path
-            # meta, help, before_args = parser.parse(args, meta)
-    else:
-        cprint(f"Path: {path} does not exist", 'grey', 'on_red')
-        exit()
     try:
         with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
             meta = json.load(f)
             f.close()
     except FileNotFoundError:
         pass
+    if os.path.exists(path):
+            meta['path'] = path
+            meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
+    else:
+        cprint(f"Path: {path} does not exist", 'grey', 'on_red')
+        exit()
     cprint(f"Gathering info for {os.path.basename(path)}", 'grey', 'on_green')
     if meta['imghost'] == None:
         meta['imghost'] = config['DEFAULT']['img_host_1']
