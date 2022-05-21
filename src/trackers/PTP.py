@@ -625,8 +625,7 @@ class PTP():
                     loggedIn = await self.validate_login(uploadresponse)
             if loggedIn == True:
                 AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
-            else:
-                session.cookies.clear() 
+            else: 
                 passKey = re.match(r"https?://please\.passthepopcorn\.me:?\d*/(.+)/announce",self.announce_url).group(1)
                 data = {
                     "username": self.username,
