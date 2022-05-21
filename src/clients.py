@@ -186,7 +186,8 @@ class Clients():
         if local_path.lower() in path.lower() and local_path.lower() != remote_path.lower():
             path = path.replace(local_path, remote_path)
             path = path.replace(os.sep, '/')
-        
+        if not path.endswith(os.sep):
+            path = f"{path}/"
         qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'])
         cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
         try:
