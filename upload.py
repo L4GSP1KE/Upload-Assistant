@@ -78,12 +78,11 @@ async def do_the_thing(base_dir):
     except FileNotFoundError:
         pass
     if os.path.exists(path):
-            meta['path'] = path
+            # meta['path'] = path
             meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
     else:
         cprint(f"Path: {path} does not exist", 'grey', 'on_red')
         exit()
-    cprint(path, 'magenta')
     cprint(f"Gathering info for {os.path.basename(path)}", 'grey', 'on_green')
     if meta['imghost'] == None:
         meta['imghost'] = config['DEFAULT']['img_host_1']

@@ -57,7 +57,7 @@ class Commands(commands.Cog):
         meta['base_dir'] = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
         path = os.path.abspath(path)
         if os.path.exists(path):
-            meta['path'] = path
+            meta['path'] = os.path.abspath(path)
             try:
                 args = args + search_args
                 meta, help, before_args = parser.parse(args, meta)
