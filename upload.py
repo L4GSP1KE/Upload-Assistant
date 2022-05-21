@@ -78,8 +78,8 @@ async def do_the_thing(base_dir):
     except FileNotFoundError:
         pass
     if os.path.exists(path):
-            # meta['path'] = path
             meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
+            meta['path'] = path
     else:
         cprint(f"Path: {path} does not exist", 'grey', 'on_red')
         exit()
