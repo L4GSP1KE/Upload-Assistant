@@ -1328,7 +1328,7 @@ class Prep():
                             if t['Language'] == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
                                 orig = True
                             if t['Language'] != meta['original_language'] and t['Language'] != "en":
-                                if meta['original_language'] != "cn" and t['Language'] not in ['zh, cn']:
+                                if meta['original_language'] not in ['cn', 'cmn', 'zh'] and t['Language'] not in ['zh', 'cn', 'cmn']:
                                     cprint(f"This release has a(n) {t['Language']} audio track, and may be considered bloated", 'grey', 'on_red')
                                     time.sleep(5)
                     if eng and orig == True:
