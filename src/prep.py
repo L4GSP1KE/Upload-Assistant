@@ -1549,9 +1549,9 @@ class Prep():
                         hdr = "HDR"
                     if "HDR10+" in hdr_format_string:
                         hdr = "HDR10+"
-                    if hdr_format_string == "" and "PQ" in (mi['media']['track'][1].get('transfer_characteristics'), mi['media']['track'][1].get('transfer_characteristics_Original', None)):
+                    if hdr_format_string == "" and "PQ" in (video_track.get('transfer_characteristics'), video_track.get('transfer_characteristics_Original', None)):
                         hdr = "PQ10"
-                    transfer_characteristics = mi['media']['track'][1].get('transfer_characteristics_Original', None)
+                    transfer_characteristics = video_track.get('transfer_characteristics_Original', None)
                     if "HLG" in transfer_characteristics:
                         hdr = "HLG"
                     if hdr != "HLG" and "BT.2020 (10-bit)" in transfer_characteristics:
