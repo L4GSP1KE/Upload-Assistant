@@ -1539,19 +1539,18 @@ class Prep():
             except:
                 pass
         else: 
+            video_track = mi['media']['track'][1]
             try:
-                hdr_mi = mi['media']['track'][1]['colour_primaries']
+                hdr_mi = video_track['colour_primaries']
                 if hdr_mi in ("BT.2020", "REC.2020"):
                     hdr = ""
-                    try:
-                        hdr_format_string = mi['media']['track'][1]['HDR_Format_String']
-                        if "HDR10" in hdr_format_string:
-                            hdr = "HDR"
-                        if "HDR10+" in hdr_format_string:
-                            hdr = "HDR10+"
-                    except:
-                        if mi['media']['track'][1].get('HDR_Format_String', None) == None and "PQ" in (mi['media']['track'][1].get('transfer_characteristics'), mi['media']['track'][1].get('transfer_characteristics_Original', None)):
-                            hdr = "PQ10"
+                    hdr_format_string = video_track.get('HDR_Format_Compatibility', video_track.get('HDR_Format_String', video_track.get('HDR_Format')))
+                    if "HDR10" in hdr_format_string:
+                        hdr = "HDR"
+                    if "HDR10+" in hdr_format_string:
+                        hdr = "HDR10+"
+                    if hdr_format_string == "" and "PQ" in (mi['media']['track'][1].get('transfer_characteristics'), mi['media']['track'][1].get('transfer_characteristics_Original', None)):
+                        hdr = "PQ10"
                     transfer_characteristics = mi['media']['track'][1].get('transfer_characteristics_Original', None)
                     if "HLG" in transfer_characteristics:
                         hdr = "HLG"
@@ -1562,7 +1561,7 @@ class Prep():
 
             try:
 
-                if "Dolby Vision" in mi['media']['track'][1]['HDR_Format']:
+                if "Dolby Vision" in video_track.get('HDR_Format', '') or video_track.get('HDR_Format_String'):
                     dv = "DV"
             except:
                 pass
