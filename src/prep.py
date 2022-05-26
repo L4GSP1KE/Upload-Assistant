@@ -316,7 +316,7 @@ class Prep():
             meta['region'] = self.get_region(bdinfo, meta.get('region', None))
             meta['video_codec'] = self.get_video_codec(bdinfo)
         else:
-            meta['video_encode'], meta['video_codec'], meta['has_encode_settings'] = self.get_video_encode(mi, meta['type'], bdinfo)
+            meta['video_encode'], meta['video_codec'], meta['has_encode_settings'], meta['bit_depth'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
             meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), self.path, bdinfo, meta['filelist'])
         if "REPACK" in meta.get('edition', ""):
@@ -1658,12 +1658,14 @@ class Prep():
     def get_video_encode(self, mi, type, bdinfo):
         video_encode = ""
         codec = ""
+        bit_depth = '0'
         has_encode_settings = False
         try:
             format = mi['media']['track'][1]['Format']
             format_profile = mi['media']['track'][1]['Format_Profile']
             if mi['media']['track'][1].get('Encoded_Library_Settings', None):
                 has_encode_settings = True
+            bit_depth = mi['media']['track'][1].get('BitDepth', '0')
         except:
             format = bdinfo['video'][0]['codec']
             format_profile = bdinfo['video'][0]['profile']
@@ -1692,7 +1694,7 @@ class Prep():
         video_codec = format
         if video_codec == "MPEG Video":
             video_codec = f"MPEG-{mi['media']['track'][1].get('Format_Version')}"
-        return video_encode, video_codec, has_encode_settings
+        return video_encode, video_codec, has_encode_settings, bit_depth
 
 
     def get_edition(self, guess, video, bdinfo, filelist):
