@@ -580,6 +580,7 @@ class PTP():
                         for each in range(len(images)):
                             raw_url = images[each]['raw_url']
                             desc.write(f"[img]{raw_url}[/img]")
+                    desc.write("\n")
             # For non-discs
             elif len(meta.get('filelist', [])) >= 1:
                 for i in range(len(meta['filelist'])):
@@ -602,7 +603,6 @@ class PTP():
                         images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})
 
                     desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
-                    desc.write("\n")
                     if i == 0:
                         base2ptp = self.convert_bbcode(base)
                         desc.write(base2ptp)    
@@ -610,6 +610,7 @@ class PTP():
                         for each in range(len(images)):
                             raw_url = images[each]['raw_url']
                             desc.write(f"[img]{raw_url}[/img]")
+                    desc.write("\n")
 
         
 
