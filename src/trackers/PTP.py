@@ -533,7 +533,7 @@ class PTP():
                 for i in range(len(discs)):
                     each = discs[i]
                     if each['type'] == "BDMV":
-                        desc.write(f"{each.get('name', 'BDINFO')}:\n[mediainfo]{each['summary']}[/mediainfo]\n")
+                        desc.write(f"[mediainfo]{each['summary']}[/mediainfo]\n")
                         desc.write("\n")
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
@@ -553,7 +553,7 @@ class PTP():
                             images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})   
 
                     if each['type'] == "DVD":
-                        desc.write(f"{each['name']}:\n")
+                        desc.write(f"[b][size=3]{each['name']}:[/size][/b]\n")
 
                         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "w", newline="", encoding="utf-8") as f:
                             f.write(each['ifo_mi_full'])
