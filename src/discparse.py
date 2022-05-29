@@ -63,7 +63,7 @@ class DiscParse():
                             files = result[0].split("FILES:", 2)[1].split("CHAPTERS:", 2)[0].split("-------------")
                             result2 = result[1].rstrip("\n")
                             result = result2.split("********************", 1)
-                            bd_summary = f"QUICK SUMMARY:{result[0]}".rstrip("\n")
+                            bd_summary = result[0].rstrip("\n")
                             f.close()
                         try:
                             shutil.copyfile(bdinfo_text, f"{save_dir}/BD_FULL_{str(i).zfill(2)}.txt")
