@@ -875,11 +875,12 @@ class Prep():
                         else:
                             i += 1
     def optimize_images(self, image):
-        if os.path.exists(image):
-            try:
-                oxipng.optimize(image, level=6)
-            except NameError:
-                pass
+        if self.config['DEFAULT'].get('optimize_images', True) == True:
+            if os.path.exists(image):
+                try:
+                    oxipng.optimize(image, level=6)
+                except NameError:
+                    pass
         return
     """
     Get type and category

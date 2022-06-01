@@ -11,6 +11,7 @@ config = {
         # "img_host_4": "",
 
         "screens" : "6",
+        "optimize_images" : True,
 
 
         # The name of your default torrent client, set in the torrent client sections below
