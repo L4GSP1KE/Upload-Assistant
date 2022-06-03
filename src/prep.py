@@ -49,6 +49,7 @@ except ModuleNotFoundError:
     cprint('pip3 install --user -U -r requirements.txt', 'grey', 'on_red')
     exit()
 
+from re import L
 from src.args import Args
 from src.exceptions import *
 from src.trackers.PTP import PTP
@@ -1105,6 +1106,8 @@ class Prep():
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
         if difference >= 0.9 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():
             meta['aka'] = ""
+        if f"({meta['year']})" in meta['aka']:
+            meta['aka'] = meta['aka'].replace(f"({meta['year']})", "").strip()
             
         
         return meta
