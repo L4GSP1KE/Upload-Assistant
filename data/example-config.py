@@ -138,7 +138,12 @@ config = {
             "qbit_user" : "username",
             "qbit_pass" : "password",
             # "qbit_tag" : "tag",
+            # "qbit_category": "category",
             # "torrent_storage_dir" : "path/to/BT_backup folder"
+
+            # -2 means use the global value and -1 is no limit
+            # "qbit_ratio_limit": "-2",
+            # "qbit_seeding_time_limit_minutes": "-2",
             
             # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "E:\\downloads\\tv",

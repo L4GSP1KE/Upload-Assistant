@@ -216,6 +216,12 @@ class Clients():
         qbt_client.torrents_resume(torrent.infohash)
         if client.get('qbit_tag', None) != None:
             qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
+        if client.get('qbit_category', None) != None:
+            qbt_client.torrents_set_category(category=client.get('qbit_category'), torrent_hashes=torrent.infohash)
+        qbt_client.torrents_set_share_limits(
+            ratio_limit=client.get('qbit_ratio_limit', '-2'),
+            seeding_time_limit=client.get('qbit_seeding_time_limit_minutes', '-2'),
+            torrent_hashes=torrent.infohash)
         
         console.print(f"Added to: {path}")
         
