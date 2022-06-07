@@ -131,9 +131,9 @@ async def do_the_thing(base_dir):
     confirm = get_confirmation(meta)  
     while confirm == False:
         # help.print_help()
-        args = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv --tmdb 12345)")
-        # args = (meta['path'],) + tuple(args.split())
-        meta, help, before_args = parser.parse(args.split(), meta)
+        editargs = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv --tmdb 12345)")
+        # editargs = (meta['path'],) + tuple(editargs.split())
+        meta, help, before_args = parser.parse(editargs.split(), meta)
         # meta = await prep.tmdb_other_meta(meta)
         meta['edit'] = True
         meta = await prep.gather_prep(meta=meta, mode='cli') 

@@ -69,32 +69,32 @@ class Args():
             value = args.get(key)
             if value not in (None, []):
                 if isinstance(value, list):
-                    meta[key] = self.list_to_string(value)
+                    value2 = self.list_to_string(value)
                     if key == 'type':
-                        meta[key] = meta[key].upper().replace('-','')
+                        meta[key] = value2.upper().replace('-','')
                     elif key == 'tag':
-                        meta[key] = f"-{meta[key]}"
+                        meta[key] = f"-{value2}"
                     elif key == 'screens':
-                        meta[key] = int(meta[key])
+                        meta[key] = int(value2)
                     elif key == 'season':
-                        meta['manual_season'] = meta[key]
+                        meta['manual_season'] = value2
                     elif key == 'episode':
-                        meta['manual_episode'] = meta[key]
+                        meta['manual_episode'] = value2
                     elif key == 'tmdb_manual':
-                        meta['category'], meta['tmdb_manual'] = self.parse_tmdb_id(meta[key], meta.get('category'))
+                        meta['category'], meta['tmdb_manual'] = self.parse_tmdb_id(value2, meta.get('category'))
                     elif key == 'ptp':
                         if meta[key].startswith('http'):
-                            parsed = urllib.parse.urlparse(meta[key])
+                            parsed = urllib.parse.urlparse(value2)
                             try:
                                 meta['ptp'] = urllib.parse.parse_qs(parsed.query)['torrentid'][0]
                             except:
                                 cprint('Your terminal ate  part of the url, please surround in quotes next time, or pass only the torrentid', 'grey', 'on_red')
                                 cprint('Continuing without -ptp', 'grey', 'on_red')
                         else:
-                            meta['ptp'] = meta[key]
+                            meta['ptp'] = value2
                     elif key == 'blu':
                         if meta[key].startswith('http'):
-                            parsed = urllib.parse.urlparse(meta[key])
+                            parsed = urllib.parse.urlparse(value2)
                             try:
                                 blupath = parsed.path
                                 if blupath.endswith('/'):
@@ -104,7 +104,14 @@ class Args():
                                 cprint('Unable to parse id from url', 'grey', 'on_red')
                                 cprint('Continuing without --blu', 'grey', 'on_red')
                         else:
-                            meta['blu'] = meta[key]
+                            meta['blu'] = value2
+                    else:
+                        meta[key] = value2
+                elif value in (True, False):
+                    if meta.get(key, False) != value:
+                        meta[key] = True
+                    else:
+                        meta[key] = value
                 else:
                     meta[key] = value
             else:
