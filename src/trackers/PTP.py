@@ -545,7 +545,7 @@ class PTP():
                                 use_vs = True
                             else:
                                 use_vs = False
-                            ds = multiprocessing.Process(target=prep.disc_screenshots, args=(f"FILE_{i}", each['bdinfo'], meta['uuid'], meta['base_dir'], use_vs, [], 2))
+                            ds = multiprocessing.Process(target=prep.disc_screenshots, args=(f"FILE_{i}", each['bdinfo'], meta['uuid'], meta['base_dir'], use_vs, [], meta.get('ffdebug', False), 2))
                             ds.start()
                             while ds.is_alive() == True:
                                 await asyncio.sleep(1)
@@ -554,16 +554,8 @@ class PTP():
 
                     if each['type'] == "DVD":
                         desc.write(f"[b][size=3]{each['name']}:[/size][/b]\n")
-
-                        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "w", newline="", encoding="utf-8") as f:
-                            f.write(each['ifo_mi_full'])
-                        mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "r", encoding="utf-8").read()
-                        desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
-
-                        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "w", newline="", encoding="utf-8") as f:
-                            f.write(each['vob_mi_full'])
-                        mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/TEMP_PTP_MEDIAINFO.txt", "r", encoding="utf-8").read()
-                        desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
+                        desc.write(f"[mediainfo]{each['ifo_mi_full']}[/mediainfo]\n")
+                        desc.write(f"[mediainfo]{each['vob_mi_full']}[/mediainfo]\n")
                         desc.write("\n")
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
