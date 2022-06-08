@@ -257,7 +257,7 @@ class Prep():
                     use_vs = True
                 else:
                     use_vs = False
-                ds = multiprocessing.Process(target=self.disc_screenshots, args=(filename, bdinfo, meta['uuid'], base_dir, use_vs, meta.get('image_list', []), None))
+                ds = multiprocessing.Process(target=self.disc_screenshots, args=(filename, bdinfo, meta['uuid'], base_dir, use_vs, meta.get('image_list', []), meta.get('ffdebug', False), None))
                 ds.start()
                 while ds.is_alive() == True:
                     await asyncio.sleep(1)
@@ -600,7 +600,7 @@ class Prep():
     Generate Screenshots
     """
 
-    def disc_screenshots(self, filename, bdinfo, folder_id, base_dir, use_vs, image_list, num_screens=None):
+    def disc_screenshots(self, filename, bdinfo, folder_id, base_dir, use_vs, image_list, ffdebug, num_screens=None):
         if num_screens == None:
             num_screens = self.screens
         if num_screens == 0 or len(image_list) >= num_screens:
@@ -637,6 +637,9 @@ class Prep():
                 from src.vs import vs_screengn
                 vs_screengn(source=file, encode=None, filter_b_frames=False, num=num_screens, dir=f"{base_dir}/tmp/{folder_id}/")
             else:
+                if bool(ffdebug) == True:
+                    loglevel = 'verbose'
+                    debug = False
                 while i != num_screens:
                     image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
                     try:
@@ -707,6 +710,9 @@ class Prep():
             cprint('Reusing screenshots', 'grey', 'on_green')
         else:
             cprint("Saving Screens...", "grey", "on_yellow")
+            if bool(meta.get('ffdebug', False)) == True:
+                loglevel = 'verbose'
+                debug = False
             looped = 0
             retake = False
             while i != num_screens:
@@ -824,10 +830,10 @@ class Prep():
             else:
                 loglevel = 'quiet'
                 debug = True
-                # if bool(meta.get('debug', False)):
-                #     loglevel = 'verbose'
-                #     debug = False
                 cprint("Saving Screens...", "grey", "on_yellow")
+                if bool(meta.get('ffdebug', False)) == True:
+                    loglevel = 'verbose'
+                    debug = False
                 if meta.get('vapoursynth', False) == True:
                     from src.vs import vs_screengn
                     vs_screengn(source=path, encode=None, filter_b_frames=False, num=num_screens, dir=f"{base_dir}/tmp/{folder_id}/")

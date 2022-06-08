@@ -295,7 +295,6 @@ async def do_the_thing(base_dir):
 
 
 
-
 def get_confirmation(meta):
     if meta['debug'] == True:
         cprint("DEBUG: True", 'grey', 'on_red')
