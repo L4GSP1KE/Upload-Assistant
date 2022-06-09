@@ -8,7 +8,6 @@ try:
     from os.path import basename
     import re
     import sys
-    import shortuuid
     import distutils.util
     import asyncio
     from guessit import guessit
@@ -81,7 +80,6 @@ class Prep():
         base_dir = meta['base_dir']
 
         if meta.get('uuid', None) == None:
-            # folder_id = shortuuid.uuid()
             folder_id = os.path.basename(self.path)
             meta['uuid'] = folder_id 
         if not os.path.exists(f"{base_dir}/tmp/{meta['uuid']}"):

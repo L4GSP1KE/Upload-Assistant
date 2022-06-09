@@ -1,7 +1,5 @@
-discord.py
 torf
 termcolor
-shortuuid
 guessit
 ffmpeg-python
 pymediainfo
