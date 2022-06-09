@@ -59,7 +59,7 @@ class Commands(commands.Cog):
         if os.path.exists(path):
             meta['path'] = os.path.abspath(path)
             try:
-                args = args + search_args
+                args = (meta['path'],) + args + search_args
                 meta, help, before_args = parser.parse(args, meta)
             except SystemExit as error:
                 await ctx.send(f"Invalid argument detected, use `{config['DISCORD']['command_prefix']}args` for list of valid args")
@@ -174,6 +174,7 @@ class Commands(commands.Cog):
             return
         prep = Prep(path=meta['path'], screens=meta['screens'], img_host=meta['imghost'], config=config) 
         try:
+            args = (meta['path'],) + args
             meta, help, before_args = parser.parse(args, meta)
         except argparse.ArgumentError as error:
             ctx.send(error)

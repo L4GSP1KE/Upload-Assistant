@@ -134,7 +134,7 @@ class Prep():
             except Exception:
                 meta['search_year'] = ""
             if meta.get('edit', False) == False:
-                mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.VOB", False, meta['uuid'], meta['base_dir'], export_text=False)
+                mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.IFO", False, meta['uuid'], meta['base_dir'], export_text=False)
                 meta['mediainfo'] = mi
             else:
                 mi = meta['mediainfo']
@@ -1333,12 +1333,13 @@ class Prep():
                         if t['@type'] != "Audio":
                             pass
                         else: 
-                            if t['Language'] == "en" and "commentary" not in t.get('Title', '').lower():
+                            audio_language = t.get('Language', '')
+                            if audio_language == "en" and "commentary" not in t.get('Title', '').lower():
                                 eng = True
-                            if t['Language'] == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
+                            if audio_language == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
                                 orig = True
-                            if t['Language'] != meta['original_language'] and t['Language'] != "en":
-                                if meta['original_language'] not in ['cn', 'cmn', 'zh'] and t['Language'] not in ['zh', 'cn', 'cmn']:
+                            if audio_language != meta['original_language'] and audio_language != "en":
+                                if meta['original_language'] not in ['cn', 'cmn', 'zh'] and audio_language not in ['zh', 'cn', 'cmn']:
                                     cprint(f"This release has a(n) {t['Language']} audio track, and may be considered bloated", 'grey', 'on_red')
                                     time.sleep(5)
                     if eng and orig == True:
