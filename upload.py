@@ -1,4 +1,5 @@
 from argparse import ArgumentParser
+from click import edit
 import requests
 from src.trackers.RF import RF
 from src.args import Args
@@ -133,6 +134,8 @@ async def do_the_thing(base_dir):
         # help.print_help()
         editargs = cli_ui.ask_string("Input args that need correction e.g.(--tag NTb --category tv --tmdb 12345)")
         editargs = (meta['path'],) + tuple(editargs.split())
+        if meta['debug']:
+            editargs = editargs + ("--debug",)
         meta, help, before_args = parser.parse(editargs, meta)
         # meta = await prep.tmdb_other_meta(meta)
         meta['edit'] = True
