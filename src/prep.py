@@ -1337,8 +1337,8 @@ class Prep():
                             if audio_language == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
                                 orig = True
                             if audio_language != meta['original_language'] and audio_language != "en":
-                                if meta['original_language'] not in ['cn', 'cmn', 'zh'] and audio_language not in ['zh', 'cn', 'cmn']:
-                                    cprint(f"This release has a(n) {t['Language']} audio track, and may be considered bloated", 'grey', 'on_red')
+                                if meta['original_language'] not in ['cn', 'cmn', 'zh'] and audio_language not in ['zh', 'cn', 'cmn', '']:
+                                    cprint(f"This release has a(n) {audio_language} audio track, and may be considered bloated", 'grey', 'on_red')
                                     time.sleep(5)
                     if eng and orig == True:
                         dual = "Dual-Audio"
