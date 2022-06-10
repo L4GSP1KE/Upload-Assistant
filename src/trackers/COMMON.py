@@ -26,16 +26,16 @@ class COMMON():
             if meta.get('discs', []) != []:
                 discs = meta['discs']
                 if discs[0]['type'] == "DVD":
-                    descfile.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]")
+                    descfile.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]\n")
                     descfile.write("\n")
                 if len(discs) >= 2:
                     for each in discs[1:]:
                         if each['type'] == "BDMV":
-                            descfile.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
+                            descfile.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]\n")
                             descfile.write("\n")
                         if each['type'] == "DVD":
                             descfile.write(f"{each['name']}:\n")
-                            descfile.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
+                            descfile.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]\n")
                             descfile.write("\n")
             desc = base
             desc = bbcode.convert_pre_to_code(desc)
