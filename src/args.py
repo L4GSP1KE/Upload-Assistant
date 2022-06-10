@@ -108,11 +108,6 @@ class Args():
                             meta['blu'] = value2
                     else:
                         meta[key] = value2
-                elif value in (True, False):
-                    if meta.get(key, False) != value:
-                        meta[key] = True
-                    else:
-                        meta[key] = value
                 else:
                     meta[key] = value
             else:
