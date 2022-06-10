@@ -40,7 +40,7 @@ try:
     import cli_ui
     import platform
     pyver = platform.python_version_tuple()
-    if int(pyver[0]) == 3 and int(pyver[1]) <= 7:
+    if int(pyver[0]) == 3 and int(pyver[1]) >= 7:
         import oxipng 
 except ModuleNotFoundError:
     print(traceback.print_exc())
