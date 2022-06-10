@@ -884,7 +884,7 @@ class Prep():
             if os.path.exists(image):
                 try:
                     oxipng.optimize(image, level=6)
-                except NameError:
+                except:
                     pass
         return
     """
