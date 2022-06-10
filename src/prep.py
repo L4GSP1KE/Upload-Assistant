@@ -132,7 +132,7 @@ class Prep():
             except Exception:
                 meta['search_year'] = ""
             if meta.get('edit', False) == False:
-                mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_1.IFO", False, meta['uuid'], meta['base_dir'], export_text=False)
+                mi = self.exportInfo(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO", False, meta['uuid'], meta['base_dir'], export_text=False)
                 meta['mediainfo'] = mi
             else:
                 mi = meta['mediainfo']
