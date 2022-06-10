@@ -1,5 +1,4 @@
 from argparse import ArgumentParser
-from click import edit
 import requests
 from src.trackers.RF import RF
 from src.args import Args
