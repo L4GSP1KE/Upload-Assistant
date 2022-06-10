@@ -39,9 +39,6 @@ try:
     import itertools
     import cli_ui
     import platform
-    pyver = platform.python_version_tuple()
-    if int(pyver[0]) == 3 and int(pyver[1]) >= 7:
-        import oxipng 
 except ModuleNotFoundError:
     print(traceback.print_exc())
     cprint('Missing Module Found. Please reinstall required dependancies.', 'grey', 'on_red')
@@ -883,6 +880,9 @@ class Prep():
         if self.config['DEFAULT'].get('optimize_images', True) == True:
             if os.path.exists(image):
                 try:
+                    pyver = platform.python_version_tuple()
+                    if int(pyver[0]) == 3 and int(pyver[1]) >= 7:
+                        import oxipng 
                     oxipng.optimize(image, level=6)
                 except:
                     pass
