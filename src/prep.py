@@ -1882,8 +1882,8 @@ class Prep():
                             'key': self.config['DEFAULT']['imgbb_api'],
                             'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
                         }
-                        response = requests.post(url, data = data)
                         try:
+                            response = requests.post(url, data = data)
                             response = response.json()
                             if response.get('success') != True:
                                 cprint(response, 'red')
@@ -1924,8 +1924,8 @@ class Prep():
                         url = "https://ptpimg.me/upload.php"
 
                         # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
-                        response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
                         try:
+                            response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
                             response = response.json()
                             ptpimg_code = response[0]['code'] 
                             ptpimg_ext = response[0]['ext'] 
