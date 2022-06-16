@@ -10,7 +10,9 @@ config = {
         "img_host_3": "imgbox",
         # "img_host_4": "",
 
+
         "screens" : "6",
+        # Enable lossless PNG Compression (True/False)
         "optimize_images" : True,
 
 
