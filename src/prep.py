@@ -1342,7 +1342,7 @@ class Prep():
                                     time.sleep(5)
                     if eng and orig == True:
                         dual = "Dual-Audio"
-                    elif eng == True and orig == False:
+                    elif eng == True and orig == False and meta['original_language'] not in ['zxx']:
                         dual = "Dubbed"
                 except Exception:
                     print(traceback.print_exc())
