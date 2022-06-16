@@ -84,7 +84,7 @@ class Args():
                     elif key == 'tmdb_manual':
                         meta['category'], meta['tmdb_manual'] = self.parse_tmdb_id(value2, meta.get('category'))
                     elif key == 'ptp':
-                        if meta[key].startswith('http'):
+                        if value2.startswith('http'):
                             parsed = urllib.parse.urlparse(value2)
                             try:
                                 meta['ptp'] = urllib.parse.parse_qs(parsed.query)['torrentid'][0]
@@ -94,7 +94,7 @@ class Args():
                         else:
                             meta['ptp'] = value2
                     elif key == 'blu':
-                        if meta[key].startswith('http'):
+                        if value2.startswith('http'):
                             parsed = urllib.parse.urlparse(value2)
                             try:
                                 blupath = parsed.path
