@@ -792,7 +792,7 @@ class Prep():
 
     def screenshots(self, path, filename, folder_id, base_dir, meta, num_screens=None):
         if num_screens == None:
-            num_screens = self.screens
+            num_screens = self.screens - len(meta.get('image_list', []))
         if num_screens == 0: 
         # or len(meta.get('image_list', [])) >= num_screens:
             return
