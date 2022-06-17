@@ -2648,7 +2648,7 @@ class Prep():
             imdb_info['type'] = info.get('kind')
             imdb_info['imdbID'] = info.get('imdbID')
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
-            imdb_info['cover'] = info.get('full-size cover url')
+            imdb_info['cover'] = info.get('cover url')
             if len(info.get('directors', [])) >= 1:
                 imdb_info['directors'] = []
                 for director in info.get('directors'):
