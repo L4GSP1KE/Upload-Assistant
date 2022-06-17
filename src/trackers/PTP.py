@@ -135,6 +135,7 @@ class PTP():
         ptp_desc = response.text
         bbcode = BBCODE()
         desc = bbcode.clean_ptp_description(ptp_desc, is_disc)
+        cprint(f"Successfully grabbed description from PTP", 'grey', 'on_green')
         return desc
     
 
@@ -615,14 +616,11 @@ class PTP():
             if os.path.exists(cookiefile):
                 with open(cookiefile, 'rb') as cf:
                     session.cookies.update(pickle.load(cf))
-                if "pasthepopcorn.me" in session.cookies.list_domains():
-                    uploadresponse = session.get("https://passthepopcorn.me/upload.php")
-                    loggedIn = await self.validate_login(uploadresponse)
+                uploadresponse = session.get("https://passthepopcorn.me/upload.php")
+                loggedIn = await self.validate_login(uploadresponse)
             if loggedIn == True:
                 AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
             else:
-                cprint("No existing / expired session found. Creating new session", 'grey', 'on_yellow')
-                session.cookies.clear()
                 passKey = re.match(r"https?://please\.passthepopcorn\.me:?\d*/(.+)/announce",self.announce_url).group(1)
                 data = {
                     "username": self.username,
