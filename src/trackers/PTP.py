@@ -618,6 +618,8 @@ class PTP():
                     session.cookies.update(pickle.load(cf))
                 uploadresponse = session.get("https://passthepopcorn.me/upload.php")
                 loggedIn = await self.validate_login(uploadresponse)
+            else:
+                cprint("PTP Cookies not found. Creating new session.", 'grey', 'on_yellow')
             if loggedIn == True:
                 AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
             else:
