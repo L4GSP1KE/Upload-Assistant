@@ -25,7 +25,7 @@ class BHD():
         self.tracker = 'BHD'
         self.source_flag = 'BHD'
         self.upload_url = 'https://beyond-hd.me/api/upload/'
-        self.signature = f"\n[center][url=https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456]Created by L4Gs Upload Assistant[/url][/center]"
+        self.signature = f"\n[center][url=https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456]Created by L4G's Upload Assistant[/url][/center]"
         pass
     
     async def upload(self, meta):
