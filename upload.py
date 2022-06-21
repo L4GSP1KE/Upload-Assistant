@@ -16,6 +16,7 @@ from src.trackers.STT import STT
 from src.trackers.HP import HP
 from src.trackers.PTP import PTP
 from src.trackers.SN import SN
+from src.trackers.ACM import ACM
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -154,8 +155,8 @@ async def do_the_thing(base_dir):
     #######  Upload to Trackers  #######
     ####################################
     common = COMMON(config=config)
-    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF']
-    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN}
+    unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM']
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM}
 
     for tracker in trackers:
         tracker = tracker.replace(" ", "").upper().strip()

@@ -24,7 +24,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -74,6 +74,11 @@ config = {
         "HP" :{
             "api_key" : "HP",
             "announce_url" : "https://hidden-palace.net/announce/customannounceurl",
+            # "anon" : "False"
+        },
+        "ACM" :{
+            "api_key" : "ACM api key",
+            "announce_url" : "https://asiancinema.me/announce/customannounceurl",
             # "anon" : "False"
         },
         "THR" : {
@@ -174,6 +179,7 @@ config = {
                 "BHD": "🎉",
                 "AITHER": "🛫",
                 "STC": "📺",
+                "ACM": "🍙",
                 "MANUAL" : "📩",
                 "UPLOAD" : "✅",
                 "CANCEL" : "🚫"

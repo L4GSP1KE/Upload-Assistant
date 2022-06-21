@@ -1049,6 +1049,7 @@ class Prep():
             else:
                 meta['original_language'] = response['original_language']
 
+            meta['original_title'] = response['original_title']
             meta['keywords'] = self.get_keywords(movie)
             meta['genres'] = self.get_genres(response)
             meta['tmdb_directors'] = self.get_directors(movie)
