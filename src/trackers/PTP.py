@@ -734,7 +734,7 @@ class PTP():
 
         return url, data
 
-    async def upload(self, groupID, meta, url, data):
+    async def upload(self, meta, url, data):
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb') as torrentFile:
             files = {
                 "file_input" : ("placeholder.torrent", torrentFile, "application/x-bittorent")
@@ -770,7 +770,8 @@ class PTP():
                 # URL format in case of successful upload: https://passthepopcorn.me/torrents.php?id=9329&torrentid=91868
                 match = re.match(r".*?passthepopcorn\.me/torrents\.php\?id=(\d+)&torrentid=(\d+)", response.url)
                 if match is None:
-                    pprint(response.text)
+                    pprint(url)
+                    pprint(data)
                     raise UploadException(f"Upload to PTP failed: result URL {response.url} ({response.status_code}) is not the expected one.")
 
         
