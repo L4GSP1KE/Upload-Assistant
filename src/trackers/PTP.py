@@ -673,6 +673,7 @@ class PTP():
             "submit": "true",
             "remaster_year": "",
             "remaster_title": self.get_remaster_title(meta), #Eg.: Hardcoded English
+            "type": self.get_type(meta['imdb_info'], meta),
             "codec": "Other", # Sending the codec as custom.
             "other_codec": self.get_codec(meta),
             "container": "Other",
@@ -717,7 +718,6 @@ class PTP():
                 "tags": tinfo.get("tags", ""),
                 "album_desc": tinfo.get("plot", meta.get("overview", "")),
                 "trailer": meta.get("youtube", ""),
-                "type": self.get_type(meta['imdb_info'], meta),
             }
             while new_data["tags"] == "":
                  if meta.get('mode', 'discord') == 'cli':
