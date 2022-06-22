@@ -288,7 +288,7 @@ async def do_the_thing(base_dir):
                         meta['imdb_info'] = await prep.get_imdb_info(meta['imdb_id'], meta)
                     if meta['upload'] == True:
                         ptpUrl, ptpData = await ptp.fill_upload_form(groupID, meta)
-                        await ptp.upload(groupID, meta, ptpUrl, ptpData)
+                        await ptp.upload(meta, ptpUrl, ptpData)
                         await asyncio.sleep(5)
                         await client.add_to_client(meta, "PTP")
                 except:
