@@ -93,28 +93,36 @@ class Clients():
             elif torrent_client == 'rtorrent':
                 torrenthash = torrenthash.upper()
             torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
+            reuse = None
             if os.path.exists(torrent_path):
                 # Reuse if disc
                 if meta.get('is_disc', None) != None:
                     cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
-                    return torrent_path
+                    reuse = torrent_path
                 torrent = Torrent.read(torrent_path)
                 # If one file, check for folder
                 if len(torrent.files) == len(meta['filelist']) == 1:
                     if str(torrent.files[0]) == os.path.basename(torrent.files[0]):
                         cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
-                        return torrent_path
+                        reuse = torrent_path
                 # Check if number of files matches number of videos
                 elif len(torrent.files) == len(meta['filelist']):
                     torrent_filepath = os.path.commonpath(torrent.files)
                     actual_filepath = os.path.commonpath(meta['filelist'])
                     if torrent_filepath in actual_filepath:
                         cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
-                        return torrent_path
+                        reuse = torrent_path
                 cprint('Unwanted Files/Folders Identified', 'grey', 'on_yellow')
                 return None
             else:
                 cprint(f'NO .torrent WITH INFOHASH {torrenthash} FOUND', 'grey', 'on_yellow')
+            if reuse != None:
+                 if os.path.exists(torrent_path):
+                    reuse_torrent = Torrent.read(torrent_path)
+                    if reuse_torrent.pieces >= 3000 and reuse_torrent.piece_size < 16777216:
+                        cprint("Too many pieces exist in current hash. REHASHING", 'grey', 'on_yellow')
+                        reuse = None
+            return reuse
         return None
 
 
