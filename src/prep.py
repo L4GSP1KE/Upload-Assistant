@@ -1569,8 +1569,7 @@ class Prep():
                 pass
 
             try:
-
-                if "Dolby Vision" in (video_track.get('HDR_Format', ''), "Dolby Vision" in video_track.get('HDR_Format_String', '')):
+                if "Dolby Vision" in video_track.get('HDR_Format', '') or "Dolby Vision" in video_track.get('HDR_Format_String', ''):
                     dv = "DV"
             except:
                 pass
