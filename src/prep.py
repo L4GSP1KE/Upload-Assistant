@@ -1332,10 +1332,16 @@ class Prep():
                             pass
                         else: 
                             audio_language = t.get('Language', '')
+                            # Check for English Language Track
                             if audio_language == "en" and "commentary" not in t.get('Title', '').lower():
                                 eng = True
+                            # Check for original Language Track
                             if audio_language == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
                                 orig = True
+                            # Catch Improperly Tagged Chinese
+                            if audio_language in ['zh', 'cn', 'cmn'] and meta['original_language'] in ['zh', 'cn', 'cmn']:
+                                orig = True
+                            # Check for additional, bloated Tracks
                             if audio_language != meta['original_language'] and audio_language != "en":
                                 if meta['original_language'] not in ['cn', 'cmn', 'zh'] and audio_language not in ['zh', 'cn', 'cmn', '']:
                                     cprint(f"This release has a(n) {audio_language} audio track, and may be considered bloated", 'grey', 'on_red')
