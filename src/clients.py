@@ -115,7 +115,7 @@ class Clients():
             if reuse != None:
                  if os.path.exists(torrent_path):
                     reuse_torrent = Torrent.read(torrent_path)
-                    if reuse_torrent.pieces >= 3000 and reuse_torrent.piece_size < 16777216:
+                    if reuse_torrent.pieces >= 4000 and reuse_torrent.piece_size < 16777216:
                         cprint("Too many pieces exist in current hash. REHASHING", 'grey', 'on_yellow')
                         reuse = None
                     else:
