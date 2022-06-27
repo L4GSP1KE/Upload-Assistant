@@ -37,6 +37,9 @@ class BBCODE:
         pass
 
     def clean_ptp_description(self, desc, is_disc):
+        # Convert Bullet Points to -
+        desc = desc.replace("&bull;", "-")
+
         # Unescape html
         desc = html.unescape(desc)
         # End my suffering
