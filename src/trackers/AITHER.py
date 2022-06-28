@@ -178,8 +178,10 @@ class AITHER():
         if meta['category'] == 'TV':
             params['name'] = f"{meta.get('season', '')}{meta.get('episode', '')}"
         if meta.get('edition', "") != "":
-            params['name'] = params['name'] + meta['edition']
-        params['name'] + meta['audio']
+            params['name'] = params['name'] + f" {meta['edition']}"
+        if meta.get('hdr', "").strip() != "":
+            params['name'] = params['name'] + f" {meta['hdr']}"
+        params['name'] + f" {meta['audio']}"
         try:
             response = requests.get(url=self.search_url, params=params)
             response = response.json()
