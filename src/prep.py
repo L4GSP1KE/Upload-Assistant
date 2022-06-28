@@ -45,7 +45,8 @@ except ModuleNotFoundError:
     cprint('pip3 install --user -U -r requirements.txt', 'grey', 'on_red')
     exit()
 
-from re import L
+
+
 from src.args import Args
 from src.exceptions import *
 from src.trackers.PTP import PTP
@@ -1338,12 +1339,13 @@ class Prep():
                             # Check for original Language Track
                             if audio_language == meta['original_language'] and "commentary" not in t.get('Title', '').lower():
                                 orig = True
-                            # Catch Improperly Tagged Chinese
-                            if audio_language in ['zh', 'cn', 'cmn'] and meta['original_language'] in ['zh', 'cn', 'cmn']:
+                            # Catch Chinese / Norwegian variants
+                            variants = ['zh', 'cn', 'cmn', 'no', 'nb']
+                            if audio_language in variants and meta['original_language'] in variants:
                                 orig = True
                             # Check for additional, bloated Tracks
                             if audio_language != meta['original_language'] and audio_language != "en":
-                                if meta['original_language'] not in ['cn', 'cmn', 'zh'] and audio_language not in ['zh', 'cn', 'cmn', '']:
+                                if meta['original_language'] not in variants and audio_language not in variants:
                                     cprint(f"This release has a(n) {audio_language} audio track, and may be considered bloated", 'grey', 'on_red')
                                     time.sleep(5)
                     if eng and orig == True:
