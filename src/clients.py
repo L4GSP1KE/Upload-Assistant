@@ -118,6 +118,9 @@ class Clients():
                     if reuse_torrent.pieces >= 5000 and reuse_torrent.piece_size < 16777216:
                         cprint("Too many pieces exist in current hash. REHASHING", 'grey', 'on_yellow')
                         reuse = None
+                    elif reuse_torrent.piece_size < 32768:
+                        cprint("Piece size too small to reuse", 'grey', 'on_yellow')
+                        reuse = None
                     else:
                         cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
             else:
