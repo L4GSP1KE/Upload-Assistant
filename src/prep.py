@@ -1716,6 +1716,7 @@ class Prep():
 
     def get_edition(self, guess, video, bdinfo, filelist):
         repack = ""
+        edition = ""
         if bdinfo != None:
             try:
                 edition = guessit(bdinfo['label'])['edition']
@@ -1735,18 +1736,16 @@ class Prep():
         if "open matte" in video.replace('.', ' ').lower():
             edition = edition + "Open Matte"
         if "REPACK" in video.upper() or "V2" in video.upper():
-            edition = ""
             repack = "REPACK"
         if "REPACK2" in video.upper() or "V3" in video.upper():
-            edition = ""
             repack = "REPACK2"
         if "REPACK3" in video.upper() or "V4" in video.upper():
-            edition = ""
             repack = "REPACK3"
         if "PROPER" in video:
-            edition = ""
             repack = "PROPER"
-        
+        if "RERIP" in video:
+            repack = "RERIP"
+        edition = re.sub("(REPACK\d?)?(RERIP)?(PROPER)?", "", edition, flags=re.IGNORECASE).strip()
         bad = ['internal', 'limited', 'retail']
 
         if edition.lower() in bad:
