@@ -489,9 +489,10 @@ class Prep():
             width_list = [3840, 2560, 1920, 1280, 1024, 854, 720, 15360, 7680, 0]
             height_list = [2160, 1440, 1080, 720, 576, 540, 480, 8640, 4320, 0]
             width = self.closest(width_list, int(width))
+            actual_height = int(height)
             height = self.closest(height_list, int(height))
             res = f"{width}x{height}{scan}"
-            resolution = self.mi_resolution(res, guess, width, scan, height)
+            resolution = self.mi_resolution(res, guess, width, scan, height, actual_height)
         return resolution
 
     def closest(self, lst, K):
@@ -509,7 +510,7 @@ class Prep():
             
         # return lst[min(range(len(lst)), key = lambda i: abs(lst[i]-K))]
 
-    def mi_resolution(self, res, guess, width, scan, height):
+    def mi_resolution(self, res, guess, width, scan, height, actual_height):
         res_map = {
             "3840x2160p" : "2160p", "2160p" : "2160p",
             "2560x1440p" : "1440p", "1440p" : "1440p",
@@ -528,7 +529,7 @@ class Prep():
             "7680x4320p" : "4320p", "4320p" : "4320p",
             "OTHER" : "OTHER"}
         resolution = res_map.get(res, None)
-        if height == 540:
+        if actual_height == 540:
             resolution = "OTHER"
         if resolution == None:
             try:     
