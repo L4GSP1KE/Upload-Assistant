@@ -709,9 +709,9 @@ class PTP():
                 tinfo = await self.get_torrent_info_tmdb(meta)
             else:
                 tinfo = await self.get_torrent_info(meta.get("imdb_id", "0"))
-            cover = meta["imdb_info"].get("cover")
+            cover = meta.get('poster')
             if cover == None:
-                cover = meta.get('poster')
+                cover = meta["imdb_info"].get("cover")
             if cover != None and "ptpimg" not in cover:
                 ptpimg_cover = await self.ptpimg_url_rehost(cover)
             new_data = {
