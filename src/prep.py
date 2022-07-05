@@ -866,7 +866,7 @@ class Prep():
                                 i += 1
                             elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox" and retake == False:
                                 i += 1
-                            elif self.img_host == "ptpimg":
+                            elif self.img_host == "ptpimg" and retake == False:
                                 i += 1
                             elif self.img_host == "freeimage.host":
                                 cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
@@ -1480,7 +1480,6 @@ class Prep():
                     source = guessit(path['source'])
                 except:
                     source = "BluRay"
-            
             if source in ("Blu-ray", "Ultra HD Blu-ray", "BluRay", "BR") or is_disc == "BDMV":
                 if type == "DISC":
                     source = "Blu-ray"
@@ -1488,7 +1487,10 @@ class Prep():
                     source = "BluRay"
             if is_disc == "DVD" or source in ("DVD", "dvd"):
                 try:
-                    mediainfo = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO")
+                    if is_disc == "DVD":
+                        mediainfo = MediaInfo.parse(f"{meta['discs'][0]['path']}/VTS_{meta['discs'][0]['main_set'][0][:2]}_0.IFO")
+                    else:
+                        mediainfo = MediaInfo.parse(video)
                     for track in mediainfo.tracks:
                         if track.track_type == "Video":
                             system = track.standard
@@ -1503,9 +1505,11 @@ class Prep():
                             system = "NTSC"
                     except:
                         system = ""
-                finally:        
+                finally:
+                    if system == None:
+                        system = ""        
                     if type == "REMUX":
-                        system = f"{system} DVD"
+                        system = f"{system} DVD".strip()
                     source = system
             if source in ("Web"):
                 if type == "ENCODE":
@@ -1518,7 +1522,7 @@ class Prep():
             if type in ("WEBDL", 'WEBRIP'):
                 source = "Web"
         except Exception:
-            # print(traceback.format_exc())
+            print(traceback.format_exc())
             source = "BluRay"
 
         return source, type
@@ -2047,7 +2051,7 @@ class Prep():
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
                 potential_missing = ['edition', 'description']
-            elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
+            elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD", "DVD"): #DVD Remux
                 name = f"{title} {alt_title} {year} {edition} {repack} {source} REMUX  {audio}" 
                 potential_missing = ['edition', 'description']
             elif type == "ENCODE": #Encode
