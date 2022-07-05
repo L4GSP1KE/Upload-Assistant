@@ -315,7 +315,7 @@ class Prep():
         else:
             meta['video_encode'], meta['video_codec'], meta['has_encode_settings'], meta['bit_depth'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
-            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), self.path, bdinfo, meta['filelist'])
+            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), self.path, bdinfo, meta['filelist'], meta['title'])
         if "REPACK" in meta.get('edition', ""):
             meta['repack'] = re.search("REPACK[\d]?", meta['edition'])[0]
             meta['edition'] = re.sub("REPACK[\d]?", "", meta['edition']).strip().replace('  ', ' ')
@@ -1718,7 +1718,7 @@ class Prep():
         return video_encode, video_codec, has_encode_settings, bit_depth
 
 
-    def get_edition(self, guess, video, bdinfo, filelist):
+    def get_edition(self, guess, video, bdinfo, filelist, title):
         repack = ""
         edition = ""
         if bdinfo != None:
@@ -1745,10 +1745,12 @@ class Prep():
             repack = "REPACK2"
         if "REPACK3" in video.upper() or "V4" in video.upper():
             repack = "REPACK3"
-        if "PROPER" in video:
+        if "PROPER" in video.upper():
             repack = "PROPER"
-        if "RERIP" in video:
+        if "RERIP" in video.upper():
             repack = "RERIP"
+        if "HYBRID" in video.upper() and "HYBRID" not in title.upper():
+            edition = "Hybrid " + edition
         edition = re.sub("(REPACK\d?)?(RERIP)?(PROPER)?", "", edition, flags=re.IGNORECASE).strip()
         bad = ['internal', 'limited', 'retail']
 
