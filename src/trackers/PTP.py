@@ -539,6 +539,7 @@ class PTP():
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
                             desc.write(base2ptp)
+                            desc.write("\n\n")
                             mi_dump = each['summary']
                         else:
                             mi_dump = each['summary']
@@ -561,6 +562,7 @@ class PTP():
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
                             desc.write(base2ptp)
+                            desc.write("\n\n")
                         else:
                             ds = multiprocessing.Process(target=prep.dvd_screenshots, args=(meta, i, 2))
                             ds.start()
@@ -572,7 +574,7 @@ class PTP():
                     if len(images) > 0: 
                         for each in range(len(images)):
                             raw_url = images[each]['raw_url']
-                            desc.write(f"[img]{raw_url}[/img]")
+                            desc.write(f"[img]{raw_url}[/img]\n\n")
                     desc.write("\n")
             # For non-discs
             elif len(meta.get('filelist', [])) >= 1:
@@ -598,11 +600,12 @@ class PTP():
                     desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
                     if i == 0:
                         base2ptp = self.convert_bbcode(base)
-                        desc.write(base2ptp)    
+                        desc.write(base2ptp)
+                        desc.write("\n\n")    
                     if len(images) > 0: 
                         for each in range(len(images)):
                             raw_url = images[each]['raw_url']
-                            desc.write(f"[img]{raw_url}[/img]")
+                            desc.write(f"[img]{raw_url}[/img]\n\n")
                     desc.write("\n")
 
         
