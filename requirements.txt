@@ -17,3 +17,4 @@ bencode.py
 unidecode
 beautifulsoup4
 pyoxipng
+rich

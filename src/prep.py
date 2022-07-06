@@ -38,6 +38,7 @@ try:
     from pprint import pprint
     import itertools
     import cli_ui
+    from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn
     import platform
 except ModuleNotFoundError:
     print(traceback.print_exc())
@@ -638,35 +639,50 @@ class Prep():
                 if bool(ffdebug) == True:
                     loglevel = 'verbose'
                     debug = False
-                while i != num_screens:
-                    image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
-                    try:
-                        (
-                            ffmpeg
-                            .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
-                            .output(image, vframes=1)
-                            .overwrite_output()
-                            .global_args('-loglevel', 'quiet')
-                            .run(quiet=True)
-                        )
-                    except Exception:
-                        print(traceback.format_exc())
-                    
-                    self.optimize_images(image)
-                    cli_ui.info_count(i, num_screens, "Screens Saved")
-                    if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                        i += 1
-                    elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                        i += 1
-                    elif os.path.getsize(Path(image)) <= 75000:
-                        cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
-                        time.sleep(1)
-                    elif self.img_host == "ptpimg":
-                        i += 1
-                    else:
-                        cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                        time.sleep(1)
-                
+                with Progress(
+                        TextColumn("[bold green]Saving Screens..."),
+                        BarColumn(),
+                        "[cyan]{task.completed}/{task.total}",
+                        TimeRemainingColumn()
+                    ) as progress:
+                    screen_task = progress.add_task("[green]Saving Screens...", total=num_screens + 1)
+                    for i in range(num_screens + 1):
+                        image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
+                        try:
+                            (
+                                ffmpeg
+                                .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
+                                .output(image, vframes=1)
+                                .overwrite_output()
+                                .global_args('-loglevel', 'quiet')
+                                .run(quiet=True)
+                            )
+                        except Exception:
+                            print(traceback.format_exc())
+                        
+                        self.optimize_images(image)
+                        if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                            i += 1
+                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                            i += 1
+                        elif os.path.getsize(Path(image)) <= 75000:
+                            cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                            time.sleep(1)
+                        elif self.img_host == "ptpimg":
+                            i += 1
+                        else:
+                            cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                            time.sleep(1)
+                    progress.advance(screen_task)
+                #remove smallest image
+                smallest = ""
+                smallestsize = 99 ** 99
+                for screens in glob.glob1(f"{base_dir}/tmp/{folder_id}/", f"{filename}-*"): 
+                    screensize = os.path.getsize(screens)
+                    if screensize < smallestsize:
+                        smallestsize = screensize
+                        smallest = screens
+                os.remove(smallest)       
         
     def dvd_screenshots(self, meta, disc_num, num_screens=None):
         if num_screens == None:
@@ -707,91 +723,105 @@ class Prep():
             i = num_screens
             cprint('Reusing screenshots', 'grey', 'on_green')
         else:
-            cprint("Saving Screens...", "grey", "on_yellow")
             if bool(meta.get('ffdebug', False)) == True:
                 loglevel = 'verbose'
                 debug = False
             looped = 0
             retake = False
-            while i != num_screens:
-                if n >= len(main_set):
-                    n = 0
-                if n >= num_screens:
-                    n -= num_screens
-                image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][disc_num]['name']}-{i}.png"
-                if not os.path.exists(image) or retake != False:
-                    retake = False
-                    loglevel = 'quiet'
-                    debug = True
-                    if bool(meta.get('debug', False)):
-                        loglevel = 'error'
-                        debug = False
-                    def _is_vob_good(n, loops, num_screens):
-                        voblength = 300
-                        vob_mi = MediaInfo.parse(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", output='JSON')
-                        vob_mi = json.loads(vob_mi)
-                        try:
-                            voblength = float(vob_mi['media']['track'][1]['Duration'])
-                            return voblength, n
-                        except Exception:
-                            try:
-                                voblength = float(vob_mi['media']['track'][2]['Duration'])
-                                return voblength, n
-                            except Exception:
-                                n += 1
-                                if n >= len(main_set):
-                                    n = 0
-                                if n >= num_screens:
-                                    n -= num_screens
-                                if loops < 6:
-                                    loops = loops + 1
-                                    voblength, n = _is_vob_good(n, loops)
+            with Progress(
+                    TextColumn("[bold green]Saving Screens..."),
+                    BarColumn(),
+                    "[cyan]{task.completed}/{task.total}",
+                    TimeRemainingColumn()
+                ) as progress:
+                    screen_task = progress.add_task("[green]Saving Screens...", total=num_screens + 1)
+                    for i in range(num_screens + 1):
+                        if n >= len(main_set):
+                            n = 0
+                        if n >= num_screens:
+                            n -= num_screens
+                        image = f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][disc_num]['name']}-{i}.png"
+                        if not os.path.exists(image) or retake != False:
+                            retake = False
+                            loglevel = 'quiet'
+                            debug = True
+                            if bool(meta.get('debug', False)):
+                                loglevel = 'error'
+                                debug = False
+                            def _is_vob_good(n, loops, num_screens):
+                                voblength = 300
+                                vob_mi = MediaInfo.parse(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", output='JSON')
+                                vob_mi = json.loads(vob_mi)
+                                try:
+                                    voblength = float(vob_mi['media']['track'][1]['Duration'])
                                     return voblength, n
+                                except Exception:
+                                    try:
+                                        voblength = float(vob_mi['media']['track'][2]['Duration'])
+                                        return voblength, n
+                                    except Exception:
+                                        n += 1
+                                        if n >= len(main_set):
+                                            n = 0
+                                        if n >= num_screens:
+                                            n -= num_screens
+                                        if loops < 6:
+                                            loops = loops + 1
+                                            voblength, n = _is_vob_good(n, loops)
+                                            return voblength, n
+                                        else:
+                                            return 300, n
+                            try:
+                                voblength, n = _is_vob_good(n, 0, num_screens)
+                                img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
+
+                                ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
+                                if w_sar != 1 or h_sar != 1:
+                                    ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
+                                (
+                                    ff
+                                    .output(image, vframes=1)
+                                    .overwrite_output()
+                                    .global_args('-loglevel', loglevel)
+                                    .run(quiet=debug)
+                                )
+                            except Exception:
+                                print(traceback.format_exc())
+                            # print(os.path.getsize(image))
+                            # print(f'{i+1}/{self.screens}')
+                            self.optimize_images(image)
+                            n += 1
+                            try: 
+                                if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
+                                    i += 1
+                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                                    i += 1
+                                elif os.path.getsize(Path(image)) <= 75000:
+                                    cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
+                                    retake = True
+                                    time.sleep(1)
+                                elif self.img_host == "ptpimg":
+                                    i += 1
                                 else:
-                                    return 300, n
-                    try:
-                        voblength, n = _is_vob_good(n, 0, num_screens)
-                        img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
-
-                        ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
-                        if w_sar != 1 or h_sar != 1:
-                            ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
-                        (
-                            ff
-                            .output(image, vframes=1)
-                            .overwrite_output()
-                            .global_args('-loglevel', loglevel)
-                            .run(quiet=debug)
-                        )
-                    except Exception:
-                        print(traceback.format_exc())
-                    # print(os.path.getsize(image))
-                    # print(f'{i+1}/{self.screens}')
-                    self.optimize_images(image)
-                    n += 1
-                    try: 
-                        if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
-                            i += 1
-                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
-                            i += 1
-                        elif os.path.getsize(Path(image)) <= 75000:
-                            cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
-                            retake = True
-                            time.sleep(1)
-                        elif self.img_host == "ptpimg":
-                            i += 1
-                        else:
-                            cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                            retake = True
-                            time.sleep(1)
-                        cli_ui.info_count(i-1, num_screens, "Screens Saved")
-                        looped = 0
-                    except Exception:
-                        if looped >= 25:
-                            cprint('Failed to take screenshots', 'grey', 'on_red')
-                            exit()
-                        looped += 1
-
+                                    cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                                    retake = True
+                                    time.sleep(1)
+                                looped = 0
+                            except Exception:
+                                if looped >= 25:
+                                    cprint('Failed to take screenshots', 'grey', 'on_red')
+                                    exit()
+                                looped += 1
+                        progress.advance(screen_task)
+            #remove smallest image
+            smallest = ""
+            smallestsize = 99**99
+            for screens in glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}/", f"{meta['discs'][disc_num]['name']}-*"): 
+                screensize = os.path.getsize(screens)
+                if screensize < smallestsize:
+                    smallestsize = screensize
+                    smallest = screens
+            os.remove(smallest)   
 
     def screenshots(self, path, filename, folder_id, base_dir, meta, num_screens=None):
         if num_screens == None:
@@ -828,7 +858,7 @@ class Prep():
             else:
                 loglevel = 'quiet'
                 debug = True
-                cprint("Saving Screens...", "grey", "on_yellow")
+                # cprint("Saving Screens...", "grey", "on_yellow")
                 if bool(meta.get('ffdebug', False)) == True:
                     loglevel = 'verbose'
                     debug = False
@@ -837,48 +867,67 @@ class Prep():
                     vs_screengn(source=path, encode=None, filter_b_frames=False, num=num_screens, dir=f"{base_dir}/tmp/{folder_id}/")
                 else:
                     retake = False
-                    while i != num_screens:
-                        image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
-                        if not os.path.exists(image) or retake != False:
-                            retake = False
-                            try:
-                                ff = ffmpeg.input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                                if w_sar != 1 or h_sar != 1:
-                                    ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
-                                (
-                                    ff
-                                    .output(image, vframes=1)
-                                    .overwrite_output()
-                                    .global_args('-loglevel', loglevel)
-                                    .run(quiet=debug)
-                                )
-                            except Exception:
-                                print(traceback.format_exc())
-                            # print(os.path.getsize(image))
-                            # print(f'{i+1}/{self.screens}')
-                            cli_ui.info_count(i, num_screens, "Screens Saved")
-                            self.optimize_images(image)
-                            if os.path.getsize(Path(image)) <= 75000:
-                                cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
-                                retake = True
-                                time.sleep(1)
-                            if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb" and retake == False:
-                                i += 1
-                            elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox" and retake == False:
-                                i += 1
-                            elif self.img_host == "ptpimg" and retake == False:
-                                i += 1
-                            elif self.img_host == "freeimage.host":
-                                cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
-                                exit()
-                            elif retake == True:
-                                pass
+                    with Progress(
+                        TextColumn("[bold green]Saving Screens..."),
+                        BarColumn(),
+                        "[cyan]{task.completed}/{task.total}",
+                        TimeRemainingColumn()
+                    ) as progress:
+                        screen_task = progress.add_task("[green]Saving Screens...", total=num_screens + 1)
+                        for i in range(num_screens + 1):
+                            image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
+                            if not os.path.exists(image) or retake != False:
+                                retake = False
+                                try:
+                                    ff = ffmpeg.input(path, ss=random.randint(round(length/5) , round(length - length/5)))
+                                    # ff = ffmpeg.input(path, ss=0)
+                                    if w_sar != 1 or h_sar != 1:
+                                        ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
+                                    (
+                                        ff
+                                        .output(image, vframes=1)
+                                        .overwrite_output()
+                                        .global_args('-loglevel', loglevel)
+                                        .run(quiet=debug)
+                                    )
+                                except Exception:
+                                    print(traceback.format_exc())
+                                # print(os.path.getsize(image))
+                                # print(f'{i+1}/{self.screens}')
+                                self.optimize_images(image)
+                                if os.path.getsize(Path(image)) <= 75000:
+                                    cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                                    retake = True
+                                    time.sleep(1)
+                                if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb" and retake == False:
+                                    i += 1
+                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox" and retake == False:
+                                    i += 1
+                                elif self.img_host == "ptpimg" and retake == False:
+                                    i += 1
+                                elif self.img_host == "freeimage.host":
+                                    cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
+                                    exit()
+                                elif retake == True:
+                                    pass
+                                else:
+                                    cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                                    retake = True
+                                    time.sleep(1) 
                             else:
-                                cprint("Image too large for your image host, retaking", 'grey', 'on_red')
-                                retake = True
-                                time.sleep(1) 
-                        else:
-                            i += 1
+                                i += 1
+                            progress.advance(screen_task)
+                    #remove smallest image
+                    smallest = ""
+                    smallestsize = 99 ** 99
+                    for screens in glob.glob1(f"{base_dir}/tmp/{folder_id}/", f"{filename}-*"): 
+                        screensize = os.path.getsize(screens)
+                        if screensize < smallestsize:
+                            smallestsize = screensize
+                            smallest = screens
+                    os.remove(smallest)       
+
+
     def optimize_images(self, image):
         if self.config['DEFAULT'].get('optimize_images', True) == True:
             if os.path.exists(image):
@@ -1858,9 +1907,9 @@ class Prep():
     Upload Screenshots
     """
     def upload_screens(self, meta, screens, img_host_num, i, total_screens, custom_img_list, return_dict):
-        if int(total_screens) != 0 or len(meta.get('image_list', [])) > total_screens:
-            if custom_img_list == []:
-                cprint('Uploading Screens', 'grey', 'on_yellow')   
+        # if int(total_screens) != 0 or len(meta.get('image_list', [])) > total_screens:
+        #     if custom_img_list == []:
+        #         cprint('Uploading Screens', 'grey', 'on_yellow')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
         if img_host != self.img_host and meta.get('imghost', None) == None:
@@ -1869,11 +1918,6 @@ class Prep():
         elif img_host_num == 1 and meta.get('imghost') != img_host:
             img_host = meta.get('imghost')
             img_host_num = 0
-
-        
-           
-        # description = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'a', newline="")
-        # description.write('[center]')
         image_list = []
         newhost_list = []
         if custom_img_list != []:
@@ -1887,95 +1931,81 @@ class Prep():
         if len(existing_images) < total_screens:
             if img_host == 'imgbox':
                 nest_asyncio.apply()
+                cprint("Uploading Screens...")
                 image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
             else:
-                for image in image_glob[-screens:]:        
-                    if img_host == "imgbb":
-                        url = "https://api.imgbb.com/1/upload"
-                        data = {
-                            'key': self.config['DEFAULT']['imgbb_api'],
-                            'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
-                        }
-                        try:
-                            response = requests.post(url, data = data)
-                            response = response.json()
-                            if response.get('success') != True:
-                                cprint(response, 'red')
-                            img_url = response['data'].get('medium', response['data']['image'])['url']
-                            web_url = response['data']['url_viewer']
-                            raw_url = response['data']['image']['url']
-                        except Exception:
-                            cprint("imgbb failed, trying next image host", 'yellow')
-                            newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
-                    elif img_host == "freeimage.host":
-                        cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
-                        print("continuing in 30 seconds")
-                        time.sleep(30)
-                    #     url = "https://freeimage.host/api/1/upload"
-                    #     data = {
-                    #         'key': '6d207e02198a847aa98d0a2a901485a5',
-                    #         'action' : 'upload',
-                    #         'source' : base64.b64encode(open(image, "rb").read()).decode('utf8'),
-                    #     }
-                    #     headers = {'content-type' : 'image/png'}
-                    #     files= {open(image, 'rb')}
-                    #     response = requests.post(url, data = data)
-                    #     try:
-                    #         response = response.json()
-                    #         img_url = response['image']['medium']['url']
-                    #         web_url = response['image']['url_viewer']
-                    #         raw_url = response['image']['url']
-                    #     except:
-                    #         cprint("freeimage.host failed, trying next image host", 'yellow')
-                        newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
-                    elif img_host == "ptpimg":
-                        payload = {
-                            'format' : 'json',
-                            'api_key' : self.config['DEFAULT']['ptpimg_api'] # API key is obtained from inspecting element on the upload page. 
-                        }
-                        files = [('file-upload[0]', open(image, 'rb'))] 
-                        headers = { 'referer': 'https://ptpimg.me/index.php'} 
-                        url = "https://ptpimg.me/upload.php"
-
-                        # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
-                        try:
-                            response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
-                            response = response.json()
-                            ptpimg_code = response[0]['code'] 
-                            ptpimg_ext = response[0]['ext'] 
-                            img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                            web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                            raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
-                        except:
-                            # print(traceback.format_exc())
-                            cprint("ptpimg failed, trying next image host", 'yellow')
+                with Progress(
+                    TextColumn("[bold green]Uploading Screens..."),
+                    BarColumn(),
+                    "[cyan]{task.completed}/{task.total}",
+                    TimeRemainingColumn()
+                ) as progress:
+                    upload_task = progress.add_task("[green]Uploading Screens...", total = len(image_glob[-screens:]))
+                    for image in image_glob[-screens:]:        
+                        if img_host == "imgbb":
+                            url = "https://api.imgbb.com/1/upload"
+                            data = {
+                                'key': self.config['DEFAULT']['imgbb_api'],
+                                'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
+                            }
+                            try:
+                                response = requests.post(url, data = data)
+                                response = response.json()
+                                if response.get('success') != True:
+                                    cprint(response, 'red')
+                                img_url = response['data'].get('medium', response['data']['image'])['url']
+                                web_url = response['data']['url_viewer']
+                                raw_url = response['data']['image']['url']
+                            except Exception:
+                                cprint("imgbb failed, trying next image host", 'yellow')
+                                newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
+                        elif img_host == "freeimage.host":
+                            cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
+                            print("continuing in 30 seconds")
+                            time.sleep(30)
                             newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
-                    else:
-                        cprint("Please choose a supported image host in your config", 'grey', 'on_red')
-                        exit()
+                        elif img_host == "ptpimg":
+                            payload = {
+                                'format' : 'json',
+                                'api_key' : self.config['DEFAULT']['ptpimg_api'] # API key is obtained from inspecting element on the upload page. 
+                            }
+                            files = [('file-upload[0]', open(image, 'rb'))] 
+                            headers = { 'referer': 'https://ptpimg.me/index.php'} 
+                            url = "https://ptpimg.me/upload.php"
+
+                            # tasks.append(asyncio.ensure_future(self.upload_image(session, url, data, headers, files=None)))
+                            try:
+                                response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload, files=files)
+                                response = response.json()
+                                ptpimg_code = response[0]['code'] 
+                                ptpimg_ext = response[0]['ext'] 
+                                img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                                web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                                raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
+                            except:
+                                # print(traceback.format_exc())
+                                cprint("ptpimg failed, trying next image host", 'yellow')
+                                newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
+                        else:
+                            cprint("Please choose a supported image host in your config", 'grey', 'on_red')
+                            exit()
 
 
-                
-                # description.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
-                # if i % 3 == 0:
-                #     description.write("\n")
-                    if len(newhost_list) >=1:
-                        image_list.extend(newhost_list)
-                    else:
-                        image_dict = {}
-                        image_dict['web_url'] = web_url
-                        image_dict['img_url'] = img_url
-                        image_dict['raw_url'] = raw_url
-                        image_list.append(image_dict)
-                        cli_ui.info_count(i, total_screens, "Uploaded")
-                        i += 1
-                    time.sleep(0.5)
-                    if i >= total_screens:
-                        break
-            # description.write("[/center]")
-            # description.write("\n")
-                
-            # description.close()
+                    
+                        if len(newhost_list) >=1:
+                            image_list.extend(newhost_list)
+                        else:
+                            image_dict = {}
+                            image_dict['web_url'] = web_url
+                            image_dict['img_url'] = img_url
+                            image_dict['raw_url'] = raw_url
+                            image_list.append(image_dict)
+                            # cli_ui.info_count(i, total_screens, "Uploaded")
+                            progress.advance(upload_task)
+                            i += 1
+                        time.sleep(0.5)
+                        if i >= total_screens:
+                            break
             return_dict['image_list'] = image_list
             return image_list, i
         else:
