@@ -85,6 +85,7 @@ class THR():
         else:
             thr_upload_prompt = cli_ui.ask_yes_no("send to takeupload.php?", default=False)
         if thr_upload_prompt == True:
+            await asyncio.sleep(0.5)
             response = session.post(url=url, files=files, data=payload, headers=headers)
             try:
                 if meta['debug']:
