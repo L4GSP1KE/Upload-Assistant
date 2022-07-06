@@ -658,7 +658,7 @@ class Prep():
                         i += 1
                     elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                         i += 1
-                    elif os.path.getsize(Path(image)) <= 15000:
+                    elif os.path.getsize(Path(image)) <= 75000:
                         cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                         time.sleep(1)
                     elif self.img_host == "ptpimg":
@@ -774,7 +774,7 @@ class Prep():
                             i += 1
                         elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                             i += 1
-                        elif os.path.getsize(Path(image)) <= 15000:
+                        elif os.path.getsize(Path(image)) <= 75000:
                             cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
                             retake = True
                             time.sleep(1)
@@ -858,7 +858,7 @@ class Prep():
                             # print(f'{i+1}/{self.screens}')
                             cli_ui.info_count(i, num_screens, "Screens Saved")
                             self.optimize_images(image)
-                            if os.path.getsize(Path(image)) <= 15000:
+                            if os.path.getsize(Path(image)) <= 75000:
                                 cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
                                 retake = True
                                 time.sleep(1)
