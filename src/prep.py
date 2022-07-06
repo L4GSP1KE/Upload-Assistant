@@ -849,7 +849,6 @@ class Prep():
                 sar = w_sar = par 
                 h_sar = 1
             length = round(float(length))
-            # for i in range(screens):
             os.chdir(f"{base_dir}/tmp/{folder_id}")
             i = 0
             if len(glob.glob(f"{filename}-*.png")) >= num_screens:
@@ -880,7 +879,6 @@ class Prep():
                                 retake = False
                                 try:
                                     ff = ffmpeg.input(path, ss=random.randint(round(length/5) , round(length - length/5)))
-                                    # ff = ffmpeg.input(path, ss=0)
                                     if w_sar != 1 or h_sar != 1:
                                         ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                     (
@@ -1101,7 +1099,7 @@ class Prep():
             else:
                 meta['original_language'] = response['original_language']
 
-            meta['original_title'] = response['original_title']
+            meta['original_title'] = response.get('original_title', meta['title'])
             meta['keywords'] = self.get_keywords(movie)
             meta['genres'] = self.get_genres(response)
             meta['tmdb_directors'] = self.get_directors(movie)
@@ -1145,6 +1143,7 @@ class Prep():
                 meta['original_language'] = original_language
             else:
                 meta['original_language'] = response['original_language']
+            meta['original_title'] = response.get('original_name', meta['title'])
             meta['keywords'] = self.get_keywords(tv)
             meta['genres'] = self.get_genres(response)
             meta['tmdb_directors'] = self.get_directors(tv)
