@@ -574,7 +574,7 @@ class PTP():
                     if len(images) > 0: 
                         for each in range(len(images)):
                             raw_url = images[each]['raw_url']
-                            desc.write(f"[img]{raw_url}[/img]\n\n")
+                            desc.write(f"[img]{raw_url}[/img]\n")
                     desc.write("\n")
             # For non-discs
             elif len(meta.get('filelist', [])) >= 1:
@@ -605,7 +605,7 @@ class PTP():
                     if len(images) > 0: 
                         for each in range(len(images)):
                             raw_url = images[each]['raw_url']
-                            desc.write(f"[img]{raw_url}[/img]\n\n")
+                            desc.write(f"[img]{raw_url}[/img]\n")
                     desc.write("\n")
 
         
