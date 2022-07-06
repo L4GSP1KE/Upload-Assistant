@@ -1,0 +1,345 @@
+# -*- coding: utf-8 -*-
+# import discord
+import asyncio
+from torf import Torrent
+import requests
+from termcolor import cprint
+import distutils.util
+from pprint import pprint
+import os
+
+from src.trackers.COMMON import COMMON
+
+# from pprint import pprint
+
+class ACM():
+    """
+    Edit for Tracker:
+        Edit BASE.torrent with announce and source
+        Check for duplicates
+        Set type/category IDs
+        Upload
+    """
+
+    ###############################################################
+    ########                    EDIT ME                    ########
+    ###############################################################
+
+    # ALSO EDIT CLASS NAME ABOVE
+
+    def __init__(self, config):
+        self.config = config
+        self.tracker = 'ACM'
+        self.source_flag = 'AsianCinema'
+        self.upload_url = 'https://asiancinema.me/api/torrents/upload'
+        self.search_url = 'https://asiancinema.me/api/torrents/filter'
+        self.signature = None
+        pass
+    
+    async def get_cat_id(self, category_name):
+        category_id = {
+            'MOVIE': '1', 
+            'TV': '2', 
+            }.get(category_name, '0')
+        return category_id
+
+    async def get_type (self, meta):
+        if meta['is_disc'] == "BDMV":
+            bdinfo = meta['bdinfo']
+            bd_sizes = [25, 50, 66, 100]
+            for each in bd_sizes:
+                if bdinfo['size'] < each:
+                    bd_size = each
+                    break
+            if meta['uhd'] == "UHD" and bd_size != 25:
+                type_string = f"UHD {bd_size}"
+            else:
+                type_string = f"BD {bd_size}"
+            # if type_id not in ['UHD 100', 'UHD 66', 'UHD 50', 'BD 50', 'BD 25']:
+            #     type_id = "Other"
+        elif meta['is_disc'] == "DVD":
+            if "DVD5" in meta['dvd_size']:
+                type_string = "DVD 5"
+            elif "DVD9" in meta['dvd_size']:
+                type_string = "DVD 9"    
+        else:
+            if meta['type'] == "REMUX":
+                if meta['source'] == "BluRay":
+                    type_string = "REMUX"
+                if meta['uhd'] == "UHD":
+                    type_string = "UHD REMUX"
+            else:
+                type_string = meta['type']
+            # else:
+            #     acceptable_res = ["2160p", "1080p", "1080i", "720p", "576p", "576i", "540p", "480p", "Other"]
+            #     if meta['resolution'] in acceptable_res:
+            #         type_id = meta['resolution']
+            #     else:   
+            #         type_id = "Other"
+        return type_string
+
+    async def get_type_id(self, type):
+        type_id = {
+            'UHD 100': '1',  
+            'UHD 66': '2',
+            'UHD 50': '3',
+            'UHD REMUX': '12',
+            'BD 50': '4',
+            'BD 25': '5',   
+            'DVD 5': '14',
+            'REMUX': '7',
+            'WEBDL': '9',
+            'SDTV': '13',
+            'DVD 9': '16',
+            'HDTV': '17'
+            }.get(type, '0')
+        return type_id
+
+    async def get_res_id(self, resolution):
+        resolution_id = {
+            '2160p': '1', 
+            '1080p': '2',
+            '1080i':'2', 
+            '720p': '3',  
+            '576p': '4', 
+            '576i': '4',
+            '480p': '5', 
+            '480i': '5'
+            }.get(resolution, '10')
+        return resolution_id    
+
+    #ACM rejects uploads with more that 4 keywords
+    async def get_keywords(self, keywords):
+        if keywords !='':
+            keywords_list = keywords.split(',')
+            if len(keywords_list) > 4:      
+                keywords_list = keywords_list[0:4]
+                keywords = ','.join([keyword for keyword in keywords_list])
+        return keywords
+
+    def get_subtitles(self, meta):
+        sub_lang_map = {
+            ("Arabic", "ara", "ar") : 'Ara',
+            ("Brazilian Portuguese", "Brazilian", "Portuguese-BR", 'pt-br') : 'Por-BR',
+            ("Bulgarian", "bul", "bg") : 'Bul',
+            ("Chinese", "chi", "zh", "Chinese (Simplified)", "Chinese (Traditional)") : 'Chi',
+            ("Croatian", "hrv", "hr", "scr") : 'Cro',
+            ("Czech", "cze", "cz", "cs") : 'Cze',
+            ("Danish", "dan", "da") : 'Dan',
+            ("Dutch", "dut", "nl") : 'Dut',
+            ("English", "eng", "en", "English (CC)", "English - SDH") : 'Eng',
+            ("English - Forced", "English (Forced)", "en (Forced)") : 'Eng',
+            ("English Intertitles", "English (Intertitles)", "English - Intertitles", "en (Intertitles)") : 'Eng',
+            ("Estonian", "est", "et") : 'Est',
+            ("Finnish", "fin", "fi") : 'Fin',
+            ("French", "fre", "fr") : 'Fre',
+            ("German", "ger", "de") : 'Ger',
+            ("Greek", "gre", "el") : 'Gre',
+            ("Hebrew", "heb", "he") : 'Heb',
+            ("Hindi" "hin", "hi") : 'Hin',
+            ("Hungarian", "hun", "hu") : 'Hun',
+            ("Icelandic", "ice", "is") : 'Ice',
+            ("Indonesian", "ind", "id") : 'Ind',
+            ("Italian", "ita", "it") : 'Ita',
+            ("Japanese", "jpn", "ja") : 'Jpn',
+            ("Korean", "kor", "ko") : 'Kor',
+            ("Latvian", "lav", "lv") : 'Lav',
+            ("Lithuanian", "lit", "lt") : 'Lit',
+            ("Norwegian", "nor", "no") : 'Nor',
+            ("Persian", "fa", "far") : 'Per',
+            ("Polish", "pol", "pl") : 'Pol',
+            ("Portuguese", "por", "pt") : 'Por',
+            ("Romanian", "rum", "ro") : 'Rom',
+            ("Russian", "rus", "ru") : 'Rus',
+            ("Serbian", "srp", "sr", "scc") : 'Ser',
+            ("Slovak", "slo", "sk") : 'Slo',
+            ("Slovenian", "slv", "sl") : 'Slv',
+            ("Spanish", "spa", "es") : 'Spa',
+            ("Swedish", "swe", "sv") : 'Swe',
+            ("Thai", "tha", "th") : 'Tha',
+            ("Turkish", "tur", "tr") : 'Tur',
+            ("Ukrainian", "ukr", "uk") : 'Ukr',
+            ("Vietnamese", "vie", "vi") : 'Vie',
+        }
+
+        sub_langs = []
+        if meta.get('is_disc', '') != 'BDMV':
+            mi = meta['mediainfo']
+            for track in mi['media']['track']:
+                if track['@type'] == "Text":
+                    language = track.get('Language')
+                    if language == "en":
+                        if track.get('Forced', "") == "Yes":
+                            language = "en (Forced)"
+                        if "intertitles" in track.get('Title', "").lower():
+                            language = "en (Intertitles)"
+                    for lang, subID in sub_lang_map.items():
+                        if language in lang and subID not in sub_langs:
+                            sub_langs.append(subID)
+        else:
+            for language in meta['bdinfo']['subtitles']:
+                for lang, subID in sub_lang_map.items():
+                    if language in lang and subID not in sub_langs:
+                        sub_langs.append(subID)
+        
+        # if sub_langs == []: 
+        #     sub_langs = [44] # No Subtitle
+        return sub_langs
+
+    def get_subs_tag(self, subs):   
+        if subs == []:
+            return ' [No subs]'
+        elif 'Eng' in subs:
+            return ''
+        elif len(subs) > 1:
+            return ' [No Eng subs]'
+        return f" [{subs[0]} subs only]"
+
+    ###############################################################
+    ######   STOP HERE UNLESS EXTRA MODIFICATION IS NEEDED   ######
+    ###############################################################
+
+    async def upload(self, meta):
+        common = COMMON(config=self.config)
+        await common.edit_torrent(meta, self.tracker, self.source_flag)
+        cat_id = await self.get_cat_id(meta['category'])
+        type_id = await self.get_type_id(await self.get_type(meta))
+        resolution_id = await self.get_res_id(meta['resolution'])
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
+        region_id = await common.unit3d_region_ids(meta.get('region'))
+        distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
+        acm_name = await self.edit_name(meta)
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:
+            anon = 0
+        else:
+            anon = 1
+
+        if meta['bdinfo'] != None:
+            mi_dump = None
+            bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
+        else:   
+            mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
+            bd_dump = None
+        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
+        open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
+        files = {'torrent': open_torrent}
+        data = {
+            'name' : acm_name,
+            'description' : desc,
+            'mediainfo' : mi_dump,
+            'bdinfo' : bd_dump, 
+            'category_id' : cat_id,
+            'type_id' : type_id,
+            'resolution_id' : resolution_id,
+            'tmdb' : meta['tmdb'],
+            'imdb' : meta['imdb_id'].replace('tt', ''),
+            'tvdb' : meta['tvdb_id'],
+            'mal' : meta['mal_id'],
+            'igdb' : 0,
+            'anonymous' : anon,
+            'stream' : meta['stream'],
+            'sd' : meta['sd'],
+            'keywords' : await self.get_keywords(meta['keywords']),
+            'personal_release' : int(meta.get('personalrelease', False)),
+            'internal' : 0,
+            'featured' : 0,
+            'free' : 0,
+            'doubleup' : 0,
+            'sticky' : 0,
+        }
+        if region_id != 0:
+            data['region_id'] = region_id
+        if distributor_id != 0:
+            data['distributor_id'] = distributor_id
+        if meta.get('category') == "TV":
+            data['season_number'] = meta.get('season_int', '0')
+            data['episode_number'] = meta.get('episode_int', '0')
+        headers = {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+        }
+        params = {
+            'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip()
+        }
+        
+        if meta['debug'] == False:
+            response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
+            try:
+                print(response.json())
+            except:
+                cprint("It may have uploaded, go check")
+                return 
+        else:
+            cprint(f"Request Data:", 'cyan')
+            pprint(data)
+        open_torrent.close()
+
+
+   
+
+
+    async def search_existing(self, meta):
+        dupes = []
+        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        params = {
+            'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
+            'tmdb' : meta['tmdb'],
+            'categories[]' : await self.get_cat_id(meta['category']),
+            'types[]' : await self.get_type_id(await self.get_type(meta)),
+            # A majority of the ACM library doesn't contain resolution information
+            # 'resolutions[]' : await self.get_res_id(meta['resolution']),
+            'name' : ""
+        }
+        if meta['category'] == 'TV':
+            params['name'] = params['name'] + f"{meta.get('season', '')}{meta.get('episode', '')}"
+        if meta.get('edition', "") != "":
+            params['name'] = params['name'] + meta['edition']
+        params['name'] + meta['audio']
+        try:
+            response = requests.get(url=self.search_url, params=params)
+            response = response.json()
+            for each in response['data']:
+                result = [each][0]['attributes']['name']
+                # difference = SequenceMatcher(None, meta['clean_name'], result).ratio()
+                # if difference >= 0.05:
+                dupes.append(result)
+        except:
+            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            await asyncio.sleep(5)
+
+        return dupes
+
+    async def fix_rtl(self, meta):
+        original_title = meta.get('original_title')
+        right_to_left_languages: ["Arabic", "Aramaic", "Azeri", "Divehi", "Fula", "Hebrew", "Kurdish", "N'ko", "Persian", "Rohingya", "Syriac", "Urdu"]
+        if meta.get('original_language') in right_to_left_languages:
+            return f' / {original_title} {chr(int("202A", 16))}'
+        return original_title
+
+    async def edit_name(self, meta):
+        name = meta.get('name')
+        aka = meta.get('aka')
+        original_title = meta.get('original_title')
+        year = str(meta.get('year'))
+        audio = meta.get('audio')
+        source = meta.get('source')
+        is_disc = meta.get('is_disc')
+        subs = self.get_subtitles(meta)
+        if aka != '':
+            # ugly fix to remove the extra space in the title
+            aka = aka + ' '
+            name = name.replace (aka, f' / {original_title} {chr(int("202A", 16))}')
+        elif aka == '':
+            if meta.get('title') != original_title:
+                name = f'{name[:name.find(year)]}/ {original_title} {chr(int("202A", 16))}{name[name.find(year):]}'
+        if 'AAC' in audio:
+            name = name.replace(audio.strip().replace("  ", " "), audio.replace(" ", ""))
+        name = name.replace("DD+ ", "DD+")
+        name = name.replace ("BluRay REMUX", "Remux")
+        name = name.replace ("UHD BluRay REMUX", "Remux")
+        name = name.replace ("H.265", "HEVC")
+        if is_disc == 'DVD':
+            name = name.replace (f'{source} DVD5', f'DVD {source}')
+            name = name.replace (f'{source} DVD9', f'DVD {source}')
+
+        name = name + self.get_subs_tag(subs)
+        return name
