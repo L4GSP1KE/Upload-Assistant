@@ -5,13 +5,17 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
 ## What It Can Do:
   - Generates and Parses MediaInfo/BDInfo.
   - Generates and Uploads screenshots.
+  - Uses srrdb to fix scene filenames
+  - Can grab descriptions from PTP (automatically on filename match or arg) / BLU (arg)
   - Obtains TMDb/IMDb/MAL identifiers.
+  - Converts absolute to season episode numbering for Anime
   - Generates custom .torrents without useless top level folders/nfos.
-  - Generates proper name for your sites.
+  - Can re-use existing torrents instead of hashing new
+  - Generates proper name for your upload using Mediainfo/BDInfo and TMDb/IMDb conforming to site rules
+  - Checks for existing releases already on site
   - Uploads to BLU/BHD/Aither/THR/STC/R4E(limited)/STT/HP/ACM
-  - Adds to your client, seeding instantly
+  - Adds to your client with fast resume, seeding instantly (rtorrent/qbittorrent/deluge/watch folder)
   - ALL WITH MINIMAL INPUT!
-
   - Currently works with .mkv/.mp4/Blu-ray/DVD/HD-DVDs
 
 
