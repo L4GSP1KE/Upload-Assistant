@@ -88,7 +88,7 @@ class Clients():
                 torrenthash = meta['torrenthash']
             elif meta.get('ext_torrenthash', None) != None:
                 torrenthash = meta['ext_torrenthash']
-            if torrent_client == 'qbit':
+            if torrent_client in ('qbit', 'deluge'):
                 torrenthash = torrenthash.lower()
             elif torrent_client == 'rtorrent':
                 torrenthash = torrenthash.upper()
