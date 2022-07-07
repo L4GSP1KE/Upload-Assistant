@@ -9,10 +9,10 @@ from termcolor import cprint
 # Strikethrough - KEEP
 # Color - KEEP
 # URL - KEEP
-# QUOTE - KEEP
 # PARSING - Probably not exist in uploads
 # Spoiler - KEEP
 
+# QUOTE - CONVERT to CODE
 # PRE - CONVERT to CODE
 # Hide - CONVERT to SPOILER
 # COMPARISON - CONVERT
@@ -70,6 +70,9 @@ class BBCODE:
             return ""
 
 
+        # Convert Quote tags:
+        desc = re.sub("\[quote.*?\]", "[code]", desc)
+        desc = desc.replace("[/quote]", "[/code]")
        
         # Remove Alignments:
         desc = re.sub("\[align=.*?\]", "", desc)
