@@ -1569,7 +1569,7 @@ class Prep():
             if source in ("HD-DVD", "HD DVD", "HDDVD"):
                 if is_disc == "HDDVD":
                     source = "HD DVD"
-                if type == "ENCODE":
+                if type in ("ENCODE", "REMUX"):
                     source = "HDDVD"
             if type in ("WEBDL", 'WEBRIP'):
                 source = "Web"
@@ -2112,7 +2112,7 @@ class Prep():
                 elif meta['is_disc'] == 'HDDVD':
                     name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
-            elif type == "REMUX" and source == "BluRay": #BluRay Remux
+            elif type == "REMUX" and source in ("BluRay", "HDDVD"): #BluRay Remux
                 name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
