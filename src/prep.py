@@ -306,7 +306,7 @@ class Prep():
         meta['3D'] = self.is_3d(mi, bdinfo)
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):
-            meta['service'] = self.get_service(video)
+            meta['service'], meta['service_longname'] = self.get_service(video)
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
         meta['hdr'] = self.get_hdr(mi, bdinfo)
         meta['distributor'] = self.get_distributor(meta['distributor'])
@@ -2408,7 +2408,13 @@ class Prep():
                 service = value
             elif key == service:
                 service = value
-        return service
+        service_longname = service
+        for key, value in services.items():
+            if value == service and len(key) > len(service_longname):
+                service_longname = key
+        if service_longname == "Amazon Prime":
+            service_longname = "Amazon"
+        return service, service_longname
 
 
 
@@ -2485,7 +2491,13 @@ class Prep():
                     description.write(meta['blu_desc'])
                     meta['description'] = 'BLU'
 
-            
+            if meta.get('desc_template', None) != None:
+                from jinja2 import Template
+                with open(f"{meta['base_dir']}/data/templates/{meta['desc_template']}.txt", 'r') as f:
+                    desc_templater = Template(f.read())
+                    description.write(desc_templater.render(meta))
+                    description.write("\n\n")
+
             if meta['nfo'] != False:
                 description.write("[code]")
                 nfo = glob.glob("*.nfo")[0]
@@ -2535,6 +2547,8 @@ class Prep():
                             pass
                     elif key == 'personalrelease':
                         meta[key] = bool(distutils.util.strtobool(value.get(key, 'False')))
+                    elif key == 'template':
+                        meta['desc_template'] = value.get(key)
                     else:
                         meta[key] = value.get(key)
                 # print(f"Tag: {meta['tag']} | Key: {key} | Value: {meta[key]}"
