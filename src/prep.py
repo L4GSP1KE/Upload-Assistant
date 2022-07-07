@@ -2083,7 +2083,7 @@ class Prep():
                 elif meta['is_disc'] == 'HDDVD':
                     name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
-            elif type == "REMUX" and source == "BluRay": #BluRay Remux
+            elif type == "REMUX" and source in ("BluRay", "HDDVD"): #BluRay/HDDVD Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
                 potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD", "DVD"): #DVD Remux
