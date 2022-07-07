@@ -24,7 +24,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -79,7 +79,11 @@ config = {
         "ACM" :{
             "api_key" : "ACM api key",
             "announce_url" : "https://asiancinema.me/announce/customannounceurl",
-            # "anon" : "False"
+            # "anon" : "False",
+
+            # FOR INTERNAL USE ONLY:
+            # "internal" : True,
+            # "interal_groups" : ["What", "Internal", "Groups", "Are", "You", "In"],
         },
         "THR" : {
             "username" : "username",
