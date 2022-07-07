@@ -16,6 +16,9 @@
     },
     "NanDesuKa" : {
         "in_name" : "NanDesuKa"
+    },
+    "ARiN" : {
+        "template" : "WEBDL"
     }
 
 }
