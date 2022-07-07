@@ -170,6 +170,8 @@ class BHD():
                     type_id = "DVD Remux"
                 if meta['uhd'] == "UHD":
                     type_id = "UHD Remux"
+                if meta['source'] == "HDDVD":
+                    type_id = "Other"
             else:
                 acceptable_res = ["2160p", "1080p", "1080i", "720p", "576p", "576i", "540p", "480p", "Other"]
                 if meta['resolution'] in acceptable_res:
