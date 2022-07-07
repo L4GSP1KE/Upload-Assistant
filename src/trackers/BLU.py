@@ -35,7 +35,7 @@ class BLU():
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
         await common.unit3d_edit_desc(meta, self.tracker, self.signature)
-        cat_id = await self.get_cat_id(meta['category'])
+        cat_id = await self.get_cat_id(meta['category'], meta.get('edition', ''))
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
         region_id = await common.unit3d_region_ids(meta.get('region'))
@@ -111,12 +111,14 @@ class BLU():
 
 
 
-    async def get_cat_id(self, category_name):
+    async def get_cat_id(self, category_name, edition):
         category_id = {
             'MOVIE': '1', 
             'TV': '2', 
             'FANRES': '3'
             }.get(category_name, '0')
+        if category_name == 'MOVIE' and 'FANRES' in edition:
+            category_id = '3'
         return category_id
 
     async def get_type_id(self, type):
