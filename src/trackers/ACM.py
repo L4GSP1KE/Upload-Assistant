@@ -287,13 +287,14 @@ class ACM():
             'types[]' : await self.get_type_id(await self.get_type(meta)),
             # A majority of the ACM library doesn't contain resolution information
             # 'resolutions[]' : await self.get_res_id(meta['resolution']),
-            'name' : ""
+            # 'name' : ""
         }
-        if meta['category'] == 'TV':
-            params['name'] = params['name'] + f"{meta.get('season', '')}{meta.get('episode', '')}"
-        if meta.get('edition', "") != "":
-            params['name'] = params['name'] + meta['edition']
-        params['name'] + meta['audio']
+        # Adding Name to search seems to override tmdb
+        # if meta['category'] == 'TV':
+        #     params['name'] = params['name'] + f"{meta.get('season', '')}{meta.get('episode', '')}"
+        # if meta.get('edition', "") != "":
+        #     params['name'] = params['name'] + meta['edition']
+        # params['name'] + meta['audio']
         try:
             response = requests.get(url=self.search_url, params=params)
             response = response.json()
@@ -308,12 +309,12 @@ class ACM():
 
         return dupes
 
-    async def fix_rtl(self, meta):
-        original_title = meta.get('original_title')
-        right_to_left_languages: ["Arabic", "Aramaic", "Azeri", "Divehi", "Fula", "Hebrew", "Kurdish", "N'ko", "Persian", "Rohingya", "Syriac", "Urdu"]
-        if meta.get('original_language') in right_to_left_languages:
-            return f' / {original_title} {chr(int("202A", 16))}'
-        return original_title
+    # async def fix_rtl(self, meta):
+    #     original_title = meta.get('original_title')
+    #     right_to_left_languages: ["Arabic", "Aramaic", "Azeri", "Divehi", "Fula", "Hebrew", "Kurdish", "N'ko", "Persian", "Rohingya", "Syriac", "Urdu"]
+    #     if meta.get('original_language') in right_to_left_languages:
+    #         return f' / {original_title} {chr(int("202A", 16))}'
+    #     return original_title
 
     async def edit_name(self, meta):
         name = meta.get('name')
