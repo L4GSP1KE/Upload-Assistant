@@ -18,3 +18,4 @@ unidecode
 beautifulsoup4
 pyoxipng
 rich
+jinja2
