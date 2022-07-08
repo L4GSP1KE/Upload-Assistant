@@ -215,8 +215,8 @@ class ACM():
             anon = 1
 
         if meta['bdinfo'] != None:
-            mi_dump = None
             # bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
+            mi_dump = None
             bd_dump = ""
             for each in meta['discs']:
                 bd_dump = bd_dump + each['summary'] + "\n\n"
