@@ -205,7 +205,7 @@ class ACM():
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(await self.get_type(meta))
         resolution_id = await self.get_res_id(meta['resolution'])
-        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
+        await self.edit_desc(meta)
         region_id = await common.unit3d_region_ids(meta.get('region'))
         distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
         acm_name = await self.edit_name(meta)
@@ -216,7 +216,10 @@ class ACM():
 
         if meta['bdinfo'] != None:
             mi_dump = None
-            bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
+            # bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
+            bd_dump = ""
+            for each in meta['discs']:
+                bd_dump = bd_dump + each['summary'] + "\n\n"
         else:   
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
             bd_dump = None
@@ -348,3 +351,44 @@ class ACM():
 
         name = name + self.get_subs_tag(subs)
         return name
+
+
+
+    async def edit_desc(self, meta):
+        base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
+            from src.bbcode import BBCODE()
+            bbcode = BBCODE()
+            if meta.get('discs', []) != []:
+                discs = meta['discs']
+                if discs[0]['type'] == "DVD":
+                    descfile.write(f"[spoiler=VOB MediaInfo][code]{discs[0]['vob_mi']}[/code][/spoiler]\n")
+                    descfile.write("\n")
+                if len(discs) >= 2:
+                    for each in discs[1:]:
+                        if each['type'] == "BDMV":
+                            # descfile.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]\n")
+                            # descfile.write("\n")
+                            pass
+                        if each['type'] == "DVD":
+                            descfile.write(f"{each['name']}:\n")
+                            descfile.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]\n")
+                            descfile.write("\n")
+            desc = base
+            desc = bbcode.convert_pre_to_code(desc)
+            desc = bbcode.convert_hide_to_spoiler(desc)
+            desc = bbcode.convert_comparison_to_collapse(desc, 1000)
+            desc = desc.replace('[img]', '[img=300]')
+            descfile.write(desc)
+            images = meta['image_list']
+            if len(images) > 0: 
+                descfile.write("[center]")
+                for each in range(len(images)):
+                    web_url = images[each]['web_url']
+                    img_url = images[each]['img_url']
+                    descfile.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
+                descfile.write("[/center]")
+            if self.signature != None:
+                descfile.write(self.signature)
+            descfile.close()
+        return 
