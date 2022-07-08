@@ -80,8 +80,8 @@ class Clients():
             return None
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_storage_dir = client.get('torrent_storage_dir', None)
-        torrent_client = client.get('torrent_client', None)
-        if torrent_storage_dir == None:
+        torrent_client = client.get('torrent_client', None).lower()
+        if torrent_storage_dir == None and torrent_client != "watch":
             cprint(f'Missing torrent_storage_dir for {default_torrent_client}', 'grey', 'on_red')
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:

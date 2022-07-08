@@ -1961,11 +1961,13 @@ class Prep():
                                 raw_url = response['data']['image']['url']
                             except Exception:
                                 cprint("imgbb failed, trying next image host", 'yellow')
+                                progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "freeimage.host":
                             cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
                             print("continuing in 30 seconds")
                             time.sleep(30)
+                            progress.stop()
                             newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "ptpimg":
                             payload = {
@@ -1988,6 +1990,7 @@ class Prep():
                             except:
                                 # print(traceback.format_exc())
                                 cprint("ptpimg failed, trying next image host", 'yellow')
+                                progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                         else:
                             cprint("Please choose a supported image host in your config", 'grey', 'on_red')
