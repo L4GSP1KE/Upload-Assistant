@@ -112,7 +112,7 @@ class ACM():
     async def get_keywords(self, keywords):
         if keywords !='':
             keywords_list = keywords.split(',')   
-            keywords_list = [keyword for keyword in keywords_list][:4]
+            keywords_list = [keyword for keyword in keywords_list if " " not in keyword][:4]
             keywords = ', '.join( keywords_list) 
         return keywords
 
