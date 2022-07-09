@@ -111,10 +111,9 @@ class ACM():
     #ACM rejects uploads with more that 4 keywords
     async def get_keywords(self, keywords):
         if keywords !='':
-            keywords_list = keywords.split(',')
-            if len(keywords_list) > 4:      
-                keywords_list = keywords_list[0:4]
-                keywords = ','.join([keyword for keyword in keywords_list])
+            keywords_list = keywords.split(',')   
+            keywords_list = [keyword for keyword in keywords_list][:4]
+            keywords = ', '.join( keywords_list) 
         return keywords
 
     def get_subtitles(self, meta):
