@@ -26,7 +26,7 @@ class AITHER():
         self.source_flag = 'Aither'
         self.search_url = 'https://aither.cc/api/torrents/filter'
         self.upload_url = 'https://aither.cc/api/torrents/upload'
-        self.signature = f"\n[center][url=https://aither.cc/forums/topics/1349]Created by L4Gs Upload Assistant[/url][/center]"
+        self.signature = f"\n[center][url=https://aither.cc/forums/topics/1349]Created by L4G's Upload Assistant[/url][/center]"
         pass
     
     async def upload(self, meta):
