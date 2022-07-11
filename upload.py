@@ -309,13 +309,13 @@ def get_confirmation(meta):
     cli_ui.info(f"Overview: {meta['overview']}")
     print()
     cli_ui.info(f"Category: {meta['category']}")
-    if meta.get('tmdb', 0) != 0:
+    if int(meta.get('tmdb', 0)) != 0:
         cli_ui.info(f"TMDB: https://www.themoviedb.org/{meta['category'].lower()}/{meta['tmdb']}")
-    if meta.get('imdb_id', '0') != '0':
+    if int(meta.get('imdb_id', '0')) != 0:
         cli_ui.info(f"IMDB: https://www.imdb.com/title/tt{meta['imdb_id']}")
-    if meta.get('tvdb_id', '0') != '0':
+    if int(meta.get('tvdb_id', '0')) != 0:
         cli_ui.info(f"TVDB: https://www.thetvdb.com/?id={meta['tvdb_id']}&tab=series")
-    if meta.get('mal_id', 0) != 0:
+    if int(meta.get('mal_id', 0)) != 0:
         cli_ui.info(f"MAL : https://myanimelist.net/anime/{meta['mal_id']}")
     print()
     if meta['tag'] == "":

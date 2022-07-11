@@ -48,6 +48,7 @@ except ModuleNotFoundError:
 
 
 
+import imdb
 from src.args import Args
 from src.exceptions import *
 from src.trackers.PTP import PTP
@@ -289,7 +290,17 @@ class Prep():
             meta = await self.get_tmdb_from_imdb(meta, filename)
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
-        meta = await self.tmdb_other_meta(meta)
+
+        # If no imdb, search for it
+        if meta.get('imdb_id', None) == None:
+            meta['imdb_id'] = await self.search_imdb(filename, meta['search_year'])
+        # Search tvmaze
+        meta['tvmaze_id'], meta['imdb_id'], meta['tvdb_id'] = await self.search_tvmaze(filename, meta['search_year'], meta.get('imdb_id','0'), meta.get('tvdb_id', 0))
+        # If no tmdb, use imdb for meta
+        if int(meta['tmdb']) == 0:
+            meta = await self.imdb_other_meta(meta)
+        else:
+            meta = await self.tmdb_other_meta(meta)
 
         if meta.get('tag', None) == None:
             meta['tag'] = self.get_tag(video, meta)
@@ -1007,7 +1018,7 @@ class Prep():
                     tmdb_id = cli_ui.ask_string("Please enter tmdb id:")
                     parser = Args(config=self.config)
                     meta['category'], meta['tmdb'] = parser.parse_tmdb_id(id=tmdb_id, category=meta.get('category'))
-        await asyncio.sleep(3)
+        await asyncio.sleep(2)
         return meta
 
     async def get_tmdb_id(self, filename, search_year, meta, category, untouched_filename="", attempted=0):
@@ -1349,6 +1360,8 @@ class Prep():
                         break
             format = mi['media']['track'][track_num]['Format']
             commercial = mi['media']['track'][track_num].get('Format_Commercial', '')
+            if mi['media']['track'][track_num].get('Language', '') == "zxx":
+                meta['silent'] = True
             try:
                 additional = mi['media']['track'][track_num]['Format_AdditionalFeatures']
                 # format = f"{format} {additional}"
@@ -2384,7 +2397,7 @@ class Prep():
             'HMAX': 'HMAX', 'HBO Max': 'HMAX', 'HS': 'HS', 'HULU': 'HULU', 'Hulu': 'HULU', 'hoichoi': 'HoiChoi', 'ID': 'ID', 
             'Investigation Discovery': 'ID', 'IFC': 'IFC', 'iflix': 'IFX', 'National Audiovisual Institute': 'INA', 'ITV': 'ITV', 
             'KAYO': 'KAYO', 'KNOW': 'KNOW', 'Knowledge Network': 'KNOW', 'KNPY': 'KNPY', 'LIFE': 'LIFE', 'Lifetime': 'LIFE', 'LN': 'LN', 
-            'MA' : 'MA', 'MBC': 'MBC', 'MNBC': 'MNBC', 'MSNBC': 'MNBC', 'MTOD': 'MTOD', 'Motor Trend OnDemand': 'MTOD', 'MTV': 'MTV', 'MUBI': 'MUBI', 
+            'MA' : 'MA', 'Movies Anywhere' : 'MA','MBC': 'MBC', 'MNBC': 'MNBC', 'MSNBC': 'MNBC', 'MTOD': 'MTOD', 'Motor Trend OnDemand': 'MTOD', 'MTV': 'MTV', 'MUBI': 'MUBI', 
             'NATG': 'NATG', 'National Geographic': 'NATG', 'NBA': 'NBA', 'NBA TV': 'NBA', 'NBC': 'NBC', 'NF': 'NF', 'Netflix': 'NF', 
             'National Film Board': 'NFB', 'NFL': 'NFL', 'NFLN': 'NFLN', 'NFL Now': 'NFLN', 'NICK': 'NICK', 'Nickelodeon': 'NICK', 'NRK': 'NRK', 
             'Norsk Rikskringkasting': 'NRK', 'OnDemandKorea': 'ODK', 'Opto': 'OPTO', 'Oprah Winfrey Network': 'OWN', 'PA': 'PA', 'PBS': 'PBS', 
@@ -2484,13 +2497,13 @@ class Prep():
             if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
                 ptp = PTP(config=self.config)
                 ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
-                if ptp_desc != "":
+                if ptp_desc.rstrip().strip().replace('\r\n', '').replace('\n', '') != "":
                     description.write(ptp_desc)
                     description.write("\n")
                     meta['description'] = 'PTP'
 
             if ptp_desc == "" and meta.get('blu_desc', '').rstrip() not in [None, ''] and desc_source in ['BLU', None]:
-                if meta.get('blu_desc', '') != '':
+                if meta.get('blu_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
                     description.write(meta['blu_desc'])
                     meta['description'] = 'BLU'
 
@@ -2498,8 +2511,10 @@ class Prep():
                 from jinja2 import Template
                 with open(f"{meta['base_dir']}/data/templates/{meta['desc_template']}.txt", 'r') as f:
                     desc_templater = Template(f.read())
-                    description.write(desc_templater.render(meta))
-                    description.write("\n\n")
+                    template_desc = desc_templater.render(meta)
+                    if template_desc.strip().rstrip() != "":
+                        description.write(template_desc)
+                        description.write("\n")
 
             if meta['nfo'] != False:
                 description.write("[code]")
@@ -2732,3 +2747,67 @@ class Prep():
         return imdb_info
         
 
+    async def search_imdb(self, filename, search_year):
+        imdbID = None
+        ia = Cinemagoer()
+        search = ia.search_movie(f"{filename}")
+        for movie in search:
+            if movie.get('year') == search_year:
+                imdbID = str(movie.movieID).replace('tt', '')
+        return imdbID
+
+
+    async def imdb_other_meta(self, meta):
+        imdb_info = meta['imdb_info'] = await self.get_imdb_info(meta['imdb_id'], meta)
+        meta['title'] = imdb_info['title']
+        meta['year'] = imdb_info['year']
+        meta['aka'] = imdb_info['aka']
+        meta['poster'] = imdb_info['cover']
+
+        difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
+        if difference >= 0.9 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():
+            meta['aka'] = ""
+        if f"({meta['year']})" in meta['aka']:
+            meta['aka'] = meta['aka'].replace(f"({meta['year']})", "").strip()
+        return meta
+
+    async def search_tvmaze(self, filename, year, imdbID, tvdbID):
+        tvdbID = int(tvdbID)
+        tvmazeID = 0
+        lookup = False
+        if imdbID == None:
+            imdbID = 0
+        if tvdbID == None:
+            tvdbID = 0
+        if int(imdbID) != 0:
+            params = {
+                "imdb" : f"tt{imdbID}"
+            }
+            url = "https://api.tvmaze.com/lookup/shows"
+            lookup = True
+        elif int(tvdbID) != 0:
+            params = {
+                "tvdb" : tvdbID
+            }
+            url = "https://api.tvmaze.com/lookup/shows"
+            lookup = True
+        else:
+            params = {
+                "q" : filename
+            }
+            url = f"https://api.tvmaze.com/search/shows"
+        
+        resp = requests.get(url=url, params=params).json()
+        if lookup == True:
+            show = resp
+        else:
+            for each in resp:
+                if each['show'].get('premiered', '').startswith(str(year)):
+                    show = each['show']
+        if show != None:
+            tvmazeID = show.get('id')
+            if int(imdbID) != 0:
+                imdbID = show.get('externals', {}).get('imdb', '0').replace('tt', '')
+            if int(tvdbID) != 0:
+                tvdbID = show.get('externals', {}).get('tvdb', '0')
+        return tvmazeID, imdbID, tvdbID

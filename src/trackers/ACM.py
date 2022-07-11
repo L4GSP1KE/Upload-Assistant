@@ -218,7 +218,7 @@ class ACM():
             mi_dump = None
             bd_dump = ""
             for each in meta['discs']:
-                bd_dump = bd_dump + each['summary'] + "\n\n"
+                bd_dump = bd_dump + each['summary'].strip().rstrip() + "\n\n"
         else:   
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
             bd_dump = None
@@ -337,7 +337,7 @@ class ACM():
         elif aka == '':
             if meta.get('title') != original_title:
                 # name = f'{name[:name.find(year)]}/ {original_title} {chr(int("202A", 16))}{name[name.find(year):]}'
-                name.replace(meta['title'], f"{meta['title']} / {original_title} {chr(int('202A', 16))}")
+                name = name.replace(meta['title'], f"{meta['title']} / {original_title} {chr(int('202A', 16))}")
         if 'AAC' in audio:
             name = name.replace(audio.strip().replace("  ", " "), audio.replace(" ", ""))
         name = name.replace("DD+ ", "DD+")
@@ -357,6 +357,9 @@ class ACM():
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
             from src.bbcode import BBCODE
+            # Add This line for all web-dls
+            if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '':
+                descfile.write(f"[center][b][color=#ff00ff][size=18]This release is sourced from {meta['service_longname']} and is not transcoded, just remuxed from the direct {meta['service_longname']} stream[/size][/color][/b][/center]")
             bbcode = BBCODE()
             if meta.get('discs', []) != []:
                 discs = meta['discs']
