@@ -2777,6 +2777,7 @@ class Prep():
         tvdbID = int(tvdbID)
         tvmazeID = 0
         lookup = False
+        show = None
         if imdbID == None:
             imdbID = 0
         if tvdbID == None:
