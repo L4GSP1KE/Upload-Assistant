@@ -2727,7 +2727,9 @@ class Prep():
             imdb_info['type'] = info.get('kind')
             imdb_info['imdbID'] = info.get('imdbID')
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
-            imdb_info['cover'] = info.get('full-size cover url').replace(".jpg", "._V1_FMjpg_UX750_.jpg")
+            imdb_info['cover'] = info.get('full-size cover url', '').replace(".jpg", "._V1_FMjpg_UX750_.jpg")
+            if imdb_info['cover'] == '':
+                imdb_info['cover'] = meta.get('poster', '')
             if len(info.get('directors', [])) >= 1:
                 imdb_info['directors'] = []
                 for director in info.get('directors'):
