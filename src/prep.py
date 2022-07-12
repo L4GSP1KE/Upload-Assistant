@@ -317,7 +317,7 @@ class Prep():
         meta['3D'] = self.is_3d(mi, bdinfo)
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):
-            meta['service'], meta['service_longname'] = self.get_service(video)
+            meta['service'], meta['service_longname'] = self.get_service(video, meta.get('tag', ''))
         meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
         meta['hdr'] = self.get_hdr(mi, bdinfo)
         meta['distributor'] = self.get_distributor(meta['distributor'])
@@ -2368,8 +2368,9 @@ class Prep():
         return meta
 
 
-    def get_service(self, video):
+    def get_service(self, video, tag):
         service = guessit(video).get('streaming_service', "")
+        guess_title = guessit(video).get('title', '')
         services = {
             '9NOW': '9NOW', '9Now': '9NOW', 'AE': 'AE', 'A&E': 'AE', 'AJAZ': 'AJAZ', 'Al Jazeera English': 'AJAZ', 
             'ALL4': 'ALL4', 'Channel 4': 'ALL4', 'AMBC': 'AMBC', 'ABC': 'AMBC', 'AMC': 'AMC', 'AMZN': 'AMZN', 
@@ -2418,7 +2419,7 @@ class Prep():
             }
         
         
-        video_name = re.sub("[.()]", " ", video)
+        video_name = re.sub("[.()]", " ", video.replace(tag, '').replace(guess_title, ''))
         for key, value in services.items():
             if (' ' + key + ' ') in (video_name):
                 service = value
