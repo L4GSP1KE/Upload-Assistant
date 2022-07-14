@@ -275,6 +275,7 @@ class HDB():
     async def search_existing(self, meta):
         dupes = []
         cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        url = "https://hdbits.org/api/torrents"
         data = {
             'username' : self.username,
             'passkey' : self.passkey,
@@ -284,7 +285,7 @@ class HDB():
             'search' : meta['resolution']
         }
         try:
-            response = requests.get(url=self.search_url, data=json.dumps(data))
+            response = requests.get(url=url, data=json.dumps(data))
             response = response.json()
             for each in response['data']:
                 result = each['name']
