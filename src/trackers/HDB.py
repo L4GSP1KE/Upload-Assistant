@@ -333,6 +333,11 @@ class HDB():
             with requests.Session() as session:
                 session.cookies.update(await common.parseCookieFile(cookiefile))
                 resp = session.get(url=url)
+                if meta['debug']:
+                    cprint('Cookies:', 'cyan')
+                    pprint(session.cookies.get_dict())
+                    print("\n\n\n\n\n\n")
+                    pprint(resp.text)
                 if resp.text.find("""<a href="/logout.php">Logout</a>""") != -1:
                     return True
                 else:
