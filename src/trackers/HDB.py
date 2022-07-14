@@ -291,6 +291,7 @@ class HDB():
                 dupes.append(result)
         except:
             cprint('Unable to search for existing torrents on site. Either the site is down or your passkey is incorrect', 'grey', 'on_red')
+            print(traceback.print_exc())
             await asyncio.sleep(5)
 
         return dupes
