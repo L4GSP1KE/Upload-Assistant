@@ -332,7 +332,7 @@ class HDB():
         if os.path.exists(cookiefile):
             with requests.Session() as session:
                 session.cookies.update(await common.parseCookieFile(cookiefile))
-                resp = session.post(url=url)
+                resp = session.get(url=url)
                 if resp.text.find("""<a href="/logout.php">Logout</a>""") != -1:
                     return True
                 else:
