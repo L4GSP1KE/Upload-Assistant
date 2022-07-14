@@ -227,10 +227,10 @@ class HDB():
             }
             data = {
                 'name' : hdb_name,
-                'type_category' : cat_id,
-                'type_codec' : codec_id,
-                'type_medium' : medium_id,
-                'type_origin' : 0,
+                'category' : cat_id,
+                'codec' : codec_id,
+                'medium' : medium_id,
+                'origin' : 0,
                 'descr' : hdb_desc.rstrip(),
                 'techinfo' : '',
                 'tags[]' : hdb_tags,
