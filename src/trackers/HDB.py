@@ -278,9 +278,9 @@ class HDB():
         data = {
             'username' : self.username,
             'passkey' : self.passkey,
-            'category' : self.get_type_category_id(meta),
-            'codec' : self.get_type_codec_id(meta),
-            'medium' : self.get_type_medium_id(meta),
+            'category' : await self.get_type_category_id(meta),
+            'codec' : await self.get_type_codec_id(meta),
+            'medium' : await self.get_type_medium_id(meta),
             'search' : meta['resolution']
         }
         try:
