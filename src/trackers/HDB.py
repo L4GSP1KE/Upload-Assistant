@@ -221,9 +221,9 @@ class HDB():
         hdb_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
         torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
         with open(torrent_path, 'rb') as torrentFile:
-            torrentFileName = unidecode(hdb_name.replace(' ', ''))
+            torrentFileName = unidecode(hdb_name.replace(' ', '.'))
             files = {
-                'file' : (f"[HDB]{torrentFileName}.torrent".replace(' ', '.'), torrentFile, "application/x-bittorent")
+                'file' : (f"[HDB]{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
             }
             data = {
                 'name' : hdb_name,
@@ -246,10 +246,10 @@ class HDB():
                 data['techinfo'] = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()
             # If tv, submit tvdb_id/season/episode
             if meta.get('tvdb_id', 0) != 0:
-                data['tvdb_id'] = meta['tvdb_id']
+                data['tvdb'] = meta['tvdb_id']
             if meta.get('category') == 'TV':
-                data['season'] = int(meta.get('season_int', 1))
-                data['episode'] = int(meta.get('episode_int', 1))
+                data['tvdb_season'] = int(meta.get('season_int', 1))
+                data['tvdb_episode'] = int(meta.get('episode_int', 1))
             # aniDB
 
 
