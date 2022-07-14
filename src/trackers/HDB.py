@@ -1,8 +1,6 @@
-from numpy import True_
 import requests
 import asyncio
 import re
-from sqlalchemy import false
 from termcolor import cprint
 import os
 from pathlib import Path
