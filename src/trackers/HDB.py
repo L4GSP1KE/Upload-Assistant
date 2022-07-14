@@ -284,6 +284,10 @@ class HDB():
             'medium' : await self.get_type_medium_id(meta),
             'search' : meta['resolution']
         }
+        if int(meta.get('imdb_id', '0').replace('tt', '0')) != 0:
+            data['imdb'] = {'id' : meta['imdb_id']}
+        if int(meta.get('tvdb_id', '0')) != 0:
+            data['tvdb'] = {'id' : meta['tvdb_id']}
         try:
             response = requests.get(url=url, data=json.dumps(data))
             response = response.json()
