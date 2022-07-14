@@ -326,7 +326,7 @@ class HDB():
             return False
     
     async def validate_cookies(self, meta):
-        import src.trackers.COMMON as common
+        common = COMMON(config=self.config)
         url = "https://hdbits.org"
         cookiefile = f"{meta['base_dir']}/data/cookies/HDB.txt"
         if os.path.exists(cookiefile):

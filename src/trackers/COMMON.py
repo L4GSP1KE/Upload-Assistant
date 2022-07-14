@@ -148,7 +148,7 @@ class COMMON():
 
         return tmdb, imdb, tvdb, mal, description, category, infohash, imagelist
 
-    async def parseCookieFile(cookiefile):
+    async def parseCookieFile(self, cookiefile):
         """Parse a cookies.txt file and return a dictionary of key value pairs
         compatible with requests."""
 
