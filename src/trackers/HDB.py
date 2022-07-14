@@ -410,6 +410,7 @@ class HDB():
             desc = re.sub("(\[img=\d+)]", "[imgw]", desc, flags=re.IGNORECASE)
             descfile.write(desc)
             if self.rehost_images == True:
+                cprint("Rehosting Images...", 'green')
                 hdbimg_bbcode = await self.hdbimg_upload(meta)
                 descfile.write(f"\n{hdbimg_bbcode}")
             else:
