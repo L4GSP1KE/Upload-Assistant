@@ -303,13 +303,13 @@ async def do_the_thing(base_dir):
                 upload_to_hdb = cli_ui.ask_yes_no(f"Upload to {tracker}? {debug}", default=meta['unattended'])
             if upload_to_hdb:
                 print(f"Uploading to {tracker}")
-                tracker_class = tracker_class_map[manual_tracker](config=config)
-                if tracker_class.validate_credentials(meta) == True:
-                    dupes = tracker_class.search_existing(meta)
+                hdb = HDB(config=config)
+                if hdb.validate_credentials(meta) == True:
+                    dupes = hdb.search_existing(meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
-                        await tracker_class.upload(meta)
-                        await client.add_to_client(meta, tracker_class.tracker)
+                        await hdb.upload(meta)
+                        await client.add_to_client(meta, hdb.tracker)
 
 
 
