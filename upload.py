@@ -304,8 +304,8 @@ async def do_the_thing(base_dir):
             if upload_to_hdb:
                 print(f"Uploading to {tracker}")
                 hdb = HDB(config=config)
-                if hdb.validate_credentials(meta) == True:
-                    dupes = hdb.search_existing(meta)
+                if await hdb.validate_credentials(meta) == True:
+                    dupes = await hdb.search_existing(meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await hdb.upload(meta)
