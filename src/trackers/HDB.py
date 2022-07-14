@@ -97,7 +97,7 @@ class HDB():
             }.get(resolution, '10')
         return resolution_id
 
-    def get_tags(self, meta):
+    async def get_tags(self, meta):
         tags = []
 
         # Web Services:
