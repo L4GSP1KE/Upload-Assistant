@@ -97,7 +97,7 @@ class Prep():
             meta['filelist'] = []
             try:
                 guess_name = bdinfo['title'].replace('-',' ')
-                filename = meta['filename'] = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
                 untouched_filename = bdinfo['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
@@ -105,7 +105,7 @@ class Prep():
                     meta['search_year'] = ""
             except Exception:
                 guess_name = bdinfo['label'].replace('-',' ')
-                filename = meta['filename'] = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
                 untouched_filename = bdinfo['label']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
@@ -125,7 +125,7 @@ class Prep():
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
-            filename = meta['filename'] = guessit(guess_name)['title']
+            filename = guessit(guess_name)['title']
             untouched_filename = os.path.basename(os.path.dirname(meta['discs'][0]['path']))
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
@@ -145,7 +145,7 @@ class Prep():
             video, meta['scene'] = self.is_scene(self.path)
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-','')
-            filename = meta['filename'] = guessit(guess_name)['title']
+            filename = guessit(guess_name)['title']
             untouched_filename = os.path.basename(meta['discs'][0]['path'])
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
@@ -191,6 +191,7 @@ class Prep():
         
         if " AKA " in filename.replace('.',' '):
             filename = filename.split('AKA')[0]
+        meta['filename'] = filename
 
         meta['bdinfo'] = bdinfo
         
