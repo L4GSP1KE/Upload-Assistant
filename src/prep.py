@@ -291,16 +291,17 @@ class Prep():
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
 
+        
         # If no imdb, search for it
         if meta.get('imdb_id', None) == None:
             meta['imdb_id'] = await self.search_imdb(filename, meta['search_year'])
-        # Search tvmaze
-        meta['tvmaze_id'], meta['imdb_id'], meta['tvdb_id'] = await self.search_tvmaze(filename, meta['search_year'], meta.get('imdb_id','0'), meta.get('tvdb_id', 0))
         # If no tmdb, use imdb for meta
         if int(meta['tmdb']) == 0:
             meta = await self.imdb_other_meta(meta)
         else:
             meta = await self.tmdb_other_meta(meta)
+        # Search tvmaze
+        meta['tvmaze_id'], meta['imdb_id'], meta['tvdb_id'] = await self.search_tvmaze(filename, meta['search_year'], meta.get('imdb_id','0'), meta.get('tvdb_id', 0))
 
         if meta.get('tag', None) == None:
             meta['tag'] = self.get_tag(video, meta)
@@ -2805,13 +2806,18 @@ class Prep():
         if lookup == True:
             show = resp
         else:
-            for each in resp:
-                if each['show'].get('premiered', '').startswith(str(year)):
-                    show = each['show']
+            if year not in (None, ''):
+                for each in resp:
+                    premier_date = each['show'].get('premiered', '')
+                    if premier_date != None:
+                        if premier_date.startswith(str(year)):
+                            show = each['show']
+            else:
+                show = resp[0]['show']
         if show != None:
             tvmazeID = show.get('id')
-            if int(imdbID) != 0:
+            if int(imdbID) == 0:
                 imdbID = show.get('externals', {}).get('imdb', '0').replace('tt', '')
-            if int(tvdbID) != 0:
+            if int(tvdbID) == 0:
                 tvdbID = show.get('externals', {}).get('tvdb', '0')
         return tvmazeID, imdbID, tvdbID
