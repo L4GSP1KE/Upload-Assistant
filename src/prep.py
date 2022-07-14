@@ -663,7 +663,7 @@ class Prep():
                             (
                                 ffmpeg
                                 .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
-                                .output(image, vframes=1)
+                                .output(image, vframes=1, pix_fmt="rgb24")
                                 .overwrite_output()
                                 .global_args('-loglevel', 'quiet')
                                 .run(quiet=True)
@@ -791,7 +791,7 @@ class Prep():
                                     ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                 (
                                     ff
-                                    .output(image, vframes=1)
+                                    .output(image, vframes=1, pix_fmt="rgb24")
                                     .overwrite_output()
                                     .global_args('-loglevel', loglevel)
                                     .run(quiet=debug)
@@ -894,7 +894,7 @@ class Prep():
                                         ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                     (
                                         ff
-                                        .output(image, vframes=1)
+                                        .output(image, vframes=1, pix_fmt="rgb24")
                                         .overwrite_output()
                                         .global_args('-loglevel', loglevel)
                                         .run(quiet=debug)
@@ -2724,7 +2724,7 @@ class Prep():
             info = ia.get_movie(imdbID)
             imdb_info['title'] = info.get('title')
             imdb_info['year'] = info.get('year')
-            imdb_info['aka'] = info.get('original title', info.get('localized title'))
+            imdb_info['aka'] = info.get('original title', info.get('localized title', imdb_info['title']))
             imdb_info['type'] = info.get('kind')
             imdb_info['imdbID'] = info.get('imdbID')
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
