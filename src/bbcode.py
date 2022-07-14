@@ -276,7 +276,7 @@ class BBCODE:
     def convert_code_to_quote(self, desc):
         desc = desc.replace('[code', '[quote')
         desc = desc.replace('[/code]', '[/quote]')
-
+        return desc
  
     def convert_comparison_to_collapse(self, desc, max_width):
         comparisons = re.findall("\[comparison=[\s\S]*?\[\/comparison\]", desc)
