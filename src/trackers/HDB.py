@@ -272,6 +272,8 @@ class HDB():
                         await self.download_new_torrent(id, torrent_path)
                     else:
                         pprint(data)
+                        print("\n\n\n\n")
+                        pprint(up.text)
                         raise UploadException(f"Upload to HDB Failed: result URL {up.url} ({up.status_code}) was not expected", 'red')
         return
 
