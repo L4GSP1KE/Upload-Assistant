@@ -17,6 +17,7 @@ from src.trackers.HP import HP
 from src.trackers.PTP import PTP
 from src.trackers.SN import SN
 from src.trackers.ACM import ACM
+from src.trackers.HDB import HDB
 import json
 from termcolor import cprint
 from pathlib import Path
@@ -156,7 +157,7 @@ async def do_the_thing(base_dir):
     ####################################
     common = COMMON(config=config)
     unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM']
-    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM}
+    tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB}
 
     for tracker in trackers:
         tracker = tracker.replace(" ", "").upper().strip()
@@ -294,7 +295,21 @@ async def do_the_thing(base_dir):
                         await client.add_to_client(meta, "PTP")
                 except:
                     print(traceback.print_exc())
-
+        
+        if tracker == 'HDB':
+            if meta['unattended']:
+                upload_to_hdb = True
+            else:
+                upload_to_hdb = cli_ui.ask_yes_no(f"Upload to {tracker}? {debug}", default=meta['unattended'])
+            if upload_to_hdb:
+                print(f"Uploading to {tracker}")
+                tracker_class = tracker_class_map[manual_tracker](config=config)
+                if tracker_class.validate_credentials(meta) == True:
+                    dupes = tracker_class.search_existing(meta)
+                    meta = dupe_check(dupes, meta)
+                    if meta['upload'] == True:
+                        await tracker_class.upload(meta)
+                        await client.add_to_client(meta, tracker_class.tracker)
 
 
 
