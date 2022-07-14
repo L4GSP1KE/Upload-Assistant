@@ -172,13 +172,15 @@ class HDB():
         hdb_name = meta['name']
         hdb_name = hdb_name.replace('H.265', 'HEVC')
         if meta.get('source', '').upper() == 'WEB':
-            hdb_name = hdb_name.replace(meta.get('service', ''), '')
+            hdb_name = hdb_name.replace(f"{meta.get('service', '')} ", '')
         if 'DV' in meta.get('hdr', ''):
             hdb_name = hdb_name.replace(' DV ', ' DoVi ')
+        if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE'):
+            hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace(' ', ''))
         hdb_name = hdb_name.replace(meta['title'], meta['imdb_info']['aka']).replace(meta.get('aka', ''), '')
         return hdb_name 
 
-        
+
     ###############################################################
     ######   STOP HERE UNLESS EXTRA MODIFICATION IS NEEDED   ######
     ###############################################################
@@ -229,7 +231,7 @@ class HDB():
                 'type_codec' : codec_id,
                 'type_medium' : medium_id,
                 'type_origin' : 0,
-                'descr' : hdb_desc,
+                'descr' : hdb_desc.rstrip(),
                 'techinfo' : '',
                 'tags[]' : hdb_tags,
                 'imdb' : f"https://www.imdb.com/title/tt{meta.get('imdb_id', '').replace('tt', '')}/",
