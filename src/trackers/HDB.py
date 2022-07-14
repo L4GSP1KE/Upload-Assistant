@@ -176,7 +176,9 @@ class HDB():
         if 'DV' in meta.get('hdr', ''):
             hdb_name = hdb_name.replace(' DV ', ' DoVi ')
         hdb_name = hdb_name.replace(meta['title'], meta['imdb_info']['aka']).replace(meta.get('aka', ''), '')
+        return hdb_name 
 
+        
     ###############################################################
     ######   STOP HERE UNLESS EXTRA MODIFICATION IS NEEDED   ######
     ###############################################################
