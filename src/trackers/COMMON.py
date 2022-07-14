@@ -3,6 +3,7 @@ import os
 from termcolor import cprint
 import traceback
 import requests
+import re
 
 from src.bbcode import BBCODE
 
@@ -155,7 +156,8 @@ class COMMON():
         cookies = {}
         with open (cookiefile, 'r') as fp:
             for line in fp:
-                if not line.startswith(("# ", "\n")):
-                    lineFields = line.strip().split('\t')
+                if not line.startswith(("# ", "\n", "#\n")):
+                    lineFields = re.split(' |\t', line.strip())
+                    lineFields = [x for x in lineFields if x != ""]
                     cookies[lineFields[5]] = lineFields[6]
         return cookies
