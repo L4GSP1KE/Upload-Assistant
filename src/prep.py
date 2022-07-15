@@ -303,7 +303,7 @@ class Prep():
             meta = await self.tmdb_other_meta(meta)
         # Search tvmaze
         meta['tvmaze_id'], meta['imdb_id'], meta['tvdb_id'] = await self.search_tvmaze(filename, meta['search_year'], meta.get('imdb_id','0'), meta.get('tvdb_id', 0))
-        if meta.get('imdb_info', None) == None:
+        if meta.get('imdb_info', None) == None and int(meta['imdb_id']) != 0:
             meta['imdb_info'] = await self.get_imdb_info(meta['imdb_id'], meta)
         if meta.get('tag', None) == None:
             meta['tag'] = self.get_tag(video, meta)
