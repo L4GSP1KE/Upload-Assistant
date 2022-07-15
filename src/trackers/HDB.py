@@ -221,7 +221,7 @@ class HDB():
         with open(torrent_path, 'rb') as torrentFile:
             torrentFileName = unidecode(os.path.basename(meta['video']).replace(' ', '.'))
             files = {
-                'file' : (f"[HDB]{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
+                'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
             }
             data = {
                 'name' : hdb_name,
