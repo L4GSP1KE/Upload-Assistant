@@ -177,6 +177,11 @@ class HDB():
         if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE'):
             hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace(' ', ''))
         hdb_name = hdb_name.replace(meta['title'], meta['imdb_info']['aka']).replace(meta.get('aka', ''), '')
+        
+        # Remove Dubbed from title
+        hdb_name = hdb_name.replace('Dubbed', '')
+        hdb_name = ' '.join(hdb_name.split())
+
         return hdb_name 
 
 
