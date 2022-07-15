@@ -24,7 +24,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -93,6 +93,12 @@ config = {
             "pronfo_api_key" : "pronfo api key",
             "pronfo_theme" : "pronfo theme code",
             "pronfo_rapi_id" : "pronfo remote api id",
+            # "anon" : "False"
+        },
+        "LCD" : {
+            "useAPI" : False, # Set to True if using BLU
+            "api_key" : "LCD api key",
+            "announce_url" : "https://locadora.xyz/announce/customannounceurl",
             # "anon" : "False"
         },
 
