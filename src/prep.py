@@ -2755,12 +2755,13 @@ class Prep():
         
 
     async def search_imdb(self, filename, search_year):
-        imdbID = None
+        imdbID = '0'
         ia = Cinemagoer()
         search = ia.search_movie(f"{filename}")
         for movie in search:
-            if movie.get('year') == search_year:
-                imdbID = str(movie.movieID).replace('tt', '')
+            if filename in movie.get('title', ''):
+                if movie.get('year') == search_year:
+                    imdbID = str(movie.movieID).replace('tt', '')
         return imdbID
 
 
