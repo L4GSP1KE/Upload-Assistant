@@ -219,7 +219,7 @@ class HDB():
         hdb_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
         torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
         with open(torrent_path, 'rb') as torrentFile:
-            torrentFileName = unidecode(hdb_name.replace(' ', '.'))
+            torrentFileName = unidecode(os.path.basename(meta['video']).replace(' ', '.'))
             files = {
                 'file' : (f"[HDB]{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
             }
@@ -410,7 +410,7 @@ class HDB():
             if self.rehost_images == True:
                 cprint("Rehosting Images...", 'green')
                 hdbimg_bbcode = await self.hdbimg_upload(meta)
-                descfile.write(f"\n{hdbimg_bbcode}")
+                descfile.write(f"{hdbimg_bbcode}")
             else:
                 images = meta['image_list']
                 if len(images) > 0: 
