@@ -1514,6 +1514,7 @@ class Prep():
         
 
         audio = f"{dual} {codec} {format_settings} {chan}{extra}"
+        audio = ' '.join(audio.split())
         return audio, chan, has_commentary
 
 
