@@ -80,6 +80,12 @@ class AITHER():
         params = {
             'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()
         }
+
+        # Internal
+        if self.config['TRACKERS'][self.tracker].get('internal', False) == True:
+            if meta['tag'] != "" and (meta['tag'][1:] in self.config['TRACKERS'][self.tracker].get('internal_groups', [])):
+                data['internal'] = 1
+        
         if meta.get('category') == "TV":
             data['season_number'] = meta.get('season_int', '0')
             data['episode_number'] = meta.get('episode_int', '0')

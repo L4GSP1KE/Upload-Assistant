@@ -76,6 +76,11 @@ class BHD():
             # 'double_up' : 0,
             # 'sticky' : 0,
         }
+        # Internal
+        if self.config['TRACKERS'][self.tracker].get('internal', False) == True:
+            if meta['tag'] != "" and (meta['tag'][1:] in self.config['TRACKERS'][self.tracker].get('internal_groups', [])):
+                data['internal'] = 1
+                
         if meta.get('tv_pack', 0) == 1:
             data['pack'] = 1
         if meta.get('season', None) == "S00":

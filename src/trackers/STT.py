@@ -80,6 +80,11 @@ class STT():
         params = {
             'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()
         }
+        # Internal
+        if self.config['TRACKERS'][self.tracker].get('internal', False) == True:
+            if meta['tag'] != "" and (meta['tag'][1:] in self.config['TRACKERS'][self.tracker].get('internal_groups', [])):
+                data['internal'] = 1
+                
         if meta.get('category') == "TV":
             cprint('This site only ALLOWS Movies.',
                 'grey', 'on_red')
