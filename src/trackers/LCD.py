@@ -24,10 +24,10 @@ class LCD():
         self.config = config
         self.tracker = 'LCD'
         self.source_flag = 'LCD'
-        self.search_url = 'http://unit3d.local/api/torrents/filter'
-        self.torrent_url = 'http://unit3d.local/api/torrents/'
-        self.upload_url = 'http://unit3d.local/api/torrents/upload' 
-        self.signature = f"\n[center][url=http://unit3d.local/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]"
+        self.search_url = 'https://locadora.xyz/api/torrents/filter'
+        self.torrent_url = 'https://locadora.xyz/api/torrents/'
+        self.upload_url = 'https://locadora.xyz/api/torrents/upload' 
+        self.signature = f"\n[center][url=https://locadora.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]"
         
         pass
     
