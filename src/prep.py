@@ -53,6 +53,7 @@ from src.args import Args
 from src.exceptions import *
 from src.trackers.PTP import PTP
 from src.trackers.BLU import BLU
+from src.trackers.LCD import LCD
 from src.trackers.COMMON import COMMON
 
 
@@ -245,7 +246,31 @@ class Prep():
                 pass
 
 
-
+        if self.config['TRACKERS'].get('LCD', {}).get('useAPI') == True:
+            lcd = LCD(config=self.config)
+            if meta.get('lcd', None) != None:
+                meta['lcd_manual'] = meta['lcd']
+                lcd_tmdb, lcd_imdb, lcd_tvdb, lcd_mal, lcd_desc, lcd_category, meta['ext_torrenthash'], lcd_imagelist = await COMMON(self.config).unit3d_torrent_info("LCD", lcd.torrent_url, meta['lcd'])
+                if lcd_tmdb not in [None, '0']:
+                    meta['tmdb_manual'] = lcd_tmdb
+                if lcd_imdb not in [None, '0']:
+                    meta['imdb'] = lcd_imdb
+                if lcd_tvdb not in [None, '0']:
+                    meta['tmdb_id'] = lcd_tvdb
+                if lcd_mal not in [None, '0']:
+                    meta['mal'] = lcd_mal
+                if lcd_desc not in [None, '0', '']:
+                    meta['lcd_desc'] = lcd_desc
+                if lcd_category.upper() in ['MOVIE', 'TV SHOW', 'ANIMES']:
+                    if lcd_category.upper() == 'TV SHOW':
+                        meta['category'] = 'TV'
+                    else:
+                        meta['category'] = lcd_category.upper()
+                if meta.get('image_list', []) == []:
+                    meta['image_list'] = lcd_imagelist
+            else:
+                # Seach automatically
+                pass
 
 
         # Take Screenshots
@@ -2489,6 +2514,8 @@ class Prep():
             desc_source.append('PTP')
         if meta.get('blu_manual') != None:
             desc_source.append('BLU')
+        if meta.get('lcd_manual') != None:
+            desc_source.append('LCD')            
         if len(desc_source) != 1:
             desc_source = None
         else:
@@ -2508,6 +2535,11 @@ class Prep():
                 if meta.get('blu_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
                     description.write(meta['blu_desc'])
                     meta['description'] = 'BLU'
+
+            if ptp_desc == "" and meta.get('lcd_desc', '').rstrip() not in [None, ''] and desc_source in ['LCD', None]:
+                if meta.get('lcd_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
+                    description.write(meta['lcd_desc'])
+                    meta['description'] = 'LCD'                    
 
             if meta.get('desc_template', None) != None:
                 from jinja2 import Template
