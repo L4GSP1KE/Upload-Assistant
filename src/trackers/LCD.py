@@ -23,7 +23,7 @@ class LCD():
     def __init__(self, config):
         self.config = config
         self.tracker = 'LCD'
-        self.source_flag = 'LCD'
+        self.source_flag = 'LOCADORA'
         self.search_url = 'https://locadora.xyz/api/torrents/filter'
         self.torrent_url = 'https://locadora.xyz/api/torrents/'
         self.upload_url = 'https://locadora.xyz/api/torrents/upload' 
