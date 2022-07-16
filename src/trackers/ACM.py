@@ -341,8 +341,8 @@ class ACM():
         if 'AAC' in audio:
             name = name.replace(audio.strip().replace("  ", " "), audio.replace(" ", ""))
         name = name.replace("DD+ ", "DD+")
-        name = name.replace ("BluRay REMUX", "Remux")
         name = name.replace ("UHD BluRay REMUX", "Remux")
+        name = name.replace ("BluRay REMUX", "Remux")
         name = name.replace ("H.265", "HEVC")
         if is_disc == 'DVD':
             name = name.replace (f'{source} DVD5', f'DVD {source}')
