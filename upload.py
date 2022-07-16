@@ -74,10 +74,14 @@ parser = Args(config)
 async def do_the_thing(base_dir):
     meta = dict()
     meta['base_dir'] = base_dir
+    paths = []
+    for each in sys.argv[1:]:
+        if os.path.exists(each):
+            paths.append(each)
+        else:
+            break
     meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
     path = meta['path']
-    if meta['debug']:
-        print(path)
     path = os.path.abspath(path)
     if path.endswith('"'):
         path = path[:-1]
@@ -91,7 +95,13 @@ async def do_the_thing(base_dir):
             escaped_path = path.replace('[', '[[]')
             globs = glob.glob(escaped_path)
             queue = globs
-            md_text = "\n - ".join(globs)
+            md_text = "\n - ".join(queue)
+            print("\n[bold green]Queuing these files:[/bold green]", end='')
+            print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
+            print("\n\n")
+        elif len(paths) != 1:
+            queue = paths
+            md_text = "\n - ".join(queue)
             print("\n[bold green]Queuing these files:[/bold green]", end='')
             print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
             print("\n\n")

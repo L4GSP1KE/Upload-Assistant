@@ -20,7 +20,7 @@ class Args():
     def parse(self, args, meta):
         input = args
         parser = argparse.ArgumentParser()
-        
+
         parser.add_argument('path', nargs='*', help="Path to file/directory")
         parser.add_argument('-s', '--screens', nargs='*', required=False, help="Number of screenshots", default=int(self.config['DEFAULT']['screens']))
         parser.add_argument('-c', '--category', nargs='*', required=False, help="Category [MOVIE, TV, FANRES]", choices=['movie', 'tv', 'fanres'])
