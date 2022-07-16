@@ -76,6 +76,8 @@ async def do_the_thing(base_dir):
     meta['base_dir'] = base_dir
     meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
     path = meta['path']
+    if meta['debug']:
+        print(path)
     path = os.path.abspath(path)
     if path.endswith('"'):
         path = path[:-1]
