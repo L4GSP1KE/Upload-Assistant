@@ -256,22 +256,31 @@ class Prep():
                     use_vs = True
                 else:
                     use_vs = False
-                ds = multiprocessing.Process(target=self.disc_screenshots, args=(filename, bdinfo, meta['uuid'], base_dir, use_vs, meta.get('image_list', []), meta.get('ffdebug', False), None))
-                ds.start()
-                while ds.is_alive() == True:
-                    await asyncio.sleep(1)
+                try:
+                    ds = multiprocessing.Process(target=self.disc_screenshots, args=(filename, bdinfo, meta['uuid'], base_dir, use_vs, meta.get('image_list', []), meta.get('ffdebug', False), None))
+                    ds.start()
+                    while ds.is_alive() == True:
+                        await asyncio.sleep(1)
+                except KeyboardInterrupt:
+                    ds.terminate()
         elif meta['is_disc'] == "DVD":
             if meta.get('edit', False) == False:
-                ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, 0, None))
-                ds.start()
-                while ds.is_alive() == True:
-                    await asyncio.sleep(1)
+                try:
+                    ds = multiprocessing.Process(target=self.dvd_screenshots, args=(meta, 0, None))
+                    ds.start()
+                    while ds.is_alive() == True:
+                        await asyncio.sleep(1)
+                except KeyboardInterrupt:
+                    ds.terminate()
         else:
             if meta.get('edit', False) == False:
-                s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, meta['uuid'], base_dir, meta))
-                s.start()
-                while s.is_alive() == True:
-                    await asyncio.sleep(3)
+                try:
+                    s = multiprocessing.Process(target=self.screenshots, args=(videopath, filename, meta['uuid'], base_dir, meta))
+                    s.start()
+                    while s.is_alive() == True:
+                        await asyncio.sleep(3)
+                except KeyboardInterrupt:
+                    s.terminate()
 
 
 
