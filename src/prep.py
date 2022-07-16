@@ -45,10 +45,11 @@ except ModuleNotFoundError:
     cprint('Missing Module Found. Please reinstall required dependancies.', 'grey', 'on_red')
     cprint('pip3 install --user -U -r requirements.txt', 'grey', 'on_red')
     exit()
+except KeyboardInterrupt:
+    exit()
 
 
 
-import imdb
 from src.args import Args
 from src.exceptions import *
 from src.trackers.PTP import PTP
