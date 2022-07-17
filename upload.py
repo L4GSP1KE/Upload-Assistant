@@ -410,8 +410,10 @@ def dupe_check(dupes, meta):
                 upload = True
         print()
         if not meta['unattended']:
-            upload = cli_ui.ask_yes_no("Upload Anyways?", default=False)
-
+            if meta.get('dupe', False) == False:
+                upload = cli_ui.ask_yes_no("Upload Anyways?", default=False)
+            else:
+                upload = True
         if upload == False:
             meta['upload'] = False
         else:
