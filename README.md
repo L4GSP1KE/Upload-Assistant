@@ -13,7 +13,7 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - Can re-use existing torrents instead of hashing new
   - Generates proper name for your upload using Mediainfo/BDInfo and TMDb/IMDb conforming to site rules
   - Checks for existing releases already on site
-  - Uploads to BLU/BHD/Aither/THR/STC/R4E(limited)/STT/HP/ACM
+  - Uploads to BLU/BHD/Aither/THR/STC/R4E(limited)/STT/HP/ACM/LCD
   - Adds to your client with fast resume, seeding instantly (rtorrent/qbittorrent/deluge/watch folder)
   - ALL WITH MINIMAL INPUT!
   - Currently works with .mkv/.mp4/Blu-ray/DVD/HD-DVDs
