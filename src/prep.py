@@ -2829,7 +2829,7 @@ class Prep():
         if show != None:
             tvmazeID = show.get('id')
             if int(imdbID) == 0:
-                imdbID = show.get('externals', {}).get('imdb', '0').replace('tt', '')
+                imdbID = str(show.get('externals', {}).get('imdb', '0')).replace('tt', '')
             if int(tvdbID) == 0:
                 tvdbID = show.get('externals', {}).get('tvdb', '0')
         return tvmazeID, imdbID, tvdbID
