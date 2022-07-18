@@ -116,6 +116,7 @@ async def do_the_thing(base_dir):
     for path in queue:
         meta = base_meta
         meta['path'] = path
+        meta['uuid'] = None
         try:
             with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
                 meta = json.load(f)
@@ -130,8 +131,8 @@ async def do_the_thing(base_dir):
             if str(ua).lower() == "true":
                 meta['unattended'] = True
                 cprint("Running in Auto Mode", 'yellow')
-    
-        prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
+        print(f"[magenta]{meta['path']}")
+        prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=config)
         meta = await prep.gather_prep(meta=meta, mode='cli') 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
 
@@ -345,7 +346,7 @@ async def do_the_thing(base_dir):
                         if meta['upload'] == True:
                             await hdb.upload(meta)
                             await client.add_to_client(meta, hdb.tracker)
-
+            
 
 
 def get_confirmation(meta):

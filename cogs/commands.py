@@ -71,7 +71,7 @@ class Commands(commands.Cog):
             #     ua = config['DEFAULT'].get('auto_mode', False)
             #     if str(ua).lower() == "true":
             #         meta['unattended'] = True
-            prep = Prep(path=path, screens=meta['screens'], img_host=meta['imghost'], config=config)
+            prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=config)
             preparing_embed = discord.Embed(title=f"Preparing to upload:", description=f"```{path}```", color=0xffff00)
             if message_id == 0:
                 message = await ctx.send(embed=preparing_embed)
@@ -173,7 +173,7 @@ class Commands(commands.Cog):
         except FileNotFoundError:
             await ctx.send("ID not found, please try again using the ID in the footer")
             return
-        prep = Prep(path=meta['path'], screens=meta['screens'], img_host=meta['imghost'], config=config) 
+        prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=config) 
         try:
             args = (meta['path'],) + args
             meta, help, before_args = parser.parse(args, meta)
@@ -321,7 +321,7 @@ class Commands(commands.Cog):
     
     
     async def send_embed_and_upload(self,ctx,meta):
-        prep = Prep(path=Path(meta['path']), screens=meta['screens'], img_host=meta['imghost'], config=config)
+        prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=config)
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
         
         if meta.get('uploaded_screens', False) == False:

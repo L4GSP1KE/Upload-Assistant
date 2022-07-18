@@ -66,8 +66,7 @@ class Prep():
         Database Identifiers (TMDB/IMDB/MAL/etc)
         Create Name
     """
-    def __init__(self, path, screens, img_host, config):
-        self.path = path
+    def __init__(self, screens, img_host, config):
         self.screens = screens
         self.config = config
         self.img_host = img_host.lower()
@@ -77,11 +76,11 @@ class Prep():
     async def gather_prep(self, meta, mode):
         meta['mode'] = mode
         base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
-        meta['isdir'] = os.path.isdir(self.path)
+        meta['isdir'] = os.path.isdir(meta['path'])
         base_dir = meta['base_dir']
 
         if meta.get('uuid', None) == None:
-            folder_id = os.path.basename(self.path)
+            folder_id = os.path.basename(meta['path'])
             meta['uuid'] = folder_id 
         if not os.path.exists(f"{base_dir}/tmp/{meta['uuid']}"):
             Path(f"{base_dir}/tmp/{meta['uuid']}").mkdir(parents=True, exist_ok=True)
@@ -94,7 +93,7 @@ class Prep():
         
         # If BD:
         if meta['is_disc'] == "BDMV":
-            video, meta['scene'] = self.is_scene(self.path)
+            video, meta['scene'] = self.is_scene(meta['path'])
             meta['filelist'] = []
             try:
                 guess_name = bdinfo['title'].replace('-',' ')
@@ -122,7 +121,7 @@ class Prep():
             mi_dump = None
         #IF DVD
         elif meta['is_disc'] == "DVD":
-            video, meta['scene'] = self.is_scene(self.path)
+            video, meta['scene'] = self.is_scene(meta['path'])
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
@@ -143,7 +142,7 @@ class Prep():
             meta['resolution'] = self.get_resolution(guessit(video), meta['uuid'], base_dir)
             meta['sd'] = self.is_sd(meta['resolution'])
         elif meta['is_disc'] == "HDDVD":
-            video, meta['scene'] = self.is_scene(self.path)
+            video, meta['scene'] = self.is_scene(meta['path'])
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-','')
             filename = guessit(guess_name)['title']
@@ -331,7 +330,7 @@ class Prep():
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):
             meta['service'], meta['service_longname'] = self.get_service(video, meta.get('tag', ''))
-        meta['uhd'] = self.get_uhd(meta['type'], guessit(self.path), meta['resolution'], self.path)
+        meta['uhd'] = self.get_uhd(meta['type'], guessit(meta['path']), meta['resolution'], meta['path'])
         meta['hdr'] = self.get_hdr(mi, bdinfo)
         meta['distributor'] = self.get_distributor(meta['distributor'])
         if meta.get('is_disc', None) == "BDMV": #Blu-ray Specific
@@ -340,7 +339,7 @@ class Prep():
         else:
             meta['video_encode'], meta['video_codec'], meta['has_encode_settings'], meta['bit_depth'] = self.get_video_encode(mi, meta['type'], bdinfo)
         if meta.get('edition', None) == None:
-            meta['edition'], meta['repack'] = self.get_edition(guessit(self.path), self.path, bdinfo, meta['filelist'], meta['title'])
+            meta['edition'], meta['repack'] = self.get_edition(guessit(meta['path']), meta['path'], bdinfo, meta['filelist'], meta['title'])
         if "REPACK" in meta.get('edition', ""):
             meta['repack'] = re.search("REPACK[\d]?", meta['edition'])[0]
             meta['edition'] = re.sub("REPACK[\d]?", "", meta['edition']).strip().replace('  ', ' ')
