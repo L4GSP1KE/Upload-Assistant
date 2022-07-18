@@ -2346,7 +2346,6 @@ class Prep():
                         cprint(f"If {season} is incorrect, use --season to correct", 'grey', 'on_yellow')
                         await asyncio.sleep(3)
                 # try:
-                #     cprint(parsed, 'magenta')
                 #     version = parsed['release_version']
                 #     if int(version) == 2:
                 #         meta['repack'] = "REPACK"

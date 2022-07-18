@@ -131,7 +131,6 @@ async def do_the_thing(base_dir):
             if str(ua).lower() == "true":
                 meta['unattended'] = True
                 cprint("Running in Auto Mode", 'yellow')
-        print(f"[magenta]{meta['path']}")
         prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=config)
         meta = await prep.gather_prep(meta=meta, mode='cli') 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
