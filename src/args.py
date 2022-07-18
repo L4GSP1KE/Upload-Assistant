@@ -112,7 +112,7 @@ class Args():
                     meta[key] = value
             else:
                 meta[key] = meta.get(key, None)
-            if key == 'trackers':
+            if key in ('trackers'):
                 meta[key] = value
             # if key == 'help' and value == True:
             #     parser.print_help()

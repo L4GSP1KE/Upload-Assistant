@@ -119,7 +119,12 @@ async def do_the_thing(base_dir):
         meta['uuid'] = None
         try:
             with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
-                meta = json.load(f)
+                saved_meta = json.load(f)
+                for key, value in saved_meta.items():
+                    overwrite_list = ['trackers', 'dupe']
+                    if meta.get(key, None) != value and key in overwrite_list:
+                        saved_meta[key] = meta[key]
+                meta = saved_meta
                 f.close()
         except FileNotFoundError:
             pass
