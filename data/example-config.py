@@ -96,7 +96,7 @@ config = {
             # "anon" : "False"
         },
         "LCD" : {
-            "useAPI" : True, # Set to True if using BLU
+            "useAPI" : True,
             "api_key" : "LCD api key",
             "announce_url" : "https://locadora.xyz/announce/customannounceurl",
             # "anon" : "False"

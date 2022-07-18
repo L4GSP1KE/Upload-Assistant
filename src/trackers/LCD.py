@@ -24,9 +24,9 @@ class LCD():
         self.config = config
         self.tracker = 'LCD'
         self.source_flag = 'LOCADORA'
-        self.search_url = 'https://dev.locadora.xyz/api/torrents/filter'
-        self.torrent_url = 'https://dev.locadora.xyz/api/torrents/'
-        self.upload_url = 'https://dev.locadora.xyz/api/torrents/upload' 
+        self.search_url = 'https://locadora.xyz/api/torrents/filter'
+        self.torrent_url = 'https://locadora.xyz/api/torrents/'
+        self.upload_url = 'https://locadora.xyz/api/torrents/upload' 
         self.signature = f"\n[center]Criado usando L4G's Upload Assistant[/center]"
         
         pass
