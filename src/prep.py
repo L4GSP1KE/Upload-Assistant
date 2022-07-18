@@ -2795,7 +2795,7 @@ class Prep():
         lookup = False
         show = None
         if imdbID == None:
-            imdbID = 0
+            imdbID = '0'
         if tvdbID == None:
             tvdbID = 0
         if int(imdbID) != 0:
@@ -2826,7 +2826,7 @@ class Prep():
                     if premier_date != None:
                         if premier_date.startswith(str(year)):
                             show = each['show']
-            else:
+            elif len(show) >= 1:
                 show = resp[0]['show']
         if show != None:
             tvmazeID = show.get('id')
