@@ -92,7 +92,7 @@ async def do_the_thing(base_dir):
             queue = [path]
     else:
         # Search glob if dirname exists
-        if os.path.exists(os.path.dirname(path)):
+        if os.path.exists(os.path.dirname(path)) and len(paths) <= 1:
             escaped_path = path.replace('[', '[[]')
             globs = glob.glob(escaped_path)
             queue = globs
