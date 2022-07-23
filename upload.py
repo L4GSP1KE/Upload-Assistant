@@ -78,7 +78,7 @@ async def do_the_thing(base_dir):
     paths = []
     for each in sys.argv[1:]:
         if os.path.exists(each):
-            paths.append(each)
+            paths.append(os.path.abspath(each))
         else:
             break
     meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
