@@ -112,16 +112,16 @@ async def do_the_thing(base_dir):
             exit()
 
 
-    base_meta = meta
+    base_meta = {k: v for k, v in meta.items()}
     for path in queue:
-        meta = base_meta
+        meta = {k: v for k, v in base_meta.items()}
         meta['path'] = path
         meta['uuid'] = None
         try:
             with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
                 saved_meta = json.load(f)
                 for key, value in saved_meta.items():
-                    overwrite_list = ['trackers', 'dupe', 'debug']
+                    overwrite_list = ['trackers', 'dupe', 'debug', 'anon', 'category', 'type']
                     if meta.get(key, None) != value and key in overwrite_list:
                         saved_meta[key] = meta[key]
                 meta = saved_meta
