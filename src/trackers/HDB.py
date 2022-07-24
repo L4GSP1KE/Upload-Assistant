@@ -225,7 +225,10 @@ class HDB():
         hdb_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
         torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
         with open(torrent_path, 'rb') as torrentFile:
-            torrentFileName = unidecode(os.path.basename(meta['video']).replace(' ', '.'))
+            if len(meta['filelist']) == 1:
+                torrentFileName = unidecode(os.path.basename(meta['video']).replace(' ', '.'))
+            else:
+                torrentFileName = unidecode(os.path.basename(meta['path']).replace(' ', '.'))
             files = {
                 'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
             }
