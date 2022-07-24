@@ -1876,7 +1876,9 @@ class Prep():
             created_by = "L4G's Upload Assistant")
         cprint("Creating .torrent", 'grey', 'on_yellow')
         file_size = torrent.size
-        if file_size < 1073741824:  # 1 GiB
+        if file_size < 268435456: # 256 MiB
+            piece_size = 18
+        elif file_size < 1073741824:  # 1 GiB
             piece_size = 19
         elif file_size < 2147483648:  # 2 GiB
             piece_size = 20
