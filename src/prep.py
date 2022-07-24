@@ -576,7 +576,7 @@ class Prep():
                     'OTHERp' : 'OTHER'
                 }
                 resolution = width_map.get(f"{width}{scan}", "OTHER")
-            resolution = self.mi_resolution(resolution, guess, width, scan, height)
+            resolution = self.mi_resolution(resolution, guess, width, scan, height, actual_height)
         
         return resolution
            
