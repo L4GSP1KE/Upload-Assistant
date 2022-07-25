@@ -1,1 +1,0 @@
-{% if type == 'WEBDL' and service_longname != '' %}[center][b][color=#ff00ff][size=18]This release is sourced from {{service_longname}} and is not transcoded, just remuxed from the direct {{service_longname}} stream[/size][/color][/b][/center]{% endif %}
