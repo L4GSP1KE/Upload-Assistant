@@ -23,11 +23,11 @@ class TTG():
         self.config = config
         self.tracker = 'TTG'
         self.source_flag = 'TTG'
-        self.username = config['TRACKERS']['TTG'].get('username', '').strip()
-        self.password = config['TRACKERS']['TTG'].get('passkey', '').strip()
-        self.passid = str(config['TRACKERS']['TTG'].get('login_question', '')).strip()
-        self.passan = config['TRACKERS']['TTG'].get('login_answer', '').strip()
-        self.uid = config['TRACKERS']['TTG'].get('user_id', '')
+        self.username = str(config['TRACKERS']['TTG'].get('username', '')).strip()
+        self.password = str(config['TRACKERS']['TTG'].get('password', '')).strip()
+        self.passid = str(config['TRACKERS']['TTG'].get('login_question', '0')).strip()
+        self.passan = str(config['TRACKERS']['TTG'].get('login_answer', '')).strip()
+        self.uid = str(config['TRACKERS']['TTG'].get('user_id', '')).strip()
         self.signature = None
     
 
@@ -254,6 +254,8 @@ class TTG():
         }
         with requests.Session() as session:
             response = session.post(url, data=data)
+            print(response.url)
+            await asyncio.sleep(1)
             if response.url.endswith('2fa.php'):
                 soup = BeautifulSoup(response.text, 'html.parser')
                 auth_token = soup.find('input', {'name' : 'authenticity_token'}).get('value')
