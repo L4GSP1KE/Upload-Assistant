@@ -93,7 +93,7 @@ class RF():
             'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()
         }
         if meta.get('category') == "TV":
-            console.print('[bold red blink]This site only ALLOWS Movies.')
+            console.print('[bold red]This site only ALLOWS Movies.')
         if meta['debug'] == False:
             response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
             try:
@@ -173,7 +173,7 @@ class RF():
                 # if difference >= 0.05:
                 dupes.append(result)
         except:
-            console.print('[bold red blink]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
+            console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
         return dupes

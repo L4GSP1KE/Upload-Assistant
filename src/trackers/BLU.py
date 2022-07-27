@@ -183,7 +183,7 @@ class BLU():
                 # if difference >= 0.05:
                 dupes.append(result)
         except:
-            console.print('[bold red blink]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
+            console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
         return dupes

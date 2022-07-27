@@ -186,7 +186,7 @@ class LCD():
                 # if difference >= 0.05:
                 dupes.append(result)
         except:
-            console.print('[bold red blink]Não foi possivel buscar no tracker torrents duplicados. O tracker está offline ou sua api está incorreta')
+            console.print('[bold red]Não foi possivel buscar no tracker torrents duplicados. O tracker está offline ou sua api está incorreta')
             await asyncio.sleep(5)
 
         return dupes

@@ -355,7 +355,7 @@ async def do_the_thing(base_dir):
 
 def get_confirmation(meta):
     if meta['debug'] == True:
-        console.print("[bold red blink]DEBUG: True")
+        console.print("[bold red]DEBUG: True")
     console.print(f"Prep material saved to {meta['base_dir']}/tmp/{meta['uuid']}")
     console.print()
     cli_ui.info_section(cli_ui.yellow, "Database Info")
@@ -463,11 +463,11 @@ def get_missing(meta):
 if __name__ == '__main__':
     pyver = platform.python_version_tuple()
     if int(pyver[0]) != 3:
-        console.print("[bold red blink]Python2 Detected, please use python3")
+        console.print("[bold red]Python2 Detected, please use python3")
         exit()
     else:
         if int(pyver[1]) <= 6:
-            console.print("[bold red blink]Python <= 3.6 Detected, please use Python >=3.7")
+            console.print("[bold red]Python <= 3.6 Detected, please use Python >=3.7")
             loop = asyncio.get_event_loop()
             loop.run_until_complete(do_the_thing(base_dir))
         else:

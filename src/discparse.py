@@ -41,7 +41,7 @@ class DiscParse():
                             proc = await asyncio.create_subprocess_exec('mono', f"{base_dir}/bin/BDInfo/BDInfo.exe", '-w', path, save_dir)
                             await proc.wait()
                         except:
-                            console.print('[bold red blink]mono not found, please install mono')
+                            console.print('[bold red]mono not found, please install mono')
 
                     elif sys.platform.startswith('win32'):
                         # await asyncio.subprocess.Process(["bin/BDInfo/BDInfo.exe", "-w", path, save_dir])

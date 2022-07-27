@@ -247,7 +247,7 @@ class BHD():
                 console.print(f"[yellow]{response.get('status_message')}")
                 await asyncio.sleep(5) 
         except:
-            console.print('[bold red blink]Unable to search for existing torrents on site. Most likely the site is down.')
+            console.print('[bold red]Unable to search for existing torrents on site. Most likely the site is down.')
             await asyncio.sleep(5)
 
         return dupes

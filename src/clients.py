@@ -204,7 +204,7 @@ class Clients():
         try:
             qbt_client.auth_log_in()
         except qbittorrentapi.LoginFailed:
-            console.print("[bold red blink]INCORRECT QBIT LOGIN CREDENTIALS")
+            console.print("[bold red]INCORRECT QBIT LOGIN CREDENTIALS")
             return
         qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True, content_layout='Original')
         qbt_client.torrents_resume(torrent.infohash)
@@ -234,7 +234,7 @@ class Clients():
             if meta['debug']:
                 console.print(f"[cyan]Path: {path}")
         else:
-            console.print("[bold red blink]Unable to connect to deluge")
+            console.print("[bold red]Unable to connect to deluge")
 
 
 

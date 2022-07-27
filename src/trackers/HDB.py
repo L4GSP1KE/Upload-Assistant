@@ -199,7 +199,7 @@ class HDB():
 
         for each in (cat_id, codec_id, medium_id):
             if each == "EXIT":
-                console.print("[bold red blink]Something didn't map correctly, or this content is not allowed on HDB")
+                console.print("[bold red]Something didn't map correctly, or this content is not allowed on HDB")
                 return
         # FORM
             # file : .torent file (needs renaming)
@@ -305,7 +305,7 @@ class HDB():
                 result = each['name']
                 dupes.append(result)
         except:
-            console.print('[bold red blink]Unable to search for existing torrents on site. Either the site is down or your passkey is incorrect')
+            console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your passkey is incorrect')
             await asyncio.sleep(5)
 
         return dupes
@@ -356,7 +356,7 @@ class HDB():
                 else:
                     return False
         else:
-            console.print("[bold red blink]Missing Cookie File. (data/cookies/HDB.txt)")
+            console.print("[bold red]Missing Cookie File. (data/cookies/HDB.txt)")
             return False
 
     async def download_new_torrent(self, id, torrent_path):

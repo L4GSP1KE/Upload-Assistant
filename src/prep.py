@@ -46,7 +46,7 @@ try:
     import platform
 except ModuleNotFoundError:
     console.print(traceback.print_exc())
-    console.print('[bold red blink]Missing Module Found. Please reinstall required dependancies.')
+    console.print('[bold red]Missing Module Found. Please reinstall required dependancies.')
     console.print('[yellow]pip3 install --user -U -r requirements.txt')
     exit()
 except KeyboardInterrupt:
@@ -971,7 +971,7 @@ class Prep():
         elif is_disc != None:
             type = "DISC"
         elif "dvdrip" in filename:
-            console.print("[bold red blink]DVDRip Detected, exiting")
+            console.print("[bold red]DVDRip Detected, exiting")
             exit()
         else:
             type = "ENCODE"
@@ -1414,7 +1414,7 @@ class Prep():
                             # Check for additional, bloated Tracks
                             if audio_language != meta['original_language'] and audio_language != "en":
                                 if meta['original_language'] not in variants and audio_language not in variants:
-                                    console.print(f"[bold red blink]This release has a(n) {audio_language} audio track, and may be considered bloated")
+                                    console.print(f"[bold red]This release has a(n) {audio_language} audio track, and may be considered bloated")
                                     time.sleep(5)
                     if eng and orig == True:
                         dual = "Dual-Audio"
@@ -2446,7 +2446,7 @@ class Prep():
     def is_anon(self, anon_in):
         anon = self.config['DEFAULT'].get("Anon", "False")
         if anon.lower() == "true":
-            console.print("[bold red blink]Global ANON has been removed in favor of per-tracker settings. Please update your config accordingly.")
+            console.print("[bold red]Global ANON has been removed in favor of per-tracker settings. Please update your config accordingly.")
             time.sleep(10)
         if anon_in == True:
             anon_out = 1

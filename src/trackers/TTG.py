@@ -269,9 +269,10 @@ class TTG():
                 with open(cookiefile, 'wb') as cf:
                     pickle.dump(session.cookies, cf)
             else:
-                console.print('[bold red blink]Something went wrong')
+                console.print('[bold red]Something went wrong')
                 await asyncio.sleep(1)
                 console.print(response.text)
+                console.print(response.url)
         return
 
 
@@ -352,6 +353,6 @@ class TTG():
                 ptgen = ptgen.split("[/img]")[1]
             ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
         except:
-            console.print("[bold red blink]There was an error getting the ptgen")
+            console.print("[bold red]There was an error getting the ptgen")
             console.print(ptgen)
         return ptgen

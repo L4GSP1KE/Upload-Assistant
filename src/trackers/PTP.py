@@ -74,10 +74,10 @@ class PTP():
                 else:
                     return None, None, None
             elif int(response.status_code) in [400, 401, 403]:
-                console.print(f"[bold red blink]PTP: {response.text}")
+                console.print(f"[bold red]PTP: {response.text}")
                 return None, None, None
             elif int(response.status_code) == 503:
-                console.print("[bold yellow blink]PTP Unavailable (503)")
+                console.print("[bold yellow]PTP Unavailable (503)")
                 return None, None, None
             else:
                 return None, None, None
@@ -109,7 +109,7 @@ class PTP():
                 console.print(response.text)
                 return None, None
             elif int(response.status_code) == 503:
-                console.print("[bold yellow blink]PTP Unavailable (503)")
+                console.print("[bold yellow]PTP Unavailable (503)")
                 return None, None
             else:
                 return None, None
