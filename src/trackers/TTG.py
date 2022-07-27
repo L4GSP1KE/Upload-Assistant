@@ -151,13 +151,13 @@ class TTG():
                 'nodistr' : 'no',
                 
             }
+            url = "https://totheglory.im/takeupload.php"
 
             # Submit
             if meta['debug']:
                 console.print(url)
                 console.print(data)
             else:
-                url = "https://totheglory.im/takeupload.php"
                 with requests.Session() as session:
                     cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/TTG.pkl")
                     with open(cookiefile, 'rb') as cf:
