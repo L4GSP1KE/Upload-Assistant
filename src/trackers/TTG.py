@@ -165,10 +165,9 @@ class TTG():
                     up = session.post(url=url, data=data, files=files)
                     torrentFile.close()
 
-                    # Match url to verify successful upload
-                    match = re.match(r".*?totheglory\.im/details\.php\?id=(\d+)&uploaded=(\d+)", up.url)
-                    if match:
-                        id = re.search(r"(id=)(\d+)", urlparse(up.url).query).group(2)
+                    
+                    if up.url.startswith("https://totheglory.im/details.php?id="):
+                        console.print(f"[green]Uploaded to: [yellow]{up.url}[/yellow][/green]")
                     else:
                         console.print(data)
                         console.print("\n\n")
@@ -295,13 +294,12 @@ class TTG():
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
             from src.bbcode import BBCODE
 
-            # INSERT PTGEN HERE?
             if int(meta.get('imdb_id', '0').replace('tt', '')) != 0:
                 await self.ptgen(meta)
 
             # Add This line for all web-dls
             if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None:
-                descfile.write(f"[center][quote]This release is sourced from {meta['service_longname']}[/quote][/center]")
+                descfile.write(f"[center][b][color=#ff00ff][size=3]{meta['service_longname']}的无损REMUX片源，没有转码/This release is sourced from {meta['service_longname']}[/size][/color][/b][/center]")
             bbcode = BBCODE()
             if meta.get('discs', []) != []:
                 discs = meta['discs']
