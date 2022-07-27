@@ -350,11 +350,12 @@ class TTG():
         try:
             ptgen = requests.get(url, params=params)
             ptgen = ptgen.json()
-            ptgen = ptgen['format']
+            ptgen = ptgen['data']['format']
             if "[/img]" in ptgen:
                 ptgen = ptgen.split("[/img]")[1]
             ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
         except:
+            console.print_exception()
             console.print("[bold red]There was an error getting the ptgen")
             console.print(ptgen)
         return ptgen
