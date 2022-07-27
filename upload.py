@@ -19,6 +19,7 @@ from src.trackers.SN import SN
 from src.trackers.ACM import ACM
 from src.trackers.HDB import HDB
 from src.trackers.LCD import LCD
+from src.trackers.TTG import TTG
 import json
 from pathlib import Path
 import asyncio
@@ -33,6 +34,7 @@ import cli_ui
 from src.console import console
 from rich.markdown import Markdown
 from rich.style import Style
+
 
 cli_ui.setup(color='always', title="L4G's Upload Assistant")
 import traceback
@@ -194,7 +196,7 @@ async def do_the_thing(base_dir):
         common = COMMON(config=config)
         unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD']
         http_trackers = ['HDB', 'TTG']
-        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD}
+        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG}
 
         for tracker in trackers:
             tracker = tracker.replace(" ", "").upper().strip()
