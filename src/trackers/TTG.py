@@ -37,7 +37,7 @@ class TTG():
 
         remove_list = ['Dubbed', 'Dual-Audio']
         for each in remove_list:
-            name = ttg_name.replace(each, '')
+            ttg_name = ttg_name.replace(each, '')
 
         return ttg_name
 
