@@ -37,7 +37,7 @@ class BHD():
         tags = await self.get_tags(meta)
         custom, edition = await self.get_edition(meta, tags)
         bhd_name = await self.edit_name(meta)
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
             anon = 0
         else:
             anon = 1
@@ -254,7 +254,7 @@ class BHD():
 
     async def get_live(self, meta): 
         draft = self.config['TRACKERS'][self.tracker]['draft_default'].strip()
-        draft = bool(distutils.util.strtobool(draft)) #0 for send to draft, 1 for live
+        draft = bool(distutils.util.strtobool(str(draft))) #0 for send to draft, 1 for live
         if draft:
             draft_int = 0
         else:

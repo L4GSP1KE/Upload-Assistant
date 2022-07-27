@@ -7,7 +7,7 @@ import os
 from pathlib import Path
 import traceback
 import json
-import distutils
+import distutils.util
 import cli_ui
 from unidecode import unidecode
 from urllib.parse import urlparse, quote
@@ -102,7 +102,7 @@ class TTG():
         return type_id
 
     async def get_anon(self, anon):
-        if anon == 0 and bool(distutils.util.strtobool(self.config['TRACKERS'][self.tracker].get('anon', "False"))) == False:
+        if anon == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
             anon = 'no'
         else:
             anon = 'yes'
@@ -195,6 +195,7 @@ class TTG():
                 res_type = meta['resolution']
             search_url = f"https://totheglory.im/browse.php?search_field= {imdb} {res_type}"
             r = session.get(search_url)
+            await asyncio.sleep(0.5)
             soup = BeautifulSoup(r.text, 'html.parser')
             find = soup.find_all('a', href=True)
             for each in find:
@@ -254,8 +255,7 @@ class TTG():
         }
         with requests.Session() as session:
             response = session.post(url, data=data)
-            print(response.url)
-            await asyncio.sleep(1)
+            await asyncio.sleep(0.5)
             if response.url.endswith('2fa.php'):
                 soup = BeautifulSoup(response.text, 'html.parser')
                 auth_token = soup.find('input', {'name' : 'authenticity_token'}).get('value')
@@ -266,6 +266,7 @@ class TTG():
                 }
                 two_factor_url = "https://totheglory.im/take2fa.php"
                 response = session.post(two_factor_url, data=two_factor_data)
+                await asyncio.sleep(0.5)
             if response.url.endswith('my.php'):
                 console.print('[green]Successfully logged into TTG')
                 with open(cookiefile, 'wb') as cf:
