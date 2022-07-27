@@ -25,7 +25,7 @@ class TTG():
         self.source_flag = 'TTG'
         self.username = config['TRACKERS']['TTG'].get('username', '').strip()
         self.password = config['TRACKERS']['TTG'].get('passkey', '').strip()
-        self.passid = config['TRACKERS']['TTG'].get('login_question', '').strip()
+        self.passid = str(config['TRACKERS']['TTG'].get('login_question', '')).strip()
         self.passan = config['TRACKERS']['TTG'].get('login_answer', '').strip()
         self.uid = config['TRACKERS']['TTG'].get('user_id', '')
         self.signature = None
