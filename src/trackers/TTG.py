@@ -236,8 +236,7 @@ class TTG():
                 if meta['debug']:
                     console.print('[cyan]Cookies:')
                     console.print(session.cookies.get_dict())
-                    console.print("\n\n\n\n\n\n")
-                    console.print(resp.text)
+                    console.print(resp.url)
                 if resp.text.find("""<a href="/logout.php">Logout</a>""") != -1:
                     return True
                 else:
