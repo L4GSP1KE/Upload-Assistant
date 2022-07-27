@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+from src.args import Args
+from src.console import console
+from src.exceptions import *
+from src.trackers.PTP import PTP
+from src.trackers.BLU import BLU
+from src.trackers.COMMON import COMMON
+
 try:
     import traceback
     import nest_asyncio
@@ -26,8 +33,6 @@ try:
     from datetime import datetime, date
     from difflib import SequenceMatcher
     from torf import Torrent
-    from termcolor import colored, cprint
-    # from pprint import pprint
     import base64
     import time
     import anitopy
@@ -35,26 +40,19 @@ try:
     from imdb import Cinemagoer
     from subprocess import Popen
     import subprocess
-    from pprint import pprint
     import itertools
     import cli_ui
     from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn
     import platform
 except ModuleNotFoundError:
-    print(traceback.print_exc())
-    cprint('Missing Module Found. Please reinstall required dependancies.', 'grey', 'on_red')
-    cprint('pip3 install --user -U -r requirements.txt', 'grey', 'on_red')
+    console.print(traceback.print_exc())
+    console.print('[bold red blink]Missing Module Found. Please reinstall required dependancies.')
+    console.print('[yellow]pip3 install --user -U -r requirements.txt')
     exit()
 except KeyboardInterrupt:
     exit()
 
 
-
-from src.args import Args
-from src.exceptions import *
-from src.trackers.PTP import PTP
-from src.trackers.BLU import BLU
-from src.trackers.COMMON import COMMON
 
 
 
@@ -86,7 +84,7 @@ class Prep():
             Path(f"{base_dir}/tmp/{meta['uuid']}").mkdir(parents=True, exist_ok=True)
         
         if meta['debug']:
-            cprint(f"ID: {meta['uuid']}", 'cyan')
+            console.print(f"[cyan]ID: {meta['uuid']}")
 
         
         meta['is_disc'], videoloc, bdinfo, meta['discs'] = await self.get_disc(meta)
@@ -355,7 +353,6 @@ class Prep():
         
         
         meta = await self.gen_desc(meta)
-        # pprint(meta)
         return meta
 
 
@@ -441,7 +438,7 @@ class Prep():
             try:
                 video = sorted(filelist)[0]       
             except IndexError:
-                cprint("No Video files found", 'grey', 'on_red')
+                console.print("[bold red]No Video files found")
                 if mode == 'cli':
                     exit()
         else:
@@ -459,7 +456,7 @@ class Prep():
     """
     def exportInfo(self, video, isdir, folder_id, base_dir, export_text):
         if os.path.exists(f"{base_dir}/tmp/{folder_id}/MEDIAINFO.txt") == False and export_text != False:
-            cprint("Exporting MediaInfo...", "grey", "on_yellow")
+            console.print("[bold yellow]Exporting MediaInfo...")
             #MediaInfo to text
             if isdir == False:
                 os.chdir(os.path.dirname(video))
@@ -470,7 +467,7 @@ class Prep():
             with open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO_CLEANPATH.txt", 'w', newline="", encoding='utf-8') as export_cleanpath:
                 export_cleanpath.write(media_info.replace(video, os.path.basename(video)))
                 export_cleanpath.close()
-            cprint("MediaInfo Exported.", "grey", "on_green")
+            console.print("[bold green]MediaInfo Exported.", end="\r")
 
         if os.path.exists(f"{base_dir}/tmp/{folder_id}/MediaInfo.json.txt") == False:
             #MediaInfo to JSON
@@ -604,11 +601,11 @@ class Prep():
             if int(response.get('resultsCount', 0)) != 0:
                 video = f"{response['results'][0]['release']}.mkv"
                 scene = True
-                cprint("SRRDB: Match Found!", 'grey', 'on_green')
+                console.print(f"[green]SRRDB: Matched to {response['results'][0]['release']}")
         except Exception:
             video = video
             scene = False
-            cprint("SRRDB: No match found, or request has timed out", 'grey', 'on_yellow')
+            console.print("[yellow]SRRDB: No match found, or request has timed out")
         return video, scene
 
 
@@ -639,12 +636,8 @@ class Prep():
                             file = f"{root}/{name}"
                             
         
-        # length = sum(int(x) * 60 ** i for i, x in enumerate(reversed(length.split(':'))))
-        # for i in range(screens):
-        # pprint(bdinfo)
         if "VC-1" in bdinfo['video'][0]['codec'] or bdinfo['video'][0]['hdr_dv'] != "":
             keyframe = 'nokey'
-            # print("VC-1")
         else:
             keyframe = 'none'
 
@@ -652,9 +645,9 @@ class Prep():
         i = len(glob.glob(f"{filename}-*.png"))        
         if i >= num_screens:
             i = num_screens
-            cprint('Reusing screenshots', 'grey', 'on_green')
+            console.print('[bold green]Reusing screenshots')
         else:
-            cprint("Saving Screens...", "grey", "on_yellow")
+            console.print("[bold yellow]Saving Screens...")
             if use_vs == True:
                 from src.vs import vs_screengn
                 vs_screengn(source=file, encode=None, filter_b_frames=False, num=num_screens, dir=f"{base_dir}/tmp/{folder_id}/")
@@ -681,7 +674,7 @@ class Prep():
                                 .run(quiet=True)
                             )
                         except Exception:
-                            print(traceback.format_exc())
+                            console.print(traceback.format_exc())
                         
                         self.optimize_images(image)
                         if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
@@ -689,12 +682,12 @@ class Prep():
                         elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                             i += 1
                         elif os.path.getsize(Path(image)) <= 75000:
-                            cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                            console.print("[bold yellow]Image is incredibly small, retaking")
                             time.sleep(1)
                         elif self.img_host == "ptpimg":
                             i += 1
                         else:
-                            cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                            console.print("[red]Image too large for your image host, retaking")
                             time.sleep(1)
                     progress.advance(screen_task)
                 #remove smallest image
@@ -744,7 +737,7 @@ class Prep():
         i = 0        
         if len(glob.glob("*.png")) >= num_screens:
             i = num_screens
-            cprint('Reusing screenshots', 'grey', 'on_green')
+            console.print('[bold green]Reusing screenshots')
         else:
             if bool(meta.get('ffdebug', False)) == True:
                 loglevel = 'verbose'
@@ -809,9 +802,7 @@ class Prep():
                                     .run(quiet=debug)
                                 )
                             except Exception:
-                                print(traceback.format_exc())
-                            # print(os.path.getsize(image))
-                            # print(f'{i+1}/{self.screens}')
+                                console.print(traceback.format_exc())
                             self.optimize_images(image)
                             n += 1
                             try: 
@@ -820,19 +811,19 @@ class Prep():
                                 elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
                                     i += 1
                                 elif os.path.getsize(Path(image)) <= 75000:
-                                    cprint("Image is incredibly small (and is most likely to be a single color), retaking", 'grey', 'on_yellow')
+                                    console.print("[yellow]Image is incredibly small (and is most likely to be a single color), retaking")
                                     retake = True
                                     time.sleep(1)
                                 elif self.img_host == "ptpimg":
                                     i += 1
                                 else:
-                                    cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                                    console.print("[red]Image too large for your image host, retaking")
                                     retake = True
                                     time.sleep(1)
                                 looped = 0
                             except Exception:
                                 if looped >= 25:
-                                    cprint('Failed to take screenshots', 'grey', 'on_red')
+                                    console.print('[red]Failed to take screenshots')
                                     exit()
                                 looped += 1
                         progress.advance(screen_task)
@@ -876,11 +867,10 @@ class Prep():
             i = 0
             if len(glob.glob(f"{filename}-*.png")) >= num_screens:
                 i = num_screens
-                cprint('Reusing screenshots', 'grey', 'on_green')
+                console.print('[bold green]Reusing screenshots')
             else:
                 loglevel = 'quiet'
                 debug = True
-                # cprint("Saving Screens...", "grey", "on_yellow")
                 if bool(meta.get('ffdebug', False)) == True:
                     loglevel = 'verbose'
                     debug = False
@@ -912,12 +902,11 @@ class Prep():
                                         .run(quiet=debug)
                                     )
                                 except Exception:
-                                    print(traceback.format_exc())
-                                # print(os.path.getsize(image))
-                                # print(f'{i+1}/{self.screens}')
+                                    console.print(traceback.format_exc())
+    
                                 self.optimize_images(image)
                                 if os.path.getsize(Path(image)) <= 75000:
-                                    cprint("Image is incredibly small, retaking", 'grey', 'on_yellow')
+                                    console.print("[yellow]Image is incredibly small, retaking")
                                     retake = True
                                     time.sleep(1)
                                 if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb" and retake == False:
@@ -927,12 +916,12 @@ class Prep():
                                 elif self.img_host == "ptpimg" and retake == False:
                                     i += 1
                                 elif self.img_host == "freeimage.host":
-                                    cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
+                                    console.print("[bold red]Support for freeimage.host has been removed. Please remove from your config")
                                     exit()
                                 elif retake == True:
                                     pass
                                 else:
-                                    cprint("Image too large for your image host, retaking", 'grey', 'on_red')
+                                    console.print("[red]Image too large for your image host, retaking")
                                     retake = True
                                     time.sleep(1) 
                             else:
@@ -982,7 +971,7 @@ class Prep():
         elif is_disc != None:
             type = "DISC"
         elif "dvdrip" in filename:
-            cprint("DVDRip Detected, exiting", 'grey', 'on_red')
+            console.print("[bold red blink]DVDRip Detected, exiting")
             exit()
         else:
             type = "ENCODE"
@@ -1022,12 +1011,12 @@ class Prep():
             year = imdb_info.get('year')
             if year == None:
                 year = meta['search_year']
-            cprint(f"TMDb was unable to find anything with that IMDb, searching TMDb for {title}", 'grey', 'on_yellow')
+            console.print(f"[yellow]TMDb was unable to find anything with that IMDb, searching TMDb for {title}")
             meta = await self.get_tmdb_id(title, year, meta, meta['category'])
             if meta.get('tmdb') in ('None', '', None, 0, '0'):
                 if meta.get('mode', 'discord') == 'cli':
-                    cprint('Unable to find a matching TMDb entry', 'grey', 'on_yellow')
-                    tmdb_id = cli_ui.ask_string("Please enter tmdb id:")
+                    console.print('[yellow]Unable to find a matching TMDb entry')
+                    tmdb_id = console.input("Please enter tmdb id: ")
                     parser = Args(config=self.config)
                     meta['category'], meta['tmdb'] = parser.parse_tmdb_id(id=tmdb_id, category=meta.get('category'))
         await asyncio.sleep(2)
@@ -1065,7 +1054,7 @@ class Prep():
                     attempted += 1
                     meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename)['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
                 else:
-                    cprint(f"Unable to find TMDb match for {filename}", 'grey', 'on_red')
+                    console.print(f"[red]Unable to find TMDb match for {filename}")
                     if meta.get('mode', 'discord') == 'cli':
                         tmdb_id = cli_ui.ask_string("Please enter tmdb id:")
                         parser = Args(config=self.config)
@@ -1086,10 +1075,10 @@ class Prep():
                     meta = await self.get_tmdb_id(title, "", meta, meta['category'])
             except:
                 if meta.get('mode', 'discord') == 'cli':
-                    cprint("Unable to find tmdb entry. Exiting.", 'grey', 'on_red')
+                    console.print("[bold red]Unable to find tmdb entry. Exiting.")
                     exit()
                 else:
-                    cprint("Unable to find tmdb entry", 'grey', 'on_red')
+                    console.print("[bold red]Unable to find tmdb entry")
                     return meta
         if meta['category'] == "MOVIE":
             movie = tmdb.Movies(meta['tmdb'])
@@ -1098,7 +1087,7 @@ class Prep():
             if response['release_date']:
                 meta['year'] = datetime.strptime(response['release_date'],'%Y-%m-%d').year
             else:
-                cprint('TMDB does not have a release date, using year from filename instead (if it exists)', 'yellow')
+                console.print('[yellow]TMDB does not have a release date, using year from filename instead (if it exists)')
                 meta['year'] = meta['search_year']
             external = movie.external_ids()
             if meta.get('imdb', None) == None:
@@ -1142,7 +1131,7 @@ class Prep():
             if response['first_air_date']:
                 meta['year'] = datetime.strptime(response['first_air_date'],'%Y-%m-%d').year
             else:
-                cprint('TMDB does not have a release date, using year from filename instead (if it exists)', 'yellow')
+                console.print('[yellow]TMDB does not have a release date, using year from filename instead (if it exists)')
                 meta['year'] = meta['search_year']
             external = tv.external_ids()
             if meta.get('imdb', None) == None:
@@ -1425,14 +1414,14 @@ class Prep():
                             # Check for additional, bloated Tracks
                             if audio_language != meta['original_language'] and audio_language != "en":
                                 if meta['original_language'] not in variants and audio_language not in variants:
-                                    cprint(f"This release has a(n) {audio_language} audio track, and may be considered bloated", 'grey', 'on_red')
+                                    console.print(f"[bold red blink]This release has a(n) {audio_language} audio track, and may be considered bloated")
                                     time.sleep(5)
                     if eng and orig == True:
                         dual = "Dual-Audio"
                     elif eng == True and orig == False and meta['original_language'] not in ['zxx', 'xx', None]:
                         dual = "Dubbed"
                 except Exception:
-                    print(traceback.print_exc())
+                    console.print(traceback.print_exc())
                     pass
         
             
@@ -1600,7 +1589,7 @@ class Prep():
             if type in ("WEBDL", 'WEBRIP'):
                 source = "Web"
         except Exception:
-            print(traceback.format_exc())
+            console.print(traceback.format_exc())
             source = "BluRay"
 
         return source, type
@@ -1810,7 +1799,6 @@ class Prep():
             except:
                 edition = ""
         if isinstance(edition, list):
-            # cprint("More than one edition detected, please edit --edition", 'grey', 'on_yellow')
             # time.sleep(2)
             edition = " ".join(edition)
         if len(filelist) == 1:
@@ -1874,7 +1862,7 @@ class Prep():
             include_globs = include or [],
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
-        cprint("Creating .torrent", 'grey', 'on_yellow')
+        console.print("[bold yellow]Creating .torrent")
         file_size = torrent.size
         if file_size < 268435456: # 256 MiB
             piece_size = 18
@@ -1896,14 +1884,14 @@ class Prep():
             err = subprocess.call(args)
             if err != 0:
                 args[2] = "OMITTED"
-                cprint(f"Process execution {args} returned with error code {err}.", 'grey', 'on_red')
+                console.print(f"[bold red]Process execution {args} returned with error code {err}.")
         else:
             torrent.piece_size = 2**piece_size
             torrent.piece_size_max = 16777216
             torrent.generate(callback=self.torf_cb, interval=5)
             torrent.write(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", overwrite=True)
             torrent.verify_filesize(path)
-        cprint(".torrent created", 'grey', 'on_green')
+        console.print("[bold green].torrent created", end="\r")
         return torrent
 
     
@@ -1940,7 +1928,7 @@ class Prep():
     def upload_screens(self, meta, screens, img_host_num, i, total_screens, custom_img_list, return_dict):
         # if int(total_screens) != 0 or len(meta.get('image_list', [])) > total_screens:
         #     if custom_img_list == []:
-        #         cprint('Uploading Screens', 'grey', 'on_yellow')   
+        #         console.print('[yellow]Uploading Screens')   
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         img_host = self.config['DEFAULT'][f'img_host_{img_host_num}']
         if img_host != self.img_host and meta.get('imghost', None) == None:
@@ -1962,7 +1950,7 @@ class Prep():
         if len(existing_images) < total_screens:
             if img_host == 'imgbox':
                 nest_asyncio.apply()
-                cprint("Uploading Screens...")
+                console.print("[green]Uploading Screens to Imgbox...")
                 image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
             else:
                 with Progress(
@@ -1983,18 +1971,18 @@ class Prep():
                                 response = requests.post(url, data = data)
                                 response = response.json()
                                 if response.get('success') != True:
-                                    cprint(response, 'red')
+                                    console.print(response, 'red')
                                 img_url = response['data'].get('medium', response['data']['image'])['url']
                                 web_url = response['data']['url_viewer']
                                 raw_url = response['data']['image']['url']
                             except Exception:
-                                cprint("imgbb failed, trying next image host", 'yellow')
+                                console.print("[yellow]imgbb failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "freeimage.host":
-                            cprint("Support for freeimage.host has been removed. Please remove from your config", 'grey', 'on_red')
-                            print("continuing in 30 seconds")
-                            time.sleep(30)
+                            console.print("[red]Support for freeimage.host has been removed. Please remove from your config")
+                            console.rint("continuing in 15 seconds")
+                            time.sleep(15)
                             progress.stop()
                             newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "ptpimg":
@@ -2016,12 +2004,11 @@ class Prep():
                                 web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                                 raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                             except:
-                                # print(traceback.format_exc())
-                                cprint("ptpimg failed, trying next image host", 'yellow')
+                                console.print("[yellow]ptpimg failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                         else:
-                            cprint("Please choose a supported image host in your config", 'grey', 'on_red')
+                            console.print("[bold red]Please choose a supported image host in your config")
                             exit()
 
 
@@ -2099,8 +2086,8 @@ class Prep():
             else:
                 year = ""
         if meta['debug']:
-            cprint("get_name meta:", 'cyan')
-            pprint(meta)
+            console.print("[cyan]get_name meta:")
+            console.print(meta)
 
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
@@ -2344,8 +2331,8 @@ class Prep():
                         except Exception:
                             season_int = "1"
                             season = "S01"
-                        cprint(f"{meta['title']} does not exist on thexem, guessing {season}", 'grey', 'on_yellow')
-                        cprint(f"If {season} is incorrect, use --season to correct", 'grey', 'on_yellow')
+                        console.print(f"[bold yellow]{meta['title']} does not exist on thexem, guessing {season}")
+                        console.print(f"[bold yellow]If [green]{season}[/green] is incorrect, use --season to correct")
                         await asyncio.sleep(3)
                 # try:
                 #     version = parsed['release_version']
@@ -2459,7 +2446,7 @@ class Prep():
     def is_anon(self, anon_in):
         anon = self.config['DEFAULT'].get("Anon", "False")
         if anon.lower() == "true":
-            cprint("Global ANON has been removed for per-tracker settings. Please update your config accordingly.", "grey", "on_red")
+            console.print("[bold red blink]Global ANON has been removed in favor of per-tracker settings. Please update your config accordingly.")
             time.sleep(10)
         if anon_in == True:
             anon_out = 1
@@ -2584,7 +2571,6 @@ class Prep():
                         meta['desc_template'] = value.get(key)
                     else:
                         meta[key] = value.get(key)
-                # print(f"Tag: {meta['tag']} | Key: {key} | Value: {meta[key]}"
         return meta
     
 
@@ -2613,7 +2599,7 @@ class Prep():
                 if meta.get('rehosted_poster', None) == None:
                     r = requests.get(meta['poster'], stream=True)
                     if r.status_code == 200:
-                        cprint("Rehosting Poster", 'grey', 'on_yellow')
+                        console.print("[bold yellow]Rehosting Poster")
                         r.raw.decode_content = True
                         with open(poster_img, 'wb') as f:
                             shutil.copyfileobj(r.raw, f)
@@ -2625,7 +2611,7 @@ class Prep():
                             json.dump(meta, metafile, indent=4)
                             metafile.close()
                     else:
-                        cprint("Poster could not be retrieved", 'grey', 'on_yellow')
+                        console.print("[bold yellow]Poster could not be retrieved")
             elif os.path.exists(poster_img) and meta.get('rehosted_poster') != None:
                 generic.write(f"TMDB Poster: {meta.get('rehosted_poster')}\n")
             if len(meta['image_list']) > 0:
@@ -2658,7 +2644,7 @@ class Prep():
                     "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
                 response = requests.post("https://uguu.se/upload.php", files=files).json()
                 if meta['debug']:
-                    cprint(response, 'cyan')
+                    console.print(f"[cyan]{response}")
                 url = response['files'][0]['url']
             return url
         except Exception:

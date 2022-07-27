@@ -1,13 +1,13 @@
 import os
 import shutil
 import traceback
-from termcolor import cprint
 import sys
 import asyncio
 from glob import glob
-from pprint import pprint
 from pymediainfo import MediaInfo
 import json
+
+from src.console import console
     
     
 class DiscParse():
@@ -37,20 +37,20 @@ class DiscParse():
                     if sys.platform.startswith('linux') or sys.platform.startswith('darwin'):
                         try:
                             # await asyncio.subprocess.Process(['mono', "bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                            cprint(f"Scanning {path}", 'grey', 'on_yellow')
+                            console.print(f"[bold green]Scanning {path}")
                             proc = await asyncio.create_subprocess_exec('mono', f"{base_dir}/bin/BDInfo/BDInfo.exe", '-w', path, save_dir)
                             await proc.wait()
                         except:
-                            cprint('mono not found, please install mono', 'grey', 'on_red')
+                            console.print('[bold red blink]mono not found, please install mono')
 
                     elif sys.platform.startswith('win32'):
                         # await asyncio.subprocess.Process(["bin/BDInfo/BDInfo.exe", "-w", path, save_dir])
-                        cprint(f"Scanning {path}", 'grey', 'on_yellow')
+                        console.print(f"[bold green]Scanning {path}")
                         proc = await asyncio.create_subprocess_exec(f"{base_dir}/bin/BDInfo/BDInfo.exe", "-w", path, save_dir)
                         await proc.wait()
                         await asyncio.sleep(1)
                     else:
-                        cprint("Not sure how to run bdinfo on your platform, get support please thanks.", 'grey', 'on_red')
+                        console.print("[red]Not sure how to run bdinfo on your platform, get support please thanks.")
                 while True:
                     try:
                         if bdinfo_text == "":
@@ -71,7 +71,7 @@ class DiscParse():
                         except shutil.SameFileError:
                             pass
                     except Exception:
-                        print(traceback.format_exc())
+                        console.print(traceback.format_exc())
                         await asyncio.sleep(5)
                         continue
                     break
@@ -102,7 +102,6 @@ class DiscParse():
             line = l.strip().lower()
             if line.startswith("*"):
                 line = l.replace("*", "").strip().lower()
-                # print(line)
             if line.startswith("playlist:"):
                 playlist = l.split(':', 1)[1]
                 bdinfo['playlist'] = playlist.split('.',1)[0].strip()
@@ -168,7 +167,6 @@ class DiscParse():
                     })
             elif line.startswith("disc title:"):
                 title = l.split(':', 1)[1]
-                # print(f"TITLE: {title}")
                 bdinfo['title'] = title
             elif line.startswith("disc label:"):
                 label = l.split(':', 1)[1]
@@ -177,7 +175,6 @@ class DiscParse():
                 split1 = l.split(':', 1)[1]
                 split2 = split1.split('/')
                 bdinfo['subtitles'].append(split2[0].strip())
-        # pprint(bdinfo)
         files = files.splitlines()
         bdinfo['files'] = []
         for line in files:
@@ -232,8 +229,6 @@ class DiscParse():
                         main_set = vob_set
             each['main_set'] = main_set
             set = main_set[0][:2]
-            # print(main_set[1:len(main_set)-1]) #For Screens #if len > 3
-            # print(main_set[0][:2])
             each['vob'] = vob = f"{path}/VTS_{set}_1.VOB"
             each['ifo'] = ifo = f"{path}/VTS_{set}_0.IFO"
             each['vob_mi'] = MediaInfo.parse(os.path.basename(vob), output='STRING', full=False, mediainfo_options={'inform_version' : '1'}).replace('\r\n', '\n')

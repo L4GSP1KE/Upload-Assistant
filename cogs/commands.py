@@ -19,9 +19,7 @@ import json
 import shutil
 import multiprocessing
 from pathlib import Path
-from pprint import pprint
 from glob import glob
-from termcolor import cprint
 import argparse
 
 
@@ -340,7 +338,7 @@ class Commands(commands.Cog):
                 await asyncio.sleep(3)
             meta['image_list'] = return_dict['image_list']
             if meta['debug']:
-                cprint(meta['image_list'], 'cyan')
+                print(meta['image_list'])
             meta['uploaded_screens'] = True
 
         #Create base .torrent
@@ -580,7 +578,7 @@ class Commands(commands.Cog):
     
     async def dupe_embed(self, dupes, meta, emojis, channel):
         if not dupes:
-            cprint("No dupes found", 'grey', 'on_green')
+            print("No dupes found")
             meta['upload'] = True   
             return meta
         else:

@@ -3,14 +3,12 @@
 import asyncio
 from torf import Torrent
 import requests
-from termcolor import cprint
 import distutils.util
-from pprint import pprint
 import os
 
 from src.trackers.COMMON import COMMON
+from src.console import console
 
-# from pprint import pprint
 
 class UNIT3D_TEMPLATE():
     """
@@ -143,13 +141,13 @@ class UNIT3D_TEMPLATE():
         if meta['debug'] == False:
             response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
             try:
-                print(response.json())
+                console.print(response.json())
             except:
-                cprint("It may have uploaded, go check")
+                console.print("It may have uploaded, go check")
                 return 
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(data)
+            console.print(f"[cyan]Request Data:")
+            console.print(data)
         open_torrent.close()
 
 
@@ -158,7 +156,7 @@ class UNIT3D_TEMPLATE():
 
     async def search_existing(self, meta):
         dupes = []
-        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        console.print("[yellow]Searching for existing torrents on site...")
         params = {
             'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'tmdbId' : meta['tmdb'],
@@ -188,7 +186,7 @@ class UNIT3D_TEMPLATE():
                 # if difference >= 0.05:
                 dupes.append(result)
         except:
-            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            console.print('[bold red blink]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
         return dupes

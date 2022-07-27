@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-from pprint import pprint
 from torf import Torrent
 import xmlrpc.client
 import bencode
@@ -13,7 +12,8 @@ import asyncio
 import ssl
 import shutil
 
-from termcolor import cprint
+
+from src.console import console 
 
 
 
@@ -56,7 +56,7 @@ class Clients():
         if local_path.endswith(os.sep):
             remote_path = remote_path + os.sep
         
-        cprint(f"Adding to {torrent_client}", 'grey', 'on_yellow')
+        console.print(f"[bold green]Adding to {torrent_client}")
         if torrent_client.lower() == "rtorrent":
             self.rtorrent(meta['path'], torrent_path, torrent, meta, local_path, remote_path, client)
         elif torrent_client == "qbit":
@@ -82,7 +82,7 @@ class Clients():
         torrent_storage_dir = client.get('torrent_storage_dir', None)
         torrent_client = client.get('torrent_client', None).lower()
         if torrent_storage_dir == None and torrent_client != "watch":
-            cprint(f'Missing torrent_storage_dir for {default_torrent_client}', 'grey', 'on_red')
+            console.print(f'[bold red]Missing torrent_storage_dir for {default_torrent_client}')
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
                 torrenthash = meta['torrenthash']
@@ -111,20 +111,20 @@ class Clients():
                         
                         reuse = torrent_path
             else:
-                cprint(f'NO .torrent WITH INFOHASH {torrenthash} FOUND', 'grey', 'on_yellow')
+                console.print(f'[bold yellow]NO .torrent WITH INFOHASH {torrenthash} FOUND')
             if reuse != None:
                  if os.path.exists(torrent_path):
                     reuse_torrent = Torrent.read(torrent_path)
                     if reuse_torrent.pieces >= 5000 and reuse_torrent.piece_size < 16777216:
-                        cprint("Too many pieces exist in current hash. REHASHING", 'grey', 'on_yellow')
+                        console.print("[bold yellow]Too many pieces exist in current hash. REHASHING")
                         reuse = None
                     elif reuse_torrent.piece_size < 32768:
-                        cprint("Piece size too small to reuse", 'grey', 'on_yellow')
+                        console.print("[bold yellow]Piece size too small to reuse")
                         reuse = None
                     else:
-                        cprint(f'REUSING .torrent with infohash: {torrenthash}', 'grey', 'on_green')
+                        console.print(f'[bold green]REUSING .torrent with infohash: {torrenthash}')
             else:
-                cprint('Unwanted Files/Folders Identified', 'grey', 'on_yellow')
+                console.print('[bold yellow]Unwanted Files/Folders Identified')
             return reuse
         return None
 
@@ -148,14 +148,14 @@ class Clients():
         try:
             fast_resume = self.add_fast_resume(metainfo, path, torrent)
         except EnvironmentError as exc:
-            cprint("Error making fast-resume data (%s)" % (exc,), 'grey', 'on_red')
+            console.print("[red]Error making fast-resume data (%s)" % (exc,))
             raise
         
             
         new_meta = bencode.bencode(fast_resume)
         if new_meta != metainfo:
             fr_file = torrent_path.replace('.torrent', '-resume.torrent')
-            print("Creating fast resume")
+            console.print("Creating fast resume")
             bencode.bwrite(fast_resume, fr_file)
 
 
@@ -175,14 +175,14 @@ class Clients():
             path = os.path.dirname(path)
         
         
-        cprint("Adding and starting torrent", 'grey', 'on_yellow')
+        console.print("[bold yellow]Adding and starting torrent")
         rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
         
         # Delete modified fr_file location
         if modified_fr:
             os.remove(f"{path_dir}/fr.torrent")
         if meta['debug']:
-            cprint(f"Path: {path}", 'cyan')
+            console.print(f"[cyan]Path: {path}")
         return
 
 
@@ -200,23 +200,19 @@ class Clients():
         if not path.endswith(os.sep):
             path = f"{path}/"
         qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'])
-        cprint("Adding and rechecking torrent", 'grey', 'on_yellow')
+        console.print("[bold yellow]Adding and rechecking torrent")
         try:
             qbt_client.auth_log_in()
         except qbittorrentapi.LoginFailed:
-            cprint("INCORRECT QBIT LOGIN CREDENTIALS", 'grey', 'on_red')
-            exit()
+            console.print("[bold red blink]INCORRECT QBIT LOGIN CREDENTIALS")
+            return
         qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True, content_layout='Original')
         qbt_client.torrents_resume(torrent.infohash)
         if client.get('qbit_tag', None) != None:
             qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
         
-        print(f"Added to: {path}")
-        # qbt_client.torrents_recheck(torrent_hashes=infohash)
-        # cprint("Rechecking File", 'grey', 'on_yellow')
-        # while qbt_client.torrents_info(torrent_hashes=infohash)[0]['completed'] == 0:
-        #     time.sleep(1)
-        # qbt_client.torrents_resume(torrent_hashes=infohash)
+        console.print(f"Added to: {path}")
+        
 
 
     def deluge(self, path, torrent_path, torrent, local_path, remote_path, client, meta):
@@ -224,7 +220,7 @@ class Clients():
         # client = LocalDelugeRPCClient()
         client.connect()
         if client.connected == True:
-            print("Deluge connected")    
+            console.print("Connected to Deluge")    
             isdir = os.path.isdir(path)
             #Remote path mount
             if local_path.lower() in path.lower() and local_path.lower() != remote_path.lower():
@@ -236,9 +232,9 @@ class Clients():
 
             client.call('core.add_torrent_file', torrent_path, base64.b64encode(torrent.dump()), {'download_location' : path, 'seed_mode' : True})
             if meta['debug']:
-                cprint(f"Path: {path}", 'cyan')
+                console.print(f"[cyan]Path: {path}")
         else:
-            cprint("Unable to connect to deluge", 'grey', 'on_red')
+            console.print("[bold red blink]Unable to connect to deluge")
 
 
 

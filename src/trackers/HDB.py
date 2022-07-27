@@ -1,7 +1,6 @@
 import requests
 import asyncio
 import re
-from termcolor import cprint
 import os
 from pathlib import Path
 import traceback
@@ -12,9 +11,7 @@ from urllib.parse import urlparse, quote
 from src.trackers.COMMON import COMMON
 from src.bbcode import BBCODE
 from src.exceptions import *
-
-
-from pprint import pprint
+from src.console import console
 
 class HDB():
 
@@ -151,7 +148,7 @@ class HDB():
         if "Atmos" in meta['audio']:
             tags.append(5)
         if meta.get('silent', False) == True:
-            cprint('zxx audio track found, suggesting you tag as silent', 'yellow') #57
+            console.print('[yellow]zxx audio track found, suggesting you tag as silent') #57
 
         # Video Metadata
         # HDR10, HDR10+, Dolby Vision, 10-bit, 
@@ -202,7 +199,7 @@ class HDB():
 
         for each in (cat_id, codec_id, medium_id):
             if each == "EXIT":
-                cprint("Something didn't map correctly, or this content is not allowed", 'yellow')
+                console.print("[bold red blink]Something didn't map correctly, or this content is not allowed on HDB")
                 return
         # FORM
             # file : .torent file (needs renaming)
@@ -262,8 +259,8 @@ class HDB():
 
             # Submit
             if meta['debug']:
-                pprint(url)
-                pprint(data)
+                console.print(url)
+                console.print(data)
             else:
                 url = "https://hdbits.org/upload/upload"
                 with requests.Session() as session:
@@ -274,20 +271,20 @@ class HDB():
 
                     # Match url to verify successful upload
                     match = re.match(r".*?hdbits\.org/details\.php\?id=(\d+)&uploaded=(\d+)", up.url)
-                    if match is not None:
+                    if match:
                         id = re.search(r"(id=)(\d+)", urlparse(up.url).query).group(2)
                         await self.download_new_torrent(id, torrent_path)
                     else:
-                        pprint(data)
-                        print("\n\n\n\n")
-                        pprint(up.text)
+                        console.print(data)
+                        console.print("\n\n")
+                        console.print(up.text)
                         raise UploadException(f"Upload to HDB Failed: result URL {up.url} ({up.status_code}) was not expected", 'red')
         return
 
 
     async def search_existing(self, meta):
         dupes = []
-        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        console.print("[yellow]Searching for existing torrents on site...")
         url = "https://hdbits.org/api/torrents"
         data = {
             'username' : self.username,
@@ -308,8 +305,7 @@ class HDB():
                 result = each['name']
                 dupes.append(result)
         except:
-            cprint('Unable to search for existing torrents on site. Either the site is down or your passkey is incorrect', 'grey', 'on_red')
-            print(traceback.print_exc())
+            console.print('[bold red blink]Unable to search for existing torrents on site. Either the site is down or your passkey is incorrect')
             await asyncio.sleep(5)
 
         return dupes
@@ -321,10 +317,10 @@ class HDB():
         vapi =  await self.validate_api()
         vcookie = await self.validate_cookies(meta)
         if vapi != True:
-            cprint('Failed to validate API. Please confirm that the site is up and your passkey is valid.', 'red')
+            console.print('[red]Failed to validate API. Please confirm that the site is up and your passkey is valid.')
             return False
         if vcookie != True:
-            cprint('Failed to validate cookies. Please confirm that the site is up and your passkey is valid.', 'red')
+            console.print('[red]Failed to validate cookies. Please confirm that the site is up and your passkey is valid.')
             return False
         return True
     
@@ -351,16 +347,16 @@ class HDB():
                 session.cookies.update(await common.parseCookieFile(cookiefile))
                 resp = session.get(url=url)
                 if meta['debug']:
-                    cprint('Cookies:', 'cyan')
-                    pprint(session.cookies.get_dict())
-                    print("\n\n\n\n\n\n")
-                    pprint(resp.text)
+                    console.print('[cyan]Cookies:')
+                    console.print(session.cookies.get_dict())
+                    console.print("\n\n")
+                    console.print(resp.text)
                 if resp.text.find("""<a href="/logout.php">Logout</a>""") != -1:
                     return True
                 else:
                     return False
         else:
-            cprint("Missing Cookie File. (data/cookies/HDB.txt)", 'red')
+            console.print("[bold red blink]Missing Cookie File. (data/cookies/HDB.txt)")
             return False
 
     async def download_new_torrent(self, id, torrent_path):
@@ -420,7 +416,7 @@ class HDB():
             desc = re.sub("(\[img=\d+)]", "[imgw]", desc, flags=re.IGNORECASE)
             descfile.write(desc)
             if self.rehost_images == True:
-                cprint("Rehosting Images...", 'green')
+                console.print("[green]Rehosting Images...")
                 hdbimg_bbcode = await self.hdbimg_upload(meta)
                 descfile.write(f"{hdbimg_bbcode}")
             else:

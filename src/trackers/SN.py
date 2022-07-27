@@ -1,13 +1,10 @@
 # -*- coding: utf-8 -*-
 import requests
-from termcolor import cprint
-from pprint import pprint
 import traceback
 
 from src.trackers.COMMON import COMMON
+from src.console import console
 
-
-# from pprint import pprint
 
 class SN():
     """
@@ -93,18 +90,17 @@ class SN():
             response = requests.request("POST", url=self.upload_url, data=data, files=files, cookies=cookie)
             try:
                 if str(response.url).__contains__("view"):
-                    cprint(response.url)
+                    console.print(response.url)
                 else:
-                    cprint("No DL link in response, unable to download torrent. It maybe a duplicate, go check", 'grey', 'on_red')
-                    pprint(data)
+                    console.print("[red]No DL link in response, unable to download torrent. It maybe a duplicate, go check")
+                    console.print(data)
             except:
-                cprint("It may have uploaded, go check", 'grey', 'on_red')
-                pprint(data)
-                print(traceback.print_exc())
+                console.print("It may have uploaded, go check", 'grey', 'on_red')
+                console.print(data)
                 return
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(data)
+            console.print(f"[cyan]Request Data:")
+            console.print(data)
 
 
     async def edit_desc(self, meta):

@@ -4,15 +4,14 @@ import asyncio
 from torf import Torrent
 import requests
 from difflib import SequenceMatcher
-from termcolor import cprint
 import distutils.util
 import json
-from pprint import pprint
 import tmdbsimple as tmdb
 import os
-# from pprint import pprint
+
 
 from src.trackers.COMMON import COMMON
+from src.console import console
 
 class R4E():
     """
@@ -83,16 +82,14 @@ class R4E():
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
             try:
-                # pprint(data)
-                print(response.json())
+                
+                console.print(response.json())
             except:
-                cprint("It may have uploaded, go check")
-                # cprint(f"Request Data:", 'cyan')
-                # pprint(data)
+                console.print("It may have uploaded, go check")
                 return 
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(data)
+            console.print(f"[cyan]Request Data:")
+            console.print(data)
         open_torrent.close()
 
 
@@ -145,7 +142,7 @@ class R4E():
 
     async def search_existing(self, meta):
         dupes = []
-        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        console.print("[yellow]Searching for existing torrents on site...")
         url = "https://racing4everyone.eu/api/torrents/filter"
         params = {
             'api_token' : self.config['TRACKERS']['R4E']['api_key'].strip(),
@@ -168,7 +165,7 @@ class R4E():
                 # if difference >= 0.05:
                 dupes.append(result)
         except:
-            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            console.print('[bold red blink]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
         return dupes

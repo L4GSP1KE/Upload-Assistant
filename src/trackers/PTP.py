@@ -2,7 +2,6 @@ import cli_ui
 import requests
 import asyncio
 import re
-from termcolor import cprint
 import distutils.util
 import os
 from pathlib import Path
@@ -19,9 +18,9 @@ from pymediainfo import MediaInfo
 from src.trackers.COMMON import COMMON
 from src.bbcode import BBCODE
 from src.exceptions import *
+from src.console import console
 
 
-from pprint import pprint
 
 class PTP():
 
@@ -63,27 +62,26 @@ class PTP():
                                             imdb_id = movie['ImdbId']
                                             ptp_torrent_id = torrent['Id']
                                             dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
-                                            cprint(f'Matched release with PTP ID: {ptp_torrent_id}', 'grey', 'on_green')
+                                            console.print(f'[bold green]Matched release with PTP ID: {ptp_torrent_id}')
                                             return imdb_id, ptp_torrent_id, ptp_torrent_hash
                                 if search_file_folder == 'folder':
                                     if str(torrent['FilePath']) == filename:
                                         imdb_id = movie['ImdbId']
                                         ptp_torrent_id = torrent['Id']
                                         dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
-                                        cprint(f'Matched release with PTP ID: {ptp_torrent_id}', 'grey', 'on_green')
+                                        console.print(f'[bold green]Matched release with PTP ID: {ptp_torrent_id}')
                                         return imdb_id, ptp_torrent_id, ptp_torrent_hash
                 else:
                     return None, None, None
             elif int(response.status_code) in [400, 401, 403]:
-                cprint(f"PTP: {response.text}", 'grey', 'on_red')
+                console.print(f"[bold red blink]PTP: {response.text}")
                 return None, None, None
             elif int(response.status_code) == 503:
-                cprint("PTP Unavailable (503)", 'grey', 'on_yellow')
+                console.print("[bold yellow blink]PTP Unavailable (503)")
                 return None, None, None
             else:
                 return None, None, None
         except Exception:
-            # print(traceback.print_exc())
             pass
         return None, None, None
     
@@ -108,15 +106,14 @@ class PTP():
                         ptp_infohash = torrent.get('InfoHash', None)
                 return imdb_id, ptp_infohash
             elif int(response.status_code) in [400, 401, 403]:
-                cprint(response.text, 'grey', 'on_red')
+                console.print(response.text)
                 return None, None
             elif int(response.status_code) == 503:
-                cprint("PTP Unavailable (503)", 'grey', 'on_yellow')
+                console.print("[bold yellow blink]PTP Unavailable (503)")
                 return None, None
             else:
                 return None, None
         except Exception:
-            # print(traceback.print_exc())
             return None, None
     
     async def get_ptp_description(self, ptp_torrent_id, is_disc):
@@ -135,7 +132,7 @@ class PTP():
         ptp_desc = response.text
         bbcode = BBCODE()
         desc = bbcode.clean_ptp_description(ptp_desc, is_disc)
-        cprint(f"Successfully grabbed description from PTP", 'grey', 'on_green')
+        console.print(f"[bold green]Successfully grabbed description from PTP")
         return desc
     
 
@@ -158,11 +155,11 @@ class PTP():
                 return None
             elif response.get('Page') == "Details": # Group Found
                 groupID = response.get('GroupId')
-                cprint(f"Matched IMDb: tt{imdb} to Group ID: {groupID}", 'grey', 'on_green')
-                cprint(f"Title: {response.get('Name')} ({response.get('Year')})", 'grey', 'on_green')
+                console.print(f"[green]Matched IMDb: tt{imdb} to Group ID: {groupID}")
+                console.print(f"[green]Title: {response.get('Name')} ({response.get('Year')})")
                 return groupID
         except Exception:
-            cprint("An error has occured trying to find a group ID", 'grey', 'on_red')
+            console.print("[red]An error has occured trying to find a group ID")
             return None
 
 
@@ -241,7 +238,7 @@ class PTP():
                     if torrent.get('Quality') == quality and quality != None:
                         existing.append(torrent.get('ReleaseName', "RELEASE NAME NOT FOUND"))
         except Exception:
-            cprint("An error has occured trying to find existing releases", 'grey', 'on_red')
+            console.print("[red]An error has occured trying to find existing releases")
         return existing
 
 
@@ -261,7 +258,7 @@ class PTP():
             ptpimg_ext = response[0]['ext']
             img_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}"
         except:
-            print("PTPIMG image rehost failed")
+            console.print("[red]PTPIMG image rehost failed")
             img_url = image_url
             # img_url = ptpimg_upload(image_url, ptpimg_api)
         return img_url
@@ -622,7 +619,7 @@ class PTP():
                 uploadresponse = session.get("https://passthepopcorn.me/upload.php")
                 loggedIn = await self.validate_login(uploadresponse)
             else:
-                cprint("PTP Cookies not found. Creating new session.", 'grey', 'on_yellow')
+                console.print("[yellow]PTP Cookies not found. Creating new session.")
             if loggedIn == True:
                 AntiCsrfToken = re.search(r'data-AntiCsrfToken="(.*)"', uploadresponse.text).group(1)
             else:
@@ -724,9 +721,9 @@ class PTP():
             }
             while new_data["tags"] == "":
                  if meta.get('mode', 'discord') == 'cli':
-                    cprint('Unable to match any tags', 'grey', 'on_yellow')
-                    print("Valid tags can be found on the PTP upload form")
-                    new_data["tags"] = cli_ui.ask_string("Please enter at least one tag. Comma seperated (action, animation, short):")
+                    console.print('[yellow]Unable to match any tags')
+                    console.print("Valid tags can be found on the PTP upload form")
+                    new_data["tags"] = console.input("Please enter at least one tag. Comma seperated (action, animation, short):")
             data.update(new_data)
             if meta["imdb_info"].get("directors", None) != None:
                 data["artist[]"] = tuple(meta['imdb_info'].get('directors'))
@@ -748,15 +745,15 @@ class PTP():
                  "User-Agent": self.user_agent
             }
             if meta['debug']:
-                pprint(url)
-                pprint(data)
+                console.print(url)
+                console.print(data)
             else:
                 with requests.Session() as session:
                     cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
                     with open(cookiefile, 'rb') as cf:
                         session.cookies.update(pickle.load(cf))
                     response = session.post(url=url, data=data, headers=headers, files=files)
-                cprint(response.url, 'cyan')
+                console.print(f"[cyan]{response.url}")
                 responsetext = response.text
                 # If the repsonse contains our announce url then we are on the upload page and the upload wasn't successful.
                 if responsetext.find(self.announce_url) != -1:
@@ -773,8 +770,8 @@ class PTP():
                 # URL format in case of successful upload: https://passthepopcorn.me/torrents.php?id=9329&torrentid=91868
                 match = re.match(r".*?passthepopcorn\.me/torrents\.php\?id=(\d+)&torrentid=(\d+)", response.url)
                 if match is None:
-                    pprint(url)
-                    pprint(data)
+                    console.print(url)
+                    console.print(data)
                     raise UploadException(f"Upload to PTP failed: result URL {response.url} ({response.status_code}) is not the expected one.")
 
         

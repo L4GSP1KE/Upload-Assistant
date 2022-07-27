@@ -1,11 +1,11 @@
 from torf import Torrent
 import os
-from termcolor import cprint
 import traceback
 import requests
 import re
 
 from src.bbcode import BBCODE
+from src.console import console
 
 class COMMON():
     def __init__(self, config):
@@ -141,10 +141,10 @@ class COMMON():
             
             bbcode = BBCODE()
             description, imagelist = bbcode.clean_unit3d_description(description, torrent_url)
-            cprint(f"Successfully grabbed description from {tracker}", 'grey', 'on_green')
+            console.print(f"[green]Successfully grabbed description from {tracker}")
         except Exception:
-            print(traceback.print_exc())
-            cprint(f"Invalid Response from {tracker} API.", 'grey', 'on_yellow')
+            console.print(traceback.print_exc())
+            console.print(f"[yellow]Invalid Response from {tracker} API.")
             
 
         return tmdb, imdb, tvdb, mal, description, category, infohash, imagelist

@@ -3,14 +3,13 @@
 import asyncio
 from torf import Torrent
 import requests
-from termcolor import cprint
 import distutils.util
-from pprint import pprint
 import os
 
 from src.trackers.COMMON import COMMON
+from src.console import console
 
-# from pprint import pprint
+
 
 class LCD():
     """
@@ -101,16 +100,13 @@ class LCD():
         if meta['debug'] == False:
             response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
             try:
-                # pprint(data)
-                print(response.json())
+                console.print(response.json())
             except:
-                cprint("It may have uploaded, go check")
-                # cprint(f"Request Data:", 'cyan')
-                # pprint(data)
+                console.print("It may have uploaded, go check")
                 return 
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(data)
+            console.print(f"[cyan]Request Data:")
+            console.print(data)
         open_torrent.close()
 
 
@@ -160,7 +156,7 @@ class LCD():
 
     async def search_existing(self, meta):
         dupes = []
-        cprint("Buscando por duplicatas no tracker...", 'grey', 'on_yellow')
+        console.print("[yellow]Buscando por duplicatas no tracker...")
         params = {
             'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'tmdbId' : meta['tmdb'],
@@ -190,7 +186,7 @@ class LCD():
                 # if difference >= 0.05:
                 dupes.append(result)
         except:
-            cprint('Não foi possivel buscar no tracker torrents duplicados. O tracker está offline ou sua api está incorreta', 'grey', 'on_red')
+            console.print('[bold red blink]Não foi possivel buscar no tracker torrents duplicados. O tracker está offline ou sua api está incorreta')
             await asyncio.sleep(5)
 
         return dupes

@@ -1,7 +1,6 @@
 import re
 import html
 import urllib.parse
-from termcolor import cprint
 
 # Bold - KEEP
 # Italic - KEEP

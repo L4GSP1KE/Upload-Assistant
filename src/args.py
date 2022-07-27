@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import argparse
 import urllib.parse
-from pprint import pprint
 import time
-from termcolor import cprint
 import traceback
+
+from src.console import console
 
 
 class Args():
@@ -89,8 +89,8 @@ class Args():
                             try:
                                 meta['ptp'] = urllib.parse.parse_qs(parsed.query)['torrentid'][0]
                             except:
-                                cprint('Your terminal ate  part of the url, please surround in quotes next time, or pass only the torrentid', 'grey', 'on_red')
-                                cprint('Continuing without -ptp', 'grey', 'on_red')
+                                console.print('[red]Your terminal ate  part of the url, please surround in quotes next time, or pass only the torrentid')
+                                console.print('[red]Continuing without -ptp')
                         else:
                             meta['ptp'] = value2
                     elif key == 'blu':
@@ -102,8 +102,8 @@ class Args():
                                     blupath = blupath[:-1]
                                 meta['blu'] = blupath.split('/')[-1]
                             except:
-                                cprint('Unable to parse id from url', 'grey', 'on_red')
-                                cprint('Continuing without --blu', 'grey', 'on_red')
+                                console.print('[red]Unable to parse id from url')
+                                console.print('[red]Continuing without --blu')
                         else:
                             meta['blu'] = value2
                     else:

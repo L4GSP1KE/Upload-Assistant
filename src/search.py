@@ -1,6 +1,7 @@
 import platform
 import asyncio
 import os
+from src.console import console
 
 class Search():
     """
@@ -16,13 +17,13 @@ class Search():
         filename = filename.lower()
         files_total = []
         if filename == "":
-            print("nothing entered")
+            console.print("nothing entered")
             return
         file_found = False
         words = filename.split()
         async def search_file(search_dir):
             files_total_search = []
-            print(f"Searching {search_dir}")
+            console.print(f"Searching {search_dir}")
             for root, dirs, files in os.walk(search_dir, topdown=False):
                 for name in files:
                     if not name.endswith('.nfo'):
@@ -49,12 +50,12 @@ class Search():
         foldername = foldername.lower()
         folders_total = []
         if foldername == "":
-            print("nothing entered")
+            console.print("nothing entered")
             return
         folders_found = False
         words = foldername.split()
         async def search_dir(search_dir):
-            print(f"Searching {search_dir}")
+            console.print(f"Searching {search_dir}")
             folders_total_search = []
             for root, dirs, files in os.walk(search_dir, topdown=False):
 

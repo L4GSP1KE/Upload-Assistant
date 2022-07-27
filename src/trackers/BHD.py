@@ -4,13 +4,11 @@ import asyncio
 from torf import Torrent
 import requests
 from difflib import SequenceMatcher
-from termcolor import cprint
 import distutils.util
 import urllib
-from pprint import pprint
 import os
-# from pprint import pprint
 from src.trackers.COMMON import COMMON
+from src.console import console
 
 class BHD():
     """
@@ -101,24 +99,21 @@ class BHD():
         if meta['debug'] == False:
             response = requests.post(url=url, files=files, data=data, headers=headers)
             try:
-                # pprint(data)
                 response = response.json()
                 if int(response['status_code']) == 0:
-                    cprint(response['status_message'], 'red')
+                    console.print(f"[red]{response['status_message']}")
                     if response['status_message'].startswith('Invalid imdb_id'):
-                        cprint('RETRYING UPLOAD', 'grey', 'on_yellow')
+                        console.print('[yellow]RETRYING UPLOAD')
                         data['imdb_id'] = 0
                         response = requests.post(url=url, files=files, data=data, headers=headers)
 
-                print(response)
+                console.print(response)
             except:
-                cprint("It may have uploaded, go check")
-                # cprint(f"Request Data:", 'cyan')
-                # pprint(data)
+                console.print("It may have uploaded, go check")
                 return 
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(data)
+            console.print(f"[cyan]Request Data:")
+            console.print(data)
         
         
 
@@ -221,7 +216,7 @@ class BHD():
 
     async def search_existing(self, meta):
         dupes = []
-        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        console.print("[yellow]Searching for existing torrents on site...")
         category = meta['category']
         if category == 'MOVIE':
             category = "Movies"
@@ -245,15 +240,14 @@ class BHD():
             if response.get('status_code') == 1:
                 for each in response['results']:
                     result = each['name']
-                    # print(result)
                     difference = SequenceMatcher(None, meta['clean_name'].replace('DD+', 'DDP'), result).ratio()
                     if difference >= 0.05:
                         dupes.append(result)
             else:
-                cprint(response.get('status_message'), 'grey', 'on_yellow')
+                console.print(f"[yellow]{response.get('status_message')}")
                 await asyncio.sleep(5) 
         except:
-            cprint('Unable to search for existing torrents on site. Most likely the site is down.', 'grey', 'on_red')
+            console.print('[bold red blink]Unable to search for existing torrents on site. Most likely the site is down.')
             await asyncio.sleep(5)
 
         return dupes

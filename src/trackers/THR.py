@@ -8,12 +8,10 @@ from difflib import SequenceMatcher
 import cli_ui
 import base64
 import os
-from termcolor import cprint
 import re
 
-from pprint import pprint
+from src.console import console 
 
-# from pprint import pprint
 
 class THR():
     """
@@ -89,22 +87,19 @@ class THR():
             response = session.post(url=url, files=files, data=payload, headers=headers)
             try:
                 if meta['debug']:
-                    pprint(response.text)
+                    console.print(response.text)
                 if response.url.endswith('uploaded=1'):
-                    cprint(f'Successfully Uploaded at: {response.url}', 'grey', 'on_green')
+                    console.print(f'[green]Successfully Uploaded at: {response.url}')
                 #Check if actually uploaded
             except:
                 if meta['debug']:
-                    pprint(response.text)
-                cprint("It may have uploaded, go check")
-                # cprint(f"Request Data:", 'cyan')
-                # pprint(data)
+                    console.print(response.text)
+                console.print("It may have uploaded, go check")
                 return 
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(files)
-            pprint(payload)
-        
+            console.print(f"[cyan]Request Data:")
+            console.print(payload)
+            
     
     
     async def get_cat_id(self, meta):
@@ -212,11 +207,11 @@ class THR():
                     img_url = response['image']['url']
                     image_list.append(img_url)
                 except json.decoder.JSONDecodeError:
-                    cprint("Failed to upload image", 'yellow')
-                    pprint(response.text)
+                    console.print("[yellow]Failed to upload image")
+                    console.print(response.text)
                 except KeyError:
-                    cprint("Failed to upload image", 'yellow')
-                    pprint(response)
+                    console.print("[yellow]Failed to upload image")
+                    console.print(response)
                 await asyncio.sleep(1)
             desc.write("[align=center]")
             if meta.get('is_disc', '') == 'BDMV':
@@ -239,10 +234,10 @@ class THR():
                         desc.write(f"\n[img]{mi_img}[/img]\n")
                         pronfo = True
                 except:
-                    cprint('Error parsing pronfo response, using THR parser instead', 'grey', 'on_red')
+                    console.print('[bold red]Error parsing pronfo response, using THR parser instead')
                     if meta['debug']:
-                        cprint(response, 'grey', 'on_red')
-                        pprint(response.text) 
+                        console.print(f"[red]{response}")
+                        console.print(response.text) 
 
             for each in image_list:
                 desc.write(f"\n[img]{each}[/img]\n")
@@ -285,5 +280,5 @@ class THR():
         }
         resp = session.post(url, headers=headers, data=payload)
         if resp.url == "https://www.torrenthr.org/index.php":
-            cprint('Successfully logged in', 'grey', 'on_green')
+            console.print('[green]Successfully logged in')
         return session

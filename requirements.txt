@@ -1,5 +1,4 @@
 torf
-termcolor
 guessit
 ffmpeg-python
 pymediainfo
