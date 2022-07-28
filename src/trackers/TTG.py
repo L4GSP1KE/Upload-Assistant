@@ -28,6 +28,8 @@ class TTG():
         self.passid = str(config['TRACKERS']['TTG'].get('login_question', '0')).strip()
         self.passan = str(config['TRACKERS']['TTG'].get('login_answer', '')).strip()
         self.uid = str(config['TRACKERS']['TTG'].get('user_id', '')).strip()
+        self.passkey = str(config['TRACKERS']['TTG'].get('announce_url', '')).strip().split('/')[-1]
+        
         self.signature = None
     
 
@@ -168,6 +170,8 @@ class TTG():
                     
                     if up.url.startswith("https://totheglory.im/details.php?id="):
                         console.print(f"[green]Uploaded to: [yellow]{up.url}[/yellow][/green]")
+                        id = re.search(r"(id=)(\d+)", urlparse(up.url).query).group(2)
+                        await self.download_new_torrent(id, torrent_path)
                     else:
                         console.print(data)
                         console.print("\n\n")
@@ -280,19 +284,6 @@ class TTG():
 
 
     async def edit_desc(self, meta):
-        ###
-        #"{% if guess.streaming_service == 'Amazon Prime' %}
-        #   {{ptgen | replace('[/img]', '[/img]\n\n
-        #   [b][color=#ff00ff][size=3]亚马逊(Amazon)的无损REMUX片源，没有转码\nThis release is sourced from Amazon and is not transcoded, just remuxed from the direct Amazon stream[/size][/color][/b]\n\n')}}
-        # {% elif guess.streaming_service == 'Netflix'%}
-        #   {{ptgen | replace('[/img]', '[/img]\n\n
-        #   [center][b][color=#ff00ff][size=3]﻿网飞(Netfilx)的无损REMUX片源，没有转码\nThis release is sourced from Netflix and is not transcoded, just remuxed from the direct Netflix stream.[/size][/color][/b][/center]\n\n')}}
-        # {% else %}
-        #   {{ptgen}}
-        # {% endif %}
-        
-        # [b][i][color=#3c78d8]This torrent has been auto-uploaded by JinBot, please report me if you encounter any issues.[/color][/i][/b]"
-
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
             from src.bbcode import BBCODE
@@ -304,7 +295,7 @@ class TTG():
 
             # Add This line for all web-dls
             if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None:
-                descfile.write(f"[center][b][color=#ff00ff][size=3]{meta['service_longname']}的无损REMUX片源，没有转码/This release is sourced from {meta['service_longname']}[/size][/color][/b][/center]")
+                descfile.write(f"[center][b][color=#ff00ff][size=3]{meta['service_longname']}的无损REMUX片源，没有转码/This release is sourced from {meta['service_longname']} and is not transcoded, just remuxed from the direct {meta['service_longname']} stream[/size][/color][/b][/center]")
             bbcode = BBCODE()
             if meta.get('discs', []) != []:
                 discs = meta['discs']
@@ -361,3 +352,9 @@ class TTG():
             console.print("[bold red]There was an error getting the ptgen")
             console.print(ptgen)
         return ptgen
+
+    async def download_new_torrent(self, id, torrent_path):
+        download_url = f"https://totheglory.im/dl/{id}/{self.passkey}"
+        r = requests.get(url=download_url)
+        with open(torrent_path, "wb") as tor:
+            tor.write(r.content)
