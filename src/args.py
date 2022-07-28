@@ -35,6 +35,8 @@ class Args():
         parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str)
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
+        parser.add_argument('--no-year', dest='no_year', action='store_true', required=False, help="Remove Year from title")
+        parser.add_argument('-year', '--year', dest='manual_year', nargs='?', required=False, help="Year", type=int, default=0)
         parser.add_argument('-ptp', '--ptp', nargs='*', required=False, help="PTP torrent id/permalink", type=str)
         parser.add_argument('-blu', '--blu', nargs='*', required=False, help="BLU torrent id/link", type=str)
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
@@ -52,7 +54,6 @@ class Args():
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode, will run through all the motions providing extra info, but will not upload to trackers.")
         parser.add_argument('-ffdebug', '--ffdebug', action='store_true', required=False, help="Will show info from ffmpeg while taking screenshots.")
         parser.add_argument('-m', '--manual', action='store_true', required=False, help="Manual Mode. Returns link to ddl screens/base.torrent")
-        parser.add_argument('--no-year', dest='no_year', action='store_true', required=False, help="Remove Year from title")
         parser.add_argument('-nh', '--nohash', action='store_true', required=False, help="Don't hash .torrent")
         parser.add_argument('-rh', '--rehash', action='store_true', required=False, help="DO hash .torrent")
         parser.add_argument('-dr', '--draft', action='store_true', required=False, help="Send to drafts (BHD)")
@@ -64,7 +65,7 @@ class Args():
         
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
-        
+        console.print(args)
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
         for key in args:

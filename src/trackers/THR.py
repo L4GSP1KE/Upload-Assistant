@@ -239,7 +239,7 @@ class THR():
                         console.print(f"[red]{response}")
                         console.print(response.text) 
 
-            for each in image_list:
+            for each in image_list[:int(meta['screens'])]:
                 desc.write(f"\n[img]{each}[/img]\n")
             # if pronfo:
             #     with open(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt"), 'r') as mi_file:

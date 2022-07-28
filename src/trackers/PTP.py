@@ -62,14 +62,14 @@ class PTP():
                                             imdb_id = movie['ImdbId']
                                             ptp_torrent_id = torrent['Id']
                                             dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
-                                            console.print(f'[bold green]Matched release with PTP ID: {ptp_torrent_id}')
+                                            console.print(f'[bold green]Matched release with PTP ID: [yellow]{ptp_torrent_id}[/yellow][/green]')
                                             return imdb_id, ptp_torrent_id, ptp_torrent_hash
                                 if search_file_folder == 'folder':
                                     if str(torrent['FilePath']) == filename:
                                         imdb_id = movie['ImdbId']
                                         ptp_torrent_id = torrent['Id']
                                         dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
-                                        console.print(f'[bold green]Matched release with PTP ID: {ptp_torrent_id}')
+                                        console.print(f'[bold green]Matched release with PTP ID: [yellow]{ptp_torrent_id}[/yellow][/green]')
                                         return imdb_id, ptp_torrent_id, ptp_torrent_hash
                 else:
                     return None, None, None
@@ -155,8 +155,8 @@ class PTP():
                 return None
             elif response.get('Page') == "Details": # Group Found
                 groupID = response.get('GroupId')
-                console.print(f"[green]Matched IMDb: tt{imdb} to Group ID: {groupID}")
-                console.print(f"[green]Title: {response.get('Name')} ({response.get('Year')})")
+                console.print(f"[green]Matched IMDb: [yellow]tt{imdb}[/yellow] to Group ID: [yellow]{groupID}[/yellow][/green]")
+                console.print(f"[green]Title: [yellow]{response.get('Name')}[/yellow] ([yellow]{response.get('Year')}[/yellow])")
                 return groupID
         except Exception:
             console.print("[red]An error has occured trying to find a group ID")
@@ -569,7 +569,7 @@ class PTP():
                             images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})  
                         
                     if len(images) > 0: 
-                        for each in range(len(images)):
+                        for each in range(len(images[:int(meta['screens'])])):
                             raw_url = images[each]['raw_url']
                             desc.write(f"[img]{raw_url}[/img]\n")
                     desc.write("\n")
@@ -600,7 +600,7 @@ class PTP():
                         desc.write(base2ptp)
                         desc.write("\n\n")    
                     if len(images) > 0: 
-                        for each in range(len(images)):
+                        for each in range(len(images[:int(meta['screens'])])):
                             raw_url = images[each]['raw_url']
                             desc.write(f"[img]{raw_url}[/img]\n")
                     desc.write("\n")

@@ -329,7 +329,7 @@ class TTG():
             images = meta['image_list']
             if len(images) > 0: 
                 descfile.write("[center]")
-                for each in range(len(images)):
+                for each in range(len(images[:int(meta['screens'])])):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
                     descfile.write(f"[url={web_url}][img=350x350]{img_url}[/img][/url]")
