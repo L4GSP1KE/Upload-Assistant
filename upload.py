@@ -20,6 +20,7 @@ from src.trackers.ACM import ACM
 from src.trackers.HDB import HDB
 from src.trackers.LCD import LCD
 from src.trackers.TTG import TTG
+from src.trackers.LST import LST
 import json
 from pathlib import Path
 import asyncio
@@ -194,9 +195,9 @@ async def do_the_thing(base_dir):
         #######  Upload to Trackers  #######
         ####################################
         common = COMMON(config=config)
-        unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD']
+        unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST']
         http_trackers = ['HDB', 'TTG']
-        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG}
+        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG, 'LST' : LST}
 
         for tracker in trackers:
             tracker = tracker.replace(" ", "").upper().strip()
