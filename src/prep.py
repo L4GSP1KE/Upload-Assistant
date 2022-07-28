@@ -2085,6 +2085,8 @@ class Prep():
                 year = meta['year']
             else:
                 year = ""
+        if meta.get('no_year', False) == True:
+            year = ''
         if meta['debug']:
             console.print("[cyan]get_name meta:")
             console.print(meta)
