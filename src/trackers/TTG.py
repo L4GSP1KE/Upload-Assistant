@@ -130,6 +130,11 @@ class TTG():
             #
         # POST > upload/upload
 
+        if meta['bdinfo'] != None:
+            mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8')
+        else:
+            mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8')
+
         ttg_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
         torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
         with open(torrent_path, 'rb') as torrentFile:
@@ -138,7 +143,8 @@ class TTG():
             else:
                 torrentFileName = unidecode(os.path.basename(meta['path']).replace(' ', '.'))
             files = {
-                'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
+                'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent"),
+                'nfo' : ("torrent.nfo", mi_dump)
             }
             data = {
                 'MAX_FILE_SIZE' : '4000000',
@@ -166,7 +172,7 @@ class TTG():
                         session.cookies.update(pickle.load(cf))
                     up = session.post(url=url, data=data, files=files)
                     torrentFile.close()
-
+                    mi_dump.close()
                     
                     if up.url.startswith("https://totheglory.im/details.php?id="):
                         console.print(f"[green]Uploaded to: [yellow]{up.url}[/yellow][/green]")
