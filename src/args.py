@@ -65,7 +65,7 @@ class Args():
         
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
-        console.print(args)
+        
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
         for key in args:
