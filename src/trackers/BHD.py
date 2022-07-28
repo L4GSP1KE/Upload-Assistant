@@ -104,8 +104,9 @@ class BHD():
                     console.print(f"[red]{response['status_message']}")
                     if response['status_message'].startswith('Invalid imdb_id'):
                         console.print('[yellow]RETRYING UPLOAD')
-                        data['imdb_id'] = 0
+                        data['imdb_id'] = 1
                         response = requests.post(url=url, files=files, data=data, headers=headers)
+                        response = response.json()
 
                 console.print(response)
             except:
