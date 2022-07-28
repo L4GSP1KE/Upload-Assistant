@@ -222,7 +222,8 @@ class TTG():
             console.print('[red]Failed to validate cookies. Please confirm that the site is up and your passkey is valid.')
             recreate = cli_ui.ask_yes_no("Log in again and create new session?")
             if recreate == True:
-                os.remove(cookiefile)
+                if os.path.exists(cookiefile):
+                    os.remove(cookiefile)
                 await self.login(cookiefile)
                 vcookie = await self.validate_cookies(meta, cookiefile)
                 return vcookie
