@@ -356,5 +356,9 @@ class TTG():
     async def download_new_torrent(self, id, torrent_path):
         download_url = f"https://totheglory.im/dl/{id}/{self.passkey}"
         r = requests.get(url=download_url)
-        with open(torrent_path, "wb") as tor:
-            tor.write(r.content)
+        if r.status_code == 200:
+            with open(torrent_path, "wb") as tor:
+                tor.write(r.content)
+        else:
+            console.print("[red]There was an issue downloading the new .torrent from TTG")
+            console.print(r.text)
