@@ -298,7 +298,9 @@ class TTG():
             from src.bbcode import BBCODE
 
             if int(meta.get('imdb_id', '0').replace('tt', '')) != 0:
-                await self.ptgen(meta)
+                ptgen = await self.ptgen(meta)
+                if ptgen.strip().rstrip() != '':
+                    descfile.write(ptgen)   
 
             # Add This line for all web-dls
             if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None:
