@@ -316,8 +316,8 @@ class TTG():
             desc = bbcode.convert_code_to_quote(desc)
             desc = bbcode.convert_spoiler_to_hide(desc)
             desc = bbcode.convert_comparison_to_centered(desc, 1000)
-            desc = desc.replace('[img]', '[img=350x350]')
-            desc = re.sub("(\[img=\d+)]", "[img=350x350]", desc, flags=re.IGNORECASE)
+            desc = desc.replace('[img]', '[img]')
+            desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
             descfile.write(desc)
             images = meta['image_list']
             if len(images) > 0: 
@@ -325,7 +325,7 @@ class TTG():
                 for each in range(len(images[:int(meta['screens'])])):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
-                    descfile.write(f"[url={web_url}][img=350x350]{img_url}[/img][/url]")
+                    descfile.write(f"[url={web_url}][img]{img_url}[/img][/url]")
                 descfile.write("[/center]")
             if self.signature != None:
                 descfile.write("\n\n")
