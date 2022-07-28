@@ -467,7 +467,7 @@ class Prep():
             with open(f"{base_dir}/tmp/{folder_id}/MEDIAINFO_CLEANPATH.txt", 'w', newline="", encoding='utf-8') as export_cleanpath:
                 export_cleanpath.write(media_info.replace(video, os.path.basename(video)))
                 export_cleanpath.close()
-            console.print("[bold green]MediaInfo Exported.", end="\r")
+            console.print("[bold green]MediaInfo Exported.")
 
         if os.path.exists(f"{base_dir}/tmp/{folder_id}/MediaInfo.json.txt") == False:
             #MediaInfo to JSON
