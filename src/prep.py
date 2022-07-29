@@ -14,6 +14,7 @@ try:
     import os
     from os.path import basename
     import re
+    import math
     import sys
     import distutils.util
     import asyncio
@@ -662,12 +663,14 @@ class Prep():
                         TimeRemainingColumn()
                     ) as progress:
                     screen_task = progress.add_task("[green]Saving Screens...", total=num_screens + 1)
+                    ss_times = []
                     for i in range(num_screens + 1):
                         image = f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png"
                         try:
+                            ss_times = self.valid_ss_time(ss_times, num_screens+1, length)
                             (
                                 ffmpeg
-                                .input(file, ss=random.randint(round(length/5) , round(length - length/5)), skip_frame=keyframe)
+                                .input(file, ss=ss_times[-1], skip_frame=keyframe)
                                 .output(image, vframes=1, pix_fmt="rgb24")
                                 .overwrite_output()
                                 .global_args('-loglevel', 'quiet')
@@ -885,13 +888,15 @@ class Prep():
                         "[cyan]{task.completed}/{task.total}",
                         TimeRemainingColumn()
                     ) as progress:
+                        ss_times = []
                         screen_task = progress.add_task("[green]Saving Screens...", total=num_screens + 1)
                         for i in range(num_screens + 1):
                             image = os.path.abspath(f"{base_dir}/tmp/{folder_id}/{filename}-{i}.png")
                             if not os.path.exists(image) or retake != False:
                                 retake = False
                                 try:
-                                    ff = ffmpeg.input(path, ss=random.randint(round(length/5) , round(length - length/5)))
+                                    ss_times = self.valid_ss_time(ss_times, num_screens+1, length)
+                                    ff = ffmpeg.input(path, ss=ss_times[-1])
                                     if w_sar != 1 or h_sar != 1:
                                         ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                     (
@@ -937,6 +942,21 @@ class Prep():
                             smallest = screens
                     os.remove(smallest)       
 
+    def valid_ss_time(self, ss_times, num_screens, length):
+        valid_time = False
+        while valid_time != True:
+            valid_time = True
+            if ss_times != []:
+                sst = random.randint(round(length/5), round(length/2))
+                for each in ss_times:
+                    tolerance = length / 10 / num_screens
+                    if abs(sst - each) <= tolerance:
+                        valid_time = False
+                if valid_time == True:
+                    ss_times.append(sst)
+            else:
+                ss_times.append(random.randint(round(length/5), round(length/2)))
+        return ss_times
 
     def optimize_images(self, image):
         if self.config['DEFAULT'].get('optimize_images', True) == True:
