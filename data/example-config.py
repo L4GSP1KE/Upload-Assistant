@@ -24,7 +24,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD, LST",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -98,6 +98,11 @@ config = {
         "LCD" : {
             "api_key" : "LCD api key",
             "announce_url" : "https://locadora.xyz/announce/customannounceurl",
+            # "anon" : "False"
+        },
+        "LST" : {
+            "api_key" : "LST api key",
+            "announce_url" : "https://lst.gg/announce/customannounceurl",
             # "anon" : "False"
         },
 
