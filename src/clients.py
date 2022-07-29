@@ -101,14 +101,13 @@ class Clients():
                 torrent = Torrent.read(torrent_path)
                 # If one file, check for folder
                 if len(torrent.files) == len(meta['filelist']) == 1:
-                    if str(torrent.files[0]) == os.path.basename(torrent.files[0]):
+                    if str(torrent.files[0]) == os.path.basename(torrent.files[0]) and os.path.basename(torrent.files[0]) == os.path.basename(meta['filelist'][0]):
                         reuse = torrent_path
                 # Check if number of files matches number of videos
                 elif len(torrent.files) == len(meta['filelist']):
                     torrent_filepath = os.path.commonpath(torrent.files)
                     actual_filepath = os.path.commonpath(meta['filelist'])
                     if torrent_filepath in actual_filepath:
-                        
                         reuse = torrent_path
             else:
                 console.print(f'[bold yellow]NO .torrent WITH INFOHASH {torrenthash} FOUND')
