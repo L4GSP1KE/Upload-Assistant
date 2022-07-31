@@ -94,6 +94,7 @@ class Clients():
                 torrenthash = torrenthash.upper()
             torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
             reuse = None
+            wrong_file = False
             if os.path.exists(torrent_path):
                 # Reuse if disc
                 if meta.get('is_disc', None) != None:
@@ -101,8 +102,11 @@ class Clients():
                 torrent = Torrent.read(torrent_path)
                 # If one file, check for folder
                 if len(torrent.files) == len(meta['filelist']) == 1:
-                    if str(torrent.files[0]) == os.path.basename(torrent.files[0]) and os.path.basename(torrent.files[0]) == os.path.basename(meta['filelist'][0]):
-                        reuse = torrent_path
+                    if os.path.basename(torrent.files[0]) == os.path.basename(meta['filelist'][0]):
+                        if str(torrent.files[0]) == os.path.basename(torrent.files[0]):
+                            reuse = torrent_path
+                    else:
+                        wrong_file = True
                 # Check if number of files matches number of videos
                 elif len(torrent.files) == len(meta['filelist']):
                     torrent_filepath = os.path.commonpath(torrent.files)
@@ -119,6 +123,9 @@ class Clients():
                         reuse = None
                     elif reuse_torrent.piece_size < 32768:
                         console.print("[bold yellow]Piece size too small to reuse")
+                        reuse = None
+                    elif wrong_file == True:
+                        console.print("[bold red] Provided .torrent has files that were not expected")
                         reuse = None
                     else:
                         console.print(f'[bold green]REUSING .torrent with infohash: {torrenthash}')

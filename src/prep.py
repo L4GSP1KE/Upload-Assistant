@@ -2775,7 +2775,7 @@ class Prep():
     async def search_imdb(self, filename, search_year):
         imdbID = '0'
         ia = Cinemagoer()
-        search = ia.search_movie(f"{filename}")
+        search = ia.search_movie(filename)
         for movie in search:
             if filename in movie.get('title', ''):
                 if movie.get('year') == search_year:
