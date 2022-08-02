@@ -1971,7 +1971,12 @@ class Prep():
             if img_host == 'imgbox':
                 nest_asyncio.apply()
                 console.print("[green]Uploading Screens to Imgbox...")
-                image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))               
+                image_list = asyncio.run(self.imgbox_upload(f"{meta['base_dir']}/tmp/{meta['uuid']}", image_glob))
+                if image_list == []:
+                    if img_host_num == 0:
+                        img_host_num = 1
+                    console.print("[yellow]Imgbox failed, trying next image host")
+                    image_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)        
             else:
                 with Progress(
                     TextColumn("[bold green]Uploading Screens..."),
@@ -2058,11 +2063,15 @@ class Prep():
         # image_glob = glob.glob("*.png")
         async with pyimgbox.Gallery(thumb_width=350, square_thumbs=False) as gallery:
             async for submission in gallery.add(image_glob):
-                image_dict = {}
-                image_dict['web_url'] = submission['web_url']
-                image_dict['img_url'] = submission['thumbnail_url']
-                image_dict['raw_url'] = submission['image_url']
-                image_list.append(image_dict)
+                if not submission['success']:
+                    console.print(f"[red]There was an error uploading to imgbox: [yellow]{submission['error']}[/yellow][/red]")
+                    return []
+                else:
+                    image_dict = {}
+                    image_dict['web_url'] = submission['web_url']
+                    image_dict['img_url'] = submission['thumbnail_url']
+                    image_dict['raw_url'] = submission['image_url']
+                    image_list.append(image_dict)
         return image_list
 
 
