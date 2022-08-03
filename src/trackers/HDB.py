@@ -176,8 +176,8 @@ class HDB():
         hdb_name = hdb_name.replace(meta.get('aka', ''), '').replace(meta['title'], meta['imdb_info']['aka'])
         if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']):
             hdb_name = hdb_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
-        # Remove Dubbed from title
-        hdb_name = hdb_name.replace('Dubbed', '')
+        # Remove Dubbed/Dual-Audio from title
+        hdb_name = hdb_name.replace('Dubbed', '').replace('Dual-Audio', '')
         hdb_name = ' '.join(hdb_name.split())
 
         return hdb_name 
