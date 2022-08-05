@@ -107,7 +107,7 @@ class HUNO():
         alt_title = meta.get('aka', "")
         year = meta.get('year', "")
         resolution = meta.get('resolution', "")
-        audio = meta.get('audio', "").replace("DD+", "DDP")
+        audio = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "")
         audio_lang = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English")
         service = meta.get('service', "")
         season = meta.get('season', "")
