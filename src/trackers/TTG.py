@@ -40,7 +40,7 @@ class TTG():
         remove_list = ['Dubbed', 'Dual-Audio']
         for each in remove_list:
             ttg_name = ttg_name.replace(each, '')
-
+        ttg_name = ttg_name.replace('.', '{@}')
         return ttg_name
 
     async def get_type_id(self, meta):
