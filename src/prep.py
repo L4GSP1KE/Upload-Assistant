@@ -337,8 +337,8 @@ class Prep():
             meta['video_codec'] = self.get_video_codec(bdinfo)
         else:
             meta['video_encode'], meta['video_codec'], meta['has_encode_settings'], meta['bit_depth'] = self.get_video_encode(mi, meta['type'], bdinfo)
-        if meta.get('edition', None) == None:
-            meta['edition'], meta['repack'] = self.get_edition(guessit(meta['path']), meta['path'], bdinfo, meta['filelist'], meta['title'])
+        
+        meta['edition'], meta['repack'] = self.get_edition(meta['path'], bdinfo, meta['filelist'], meta.get('manual_edition'))
         if "REPACK" in meta.get('edition', ""):
             meta['repack'] = re.search("REPACK[\d]?", meta['edition'])[0]
             meta['edition'] = re.sub("REPACK[\d]?", "", meta['edition']).strip().replace('  ', ' ')
@@ -1805,7 +1805,8 @@ class Prep():
         return video_encode, video_codec, has_encode_settings, bit_depth
 
 
-    def get_edition(self, guess, video, bdinfo, filelist, title):
+    def get_edition(self, video, bdinfo, filelist, manual_edition):
+        guess = guessit(video)
         repack = ""
         edition = ""
         if bdinfo != None:
@@ -1825,6 +1826,12 @@ class Prep():
             video = os.path.basename(video)
         if "open matte" in video.replace('.', ' ').lower():
             edition = edition + "Open Matte"
+
+        if manual_edition != None:
+            if isinstance(manual_edition, list):
+                manual_edition = " ".join(manual_edition)
+            edition = str(manual_edition)
+            
         if "REPACK" in video.upper() or "V2" in video.upper():
             repack = "REPACK"
         if "REPACK2" in video.upper() or "V3" in video.upper():

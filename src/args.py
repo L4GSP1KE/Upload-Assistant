@@ -32,7 +32,7 @@ class Args():
         parser.add_argument('-g', '--tag', nargs='?', required=False, help="Group Tag", type=str, const="")
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
         parser.add_argument('-dist', '--distributor', nargs='*', required=False, help="Disc Distributor e.g.(Criterion, BFI, etc.)", type=str)
-        parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str)
+        parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str, dest='manual_edition', default="")
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
         parser.add_argument('--no-year', dest='no_year', action='store_true', required=False, help="Remove Year from title")
@@ -65,6 +65,7 @@ class Args():
         
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
+        # console.print(args)
         
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
@@ -112,6 +113,8 @@ class Args():
                         meta[key] = value2
                 else:
                     meta[key] = value
+            elif key in ("manual_edition"):
+                meta[key] = value
             else:
                 meta[key] = meta.get(key, None)
             if key in ('trackers'):
