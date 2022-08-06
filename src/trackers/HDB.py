@@ -173,9 +173,11 @@ class HDB():
             hdb_name = hdb_name.replace(' DV ', ' DoVi ')
         if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE'):
             hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace(' ', '', 1))
-        hdb_name = hdb_name.replace(meta.get('aka', ''), '').replace(meta['title'], meta['imdb_info']['aka'])
-        if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']):
-            hdb_name = hdb_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
+        hdb_name = hdb_name.replace(meta.get('aka', ''), '')
+        if meta.get('imdb_info'):
+            hdb_name = hdb_name.replace(meta['title'], meta['imdb_info']['aka'])
+            if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']):
+                hdb_name = hdb_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
         # Remove Dubbed/Dual-Audio from title
         hdb_name = hdb_name.replace('Dubbed', '').replace('Dual-Audio', '')
         hdb_name = ' '.join(hdb_name.split())
@@ -238,7 +240,6 @@ class HDB():
                 'descr' : hdb_desc.rstrip(),
                 'techinfo' : '',
                 'tags[]' : hdb_tags,
-                'imdb' : f"https://www.imdb.com/title/tt{meta.get('imdb_id', '').replace('tt', '')}/",
             }
 
             # If internal, set 1
@@ -251,6 +252,8 @@ class HDB():
             # If tv, submit tvdb_id/season/episode
             if meta.get('tvdb_id', 0) != 0:
                 data['tvdb'] = meta['tvdb_id']
+            if int(meta.get('imdb_id', '').replace('tt', '')) != 0:
+                data['imdb'] = f"https://www.imdb.com/title/tt{meta.get('imdb_id', '').replace('tt', '')}/",
             if meta.get('category') == 'TV':
                 data['tvdb_season'] = int(meta.get('season_int', 1))
                 data['tvdb_episode'] = int(meta.get('episode_int', 1))

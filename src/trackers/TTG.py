@@ -153,13 +153,15 @@ class TTG():
                 'name' : ttg_name,
                 'type' : await self.get_type_id(meta),
                 'descr' : ttg_desc.rstrip(),
-                'imdb_c' : f"tt{meta.get('imdb_id', '').replace('tt', '')}",
+                
 
                 'anonymity' : await self.get_anon(meta['anon']),
                 'nodistr' : 'no',
                 
             }
             url = "https://totheglory.im/takeupload.php"
+            if int(meta['imdb_id'].replace('tt', '')) != 0:
+                data['imdb_c'] = f"tt{meta.get('imdb_id', '').replace('tt', '')}"
 
             # Submit
             if meta['debug']:
