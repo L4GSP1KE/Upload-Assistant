@@ -251,7 +251,7 @@ class PTP():
         headers = { 'referer': 'https://ptpimg.me/index.php'}
         url = "https://ptpimg.me/upload.php"
 
-        response = requests.post("https://ptpimg.me/upload.php", headers=headers, data=payload)
+        response = requests.post(url, headers=headers, data=payload)
         try:
             response = response.json()
             ptpimg_code = response[0]['code']
@@ -710,11 +710,11 @@ class PTP():
             if cover == None:
                 cover = meta.get('poster')
             if cover != None and "ptpimg" not in cover:
-                ptpimg_cover = await self.ptpimg_url_rehost(cover)
+                cover = await self.ptpimg_url_rehost(cover)
             new_data = {
                 "title": tinfo.get("title", meta["imdb_info"].get("title", meta["title"])),
                 "year": tinfo.get("year", meta["imdb_info"].get("year", meta["year"])),
-                "image": ptpimg_cover,
+                "image": cover,
                 "tags": tinfo.get("tags", ""),
                 "album_desc": tinfo.get("plot", meta.get("overview", "")),
                 "trailer": meta.get("youtube", ""),
