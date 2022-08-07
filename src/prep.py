@@ -1032,7 +1032,7 @@ class Prep():
             if year == None:
                 year = meta['search_year']
             console.print(f"[yellow]TMDb was unable to find anything with that IMDb, searching TMDb for {title}")
-            meta = await self.get_tmdb_id(title, year, meta, meta['category'])
+            meta = await self.get_tmdb_id(title, year, meta, meta['category'], imdb_info.get('original title', imdb_info.get('localized title', meta['uuid'])))
             if meta.get('tmdb') in ('None', '', None, 0, '0'):
                 if meta.get('mode', 'discord') == 'cli':
                     console.print('[yellow]Unable to find a matching TMDb entry')
