@@ -8,6 +8,7 @@ from termcolor import cprint
 import distutils.util
 import os
 from pprint import pprint
+from src.trackers.COMMON import COMMON
 
 # from pprint import pprint
 
@@ -28,20 +29,18 @@ class HUNO():
         self.forum_link = 'https://hawke.uno/pages/1'
         pass
 
+
     async def upload(self, meta):
-        await self.edit_torrent(meta)
+        common = COMMON(config=self.config)
+        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.edit_torrent(meta, self.tracker, self.source_flag)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
-        await self.edit_desc(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['HUNO'].get('anon', "False"))) == False:
             anon = 0
         else:
             anon = 1
-        if bool(distutils.util.strtobool(self.config['TRACKERS']['HUNO'].get('internal', "False"))) == False:
-            internal = 0
-        else:
-            internal = 1
 
         if meta['bdinfo'] != None:
             mi_dump = None
@@ -69,13 +68,17 @@ class HUNO():
             'stream' : await self.is_plex_friendly(meta),
             'sd' : meta['sd'],
             'keywords' : meta['keywords'],
-            'internal' : internal,
             'season_pack': await self.is_season_pack(meta),
             # 'featured' : 0,
             # 'free' : 0,
             # 'double_up' : 0,
             # 'sticky' : 0,
         }
+        if self.config['TRACKERS'][self.tracker].get('internal', False) == True:
+            if meta['tag'] != "" and (
+                    meta['tag'][1:] in self.config['TRACKERS'][self.tracker].get('internal_groups', [])):
+                data['internal'] = 1
+
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
         }
@@ -97,6 +100,7 @@ class HUNO():
             cprint(f"Request Data:", 'cyan')
             pprint(data)
         open_torrent.close()
+
 
     async def get_name(self, meta):
         # Copied from Prep.get_name() then modified to match HUNO's naming convention.
@@ -181,12 +185,14 @@ class HUNO():
 
         return ' '.join(name.split())
 
+
     async def get_cat_id(self, category_name):
         category_id = {
             'MOVIE': '1',
             'TV': '2',
             }.get(category_name, '0')
         return category_id
+
 
     async def get_type_id(self, type):
         type_id = {
@@ -197,6 +203,7 @@ class HUNO():
             'DISC': '1',
             }.get(type, '0')
         return type_id
+
 
     async def get_res_id(self, resolution):
         resolution_id = {
@@ -213,6 +220,7 @@ class HUNO():
             }.get(resolution, '10')
         return resolution_id
 
+
     async def is_plex_friendly(self, meta):
         lossy_audio_codecs = ["AAC", "DD", "DD+", "OPUS"]
 
@@ -220,6 +228,7 @@ class HUNO():
             return 1
 
         return 0
+
 
     async def is_season_pack(self, meta):
         if meta["category"] == "TV" and os.path.isdir(meta["path"]):
@@ -243,12 +252,6 @@ class HUNO():
 
         return 0
 
-    async def edit_torrent(self, meta):
-        HUNO_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-        HUNO_torrent.metainfo['announce'] = self.config['TRACKERS']['HUNO']['announce_url'].strip()
-        HUNO_torrent.metainfo['info']['source'] = "HUNO"
-        Torrent.copy(HUNO_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[HUNO]{meta['clean_name']}.torrent", overwrite=True)
-        return
 
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
@@ -268,8 +271,6 @@ class HUNO():
             desc.write("\n[center][url=https://github.com/theweasley/HUNO-Upload-Assistant]Created by HUNO's Upload Assistant[/url][/center]")
             desc.close()
         return
-
-
 
 
     async def search_existing(self, meta):
