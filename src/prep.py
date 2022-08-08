@@ -207,11 +207,11 @@ class Prep():
                 meta['imdb'], meta['ext_torrenthash'] = await ptp.get_imdb_from_torrent_id(meta['ptp'])
             else:
                 if meta['is_disc'] in [None, ""]:
-                    ptp_search_term = meta['filelist'][0]
+                    ptp_search_term = os.path.basename(meta['filelist'][0])
                     search_file_folder = 'file'
                 else:
                     search_file_folder = 'folder'
-                    ptp_search_term = meta['path']
+                    ptp_search_term = os.path.basename(meta['path'])
                 ptp_imdb, ptp_id, meta['ext_torrenthash'] = await ptp.get_ptp_id_imdb(ptp_search_term, search_file_folder)
                 if ptp_imdb != None:
                     meta['imdb'] = ptp_imdb

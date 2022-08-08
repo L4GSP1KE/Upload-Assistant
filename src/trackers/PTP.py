@@ -62,14 +62,14 @@ class PTP():
                                             imdb_id = movie['ImdbId']
                                             ptp_torrent_id = torrent['Id']
                                             dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
-                                            console.print(f'[bold green]Matched release with PTP ID: [yellow]{ptp_torrent_id}[/yellow][/green]')
+                                            console.print(f'[bold green]Matched release with PTP ID: [yellow]{ptp_torrent_id}[/yellow][/bold green]')
                                             return imdb_id, ptp_torrent_id, ptp_torrent_hash
                                 if search_file_folder == 'folder':
                                     if str(torrent['FilePath']) == filename:
                                         imdb_id = movie['ImdbId']
                                         ptp_torrent_id = torrent['Id']
                                         dummy, ptp_torrent_hash = await self.get_imdb_from_torrent_id(ptp_torrent_id)
-                                        console.print(f'[bold green]Matched release with PTP ID: [yellow]{ptp_torrent_id}[/yellow][/green]')
+                                        console.print(f'[bold green]Matched release with PTP ID: [yellow]{ptp_torrent_id}[/yellow][/bold green]')
                                         return imdb_id, ptp_torrent_id, ptp_torrent_hash
                 else:
                     return None, None, None
@@ -82,6 +82,7 @@ class PTP():
             else:
                 return None, None, None
         except Exception:
+            console.print_exception()
             pass
         return None, None, None
     
