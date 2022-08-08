@@ -4,13 +4,10 @@ import asyncio
 from torf import Torrent
 import requests
 from difflib import SequenceMatcher
-from termcolor import cprint
 import distutils.util
 import os
-from pprint import pprint
 from src.trackers.COMMON import COMMON
-
-# from pprint import pprint
+from src.console import console
 
 class HUNO():
     """
@@ -26,13 +23,13 @@ class HUNO():
         self.source_flag = 'HUNO'
         self.search_url = 'https://hawke.uno/api/torrents/filter'
         self.upload_url = 'https://hawke.uno/api/torrents/upload'
-        self.forum_link = 'https://hawke.uno/pages/1'
+        self.signature = "\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by HUNO's Upload Assistant[/url][/center]"
         pass
 
 
     async def upload(self, meta):
         common = COMMON(config=self.config)
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'])
@@ -89,16 +86,13 @@ class HUNO():
         if meta['debug'] == False:
             response = requests.post(url=self.upload_url, files=files, data=data, headers=headers, params=params)
             try:
-                # pprint(data)
-                print(response.json())
+                console.print(response.json())
             except:
-                cprint("It may have uploaded, go check")
-                # cprint(f"Request Data:", 'cyan')
-                # pprint(data)
+                console.print("It may have uploaded, go check")
                 return
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(data)
+            console.print(f"[cyan]Request Data:")
+            console.print(data)
         open_torrent.close()
 
 
@@ -253,29 +247,9 @@ class HUNO():
         return 0
 
 
-    async def edit_desc(self, meta):
-        base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[HUNO]DESCRIPTION.txt", 'w') as desc:
-            desc.write(base)
-            images = meta['image_list']
-            if len(images) > 0:
-                desc.write("[center]")
-                for each in range(len(images)):
-                    web_url = images[each]['web_url']
-                    img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
-                    if (each + 1) % 3 == 0:
-                        desc.write("\n")
-                desc.write("[/center]")
-
-            desc.write("\n[center][url=https://github.com/theweasley/HUNO-Upload-Assistant]Created by HUNO's Upload Assistant[/url][/center]")
-            desc.close()
-        return
-
-
     async def search_existing(self, meta):
         dupes = []
-        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        console.print("[yellow]Searching for existing torrents on site...")
 
         params = {
             'api_token' : self.config['TRACKERS']['HUNO']['api_key'].strip(),
@@ -299,7 +273,7 @@ class HUNO():
                 # if difference >= 0.05:
                 dupes.append(result)
         except:
-            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
         return dupes
