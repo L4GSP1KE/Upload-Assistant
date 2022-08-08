@@ -56,6 +56,11 @@ config = {
             "announce_url" : "https://racing4everyone.eu/announce/customannounceurl",
             # "anon" : "False"
         },
+        "HUNO" : {
+            "api_key" : "HUNO api key",
+            "announce_url" : "https://hawke.uno/announce/customannounceurl",
+            # "anon" : "False"
+        },
         "STC" :{
             "api_key" : "STC",
             "announce_url" : "https://skipthecommericals.xyz/announce/customannounceurl",
