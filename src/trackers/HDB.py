@@ -204,7 +204,7 @@ class HDB():
                 console.print("[bold red]Something didn't map correctly, or this content is not allowed on HDB")
                 return
         if "Dual-Audio" in meta['audio'] and meta['is_disc'] not in ("BDMV", "HDDVD", "DVD"):
-            console.print("[red]Dual-Audio Encodes are not allowed")
+            console.print("[bold red]Dual-Audio Encodes are not allowed")
             return
         # FORM
             # file : .torent file (needs renaming)
