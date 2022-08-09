@@ -49,7 +49,7 @@ class PTP():
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
         await asyncio.sleep(1)
-        console.print(f"[green]Searching PTP for [yellow]{filename}[/yellow]")
+        console.print(f"[green]Searching PTP for [bold yellow]{filename}[/bold yellow]")
         try:
             if response.status_code == 200:
                 response = response.json()
