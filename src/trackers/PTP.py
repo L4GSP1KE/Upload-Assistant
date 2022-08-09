@@ -49,6 +49,7 @@ class PTP():
         url = 'https://passthepopcorn.me/torrents.php'
         response = requests.get(url, params=params, headers=headers)
         await asyncio.sleep(1)
+        console.print(f"[green]Searching PTP for [yellow]{filename}[/yellow]")
         try:
             if response.status_code == 200:
                 response = response.json()
@@ -72,6 +73,7 @@ class PTP():
                                         console.print(f'[bold green]Matched release with PTP ID: [yellow]{ptp_torrent_id}[/yellow][/bold green]')
                                         return imdb_id, ptp_torrent_id, ptp_torrent_hash
                 else:
+                    console.print(f'[yellow]Could not find any release matching [bold yellow]{filename}[/bold yellow] on PTP')
                     return None, None, None
             elif int(response.status_code) in [400, 401, 403]:
                 console.print(f"[bold red]PTP: {response.text}")
@@ -82,8 +84,8 @@ class PTP():
             else:
                 return None, None, None
         except Exception:
-            console.print_exception()
             pass
+        console.print(f'[yellow]Could not find any release matching [bold yellow]{filename}[/bold yellow] on PTP')
         return None, None, None
     
     async def get_imdb_from_torrent_id(self, ptp_torrent_id):
