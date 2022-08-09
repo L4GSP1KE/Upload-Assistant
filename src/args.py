@@ -32,7 +32,7 @@ class Args():
         parser.add_argument('-g', '--tag', nargs='?', required=False, help="Group Tag", type=str, const="")
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
         parser.add_argument('-dist', '--distributor', nargs='*', required=False, help="Disc Distributor e.g.(Criterion, BFI, etc.)", type=str)
-        parser.add_argument('-edition', '--edition', nargs='*', required=False, help="Edition", type=str, dest='manual_edition', default="")
+        parser.add_argument('-edition', '--edition', '--repack', nargs='*', required=False, help="Edition/Repack String e.g.(Director's Cut, REPACK, Uncut)", type=str, dest='manual_edition', default="")
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
         parser.add_argument('--no-year', dest='no_year', action='store_true', required=False, help="Remove Year from title")
