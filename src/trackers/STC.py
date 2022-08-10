@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import asyncio
-from torf import Torrent
 import requests
 from difflib import SequenceMatcher
 import distutils.util

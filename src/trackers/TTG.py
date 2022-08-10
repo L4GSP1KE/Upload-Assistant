@@ -12,7 +12,6 @@ import cli_ui
 from unidecode import unidecode
 from urllib.parse import urlparse, quote
 from src.trackers.COMMON import COMMON
-from src.bbcode import BBCODE
 from src.exceptions import *
 from src.console import console
 
