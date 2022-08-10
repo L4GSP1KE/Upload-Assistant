@@ -43,7 +43,7 @@ class Args():
         parser.add_argument('-pb', '--desclink', nargs='*', required=False, help="Custom Description (link to hastebin/pastebin)")
         parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
         parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'imgbox'])
-        parser.add_argument('-th', '--torrenthash', nargs='*', required=False, help="Torrent Hash to re-use")
+        parser.add_argument('-th', '--torrenthash', nargs='*', required=False, help="Torrent Hash to re-use from your client's session directory")
         parser.add_argument('-nfo', '--nfo', action='store_true', required=False, help="Use .nfo in directory for description")
         parser.add_argument('-k', '--keywords', nargs='*', required=False, help="Add comma seperated keywords e.g. 'keyword, keyword2, etc'")
         parser.add_argument('-reg', '--region', nargs='*', required=False, help="Region for discs")

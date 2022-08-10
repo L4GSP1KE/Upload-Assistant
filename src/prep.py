@@ -1889,7 +1889,7 @@ class Prep():
             include_globs = include or [],
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
-        console.print("[bold yellow]Creating .torrent")
+        console.print("[bold yellow]Creating .torrent... (No --torrenthash was provided)")
         file_size = torrent.size
         if file_size < 268435456: # 256 MiB
             piece_size = 18
