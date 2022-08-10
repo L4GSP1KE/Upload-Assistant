@@ -232,9 +232,8 @@ class Clients():
             if local_path.lower() in path.lower() and local_path.lower() != remote_path.lower():
                 path = path.replace(local_path, remote_path)
                 path = path.replace(os.sep, '/')
-            # if isdir == False:
-            else:
-                path = os.path.dirname(path)
+            
+            path = os.path.dirname(path)
 
             client.call('core.add_torrent_file', torrent_path, base64.b64encode(torrent.dump()), {'download_location' : path, 'seed_mode' : True})
             if meta['debug']:
