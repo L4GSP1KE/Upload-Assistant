@@ -196,7 +196,7 @@ async def do_the_thing(base_dir):
         #######  Upload to Trackers  #######
         ####################################
         common = COMMON(config=config)
-        unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO']
+        unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN']
         http_trackers = ['HDB', 'TTG']
         tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO}
 
@@ -304,19 +304,6 @@ async def do_the_thing(base_dir):
                     except:
                         console.print(traceback.print_exc())
 
-            if tracker == "SN":
-                if meta['unattended']:
-                    upload_to_sn = True
-                else:
-                    upload_to_sn = cli_ui.ask_yes_no(f"Upload to Swarmazon? {debug}", default=meta['unattended'])
-                if upload_to_sn:
-                    console.print("Uploading to Swarmazon")
-                    sn = SN(config=config)
-                    console.print("[yellow]Dupe Search on Swarmazon, Currently not supported so assuming no Dupes")
-                    meta['upload'] = True
-                    if meta['upload'] == True:
-                        await sn.upload(meta)
-                        await client.add_to_client(meta, "SN")
 
             if tracker == "PTP":
                 if meta['unattended']:

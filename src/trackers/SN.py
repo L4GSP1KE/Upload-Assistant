@@ -118,3 +118,7 @@ class SN():
             desc.close()
         return
 
+
+    async def search_existing(self, meta):
+        console.print("[yellow]Dupe Search on Swarmazon, Currently not supported so assuming no Dupes")
+        return []
