@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
 import requests
+from termcolor import cprint
+from pprint import pprint
+import asyncio
 import traceback
 
 from src.trackers.COMMON import COMMON
-from src.console import console
 
+
+# from pprint import pprint
 
 class SN():
     """
@@ -19,8 +23,9 @@ class SN():
         self.config = config
         self.tracker = 'SN'
         self.source_flag = 'Swarmazon'
-        self.upload_url = 'https://swarmazon.club/en/upload/upload.php'
+        self.upload_url = 'https://swarmazon.club/api/upload.php'
         self.forum_link = 'https://swarmazon.club/php/forum.php?forum_page=2-swarmazon-rules'
+        self.search_url = 'https://swarmazon.club/api/search.php'
         pass
 
     async def get_type_id(self, type):
@@ -36,6 +41,7 @@ class SN():
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
+        #await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
         await self.edit_desc(meta)
         cat_id = ""
         sub_cat_id = ""
@@ -65,9 +71,9 @@ class SN():
             tfile = f.read()
             f.close()
 
-        # need to pass the name of the file along with the torrent
+        # uploading torrent file.
         files = {
-            'fileToUpload': (f"{meta['name']}.torrent", tfile)
+            'torrent': (f"{meta['name']}.torrent", tfile)
         }
 
         # adding bd_dump to description if it exits and adding empty string to mediainfo
@@ -76,49 +82,83 @@ class SN():
             mi_dump = ""
 
         data = {
+            'api_key': self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'name': meta['name'],
-            'categoryId': cat_id,
-            'typeid': sub_cat_id,
-            'media_ref': f"https://www.imdb.com/title/tt{meta['imdb_id']}",
+            'category_id': cat_id,
+            'type_id': sub_cat_id,
+            'media_ref': f"tt{meta['imdb_id']}",
             'description': desc,
-            'mediainfo': mi_dump
+            'media_info': mi_dump
+
         }
 
-        cookie = {'PHPSESSID': self.config['TRACKERS'][self.tracker].get('PHPSESSID'), 'swarmazon_remember': self.config['TRACKERS'][self.tracker].get('swarmazon_remember')}
-
         if meta['debug'] == False:
-            response = requests.request("POST", url=self.upload_url, data=data, files=files, cookies=cookie)
+            response = requests.request("POST", url=self.upload_url, data=data, files=files)
+
             try:
-                if str(response.url).__contains__("view"):
-                    console.print(response.url)
+                if response.json().get('success'):
+                    print(response.json())
                 else:
-                    console.print("[red]No DL link in response, unable to download torrent. It maybe a duplicate, go check")
-                    console.print(data)
+                    cprint("Did not upload successfully", 'grey', 'on_red')
+                    pprint(response.json())
             except:
-                console.print("It may have uploaded, go check", 'grey', 'on_red')
-                console.print(data)
+                cprint("Error! It may have uploaded, go check", 'grey', 'on_red')
+                pprint(data)
+                print(traceback.print_exc())
                 return
         else:
-            console.print(f"[cyan]Request Data:")
-            console.print(data)
+            cprint(f"Request Data:", 'cyan')
+            pprint(data)
 
 
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as desc:
             desc.write(base)
-            desc.write(f"[center]")
             images = meta['image_list']
             if len(images) > 0:
-                for each in range(len(images[:int(meta['screens'])])):
+                desc.write("[center]")
+                for each in range(len(images)):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img=720]{img_url}[/img][/url]")
-            desc.write(f"\n[url={self.forum_link}]Simplicity, Socializing and Sharing![/url][/center]")
+                    desc.write(f"[url={web_url}][img]{img_url}[/img][/url]")
+                desc.write("[/center]")
+            desc.write(f"\n[center][url={self.forum_link}]Simplicity, Socializing and Sharing![/url][/center]")
             desc.close()
         return
 
 
     async def search_existing(self, meta):
-        console.print("[yellow]Dupe Search on Swarmazon, Currently not supported so assuming no Dupes")
-        return []
+        dupes = []
+        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+
+        params = {
+            'api_key' : self.config['TRACKERS'][self.tracker]['api_key'].strip()
+        }
+
+        # using title if IMDB id does not exist to search
+        if meta['imdb_id'] == 0:
+            if meta['category'] == 'TV':
+                params['filter'] = meta['title'] + f"{meta.get('season', '')}{meta.get('episode', '')}" + " " + meta['resolution']
+            else:
+                params['filter'] = meta['title']
+        else:
+            #using IMDB_id to search if it exists.
+            if meta['category'] == 'TV':
+                params['media_ref'] = f"tt{meta['imdb_id']}"
+                params['filter'] = f"{meta.get('season', '')}{meta.get('episode', '')}" + " " + meta['resolution']
+            else:
+                params['media_ref'] = f"tt{meta['imdb_id']}"
+                params['filter'] = meta['resolution']
+
+        try:
+            response = requests.get(url=self.search_url, params=params)
+            response = response.json()
+            for i in response['data']:
+                result = i['name']
+                dupes.append(result)
+        except:
+            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            await asyncio.sleep(5)
+
+        return dupes
