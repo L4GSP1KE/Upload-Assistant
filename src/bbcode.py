@@ -118,8 +118,8 @@ class BBCODE:
 
 
         # Remove Images in IMG tags:
-        desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc)
-        desc = re.sub("\[img=[\s\S]*?\]", "", desc)
+        desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc, flags=re.IGNORECASE)
+        desc = re.sub("\[img=[\s\S]*?\]", "", desc, flags=re.IGNORECASE)
         # Replace Images
         loose_images = re.findall("(https?:\/\/.*\.(?:png|jpg))", nocomp, flags=re.IGNORECASE)
         if len(loose_images) >= 1:
@@ -128,7 +128,7 @@ class BBCODE:
         # Re-place comparisons
         if comp_placeholders != []:
             for i, comp in enumerate(comp_placeholders):
-                comp = comp.replace('[img]', '').replace('[/img]', '')
+                comp = re.sub("\[\/?img[\s\S]*?\]", comp, flags=re.IGNORECASE)
                 desc = desc.replace(f"COMPARISON_PLACEHOLDER-{i}", comp)
 
         # Strip blank lines:
