@@ -1806,6 +1806,8 @@ class Prep():
 
 
     def get_edition(self, video, bdinfo, filelist, manual_edition):
+        if video.lower().startswith('dc'):
+            video = video.replace('dc', '', 1)
         guess = guessit(video)
         repack = ""
         edition = ""
