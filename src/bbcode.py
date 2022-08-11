@@ -44,17 +44,19 @@ class BBCODE:
         # End my suffering
         desc = desc.replace('\r\n', '\n')
 
-        # Remove url tags with PTP links
-        ptp_url_tags = re.findall("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+)([^\[]+)(\[\/url\])?", desc)
-        if ptp_url_tags != []:
-            for ptp_url_tag in ptp_url_tags:
-                ptp_url_tag = ''.join(ptp_url_tag)
-                url_tag_removed = re.sub("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+])", "", ptp_url_tag)
+        # Remove url tags with PTP/HDB links
+        ptp_hdb_url_tags = re.findall("((\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+)|(\[url[\=\]]https?:\/\/hdbits\.o[^\]]+))([^\[]+)(\[\/url\])?", desc)
+        if ptp_hdb_url_tags != []:
+            for ptp_hdb_url_tag in ptp_hdb_url_tags:
+                ptp_hdb_url_tag = ''.join(ptp_hdb_url_tag)
+                url_tag_removed = re.sub("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+])", "", ptp_hdb_url_tag)
+                url_tag_removed = re.sub("(\[url[\=\]]https?:\/\/hdbits\.o[^\]]+])", "", ptp_hdb_url_tag)
                 url_tag_removed = url_tag_removed.replace("[/url]", "")
-                desc = desc.replace(ptp_url_tag, url_tag_removed)
+                desc = desc.replace(ptp_hdb_url_tag, url_tag_removed)
 
-        # Remove links to PTP
+        # Remove links to PTP/HDB
         desc = desc.replace('http://passthepopcorn.me', 'PTP').replace('https://passthepopcorn.me', 'PTP')
+        desc = desc.replace('http://hdbits.org', 'HDB').replace('https://hdbits.org', 'HDB')
 
         # Remove Mediainfo Tags / Attempt to regex out mediainfo
         mediainfo_tags = re.findall("\[mediainfo\][\s\S]*?\[\/mediainfo\]",  desc)
