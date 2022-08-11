@@ -2673,11 +2673,11 @@ class Prep():
                 Torrent.copy(base_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/{manual_name}.torrent", overwrite=True)
                 # shutil.copy(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"), os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['name'].replace(' ', '.')}.torrent").replace(' ', '.'))
             filebrowser = self.config['TRACKERS'].get('MANUAL', {}).get('filebrowser', None)
+            shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
             if filebrowser != None:
                 url = '/'.join(s.strip('/') for s in (filebrowser, f"/tmp/{meta['uuid']}"))
                 url = urllib.parse.quote(url, safe="https://")
             else:
-                shutil.make_archive(archive, 'tar', f"{meta['base_dir']}/tmp/{meta['uuid']}")
                 files = {
                     "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
                 response = requests.post("https://uguu.se/upload.php", files=files).json()
