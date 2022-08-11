@@ -2836,7 +2836,7 @@ class Prep():
             lookup = True
         elif int(tvdbID) != 0:
             params = {
-                "tvdb" : tvdbID
+                "thetvdb" : tvdbID
             }
             url = "https://api.tvmaze.com/lookup/shows"
             lookup = True
@@ -2845,7 +2845,6 @@ class Prep():
                 "q" : filename
             }
             url = f"https://api.tvmaze.com/search/shows"
-        
         resp = requests.get(url=url, params=params).json()
         if lookup == True:
             show = resp
