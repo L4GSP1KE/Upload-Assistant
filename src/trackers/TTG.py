@@ -345,10 +345,12 @@ class TTG():
     async def ptgen(self, meta):
         ptgen = ""
         url = "https://api.iyuu.cn/App.Movie.Ptgen"
-        params = {
-            'site' : 'douban',
-            'url' : f"tt{meta['imdb_id']}"
-        }
+        params = {}
+        if int(meta.get('imdb_id', '0')) != 0:
+            params['url'] = f"tt{meta['imdb_id']}"
+        else:
+            console.print("[red]No IMDb id was found.")
+            params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
         try:
             ptgen = requests.get(url, params=params)
             ptgen = ptgen.json()
