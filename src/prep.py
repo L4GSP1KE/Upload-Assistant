@@ -328,7 +328,7 @@ class Prep():
         meta['3D'] = self.is_3d(mi, bdinfo)
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):
-            meta['service'], meta['service_longname'] = self.get_service(video, meta.get('tag', ''))
+            meta['service'], meta['service_longname'] = self.get_service(video, meta.get('tag', ''), meta['audio'])
         meta['uhd'] = self.get_uhd(meta['type'], guessit(meta['path']), meta['resolution'], meta['path'])
         meta['hdr'] = self.get_hdr(mi, bdinfo)
         meta['distributor'] = self.get_distributor(meta['distributor'])
@@ -2125,6 +2125,8 @@ class Prep():
                 year = ""
         if meta.get('no_year', False) == True:
             year = ''
+        if meta.get('no_aka', False) == True:
+            alt_title = ''
         if meta['debug']:
             console.print("[cyan]get_name meta:")
             console.print(meta)
@@ -2409,7 +2411,7 @@ class Prep():
         return meta
 
 
-    def get_service(self, video, tag):
+    def get_service(self, video, tag, audio):
         service = guessit(video).get('streaming_service', "")
         guess_title = guessit(video).get('title', '')
         services = {
@@ -2461,6 +2463,8 @@ class Prep():
         
         
         video_name = re.sub("[.()]", " ", video.replace(tag, '').replace(guess_title, ''))
+        if "DTS-HD MA" in audio:
+            video_name = video_name.replace("DTS-HD.MA.", "").replace("DTS-HD MA ", "")
         for key, value in services.items():
             if (' ' + key + ' ') in (video_name):
                 service = value
@@ -2832,7 +2836,7 @@ class Prep():
             lookup = True
         elif int(tvdbID) != 0:
             params = {
-                "tvdb" : tvdbID
+                "thetvdb" : tvdbID
             }
             url = "https://api.tvmaze.com/lookup/shows"
             lookup = True
@@ -2841,7 +2845,6 @@ class Prep():
                 "q" : filename
             }
             url = f"https://api.tvmaze.com/search/shows"
-        
         resp = requests.get(url=url, params=params).json()
         if lookup == True:
             show = resp

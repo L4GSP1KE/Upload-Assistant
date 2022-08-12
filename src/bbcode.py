@@ -44,17 +44,20 @@ class BBCODE:
         # End my suffering
         desc = desc.replace('\r\n', '\n')
 
-        # Remove url tags with PTP links
-        ptp_url_tags = re.findall("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+)([^\[]+)(\[\/url\])?", desc)
-        if ptp_url_tags != []:
-            for ptp_url_tag in ptp_url_tags:
-                ptp_url_tag = ''.join(ptp_url_tag)
-                url_tag_removed = re.sub("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+])", "", ptp_url_tag)
+        # Remove url tags with PTP/HDB links
+        url_tags = re.findall("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+)([^\[]+)(\[\/url\])?", desc, flags=re.IGNORECASE)
+        url_tags = url_tags + re.findall("(\[url[\=\]]https?:\/\/hdbits\.o[^\]]+)([^\[]+)(\[\/url\])?", desc, flags=re.IGNORECASE)
+        if url_tags != []:
+            for url_tag in url_tags:
+                url_tag = ''.join(url_tag)
+                url_tag_removed = re.sub("(\[url[\=\]]https?:\/\/passthepopcorn\.m[^\]]+])", "", url_tag, flags=re.IGNORECASE)
+                url_tag_removed = re.sub("(\[url[\=\]]https?:\/\/hdbits\.o[^\]]+])", "", url_tag_removed, flags=re.IGNORECASE)
                 url_tag_removed = url_tag_removed.replace("[/url]", "")
-                desc = desc.replace(ptp_url_tag, url_tag_removed)
+                desc = desc.replace(url_tag, url_tag_removed)
 
         # Remove links to PTP
         desc = desc.replace('http://passthepopcorn.me', 'PTP').replace('https://passthepopcorn.me', 'PTP')
+        desc = desc.replace('http://hdbits.org', 'HDB').replace('https://hdbits.org', 'HDB')
 
         # Remove Mediainfo Tags / Attempt to regex out mediainfo
         mediainfo_tags = re.findall("\[mediainfo\][\s\S]*?\[\/mediainfo\]",  desc)
@@ -115,8 +118,8 @@ class BBCODE:
 
 
         # Remove Images in IMG tags:
-        desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc)
-        desc = re.sub("\[img=[\s\S]*?\]", "", desc)
+        desc = re.sub("\[img\][\s\S]*?\[\/img\]", "", desc, flags=re.IGNORECASE)
+        desc = re.sub("\[img=[\s\S]*?\]", "", desc, flags=re.IGNORECASE)
         # Replace Images
         loose_images = re.findall("(https?:\/\/.*\.(?:png|jpg))", nocomp, flags=re.IGNORECASE)
         if len(loose_images) >= 1:
@@ -125,7 +128,7 @@ class BBCODE:
         # Re-place comparisons
         if comp_placeholders != []:
             for i, comp in enumerate(comp_placeholders):
-                comp = comp.replace('[img]', '').replace('[/img]', '')
+                comp = re.sub("\[\/?img[\s\S]*?\]", comp, flags=re.IGNORECASE)
                 desc = desc.replace(f"COMPARISON_PLACEHOLDER-{i}", comp)
 
         # Strip blank lines:
