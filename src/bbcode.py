@@ -128,7 +128,7 @@ class BBCODE:
         # Re-place comparisons
         if comp_placeholders != []:
             for i, comp in enumerate(comp_placeholders):
-                comp = re.sub("\[\/?img[\s\S]*?\]", comp, flags=re.IGNORECASE)
+                comp = re.sub("\[\/?img[\s\S]*?\]", "",comp, flags=re.IGNORECASE)
                 desc = desc.replace(f"COMPARISON_PLACEHOLDER-{i}", comp)
 
         # Strip blank lines:
