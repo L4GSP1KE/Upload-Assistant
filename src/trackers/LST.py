@@ -33,7 +33,7 @@ class LST():
         self.signature = f"\n[center]Created by L4G's Upload Assistant[/center]"
         pass
     
-    async def get_cat_id(self, category_name, keywords):
+    async def get_cat_id(self, category_name, keywords, service):
         category_id = {
             'MOVIE': '1', 
             'TV': '2',
@@ -41,6 +41,8 @@ class LST():
             }.get(category_name, '0')
         if category_name == 'TV' and 'anime' in keywords:
             category_id = '6'
+        elif category_name == 'TV' and 'hentai' in service:
+            category_id = '8'
         return category_id
 
     async def get_type_id(self, type):
@@ -77,7 +79,7 @@ class LST():
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        cat_id = await self.get_cat_id(meta['category'], meta.get('keywords', ''))
+        cat_id = await self.get_cat_id(meta['category'], meta.get('keywords', ''), meta.get('service', ''))
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
         await common.unit3d_edit_desc(meta, self.tracker, self.signature)
@@ -97,30 +99,56 @@ class LST():
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': open_torrent}
-        data = {
-            'name' : meta['name'],
-            'description' : desc,
-            'mediainfo' : mi_dump,
-            'bdinfo' : bd_dump, 
-            'category_id' : cat_id,
-            'type_id' : type_id,
-            'resolution_id' : resolution_id,
-            'tmdb' : meta['tmdb'],
-            'imdb' : meta['imdb_id'].replace('tt', ''),
-            'tvdb' : meta['tvdb_id'],
-            'mal' : meta['mal_id'],
-            'igdb' : 0,
-            'anonymous' : anon,
-            'stream' : meta['stream'],
-            'sd' : meta['sd'],
-            'keywords' : meta['keywords'],
-            'personal_release' : int(meta.get('personalrelease', False)),
-            'internal' : 0,
-            'featured' : 0,
-            'free' : 0,
-            'doubleup' : 0,
-            'sticky' : 0,
-        }
+        if meta.get('service') == "hentai":
+            data = {
+                'name' : meta['name'],
+                'description' :  "[center]" + "[img]" + str(meta['poster']) + "[/img][/center]" + f"\n[center]" + "https://www.themoviedb.org/tv/" + str(meta['tmdb']) + f"\nhttps://myanimelist.net/anime/" + str(meta['mal']) + "[/center]" + desc,
+                'mediainfo' : mi_dump,
+                'bdinfo' : bd_dump, 
+                'category_id' : cat_id,
+                'type_id' : type_id,
+                'resolution_id' : resolution_id,
+                'tmdb' : meta['tmdb'],
+                'imdb' : meta['imdb_id'].replace('tt', ''),
+                'tvdb' : meta['tvdb_id'],
+                'mal' : meta['mal_id'],
+                'igdb' : 0,
+                'anonymous' : 1,
+                'stream' : meta['stream'],
+                'sd' : meta['sd'],
+                'keywords' : meta['keywords'],
+                'personal_release' : int(meta.get('personalrelease', False)),
+                'internal' : 0,
+                'featured' : 0,
+                'free' : 0,
+                'doubleup' : 0,
+                'sticky' : 0,
+            } 
+        else:
+            data = {
+                'name' : meta['name'],
+                'description' : desc,
+                'mediainfo' : mi_dump,
+                'bdinfo' : bd_dump, 
+                'category_id' : cat_id,
+                'type_id' : type_id,
+                'resolution_id' : resolution_id,
+                'tmdb' : meta['tmdb'],
+                'imdb' : meta['imdb_id'].replace('tt', ''),
+                'tvdb' : meta['tvdb_id'],
+                'mal' : meta['mal_id'],
+                'igdb' : 0,
+                'anonymous' : anon,
+                'stream' : meta['stream'],
+                'sd' : meta['sd'],
+                'keywords' : meta['keywords'],
+                'personal_release' : int(meta.get('personalrelease', False)),
+                'internal' : 0,
+                'featured' : 0,
+                'free' : 0,
+                'doubleup' : 0,
+                'sticky' : 0,
+            }
         # Internal
         if self.config['TRACKERS'][self.tracker].get('internal', False) == True:
             if meta['tag'] != "" and (meta['tag'][1:] in self.config['TRACKERS'][self.tracker].get('internal_groups', [])):
@@ -162,7 +190,7 @@ class LST():
         params = {
             'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'tmdbId' : meta['tmdb'],
-            'categories[]' : await self.get_cat_id(meta['category'], meta.get('keywords', '')),
+            'categories[]' : await self.get_cat_id(meta['category'], meta.get('keywords', ''), meta.get('service', '')),
             'types[]' : await self.get_type_id(meta['type']),
             'resolutions[]' : await self.get_res_id(meta['resolution']),
             'name' : ""
