@@ -179,6 +179,7 @@ class HDB():
             if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']):
                 hdb_name = hdb_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
         # Remove Dubbed/Dual-Audio from title
+        hdb_name = hdb_name.replace('PQ10', 'HDR')
         hdb_name = hdb_name.replace('Dubbed', '').replace('Dual-Audio', '')
         hdb_name = ' '.join(hdb_name.split())
 
