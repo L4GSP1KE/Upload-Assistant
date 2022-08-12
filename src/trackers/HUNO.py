@@ -105,7 +105,7 @@ class HUNO():
         year = meta.get('year', "")
         resolution = meta.get('resolution', "")
         audio = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "")
-        audio_lang = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English")
+        audio_lang = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English") if 'mediainfo' in meta else ""
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
