@@ -83,11 +83,16 @@ class Clients():
         torrent_client = client.get('torrent_client', None).lower()
         if torrent_storage_dir == None and torrent_client != "watch":
             console.print(f'[bold red]Missing torrent_storage_dir for {default_torrent_client}')
+        torrenthash = None
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
                 torrenthash = meta['torrenthash']
             elif meta.get('ext_torrenthash', None) != None:
                 torrenthash = meta['ext_torrenthash']
+            elif torrent_client == 'qbit':
+                torrenthash = await self.search_qbit_for_torrent(meta, torrent_client)
+            if not torrenthash:
+                return None
             if torrent_client in ('qbit', 'deluge'):
                 torrenthash = torrenthash.lower()
             elif torrent_client == 'rtorrent':
@@ -135,7 +140,35 @@ class Clients():
         return None
 
 
+    async def search_qbit_for__torrent(self, meta, client):
+        console.print("[green]Searching qbittorrent for an existing .torrent")
+        local_path = list_local_path = client.get('local_path','/LocalPath')
+        remote_path = list_remote_path = client.get('remote_path', '/RemotePath')
+        if isinstance(local_path, list):
+            for i in range(len(local_path)):
+                if os.path.normpath(local_path[i]).lower() in meta['path'].lower():
+                    list_local_path = local_path[i]
+                    list_remote_path = remote_path[i]
+        local_path = os.path.normpath(list_local_path)
+        remote_path = os.path.normpath(list_remote_path)
+        if local_path.endswith(os.sep):
+            remote_path = remote_path + os.sep
 
+        qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'])
+        torrents = qbt_client.torrents.info()
+        if local_path.lower() in meta['path'].lower() and local_path.lower() != remote_path.lower():
+            remote_path_map = True
+        for torrent in torrents:
+            torrent_path = torrent.content_path
+            if remote_path_map:
+                torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
+            if meta['is_disc'] == "" and len(meta['filelist']) == 1 and torrent_path == meta['filelist'][0]:
+                console.print("[green]Found a matching .torrent")
+                return torrent.hash
+            elif meta['path'] == torrent_path:
+                console.print("[green]Found a matching .torrent")
+                return torrent.hash
+        return None
 
 
 
