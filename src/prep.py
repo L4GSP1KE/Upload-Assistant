@@ -296,7 +296,7 @@ class Prep():
         if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'], untouched_filename)
         elif meta.get('imdb', None) != None and meta.get('tmdb_manual', None) == None:
-            meta['imdb_id'] = meta['imdb']
+            meta['imdb_id'] = str(meta['imdb']).replace('tt', '')
             meta = await self.get_tmdb_from_imdb(meta, filename)
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
