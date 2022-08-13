@@ -90,7 +90,7 @@ class Clients():
             elif meta.get('ext_torrenthash', None) != None:
                 torrenthash = meta['ext_torrenthash']
             elif torrent_client == 'qbit':
-                torrenthash = await self.search_qbit_for_torrent(meta, torrent_client)
+                torrenthash = await self.search_qbit_for_torrent(meta, client)
             if not torrenthash:
                 return None
             if torrent_client in ('qbit', 'deluge'):
