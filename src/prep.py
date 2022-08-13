@@ -2774,6 +2774,12 @@ class Prep():
             imdb_info['imdbID'] = info.get('imdbID')
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
             imdb_info['cover'] = info.get('full-size cover url', '').replace(".jpg", "._V1_FMjpg_UX750_.jpg")
+            imdb_info['original_language'] = info.get('language codes')
+            if isinstance(imdb_info['original_language'], list):
+                if len(imdb_info['original_language']) > 1:
+                    imdb_info['original_language'] = None
+                elif len(imdb_info['original_language']) == 1:
+                    imdb_info['original_language'] = imdb_info['original_language'][0]
             if imdb_info['cover'] == '':
                 imdb_info['cover'] = meta.get('poster', '')
             if len(info.get('directors', [])) >= 1:
