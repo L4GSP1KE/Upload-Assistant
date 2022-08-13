@@ -158,6 +158,8 @@ class Clients():
         torrents = qbt_client.torrents.info()
         if local_path.lower() in meta['path'].lower() and local_path.lower() != remote_path.lower():
             remote_path_map = True
+        else:
+            remote_path_map = False
         for torrent in torrents:
             torrent_path = torrent.content_path
             if remote_path_map:
