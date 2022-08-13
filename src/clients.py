@@ -154,7 +154,16 @@ class Clients():
         if local_path.endswith(os.sep):
             remote_path = remote_path + os.sep
 
-        qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'])
+        try:
+            qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'])
+            qbt_client.auth_log_in()
+        except qbittorrentapi.LoginFailed:
+            console.print("[bold red]INCORRECT QBIT LOGIN CREDENTIALS")
+            return None
+        except qbittorrentapi.APIConnectionError:
+            console.print("[bold red]APIConnectionError: INCORRECT HOST/PORT")
+            return None
+
         torrents = qbt_client.torrents.info()
         if local_path.lower() in meta['path'].lower() and local_path.lower() != remote_path.lower():
             remote_path_map = True
