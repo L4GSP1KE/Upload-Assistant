@@ -2818,6 +2818,7 @@ class Prep():
         meta['year'] = imdb_info['year']
         meta['aka'] = imdb_info['aka']
         meta['poster'] = imdb_info['cover']
+        meta['original_language'] = imdb_info['original_language']
 
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
         if difference >= 0.9 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():
