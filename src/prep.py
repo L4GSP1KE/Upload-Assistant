@@ -2774,6 +2774,8 @@ class Prep():
             imdb_info['imdbID'] = info.get('imdbID')
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
             imdb_info['cover'] = info.get('full-size cover url', '').replace(".jpg", "._V1_FMjpg_UX750_.jpg")
+            imdb_info['plot'] = info.get('plot', '')
+
             imdb_info['original_language'] = info.get('language codes')
             if isinstance(imdb_info['original_language'], list):
                 if len(imdb_info['original_language']) > 1:
@@ -2819,6 +2821,7 @@ class Prep():
         meta['aka'] = imdb_info['aka']
         meta['poster'] = imdb_info['cover']
         meta['original_language'] = imdb_info['original_language']
+        meta['overview'] = imdb_info['plot']
 
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
         if difference >= 0.9 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():
