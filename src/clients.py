@@ -140,7 +140,7 @@ class Clients():
         return None
 
 
-    async def search_qbit_for__torrent(self, meta, client):
+    async def search_qbit_for_torrent(self, meta, client):
         console.print("[green]Searching qbittorrent for an existing .torrent")
         local_path = list_local_path = client.get('local_path','/LocalPath')
         remote_path = list_remote_path = client.get('remote_path', '/RemotePath')
