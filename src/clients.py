@@ -165,10 +165,10 @@ class Clients():
             if remote_path_map:
                 torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
             if meta['is_disc'] == "" and len(meta['filelist']) == 1 and torrent_path == meta['filelist'][0]:
-                console.print(f"[green]Found a matching .torrent with hash [yellow]{torrent.hash}")
+                console.print(f"[green]Found a matching .torrent with hash: [yellow]{torrent.hash}")
                 return torrent.hash
             elif meta['path'] == torrent_path:
-                console.print(f"[green]Found a matching .torrent with hash [yellow]{torrent.hash}")
+                console.print(f"[green]Found a matching .torrent with hash: [yellow]{torrent.hash}")
                 return torrent.hash
         return None
 

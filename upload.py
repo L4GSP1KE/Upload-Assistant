@@ -153,7 +153,7 @@ async def do_the_thing(base_dir):
                 reuse_torrent = await client.find_existing_torrent(meta)
                 if reuse_torrent != None:
                     prep.create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
-            if meta['nohash'] == False:
+            if meta['nohash'] == False and reuse_torrent == None:
                 prep.create_torrent(meta, Path(meta['path']))
             else:
                 meta['client'] = "none"
