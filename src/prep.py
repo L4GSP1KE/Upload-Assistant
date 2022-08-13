@@ -2530,29 +2530,30 @@ class Prep():
         descfile = meta.get('descfile', None)
         ptp_desc = blu_desc = ""
         desc_source = []
-        if meta.get('ptp_manual') != None:
-            desc_source.append('PTP')
-        if meta.get('blu_manual') != None:
-            desc_source.append('BLU')
-        if len(desc_source) != 1:
-            desc_source = None
-        else:
-            desc_source = desc_source[0]
-
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="") as description:
             description.seek(0)
-            if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
-                ptp = PTP(config=self.config)
-                ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
-                if ptp_desc.rstrip().strip().replace('\r\n', '').replace('\n', '') != "":
-                    description.write(ptp_desc)
-                    description.write("\n")
-                    meta['description'] = 'PTP'
+            if (desclink, descfile, meta['desc']) == (None, None, None):
+                if meta.get('ptp_manual') != None:
+                    desc_source.append('PTP')
+                if meta.get('blu_manual') != None:
+                    desc_source.append('BLU')
+                if len(desc_source) != 1:
+                    desc_source = None
+                else:
+                    desc_source = desc_source[0]
 
-            if ptp_desc == "" and meta.get('blu_desc', '').rstrip() not in [None, ''] and desc_source in ['BLU', None]:
-                if meta.get('blu_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
-                    description.write(meta['blu_desc'])
-                    meta['description'] = 'BLU'
+                if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
+                    ptp = PTP(config=self.config)
+                    ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
+                    if ptp_desc.rstrip().strip().replace('\r\n', '').replace('\n', '') != "":
+                        description.write(ptp_desc)
+                        description.write("\n")
+                        meta['description'] = 'PTP'
+
+                if ptp_desc == "" and meta.get('blu_desc', '').rstrip() not in [None, ''] and desc_source in ['BLU', None]:
+                    if meta.get('blu_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
+                        description.write(meta['blu_desc'])
+                        meta['description'] = 'BLU'
 
             if meta.get('desc_template', None) != None:
                 from jinja2 import Template
