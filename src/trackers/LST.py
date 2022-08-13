@@ -96,59 +96,39 @@ class LST():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
             bd_dump = None
+        
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
+        if meta.get('service') == "hentai":
+            desc = "[center]" + "[img]" + str(meta['poster']) + "[/img][/center]" + f"\n[center]" + "https://www.themoviedb.org/tv/" + str(meta['tmdb']) + f"\nhttps://myanimelist.net/anime/" + str(meta['mal']) + "[/center]" + desc
+        
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': open_torrent}
-        if meta.get('service') == "hentai":
-            data = {
-                'name' : meta['name'],
-                'description' :  "[center]" + "[img]" + str(meta['poster']) + "[/img][/center]" + f"\n[center]" + "https://www.themoviedb.org/tv/" + str(meta['tmdb']) + f"\nhttps://myanimelist.net/anime/" + str(meta['mal']) + "[/center]" + desc,
-                'mediainfo' : mi_dump,
-                'bdinfo' : bd_dump, 
-                'category_id' : cat_id,
-                'type_id' : type_id,
-                'resolution_id' : resolution_id,
-                'tmdb' : meta['tmdb'],
-                'imdb' : meta['imdb_id'].replace('tt', ''),
-                'tvdb' : meta['tvdb_id'],
-                'mal' : meta['mal_id'],
-                'igdb' : 0,
-                'anonymous' : 1,
-                'stream' : meta['stream'],
-                'sd' : meta['sd'],
-                'keywords' : meta['keywords'],
-                'personal_release' : int(meta.get('personalrelease', False)),
-                'internal' : 0,
-                'featured' : 0,
-                'free' : 0,
-                'doubleup' : 0,
-                'sticky' : 0,
-            } 
-        else:
-            data = {
-                'name' : meta['name'],
-                'description' : desc,
-                'mediainfo' : mi_dump,
-                'bdinfo' : bd_dump, 
-                'category_id' : cat_id,
-                'type_id' : type_id,
-                'resolution_id' : resolution_id,
-                'tmdb' : meta['tmdb'],
-                'imdb' : meta['imdb_id'].replace('tt', ''),
-                'tvdb' : meta['tvdb_id'],
-                'mal' : meta['mal_id'],
-                'igdb' : 0,
-                'anonymous' : anon,
-                'stream' : meta['stream'],
-                'sd' : meta['sd'],
-                'keywords' : meta['keywords'],
-                'personal_release' : int(meta.get('personalrelease', False)),
-                'internal' : 0,
-                'featured' : 0,
-                'free' : 0,
-                'doubleup' : 0,
-                'sticky' : 0,
-            }
+        data = {
+            'name' : meta['name'],
+            'description' : desc,
+            'mediainfo' : mi_dump,
+            'bdinfo' : bd_dump, 
+            'category_id' : cat_id,
+            'type_id' : type_id,
+            'resolution_id' : resolution_id,
+            'tmdb' : meta['tmdb'],
+            'imdb' : meta['imdb_id'].replace('tt', ''),
+            'tvdb' : meta['tvdb_id'],
+            'mal' : meta['mal_id'],
+            'igdb' : 0,
+            'anonymous' : anon,
+            'stream' : meta['stream'],
+            'sd' : meta['sd'],
+            'keywords' : meta['keywords'],
+            'personal_release' : int(meta.get('personalrelease', False)),
+            'internal' : 0,
+            'featured' : 0,
+            'free' : 0,
+            'doubleup' : 0,
+            'sticky' : 0,
+        }
+       
+                
         # Internal
         if self.config['TRACKERS'][self.tracker].get('internal', False) == True:
             if meta['tag'] != "" and (meta['tag'][1:] in self.config['TRACKERS'][self.tracker].get('internal_groups', [])):
