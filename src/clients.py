@@ -171,7 +171,6 @@ class Clients():
             elif meta['path'] == torrent_path:
                 console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                 return torrent.hash
-        console.print("[yellow]No valid .torrent found")
         return None
 
 
