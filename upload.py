@@ -121,7 +121,7 @@ async def do_the_thing(base_dir):
             with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
                 saved_meta = json.load(f)
                 for key, value in saved_meta.items():
-                    overwrite_list = ['trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 'ptp', 'blu', 'no_aka', 'client', 'desclink', 'descfile', 'desc']
+                    overwrite_list = ['trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 'ptp', 'blu', 'no_aka', 'client', 'desclink', 'descfile', 'desc', 'draft']
                     if meta.get(key, None) != value and key in overwrite_list:
                         saved_meta[key] = meta[key]
                 meta = saved_meta
@@ -155,7 +155,7 @@ async def do_the_thing(base_dir):
                     prep.create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
             if meta['nohash'] == False and reuse_torrent == None:
                 prep.create_torrent(meta, Path(meta['path']))
-            else:
+            if meta['nohash']:
                 meta['client'] = "none"
         if int(meta.get('randomized', 0)) >= 1:
             prep.create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'], meta['path'])
