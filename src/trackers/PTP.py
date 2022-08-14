@@ -659,7 +659,7 @@ class PTP():
     async def validate_login(self, response):
         loggedIn = False
         if response.text.find("""<a href="login.php?act=recover">""") != -1:
-            raise LoginException("Looks like you are not logged in to PTP. Probably due to the bad user name or password.")
+            console.print("Looks like you are not logged in to PTP. Probably due to the bad user name, password, or expired session.")
         elif "Your popcorn quota has been reached, come back later!" in response.text:
             raise LoginException("Your PTP request/popcorn quota has been reached, try again later")
         else:
