@@ -435,7 +435,7 @@ class Prep():
         if os.path.isdir(videoloc):
             globlist = glob.glob1(videoloc, "*.mkv") + glob.glob1(videoloc, "*.mp4") + glob.glob1(videoloc, "*.ts")
             for file in globlist:
-                if not file.lower().endswith('sample.mkv'):
+                if not file.lower().endswith('sample.mkv') or "!sample" in file.lower():
                     filelist.append(os.path.abspath(f"{videoloc}{os.sep}{file}"))
             try:
                 video = sorted(filelist)[0]       
@@ -1875,14 +1875,14 @@ class Prep():
             globs = glob.glob1(path, "*.mkv") + glob.glob1(path, "*.mp4") + glob.glob1(path, "*.ts")
             no_sample_globs = []
             for file in globs:
-                if not file.lower().endswith('sample.mkv'):
+                if not file.lower().endswith('sample.mkv') or "!sample" in file.lower():
                     no_sample_globs.append(os.path.abspath(f"{path}{os.sep}{file}"))
             if len(no_sample_globs) == 1:
                 path = meta['filelist'][0]
         if meta['is_disc']:
             include, exclude = "", ""
         else:
-            exclude = ["*.*", "sample.mkv"] 
+            exclude = ["*.*", "*sample.mkv", "!sample*.*"] 
             include = ["*.mkv", "*.mp4", "*.ts"]
         torrent = Torrent(path,
             trackers = ["https://fake.tracker"],
