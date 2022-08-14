@@ -2709,7 +2709,7 @@ class Prep():
                 original_language = None
             elif len(original_language) == 1:
                 original_language = original_language[0]
-        aka = result.get('original title', result.get('localized title', ""))
+        aka = result.get('original title', result.get('localized title', "")).replace(' - IMDb', '')
         if aka != "":
             aka = f" AKA {aka}"
         return aka, original_language
@@ -2770,7 +2770,7 @@ class Prep():
             info = ia.get_movie(imdbID)
             imdb_info['title'] = info.get('title')
             imdb_info['year'] = info.get('year')
-            imdb_info['aka'] = info.get('original title', info.get('localized title', imdb_info['title']))
+            imdb_info['aka'] = info.get('original title', info.get('localized title', imdb_info['title'])).replace(' - IMDb', '')
             imdb_info['type'] = info.get('kind')
             imdb_info['imdbID'] = info.get('imdbID')
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
