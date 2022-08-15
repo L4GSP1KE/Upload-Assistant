@@ -104,7 +104,7 @@ class FL():
         await self.edit_desc(meta)
         fl_name = await self.edit_name(meta)
         cat_id = await self.get_category_id(meta)
-
+        has_ro_audio, has_ro_sub = self.get_ro_tracks(meta)
         
 
         # Download new .torrent from site
@@ -128,8 +128,10 @@ class FL():
 
             if int(meta.get('imdb_id', '').replace('tt', '')) != 0:
                 data['imdbid'] = meta.get('imdb_id', '').replace('tt', '')
-            if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
+            if self.uploader_name not in ("", None) and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
                 data['epenis'] = self.uploader_name
+            if has_ro_audio:
+                data['materialro'] = 'on'
 
             # Submit
             if meta['debug']:
