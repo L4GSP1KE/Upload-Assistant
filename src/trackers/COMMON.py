@@ -166,29 +166,29 @@ class COMMON():
         for each in dupes:
             each = each.lower().replace('-', '').replace(' ', '')
             if meta.get('sd', 0) == 1:
-                remove_set = ()
+                remove_set = {}
             else:
-                remove_set = (meta['resolution'])
+                remove_set = {meta['resolution']}
             search_combos = [
                 {
                     'search' : meta['hdr'],
-                    'search_for' : ('HDR', 'PQ10'),
-                    'update' : ('HDR', 'PQ10')
+                    'search_for' : {'HDR', 'PQ10'},
+                    'update' : {'HDR', 'PQ10'}
                 },
                 {
                     'search' : meta['hdr'],
-                    'search_for' : ('DV'),
-                    'update' : ('DV', 'DoVi')
+                    'search_for' : {'DV'},
+                    'update' : {'DV', 'DoVi'}
                 },
                 {
                     'search' : meta['type'],
-                    'search_for' : ('WEBDL', 'WEBRip'),
-                    'update' : ('WEBDL', 'WEBRip')
+                    'search_for' : {'WEBDL', 'WEBRip'},
+                    'update' : {'WEBDL', 'WEBRip'}
                 },
             ]
             search_matches = [
                 {
-                    'if' : ('REMUX', 'WEBDL', 'WEBRip', 'HDTV'),
+                    'if' : {'REMUX', 'WEBDL', 'WEBRip', 'HDTV'},
                     'in' : meta['type']
                 }
             ]
