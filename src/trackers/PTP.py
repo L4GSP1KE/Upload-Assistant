@@ -249,7 +249,7 @@ class PTP():
             if len(torrents) != 0:
                 for torrent in torrents:
                     if torrent.get('Quality') == quality and quality != None:
-                        existing.append(f"[{torrent.get('Resolution')}]{torrent.get('ReleaseName', 'RELEASE NAME NOT FOUND')}")
+                        existing.append(f"[{torrent.get('Resolution')}] {torrent.get('ReleaseName', 'RELEASE NAME NOT FOUND')}")
         except Exception:
             console.print("[red]An error has occured trying to find existing releases")
         return existing
