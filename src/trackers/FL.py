@@ -170,13 +170,13 @@ class FL():
             if int(meta['imdb_id'].replace('tt', '')) != 0:
                 params = {
                     'search' : meta['imdb_id'],
-                    'cat' : self.get_category_id(meta),
+                    'cat' : await self.get_category_id(meta),
                     'searchin' : '3'
                 }
             else:
                 params = {
                     'search' : meta['title'],
-                    'cat' : self.get_category_id(meta),
+                    'cat' : await self.get_category_id(meta),
                     'searchin' : '0'
                 }
             
@@ -237,7 +237,6 @@ class FL():
             await asyncio.sleep(0.5)
             soup = BeautifulSoup(r.text, 'html.parser')
             validator = soup.find('input', {'name' : 'validator'}).get('value')
-            print(validator)
             data = {
                 'validator' : validator,
                 'username' : self.username,
@@ -293,7 +292,7 @@ class FL():
                 screen_glob = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}", f"{meta['filename']}-*.png")
                 files = []
                 for screen in screen_glob:
-                    files.append(('images', (os.path.basename(screen), open(screen, 'rb'), 'image/png')))
+                    files.append(('images', (os.path.basename(screen), open(f"{meta['base_dir']}/tmp/{meta['uuid']}/{screen}", 'rb'), 'image/png')))
                 response = requests.post(url, data=data, files=files, auth=(self.fltools['user'], self.fltools['pass']))
                 final_desc = response.text
             else:
