@@ -161,3 +161,41 @@ class COMMON():
                     lineFields = [x for x in lineFields if x != ""]
                     cookies[lineFields[5]] = lineFields[6]
         return cookies
+
+    async def filter_dupes(self, dupes, meta):
+        for each in dupes:
+            each = each.lower().replace('-', '').replace(' ', '')
+            remove_set = (meta['resolution'])
+            search_combos = [
+                {
+                    'search' : meta['hdr'],
+                    'search_for' : ('HDR', 'PQ10'),
+                    'update' : ('HDR', 'PQ10')
+                },
+                {
+                    'search' : meta['hdr'],
+                    'search_for' : ('DV'),
+                    'update' : ('DV', 'DoVi')
+                },
+                {
+                    'search' : meta['type'],
+                    'search_for' : ('WEBDL', 'WEBRip'),
+                    'update' : ('WEBDL', 'WEBRip')
+                },
+            ]
+            search_matches = [
+                {
+                    'if' : ('REMUX', 'WEBDL', 'WEBRip', 'HDTV'),
+                    'in' : meta['type']
+                }
+            ]
+            for s in search_combos:
+                if any(x in s['search'] for x in s['search_for']):
+                    remove_set.update(s['update'])
+            for sm in search_matches:
+                for a in sm['if']:
+                    if a in sm['in']:
+                        remove_set.add(a)
+            if any(x.lower() not in each for x in remove_set):
+                dupes.remove(each)
+        return dupes

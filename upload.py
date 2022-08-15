@@ -215,6 +215,7 @@ async def do_the_thing(base_dir):
                 if upload_to_tracker:
                     console.print(f"Uploading to {tracker_class.tracker}")
                     dupes = await tracker_class.search_existing(meta)
+                    await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await tracker_class.upload(meta)
@@ -230,6 +231,7 @@ async def do_the_thing(base_dir):
                     console.print(f"Uploading to {tracker}")
                     if await tracker_class.validate_credentials(meta) == True:
                         dupes = await tracker_class.search_existing(meta)
+                        await common.filter_dupes(dupes, meta)
                         meta = dupe_check(dupes, meta)
                         if meta['upload'] == True:
                             await tracker_class.upload(meta)
@@ -270,6 +272,7 @@ async def do_the_thing(base_dir):
                 if upload_to_bhd:
                     console.print("Uploading to BHD")
                     dupes = await bhd.search_existing(meta)
+                    await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await bhd.upload(meta)
@@ -296,6 +299,7 @@ async def do_the_thing(base_dir):
                             session = thr.login(session)
                             console.print("[yellow]Searching for Dupes")
                             dupes = thr.search_existing(session, meta.get('imdb_id'))
+                            await common.filter_dupes(dupes, meta)
                             meta = dupe_check(dupes, meta)
                             if meta['upload'] == True:
                                 await thr.upload(session, meta)
@@ -327,6 +331,7 @@ async def do_the_thing(base_dir):
                         else:
                             console.print("[yellow]Searching for Existing Releases")
                             dupes = await ptp.search_existing(groupID, meta)
+                            await common.filter_dupes(dupes, meta)
                             meta = dupe_check(dupes, meta)
                         if meta.get('imdb_info', {}) == {}:
                             meta['imdb_info'] = await prep.get_imdb_info(meta['imdb_id'], meta)
