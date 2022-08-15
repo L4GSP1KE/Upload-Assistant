@@ -1,10 +1,8 @@
-from argparse import ArgumentParser
 import requests
 from src.trackers.RF import RF
 from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
-from src.search import Search
 from src.trackers.COMMON import COMMON
 from src.trackers.HUNO import HUNO
 from src.trackers.BLU import BLU
@@ -22,6 +20,7 @@ from src.trackers.HDB import HDB
 from src.trackers.LCD import LCD
 from src.trackers.TTG import TTG
 from src.trackers.LST import LST
+from src.trackers.FL import FL
 import json
 from pathlib import Path
 import asyncio
@@ -36,6 +35,7 @@ import cli_ui
 from src.console import console
 from rich.markdown import Markdown
 from rich.style import Style
+
 
 
 cli_ui.setup(color='always', title="L4G's Upload Assistant")
@@ -196,8 +196,8 @@ async def do_the_thing(base_dir):
         ####################################
         common = COMMON(config=config)
         unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN']
-        http_trackers = ['HDB', 'TTG']
-        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO}
+        http_trackers = ['HDB', 'TTG', 'FL']
+        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL}
 
         for tracker in trackers:
             tracker = tracker.replace(" ", "").upper().strip()
@@ -402,10 +402,10 @@ def dupe_check(dupes, meta):
         cli_ui.info(dupe_text)
         if meta['unattended']:
             if meta.get('dupe', False) == False:
-                console.print("[red]Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --dupe")
+                console.print("[red]Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --skip-dupe-check")
                 exit()
             else:
-                console.print("[yellow]Found potential dupes. -dupe/--dupe was passed. Uploading anyways")
+                console.print("[yellow]Found potential dupes. --skip-dupe-check was passed. Uploading anyways")
                 upload = True
         console.print()
         if not meta['unattended']:
