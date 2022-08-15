@@ -75,7 +75,6 @@ class FL():
 
     async def edit_name(self, meta):
         fl_name = meta['name']
-        fl_name = fl_name.replace('H.265', 'HEVC')
         if meta.get('source', '').upper() == 'WEB':
             fl_name = fl_name.replace(f"{meta.get('service', '')} ", '')
         if 'DV' in meta.get('hdr', ''):
