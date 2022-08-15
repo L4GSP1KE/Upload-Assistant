@@ -165,7 +165,10 @@ class COMMON():
     async def filter_dupes(self, dupes, meta):
         for each in dupes:
             each = each.lower().replace('-', '').replace(' ', '')
-            remove_set = (meta['resolution'])
+            if meta.get('sd', 0) == 1:
+                remove_set = ()
+            else:
+                remove_set = (meta['resolution'])
             search_combos = [
                 {
                     'search' : meta['hdr'],
