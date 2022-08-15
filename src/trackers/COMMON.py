@@ -198,7 +198,7 @@ class COMMON():
                 }
             ]
             for s in search_combos:
-                if s['search_for'] != None:
+                if s['search_for'] not in (None, ''):
                     if any(re.search(x, s['search'], flags=re.IGNORECASE) for x in s['search_for']):
                         remove_set.update(s['update'])
             for sm in search_matches:
