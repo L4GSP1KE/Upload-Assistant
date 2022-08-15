@@ -199,6 +199,9 @@ class COMMON():
                 for a in sm['if']:
                     if a in sm['in']:
                         remove_set.add(a)
-            if any(x.lower() not in each for x in remove_set):
-                dupes.remove(each)
+            for x in remove_set:
+                if x.lower() not in each:
+                    dupes.remove(each)
+            # if any(x.lower() not in each for x in remove_set):
+            #     dupes.remove(each)
         return dupes
