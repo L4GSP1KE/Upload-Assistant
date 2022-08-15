@@ -57,7 +57,7 @@ class FL():
             if meta['resolution'] == '2160p':
                 # 27 = TV 4k
                 cat_id = 27
-            elif meta.get('sd', 1) == 0:
+            elif meta.get('sd', 0) == 1:
                 # 23 = TV SD
                 cat_id = 23
             
@@ -108,7 +108,7 @@ class FL():
         
 
         # Download new .torrent from site
-        fl_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
+        fl_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r', newline='').read()
         torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
         if meta['bdinfo'] != None:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
@@ -128,6 +128,7 @@ class FL():
 
             if int(meta.get('imdb_id', '').replace('tt', '')) != 0:
                 data['imdbid'] = meta.get('imdb_id', '').replace('tt', '')
+                data['description'] = meta['imdb_info'].get('genres', '')
             if self.uploader_name not in ("", None) and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
                 data['epenis'] = self.uploader_name
             if has_ro_audio:
