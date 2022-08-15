@@ -180,6 +180,16 @@ class COMMON():
                     'search_for' : {'DV'},
                     'update' : {'DV|DoVi'}
                 },
+                {
+                    'search' : str(meta.get('tv_pack', 0)),
+                    'search_for' : '1',
+                    'update' : {f"{meta['season']}(?!E\d+)"}
+                },
+                {
+                    'search' : meta['episode'],
+                    'search_for' : meta['episode'],
+                    'update' : {meta['episode']}
+                }
             ]
             search_matches = [
                 {
@@ -188,8 +198,9 @@ class COMMON():
                 }
             ]
             for s in search_combos:
-                if any(x in s['search'] for x in s['search_for']):
-                    remove_set.update(s['update'])
+                if s['search_for'] != None:
+                    if any(re.search(x, s['search'], flags=re.IGNORECASE) for x in s['search_for']):
+                        remove_set.update(s['update'])
             for sm in search_matches:
                 for a in sm['if']:
                     if a in sm['in']:
@@ -203,7 +214,8 @@ class COMMON():
                         if y.lower() in search:
                             remove_set.remove(x)
                             remove_set.add(y)
-            if all(x.lower() in search for x in remove_set):
+
+            if all(re.search(x, search, flags=re.I) for x in remove_set):
                 if each not in new_dupes:
                     new_dupes.append(each)
         return new_dupes
