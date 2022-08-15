@@ -30,7 +30,7 @@ class FL():
     
 
     async def get_category_id(self, meta):
-        has_ro_audio, has_ro_sub = self.get_ro_tracks(meta)
+        has_ro_audio, has_ro_sub = await self.get_ro_tracks(meta)
         # 25 = 3D Movie
         if meta['category'] == 'MOVIE':
             # 4 = Movie HD
@@ -104,7 +104,7 @@ class FL():
         await self.edit_desc(meta)
         fl_name = await self.edit_name(meta)
         cat_id = await self.get_category_id(meta)
-        has_ro_audio, has_ro_sub = self.get_ro_tracks(meta)
+        has_ro_audio, has_ro_sub = await self.get_ro_tracks(meta)
         
 
         # Download new .torrent from site
