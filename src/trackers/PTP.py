@@ -162,6 +162,8 @@ class PTP():
                 console.print(f"[green]Title: [yellow]{response.get('Name')}[/yellow] ([yellow]{response.get('Year')}[/yellow])")
                 return groupID
         except Exception:
+            console.print_exception()
+            console.print(response)
             console.print("[red]An error has occured trying to find a group ID")
             return None
 
