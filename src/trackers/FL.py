@@ -91,6 +91,7 @@ class FL():
         fl_name = fl_name.replace('PQ10', 'HDR')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
+        fl_name = fl_name.replace(' ', '.')
         return fl_name 
 
     
@@ -115,7 +116,7 @@ class FL():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()
         with open(torrent_path, 'rb') as torrentFile:
-            torrentFileName = unidecode(fl_name.replace(' ', '.'))
+            torrentFileName = unidecode(fl_name)
             files = {
                 'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
             }
@@ -273,7 +274,7 @@ class FL():
 
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w', newline='') as descfile:
             from src.bbcode import BBCODE
             bbcode = BBCODE()
             
@@ -295,11 +296,12 @@ class FL():
                 for screen in screen_glob:
                     files.append(('images', (os.path.basename(screen), open(f"{meta['base_dir']}/tmp/{meta['uuid']}/{screen}", 'rb'), 'image/png')))
                 response = requests.post(url, data=data, files=files, auth=(self.fltools['user'], self.fltools['pass']))
-                final_desc = response.text
+                final_desc = response.text.replace('\r\n', '\n')
             else:
                 # TO DO: BD Description Generator
                 final_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
-            final_desc = final_desc.replace('[/pre][/quote]', f'[/pre][/quote]\n\n{desc}\n', 1)
+            if desc.strip().rstrip() != "":
+                final_desc = final_desc.replace('[/pre][/quote]', f'[/pre][/quote]\n\n{desc}\n', 1)
             descfile.write(final_desc)
 
             if self.signature != None:
