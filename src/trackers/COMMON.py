@@ -163,8 +163,8 @@ class COMMON():
         return cookies
 
     async def filter_dupes(self, dupes, meta):
+        new_dupes = []
         for each in dupes:
-            each = each.lower().replace('-', '').replace(' ', '')
             if meta.get('sd', 0) == 1:
                 remove_set = {}
             else:
@@ -173,17 +173,12 @@ class COMMON():
                 {
                     'search' : meta['hdr'],
                     'search_for' : {'HDR', 'PQ10'},
-                    'update' : {'HDR', 'PQ10'}
+                    'update' : {'HDR|PQ10'}
                 },
                 {
                     'search' : meta['hdr'],
                     'search_for' : {'DV'},
-                    'update' : {'DV', 'DoVi'}
-                },
-                {
-                    'search' : meta['type'],
-                    'search_for' : {'WEBDL', 'WEBRip'},
-                    'update' : {'WEBDL', 'WEBRip'}
+                    'update' : {'DV|DoVi'}
                 },
             ]
             search_matches = [
@@ -199,9 +194,15 @@ class COMMON():
                 for a in sm['if']:
                     if a in sm['in']:
                         remove_set.add(a)
+
+            search = each.lower().replace('-', '').replace(' ', '').replace('.', '')
             for x in remove_set:
-                if x.lower() not in each:
-                    dupes.remove(each)
-            # if any(x.lower() not in each for x in remove_set):
-            #     dupes.remove(each)
-        return dupes
+                if "|" in x:
+                    look_for = x.split('|')
+                    for y in look_for:
+                        if y.lower() in search:
+                            remove_set.remove(x)
+                            remove_set.add(y)
+            if all(x.lower() in search for x in remove_set):
+                new_dupes.append(each)
+        return new_dupes
