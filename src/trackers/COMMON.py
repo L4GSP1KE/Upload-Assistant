@@ -204,5 +204,6 @@ class COMMON():
                             remove_set.remove(x)
                             remove_set.add(y)
             if all(x.lower() in search for x in remove_set):
-                new_dupes.append(each)
+                if each not in new_dupes:
+                    new_dupes.append(each)
         return new_dupes
