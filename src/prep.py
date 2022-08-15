@@ -1676,7 +1676,7 @@ class Prep():
             except:
                 pass
 
-        hdr = f"{dv} {hdr}"
+        hdr = f"{dv} {hdr}".strip()
         return hdr
 
     def get_region(self, bdinfo, region=None):
@@ -2776,7 +2776,7 @@ class Prep():
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
             imdb_info['cover'] = info.get('full-size cover url', '').replace(".jpg", "._V1_FMjpg_UX750_.jpg")
             imdb_info['plot'] = info.get('plot', [''])[0]
-
+            imdb_info['genres'] = ', '.join(info.get('genres', ''))
             imdb_info['original_language'] = info.get('language codes')
             if isinstance(imdb_info['original_language'], list):
                 if len(imdb_info['original_language']) > 1:
