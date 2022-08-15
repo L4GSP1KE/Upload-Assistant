@@ -25,7 +25,7 @@ class FL():
         self.username = config['TRACKERS'][self.tracker].get('username', '').strip()
         self.password = config['TRACKERS'][self.tracker].get('password', '').strip()
         self.fltools = config['TRACKERS'][self.tracker].get('fltools', {})
-        self.uploader_name = config['TRACKERS']['self.tracker'].get('uploader_name')
+        self.uploader_name = config['TRACKERS'][self.tracker].get('uploader_name')
         self.signature = None
     
 
