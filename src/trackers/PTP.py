@@ -718,7 +718,7 @@ class PTP():
             if data["imdb"] == "0":
                 tinfo = await self.get_torrent_info_tmdb(meta)
             else:
-                tinfo = await self.get_torrent_info(meta.get("imdb_id", "0"))
+                tinfo = await self.get_torrent_info(meta.get("imdb_id", "0"), meta)
             cover = meta["imdb_info"].get("cover")
             if cover == None:
                 cover = meta.get('poster')
