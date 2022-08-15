@@ -1,14 +1,11 @@
 # -*- coding: utf-8 -*-
 import requests
-from termcolor import cprint
-from pprint import pprint
 import asyncio
 import traceback
 
 from src.trackers.COMMON import COMMON
+from src.console import console
 
-
-# from pprint import pprint
 
 class SN():
     """
@@ -97,18 +94,18 @@ class SN():
 
             try:
                 if response.json().get('success'):
-                    print(response.json())
+                    console.print(response.json())
                 else:
-                    cprint("Did not upload successfully", 'grey', 'on_red')
-                    pprint(response.json())
+                    console.print("[red]Did not upload successfully")
+                    console.print(response.json())
             except:
-                cprint("Error! It may have uploaded, go check", 'grey', 'on_red')
-                pprint(data)
-                print(traceback.print_exc())
+                console.print("[red]Error! It may have uploaded, go check")
+                console.print(data)
+                console.print_exception()
                 return
         else:
-            cprint(f"Request Data:", 'cyan')
-            pprint(data)
+            console.print(f"[cyan]Request Data:")
+            console.print(data)
 
 
     async def edit_desc(self, meta):
@@ -130,7 +127,7 @@ class SN():
 
     async def search_existing(self, meta):
         dupes = []
-        cprint("Searching for existing torrents on site...", 'grey', 'on_yellow')
+        console.print("[yellow]Searching for existing torrents on site...")
 
         params = {
             'api_key' : self.config['TRACKERS'][self.tracker]['api_key'].strip()
@@ -158,7 +155,7 @@ class SN():
                 result = i['name']
                 dupes.append(result)
         except:
-            cprint('Unable to search for existing torrents on site. Either the site is down or your API key is incorrect', 'grey', 'on_red')
+            console.print('[red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
         return dupes
