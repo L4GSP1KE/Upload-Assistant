@@ -188,7 +188,7 @@ class COMMON():
                 {
                     'search' : meta['episode'],
                     'search_for' : meta['episode'],
-                    'update' : {meta['episode']}
+                    'update' : {meta['season'], meta['episode']}
                 }
             ]
             search_matches = [
