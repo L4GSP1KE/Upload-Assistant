@@ -255,7 +255,16 @@ class BBCODE:
         desc = desc.replace('[spoiler', '[hide')
         desc = desc.replace('[/spoiler]', '[/hide]')
         return desc
+
+    def remove_spoiler(self, desc):
+        desc = re.sub("\[\/?spoiler[\s\S]*?\]", "", desc, flags=re.IGNORECASE)
+        return desc
     
+    def convert_spoiler_to_code(self, desc):
+        desc = desc.replace('[spoiler', '[code')
+        desc = desc.replace('[/spoiler]', '[/code]')
+        return desc
+
     def convert_code_to_quote(self, desc):
         desc = desc.replace('[code', '[quote')
         desc = desc.replace('[/code]', '[/quote]')
