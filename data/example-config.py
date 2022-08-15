@@ -133,6 +133,7 @@ config = {
         },
         "qbit_sample" : {
             "torrent_client" : "qbit",
+            "enable_search" : True,
             "qbit_url" : "http://127.0.0.1",
             "qbit_port" : "8080",
             "qbit_user" : "username",

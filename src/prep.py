@@ -296,14 +296,12 @@ class Prep():
         if meta.get('tmdb', None) == None and meta.get('imdb', None) == None:
             meta = await self.get_tmdb_id(filename, meta['search_year'], meta, meta['category'], untouched_filename)
         elif meta.get('imdb', None) != None and meta.get('tmdb_manual', None) == None:
+            meta['imdb_id'] = str(meta['imdb']).replace('tt', '')
             meta = await self.get_tmdb_from_imdb(meta, filename)
         else:
             meta['tmdb_manual'] = meta.get('tmdb', None)
 
         
-        # If no imdb, search for it
-        if meta.get('imdb_id', None) == None:
-            meta['imdb_id'] = await self.search_imdb(filename, meta['search_year'])
         # If no tmdb, use imdb for meta
         if int(meta['tmdb']) == 0:
             meta = await self.imdb_other_meta(meta)
@@ -311,6 +309,9 @@ class Prep():
             meta = await self.tmdb_other_meta(meta)
         # Search tvmaze
         meta['tvmaze_id'], meta['imdb_id'], meta['tvdb_id'] = await self.search_tvmaze(filename, meta['search_year'], meta.get('imdb_id','0'), meta.get('tvdb_id', 0))
+        # If no imdb, search for it
+        if meta.get('imdb_id', None) == None:
+            meta['imdb_id'] = await self.search_imdb(filename, meta['search_year'])
         if meta.get('imdb_info', None) == None and int(meta['imdb_id']) != 0:
             meta['imdb_info'] = await self.get_imdb_info(meta['imdb_id'], meta)
         if meta.get('tag', None) == None:
@@ -434,7 +435,7 @@ class Prep():
         if os.path.isdir(videoloc):
             globlist = glob.glob1(videoloc, "*.mkv") + glob.glob1(videoloc, "*.mp4") + glob.glob1(videoloc, "*.ts")
             for file in globlist:
-                if not file.lower().endswith('sample.mkv'):
+                if not file.lower().endswith('sample.mkv') or "!sample" in file.lower():
                     filelist.append(os.path.abspath(f"{videoloc}{os.sep}{file}"))
             try:
                 video = sorted(filelist)[0]       
@@ -1675,7 +1676,7 @@ class Prep():
             except:
                 pass
 
-        hdr = f"{dv} {hdr}"
+        hdr = f"{dv} {hdr}".strip()
         return hdr
 
     def get_region(self, bdinfo, region=None):
@@ -1874,14 +1875,14 @@ class Prep():
             globs = glob.glob1(path, "*.mkv") + glob.glob1(path, "*.mp4") + glob.glob1(path, "*.ts")
             no_sample_globs = []
             for file in globs:
-                if not file.lower().endswith('sample.mkv'):
+                if not file.lower().endswith('sample.mkv') or "!sample" in file.lower():
                     no_sample_globs.append(os.path.abspath(f"{path}{os.sep}{file}"))
             if len(no_sample_globs) == 1:
                 path = meta['filelist'][0]
         if meta['is_disc']:
             include, exclude = "", ""
         else:
-            exclude = ["*.*", "sample.mkv"] 
+            exclude = ["*.*", "*sample.mkv", "!sample*.*"] 
             include = ["*.mkv", "*.mp4", "*.ts"]
         torrent = Torrent(path,
             trackers = ["https://fake.tracker"],
@@ -1891,7 +1892,7 @@ class Prep():
             include_globs = include or [],
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
-        console.print("[bold yellow]Creating .torrent... (No --torrenthash was provided)")
+        console.print("[bold yellow]Creating .torrent... (No valid --torrenthash was provided)")
         file_size = torrent.size
         if file_size < 268435456: # 256 MiB
             piece_size = 18
@@ -2529,29 +2530,30 @@ class Prep():
         descfile = meta.get('descfile', None)
         ptp_desc = blu_desc = ""
         desc_source = []
-        if meta.get('ptp_manual') != None:
-            desc_source.append('PTP')
-        if meta.get('blu_manual') != None:
-            desc_source.append('BLU')
-        if len(desc_source) != 1:
-            desc_source = None
-        else:
-            desc_source = desc_source[0]
-
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="") as description:
             description.seek(0)
-            if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
-                ptp = PTP(config=self.config)
-                ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
-                if ptp_desc.rstrip().strip().replace('\r\n', '').replace('\n', '') != "":
-                    description.write(ptp_desc)
-                    description.write("\n")
-                    meta['description'] = 'PTP'
+            if (desclink, descfile, meta['desc']) == (None, None, None):
+                if meta.get('ptp_manual') != None:
+                    desc_source.append('PTP')
+                if meta.get('blu_manual') != None:
+                    desc_source.append('BLU')
+                if len(desc_source) != 1:
+                    desc_source = None
+                else:
+                    desc_source = desc_source[0]
 
-            if ptp_desc == "" and meta.get('blu_desc', '').rstrip() not in [None, ''] and desc_source in ['BLU', None]:
-                if meta.get('blu_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
-                    description.write(meta['blu_desc'])
-                    meta['description'] = 'BLU'
+                if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
+                    ptp = PTP(config=self.config)
+                    ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
+                    if ptp_desc.rstrip().strip().replace('\r\n', '').replace('\n', '') != "":
+                        description.write(ptp_desc)
+                        description.write("\n")
+                        meta['description'] = 'PTP'
+
+                if ptp_desc == "" and meta.get('blu_desc', '').rstrip() not in [None, ''] and desc_source in ['BLU', None]:
+                    if meta.get('blu_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
+                        description.write(meta['blu_desc'])
+                        meta['description'] = 'BLU'
 
             if meta.get('desc_template', None) != None:
                 from jinja2 import Template
@@ -2707,7 +2709,7 @@ class Prep():
                 original_language = None
             elif len(original_language) == 1:
                 original_language = original_language[0]
-        aka = result.get('original title', result.get('localized title', ""))
+        aka = result.get('original title', result.get('localized title', "")).replace(' - IMDb', '')
         if aka != "":
             aka = f" AKA {aka}"
         return aka, original_language
@@ -2768,11 +2770,19 @@ class Prep():
             info = ia.get_movie(imdbID)
             imdb_info['title'] = info.get('title')
             imdb_info['year'] = info.get('year')
-            imdb_info['aka'] = info.get('original title', info.get('localized title', imdb_info['title']))
+            imdb_info['aka'] = info.get('original title', info.get('localized title', imdb_info['title'])).replace(' - IMDb', '')
             imdb_info['type'] = info.get('kind')
             imdb_info['imdbID'] = info.get('imdbID')
             imdb_info['runtime'] = info.get('runtimes', ['0'])[0]
             imdb_info['cover'] = info.get('full-size cover url', '').replace(".jpg", "._V1_FMjpg_UX750_.jpg")
+            imdb_info['plot'] = info.get('plot', [''])[0]
+            imdb_info['genres'] = ', '.join(info.get('genres', ''))
+            imdb_info['original_language'] = info.get('language codes')
+            if isinstance(imdb_info['original_language'], list):
+                if len(imdb_info['original_language']) > 1:
+                    imdb_info['original_language'] = None
+                elif len(imdb_info['original_language']) == 1:
+                    imdb_info['original_language'] = imdb_info['original_language'][0]
             if imdb_info['cover'] == '':
                 imdb_info['cover'] = meta.get('poster', '')
             if len(info.get('directors', [])) >= 1:
@@ -2811,6 +2821,8 @@ class Prep():
         meta['year'] = imdb_info['year']
         meta['aka'] = imdb_info['aka']
         meta['poster'] = imdb_info['cover']
+        meta['original_language'] = imdb_info['original_language']
+        meta['overview'] = imdb_info['plot']
 
         difference = SequenceMatcher(None, meta['title'].lower(), meta['aka'][5:].lower()).ratio()
         if difference >= 0.9 or meta['aka'][5:].strip() == "" or meta['aka'][5:].strip().lower() in meta['title'].lower():

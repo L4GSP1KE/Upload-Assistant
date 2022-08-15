@@ -115,7 +115,8 @@ class HDB():
             "BCORE" : 66, "CORE" : 66,
             "CRKL" : 73,
             "FUNI" : 74,
-            "HLMK" : 71
+            "HLMK" : 71,
+            "HTSR" : 79
         }
         if meta.get('service') in service_dict.keys():
             tags.append(service_dict.get(meta['service']))

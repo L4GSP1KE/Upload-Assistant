@@ -128,8 +128,11 @@ class BBCODE:
         # Re-place comparisons
         if comp_placeholders != []:
             for i, comp in enumerate(comp_placeholders):
-                comp = re.sub("\[\/?img[\s\S]*?\]", comp, flags=re.IGNORECASE)
+                comp = re.sub("\[\/?img[\s\S]*?\]", "",comp, flags=re.IGNORECASE)
                 desc = desc.replace(f"COMPARISON_PLACEHOLDER-{i}", comp)
+
+        # Convert hides with multiple images to comparison
+        desc = self.convert_collapse_to_comparison(desc, "hide", hides)
 
         # Strip blank lines:
         desc = desc.rstrip()
@@ -208,30 +211,8 @@ class BBCODE:
                     desc = desc.replace(full_center, '')
 
         # Convert Comparison spoilers to [comparison=]
-        if spoilers != []:
-            for i in range(len(spoilers)):
-                tag = spoilers[i]
-                images = re.findall("\[img[\s\S]*?\[\/img\]", tag)
-                if len(images) >= 6:
-                    comp_images = []
-                    final_sources = []
-                    for image in images:
-                        image_url = re.sub("\[img[\s\S]*\]", "", image.replace('[/img]', ''))
-                        comp_images.append(image_url)
-                    sources = re.match("\[spoiler=[\s\S]*?\]", tag)[0].replace('[spoiler=', '')[:-1]
-                    sources = re.sub("comparison", "", sources, flags=re.IGNORECASE)
-                    for each in ['vs', ',', '|']:
-                        sources = sources.split(each)
-                        sources = "$".join(sources)
-                    sources = sources.split("$")
-                    for source in sources:
-                        final_sources.append(source.strip())
-                    comp_images = '\n'.join(comp_images)
-                    final_sources = ', '.join(final_sources)
-                    spoil2comp = f"[comparison={final_sources}]{comp_images}[/comparison]"
-                    desc = desc.replace(tag, spoil2comp)
-
-        
+        desc = self.convert_collapse_to_comparison(desc, "spoiler", spoilers)
+                
         # Strip blank lines:
         desc = desc.rstrip()
         desc = re.sub("\n\n+", "\n\n", desc)
@@ -243,7 +224,6 @@ class BBCODE:
             return "", imagelist
         
         return desc, imagelist
-
 
 
 
@@ -275,7 +255,16 @@ class BBCODE:
         desc = desc.replace('[spoiler', '[hide')
         desc = desc.replace('[/spoiler]', '[/hide]')
         return desc
+
+    def remove_spoiler(self, desc):
+        desc = re.sub("\[\/?spoiler[\s\S]*?\]", "", desc, flags=re.IGNORECASE)
+        return desc
     
+    def convert_spoiler_to_code(self, desc):
+        desc = desc.replace('[spoiler', '[code')
+        desc = desc.replace('[/spoiler]', '[/code]')
+        return desc
+
     def convert_code_to_quote(self, desc):
         desc = desc.replace('[code', '[quote')
         desc = desc.replace('[/code]', '[/quote]')
@@ -330,4 +319,33 @@ class BBCODE:
             output = '\n'.join(output)
             new_bbcode = f"[center]{' | '.join(comp_sources)}\n{output}[/center]"
             desc = desc.replace(comp, new_bbcode)
+        return desc
+
+    def convert_collapse_to_comparison(self, desc, spoiler_hide, collapses):
+        # Convert Comparison spoilers to [comparison=]
+        if collapses != []:
+            for i in range(len(collapses)):
+                tag = collapses[i]
+                images = re.findall("\[img[\s\S]*?\[\/img\]", tag, flags=re.IGNORECASE)
+                if len(images) >= 6:
+                    comp_images = []
+                    final_sources = []
+                    for image in images:
+                        image_url = re.sub("\[img[\s\S]*\]", "", image.replace('[/img]', ''), flags=re.IGNORECASE)
+                        comp_images.append(image_url)
+                    if spoiler_hide == "spoiler":
+                        sources = re.match("\[spoiler[\s\S]*?\]", tag)[0].replace('[spoiler=', '')[:-1]
+                    elif spoiler_hide == "hide":
+                        sources = re.match("\[hide[\s\S]*?\]", tag)[0].replace('[hide=', '')[:-1]
+                    sources = re.sub("comparison", "", sources, flags=re.IGNORECASE)
+                    for each in ['vs', ',', '|']:
+                        sources = sources.split(each)
+                        sources = "$".join(sources)
+                    sources = sources.split("$")
+                    for source in sources:
+                        final_sources.append(source.strip())
+                    comp_images = '\n'.join(comp_images)
+                    final_sources = ', '.join(final_sources)
+                    spoil2comp = f"[comparison={final_sources}]{comp_images}[/comparison]"
+                    desc = desc.replace(tag, spoil2comp)
         return desc

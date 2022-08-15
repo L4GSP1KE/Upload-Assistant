@@ -161,3 +161,49 @@ class COMMON():
                     lineFields = [x for x in lineFields if x != ""]
                     cookies[lineFields[5]] = lineFields[6]
         return cookies
+
+    async def filter_dupes(self, dupes, meta):
+        new_dupes = []
+        for each in dupes:
+            if meta.get('sd', 0) == 1:
+                remove_set = {}
+            else:
+                remove_set = {meta['resolution']}
+            search_combos = [
+                {
+                    'search' : meta['hdr'],
+                    'search_for' : {'HDR', 'PQ10'},
+                    'update' : {'HDR|PQ10'}
+                },
+                {
+                    'search' : meta['hdr'],
+                    'search_for' : {'DV'},
+                    'update' : {'DV|DoVi'}
+                },
+            ]
+            search_matches = [
+                {
+                    'if' : {'REMUX', 'WEBDL', 'WEBRip', 'HDTV'},
+                    'in' : meta['type']
+                }
+            ]
+            for s in search_combos:
+                if any(x in s['search'] for x in s['search_for']):
+                    remove_set.update(s['update'])
+            for sm in search_matches:
+                for a in sm['if']:
+                    if a in sm['in']:
+                        remove_set.add(a)
+
+            search = each.lower().replace('-', '').replace(' ', '').replace('.', '')
+            for x in remove_set:
+                if "|" in x:
+                    look_for = x.split('|')
+                    for y in look_for:
+                        if y.lower() in search:
+                            remove_set.remove(x)
+                            remove_set.add(y)
+            if all(x.lower() in search for x in remove_set):
+                if each not in new_dupes:
+                    new_dupes.append(each)
+        return new_dupes

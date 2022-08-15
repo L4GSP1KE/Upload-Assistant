@@ -51,7 +51,7 @@ class Args():
         parser.add_argument('-a', '--anon', action='store_true', required=False, help="Upload anonymously")
         parser.add_argument('-st', '--stream', action='store_true', required=False, help="Stream Optimized Upload")
         parser.add_argument('-pr', '--personalrelease', action='store_true', required=False, help="Personal Release")
-        parser.add_argument('-dupe', '--dupe', action='store_true', required=False, help="Pass if you know this is a dupe")
+        parser.add_argument('-sdc','--skip-dupe-check', action='store_true', required=False, help="Pass if you know this is a dupe (Skips dupe check)", dest="dupe")
         parser.add_argument('-debug', '--debug', action='store_true', required=False, help="Debug Mode, will run through all the motions providing extra info, but will not upload to trackers.")
         parser.add_argument('-ffdebug', '--ffdebug', action='store_true', required=False, help="Will show info from ffmpeg while taking screenshots.")
         parser.add_argument('-m', '--manual', action='store_true', required=False, help="Manual Mode. Returns link to ddl screens/base.torrent")

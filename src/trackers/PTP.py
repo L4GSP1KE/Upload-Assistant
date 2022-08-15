@@ -163,10 +163,11 @@ class PTP():
                 return groupID
         except Exception:
             console.print("[red]An error has occured trying to find a group ID")
+            console.print("[red]Please check that the site is online and your ApiUser/ApiKey values are correct")
             return None
 
 
-    async def get_torrent_info(self, imdb):
+    async def get_torrent_info(self, imdb, meta):
         params = {
             'imdb' : imdb,
             'action' : 'torrent_info',
@@ -187,6 +188,9 @@ class PTP():
             for key, value in response[0].items():
                 if value not in (None, ""):
                     tinfo[key] = value
+            if tinfo['tags'] == "":
+                tags = self.get_tags([meta.get("genres", ""), meta.get("keywords", ""), meta['imdb_info']['genres']])
+                tinfo['tags'] = ", ".join(tags)
         except Exception:
             pass
         return tinfo
@@ -197,6 +201,11 @@ class PTP():
             "year" : meta.get("year", ""),
             "album_desc" : meta.get("overview", ""),
         }
+        tags = self.get_tags([meta.get("genres", ""), meta.get("keywords", "")])
+        tinfo['tags'] = ", ".join(tags)
+        return tinfo
+
+    async def get_tags(self, check_against):
         tags = []
         ptp_tags = [
             "action", "adventure", "animation", "arthouse", "asian", "biography", "camp", "comedy",
@@ -204,11 +213,12 @@ class PTP():
             "history", "horror", "martial.arts", "musical", "mystery", "performance", "philosophy", "politics", "romance",
             "sci.fi", "short", "silent", "sport", "thriller", "video.art", "war", "western"
         ]
+        if not isinstance(check_against, list):
+            check_against = [check_against]
         for each in ptp_tags:
-            if each in meta.get("genres", "").lower().replace(' ', '').replace('-', '') or each in meta.get("keywords", "").lower().replace(' ', '').replace('-', ''):
+            if any(each.replace('.', '') in x for x in check_against.lower().replace(' ', '').replace('-', '')):
                 tags.append(each)
-        tinfo['tags'] = ", ".join(tags)
-        return tinfo
+        return tags
 
     async def search_existing(self, groupID, meta):
         # Map resolutions to SD / HD / UHD
@@ -239,7 +249,7 @@ class PTP():
             if len(torrents) != 0:
                 for torrent in torrents:
                     if torrent.get('Quality') == quality and quality != None:
-                        existing.append(torrent.get('ReleaseName', "RELEASE NAME NOT FOUND"))
+                        existing.append(f"[{torrent.get('Resolution')}]{torrent.get('ReleaseName', 'RELEASE NAME NOT FOUND')}")
         except Exception:
             console.print("[red]An error has occured trying to find existing releases")
         return existing
@@ -659,7 +669,7 @@ class PTP():
     async def validate_login(self, response):
         loggedIn = False
         if response.text.find("""<a href="login.php?act=recover">""") != -1:
-            raise LoginException("Looks like you are not logged in to PTP. Probably due to the bad user name or password.")
+            console.print("Looks like you are not logged in to PTP. Probably due to the bad user name, password, or expired session.")
         elif "Your popcorn quota has been reached, come back later!" in response.text:
             raise LoginException("Your PTP request/popcorn quota has been reached, try again later")
         else:

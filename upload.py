@@ -1,10 +1,8 @@
-from argparse import ArgumentParser
 import requests
 from src.trackers.RF import RF
 from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
-from src.search import Search
 from src.trackers.COMMON import COMMON
 from src.trackers.HUNO import HUNO
 from src.trackers.BLU import BLU
@@ -22,6 +20,7 @@ from src.trackers.HDB import HDB
 from src.trackers.LCD import LCD
 from src.trackers.TTG import TTG
 from src.trackers.LST import LST
+from src.trackers.FL import FL
 import json
 from pathlib import Path
 import asyncio
@@ -36,6 +35,7 @@ import cli_ui
 from src.console import console
 from rich.markdown import Markdown
 from rich.style import Style
+
 
 
 cli_ui.setup(color='always', title="L4G's Upload Assistant")
@@ -121,7 +121,7 @@ async def do_the_thing(base_dir):
             with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
                 saved_meta = json.load(f)
                 for key, value in saved_meta.items():
-                    overwrite_list = ['trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 'ptp', 'blu', 'no_aka', 'client']
+                    overwrite_list = ['trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 'ptp', 'blu', 'no_aka', 'client', 'desclink', 'descfile', 'desc', 'draft']
                     if meta.get(key, None) != value and key in overwrite_list:
                         saved_meta[key] = meta[key]
                 meta = saved_meta
@@ -147,16 +147,15 @@ async def do_the_thing(base_dir):
                 console.print(meta['image_list'])
             # meta['uploaded_screens'] = True
 
-        if meta.get('torrenthash', None) != None or meta.get('ext_torrenthash', None) != None:
+
+        if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
             if meta.get('rehash', False) == False:
                 reuse_torrent = await client.find_existing_torrent(meta)
                 if reuse_torrent != None:
                     prep.create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
-
-        if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
-            if meta['nohash'] == False:
+            if meta['nohash'] == False and reuse_torrent == None:
                 prep.create_torrent(meta, Path(meta['path']))
-            else:
+            if meta['nohash']:
                 meta['client'] = "none"
         if int(meta.get('randomized', 0)) >= 1:
             prep.create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'], meta['path'])
@@ -197,8 +196,8 @@ async def do_the_thing(base_dir):
         ####################################
         common = COMMON(config=config)
         unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN']
-        http_trackers = ['HDB', 'TTG']
-        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO}
+        http_trackers = ['HDB', 'TTG', 'FL']
+        tracker_class_map = {'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 'ACM' : ACM, 'HDB' : HDB,'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL}
 
         for tracker in trackers:
             tracker = tracker.replace(" ", "").upper().strip()
@@ -216,6 +215,7 @@ async def do_the_thing(base_dir):
                 if upload_to_tracker:
                     console.print(f"Uploading to {tracker_class.tracker}")
                     dupes = await tracker_class.search_existing(meta)
+                    dupes = await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await tracker_class.upload(meta)
@@ -231,6 +231,7 @@ async def do_the_thing(base_dir):
                     console.print(f"Uploading to {tracker}")
                     if await tracker_class.validate_credentials(meta) == True:
                         dupes = await tracker_class.search_existing(meta)
+                        dupes = await common.filter_dupes(dupes, meta)
                         meta = dupe_check(dupes, meta)
                         if meta['upload'] == True:
                             await tracker_class.upload(meta)
@@ -271,6 +272,7 @@ async def do_the_thing(base_dir):
                 if upload_to_bhd:
                     console.print("Uploading to BHD")
                     dupes = await bhd.search_existing(meta)
+                    dupes = await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await bhd.upload(meta)
@@ -297,6 +299,7 @@ async def do_the_thing(base_dir):
                             session = thr.login(session)
                             console.print("[yellow]Searching for Dupes")
                             dupes = thr.search_existing(session, meta.get('imdb_id'))
+                            dupes = await common.filter_dupes(dupes, meta)
                             meta = dupe_check(dupes, meta)
                             if meta['upload'] == True:
                                 await thr.upload(session, meta)
@@ -328,6 +331,7 @@ async def do_the_thing(base_dir):
                         else:
                             console.print("[yellow]Searching for Existing Releases")
                             dupes = await ptp.search_existing(groupID, meta)
+                            dupes = await common.filter_dupes(dupes, meta)
                             meta = dupe_check(dupes, meta)
                         if meta.get('imdb_info', {}) == {}:
                             meta['imdb_info'] = await prep.get_imdb_info(meta['imdb_id'], meta)
@@ -398,10 +402,10 @@ def dupe_check(dupes, meta):
         cli_ui.info(dupe_text)
         if meta['unattended']:
             if meta.get('dupe', False) == False:
-                console.print("[red]Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --dupe")
+                console.print("[red]Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --skip-dupe-check")
                 exit()
             else:
-                console.print("[yellow]Found potential dupes. -dupe/--dupe was passed. Uploading anyways")
+                console.print("[yellow]Found potential dupes. --skip-dupe-check was passed. Uploading anyways")
                 upload = True
         console.print()
         if not meta['unattended']:
