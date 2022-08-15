@@ -89,7 +89,7 @@ class Clients():
                 torrenthash = meta['torrenthash']
             elif meta.get('ext_torrenthash', None) != None:
                 torrenthash = meta['ext_torrenthash']
-            if torrent_client == 'qbit' and torrenthash == None:
+            if torrent_client == 'qbit' and torrenthash == None and client.get('enable_search') == True:
                 torrenthash = await self.search_qbit_for_torrent(meta, client)
             if not torrenthash:
                 return None
