@@ -1943,8 +1943,10 @@ class Prep():
             base_torrent.trackers = ['https://fake.tracker']
             base_torrent.comment = "Created by L4G's Upload Assistant"
             base_torrent.created_by = "Created by L4G's Upload Assistant"
-            base_torrent.metainfo.pop('publisher', None)
-            base_torrent.metainfo.pop('publisher-url', None)
+            #Remove Un-whitelisted info keys
+            for each in base_torrent.metainfo['info'].keys():
+                if each not in ('files', 'length', 'name', 'piece length', 'pieces', 'private', 'source'):
+                    base_torrent.metainfo.pop(each, None)
             base_torrent.source = 'L4G'
             base_torrent.private = True
             Torrent.copy(base_torrent).write(f"{base_dir}/tmp/{uuid}/BASE.torrent", overwrite=True)
