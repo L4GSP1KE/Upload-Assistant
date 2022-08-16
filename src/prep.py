@@ -1944,10 +1944,10 @@ class Prep():
             base_torrent.comment = "Created by L4G's Upload Assistant"
             base_torrent.created_by = "Created by L4G's Upload Assistant"
             #Remove Un-whitelisted info from torrent
-            for each in base_torrent.metainfo['info'].keys():
+            for each in list(base_torrent.metainfo['info']):
                 if each not in ('files', 'length', 'name', 'piece length', 'pieces', 'private', 'source'):
                     base_torrent.metainfo['info'].pop(each, None)
-            for each in base_torrent.metainfo.keys():
+            for each in list(base_torrent.metainfo):
                 if each not in ('announce', 'comment', 'created by', 'encoding', 'info'):
                     base_torrent.metainfo.pop(each, None)
             base_torrent.source = 'L4G'
