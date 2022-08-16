@@ -41,7 +41,7 @@ class FL():
                 if meta['resolution'] == '2160p':
                     # 26 = 4k Movie - BluRay
                     cat_id = 26
-            elif meta['resoltion'] == '2160p':
+            elif meta['resolution'] == '2160p':
                 # 6 = 4k Movie
                 cat_id = 6
             elif meta.get('sd', 0) == 1:
@@ -86,7 +86,7 @@ class FL():
             fl_name = fl_name.replace(meta['title'], meta['imdb_info']['aka'])
             if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']):
                 fl_name = fl_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
-        # Remove Dubbed/Dual-Audio from title
+        fl_name = fl_name.replace('DD+', 'DDP')
         fl_name = fl_name.replace('PQ10', 'HDR')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
