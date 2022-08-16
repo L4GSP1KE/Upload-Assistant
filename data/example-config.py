@@ -88,7 +88,7 @@ config = {
 
             # FOR INTERNAL USE ONLY:
             # "internal" : True,
-            # "interal_groups" : ["What", "Internal", "Groups", "Are", "You", "In"],
+            # "internal_groups" : ["What", "Internal", "Groups", "Are", "You", "In"],
         },
         "THR" : {
             "username" : "username",
