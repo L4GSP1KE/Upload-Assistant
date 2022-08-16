@@ -1949,7 +1949,7 @@ class Prep():
                     base_torrent.metainfo['info'].pop(each, None)
             for each in base_torrent.metainfo.keys():
                 if each not in ('announce', 'comment', 'created by', 'encoding', 'info'):
-                    base_torrent.pop(each, None)
+                    base_torrent.metainfo.pop(each, None)
             base_torrent.source = 'L4G'
             base_torrent.private = True
             Torrent.copy(base_torrent).write(f"{base_dir}/tmp/{uuid}/BASE.torrent", overwrite=True)
