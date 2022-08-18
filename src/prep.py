@@ -446,6 +446,7 @@ class Prep():
         else:
             video = videoloc
             filelist.append(videoloc)
+        filelist = sorted(filelist)
         return video, filelist
 
 
