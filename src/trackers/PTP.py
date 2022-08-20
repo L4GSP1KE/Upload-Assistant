@@ -593,7 +593,7 @@ class PTP():
                     if i == 0:
                         # Add This line for all web-dls
                         if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None:
-                            desc.write(f"[quote][center]This release is sourced from {meta['service_longname']}[/center][quote]")
+                            desc.write(f"[quote][align=center]This release is sourced from {meta['service_longname']}[/align][/quote]")
                         mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
                     else:
                         # Export Mediainfo
