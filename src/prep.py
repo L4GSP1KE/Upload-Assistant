@@ -1440,7 +1440,7 @@ class Prep():
                                     time.sleep(5)
                     if eng and orig == True:
                         dual = "Dual-Audio"
-                    elif eng == True and orig == False and meta['original_language'] not in ['zxx', 'xx', None]:
+                    elif eng == True and orig == False and meta['original_language'] not in ['zxx', 'xx', None] and meta.get('no_dub', False) == False:
                         dual = "Dubbed"
                 except Exception:
                     console.print(traceback.print_exc())
@@ -2134,8 +2134,6 @@ class Prep():
             year = ''
         if meta.get('no_aka', False) == True:
             alt_title = ''
-        if meta.get('no_dub', False) == True:
-            audio = audio.replace('Dubbed', '')
         if meta['debug']:
             console.print("[cyan]get_name meta:")
             console.print(meta)
