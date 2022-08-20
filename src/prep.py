@@ -2134,6 +2134,8 @@ class Prep():
             year = ''
         if meta.get('no_aka', False) == True:
             alt_title = ''
+        if meta.get('no_dub', False) == True:
+            audio = audio.replace('Dubbed', '')
         if meta['debug']:
             console.print("[cyan]get_name meta:")
             console.print(meta)
