@@ -76,13 +76,13 @@ class DiscParse():
                         continue
                     break
                 with open(f"{save_dir}/BD_SUMMARY_{str(i).zfill(2)}.txt", 'w') as f:
-                    f.write(bd_summary)
+                    f.write(bd_summary.rstrip().strip())
                     f.close()
                 
                 bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
         
-                discs[i]['summary'] = bd_summary
-                discs[i]['bdinfo'] = bdinfo
+                discs[i]['summary'] = bd_summary.rstrip().strip()
+                discs[i]['bdinfo'] = bdinfo.rstrip().strip()
                 # shutil.rmtree(f"{base_dir}/tmp")
             else:
                 discs = meta_discs
