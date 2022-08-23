@@ -181,6 +181,11 @@ class COMMON():
                     'update' : {'DV|DoVi'}
                 },
                 {
+                    'search' : meta['hdr'],
+                    'search_not' : {'DV', 'DoVi', 'HDR', 'PQ10'},
+                    'update' : {'!(DV)|(DoVi)|(HDR)|(PQ10)'}
+                },
+                {
                     'search' : str(meta.get('tv_pack', 0)),
                     'search_for' : '1',
                     'update' : {f"{meta['season']}(?!E\d+)"}
@@ -198,8 +203,11 @@ class COMMON():
                 }
             ]
             for s in search_combos:
-                if s['search_for'] not in (None, ''):
+                if s.get('search_for') not in (None, ''):
                     if any(re.search(x, s['search'], flags=re.IGNORECASE) for x in s['search_for']):
+                        remove_set.update(s['update'])
+                if s.get('search_not') not in (None, ''):
+                    if not any(re.search(x, s['search'], flags=re.IGNORECASE) for x in s['search_not']):
                         remove_set.update(s['update'])
             for sm in search_matches:
                 for a in sm['if']:
@@ -215,7 +223,14 @@ class COMMON():
                             remove_set.remove(x)
                             remove_set.add(y)
 
-            if all(re.search(x, search, flags=re.I) for x in remove_set):
-                if each not in new_dupes:
-                    new_dupes.append(each)
+            allow = True
+            for x in remove_set:
+                if not x.startswith("!"):
+                    if not re.search(x, search, flags=re.I):
+                        allow = False
+                else:
+                    if re.search(x.replace("!", "", 1), search, flags=re.I) not in (None, False):
+                        allow = False
+            if allow and each not in new_dupes:
+                new_dupes.append(each)
         return new_dupes
