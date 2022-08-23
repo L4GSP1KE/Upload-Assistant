@@ -75,7 +75,7 @@ class FL():
 
     async def edit_name(self, meta):
         fl_name = meta['name']
-        if meta.get('source', '').upper() == 'WEB':
+        if meta.get('source', '').upper() == 'WEB' and meta.get('service', '').strip() != '':
             fl_name = fl_name.replace(f"{meta.get('service', '')} ", '')
         if 'DV' in meta.get('hdr', ''):
             fl_name = fl_name.replace(' DV ', ' DoVi ')
