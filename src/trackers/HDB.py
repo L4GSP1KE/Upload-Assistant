@@ -168,7 +168,7 @@ class HDB():
     async def edit_name(self, meta):
         hdb_name = meta['name']
         hdb_name = hdb_name.replace('H.265', 'HEVC')
-        if meta.get('source', '').upper() == 'WEB':
+        if meta.get('source', '').upper() == 'WEB' and meta.get('service', '').strip() != '':
             hdb_name = hdb_name.replace(f"{meta.get('service', '')} ", '')
         if 'DV' in meta.get('hdr', ''):
             hdb_name = hdb_name.replace(' DV ', ' DoVi ')
