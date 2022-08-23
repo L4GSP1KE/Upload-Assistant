@@ -137,12 +137,12 @@ class FL():
             if int(meta.get('freeleech', '0')) != 0:
                 data['freeleech'] = 'on'
 
+            url = "https://filelist.io/takeupload.php"
             # Submit
             if meta['debug']:
                 console.print(url)
                 console.print(data)
             else:
-                url = "https://filelist.io/takeupload.php"
                 with requests.Session() as session:
                     cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/FL.pkl")
                     with open(cookiefile, 'rb') as cf:
