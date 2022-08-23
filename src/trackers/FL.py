@@ -90,7 +90,7 @@ class FL():
         fl_name = fl_name.replace('PQ10', 'HDR')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
-        fl_name = re.sub("[^0-9a-zA-Z. '\-\[\]]+", "", fl_name)
+        fl_name = re.sub("[^0-9a-zA-Z. +'\-\[\]]+", "", fl_name)
         fl_name = fl_name.replace(' ', '.')
         return fl_name 
 
