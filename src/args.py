@@ -65,6 +65,7 @@ class Args():
         parser.add_argument('-ua', '--unattended', action='store_true', required=False, help=argparse.SUPPRESS)
         parser.add_argument('-vs', '--vapoursynth', action='store_true', required=False, help="Use vapoursynth for screens (requires vs install)")
         
+        parser.add_argument('-fl', '--freeleech', nargs='*', required=False, help="Freeleech %", default=0, dest="freeleech")
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
         # console.print(args)
@@ -117,6 +118,8 @@ class Args():
                     meta[key] = value
             elif key in ("manual_edition"):
                 meta[key] = value
+            elif key in ("freeleech"):
+                meta[key] = 100
             else:
                 meta[key] = meta.get(key, None)
             if key in ('trackers'):

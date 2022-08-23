@@ -122,7 +122,7 @@ async def do_the_thing(base_dir):
             with open(f"{base_dir}/tmp/{os.path.basename(path)}/meta.json") as f:
                 saved_meta = json.load(f)
                 for key, value in saved_meta.items():
-                    overwrite_list = ['trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 'ptp', 'blu', 'no_aka', 'no_year', 'no_dub', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region']
+                    overwrite_list = ['trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 'ptp', 'blu', 'no_aka', 'no_year', 'no_dub', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech']
                     if meta.get(key, None) != value and key in overwrite_list:
                         saved_meta[key] = meta[key]
                 meta = saved_meta
@@ -367,6 +367,8 @@ def get_confirmation(meta):
     if int(meta.get('mal_id', 0)) != 0:
         cli_ui.info(f"MAL : https://myanimelist.net/anime/{meta['mal_id']}")
     console.print()
+    if int(meta.get('freeleech', '0')) != 0:
+        cli_ui.info(f"Freeleech: {meta['freeleech']}")
     if meta['tag'] == "":
             tag = ""
     else:

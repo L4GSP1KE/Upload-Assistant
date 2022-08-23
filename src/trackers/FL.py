@@ -134,6 +134,8 @@ class FL():
                 data['epenis'] = self.uploader_name
             if has_ro_audio:
                 data['materialro'] = 'on'
+            if int(meta.get('freeleech', '0')) != 0:
+                data['freeleech'] = 'on'
 
             # Submit
             if meta['debug']:
