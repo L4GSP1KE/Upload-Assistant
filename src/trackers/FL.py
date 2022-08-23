@@ -47,7 +47,7 @@ class FL():
             elif meta.get('sd', 0) == 1:
                 # 1 = Movie SD
                 cat_id = 1
-            if has_ro_sub and meta.get('sd', 0) == 0:
+            if has_ro_sub and meta.get('sd', 0) == 0 and meta['resolution'] != '2160p':
                 # 19 = Movie + RO
                 cat_id = 19
         
@@ -116,7 +116,7 @@ class FL():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()
         with open(torrent_path, 'rb') as torrentFile:
-            torrentFileName = unidecode(fl_name)
+            torrentFileName = unidecode(fl_name.replace('.', ' '))
             files = {
                 'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
             }
