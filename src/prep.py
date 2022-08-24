@@ -1836,15 +1836,15 @@ class Prep():
                 manual_edition = " ".join(manual_edition)
             edition = str(manual_edition)
             
-        if "REPACK" in video.upper() or "V2" in video.upper():
+        if "REPACK" in (video.upper(), edition) or "V2" in video.upper():
             repack = "REPACK"
-        if "REPACK2" in video.upper() or "V3" in video.upper():
+        if "REPACK2" in (video.upper(), edition) or "V3" in video.upper():
             repack = "REPACK2"
-        if "REPACK3" in video.upper() or "V4" in video.upper():
+        if "REPACK3" in (video.upper(), edition) or "V4" in video.upper():
             repack = "REPACK3"
-        if "PROPER" in video.upper():
+        if "PROPER" in (video.upper(), edition):
             repack = "PROPER"
-        if "RERIP" in video.upper():
+        if "RERIP" in (video.upper(), edition):
             repack = "RERIP"
         # if "HYBRID" in video.upper() and "HYBRID" not in title.upper():
         #     edition = "Hybrid " + edition
