@@ -64,11 +64,11 @@ class Args():
         parser.add_argument('-rt', '--randomized', nargs='*', required=False, help="Number of extra, torrents with random infohash", default=0)
         parser.add_argument('-ua', '--unattended', action='store_true', required=False, help=argparse.SUPPRESS)
         parser.add_argument('-vs', '--vapoursynth', action='store_true', required=False, help="Use vapoursynth for screens (requires vs install)")
-        
-        parser.add_argument('-fl', '--freeleech', nargs='*', required=False, help="Freeleech %", default=0, dest="freeleech")
+
+        parser.add_argument('-fl', '--freeleech', nargs='*', required=False, help="Freeleech Percentage", default=0, dest="freeleech")
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
-        # console.print(args)
+        console.print(args)
         
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
@@ -125,7 +125,7 @@ class Args():
             if key in ('trackers'):
                 meta[key] = value
             # if key == 'help' and value == True:
-            #     parser.print_help()
+                # parser.print_help()
         return meta, parser, before_args
 
 
