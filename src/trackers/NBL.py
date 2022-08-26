@@ -66,7 +66,7 @@ class NBL():
             'apikey' : self.api_key,
             'tvmazeid' : int(meta.get('tvmaze_id', 0)),
             'mediainfo' : mi_dump,
-            'category' : await self.get_cat_id(meta['tv_pack'])
+            'category' : await self.get_cat_id(meta)
         }
         
         if meta['debug'] == False:
@@ -104,17 +104,17 @@ class NBL():
             ]
         }
         try:
-
             response = requests.get(url=self.search_url, json=json)
             response = response.json()
             for each in response['result']['items']:
-                if guessit(each['rls_name']['screen_size']) == meta['resolution']:
+                if guessit(each['rls_name'])['screen_size'] == meta['resolution']:
                     if meta.get('tv_pack', 0) == 1:
                         if each['cat'] == "Season" and int(guessit(each['rls_name'])) == meta.get('season_int'):
                             dupes.append(each['rls_name'])
                     elif int(guessit(each['rls_name'])) == meta.get('episode_int'):
                         dupes.append(each['rls_name'])
-        except:
+        except Exception:
+            console.print_exception()
             console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
