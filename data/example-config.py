@@ -90,6 +90,10 @@ config = {
             # "internal" : True,
             # "internal_groups" : ["What", "Internal", "Groups", "Are", "You", "In"],
         },
+        "NBL" : {
+            "api_key" : "NBL api key",
+            "announce_url" : "https://nebulance.io/customannounceurl",
+        },
         "THR" : {
             "username" : "username",
             "password" : "password",
