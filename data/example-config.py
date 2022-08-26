@@ -24,7 +24,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD, LST",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD, LST, TDB",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -111,9 +111,14 @@ config = {
             # "anon" : "False"
         },
 
-	"LT" : {
+	    "LT" : {
             "api_key" : "LT api key",
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
+            # "anon" : "False"
+        },
+	    "TDB" : {
+            "passkey" : "TDB api key",
+            "announce_url" : "https://torrentdb.net/announce/customannounceurl",
             # "anon" : "False"
         },
 
