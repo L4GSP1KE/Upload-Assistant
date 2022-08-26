@@ -2846,15 +2846,15 @@ class Prep():
             imdbID = '0'
         if tvdbID == None:
             tvdbID = 0
-        if int(imdbID) != 0:
+        if int(tvdbID) != 0:
             params = {
-                "imdb" : f"tt{imdbID}"
+                "thetvdb" : tvdbID
             }
             url = "https://api.tvmaze.com/lookup/shows"
             lookup = True
-        elif int(tvdbID) != 0:
+        elif int(imdbID) != 0:
             params = {
-                "thetvdb" : tvdbID
+                "imdb" : f"tt{imdbID}"
             }
             url = "https://api.tvmaze.com/lookup/shows"
             lookup = True
@@ -2864,6 +2864,9 @@ class Prep():
             }
             url = f"https://api.tvmaze.com/search/shows"
         resp = requests.get(url=url, params=params).json()
+        console.print(resp)
+        console.print(url)
+        console.print(params)
         if lookup == True:
             show = resp
         else:
