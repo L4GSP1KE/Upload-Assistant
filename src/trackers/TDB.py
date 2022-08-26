@@ -197,7 +197,7 @@ class TDB():
             'Authorization' : f"Bearer {self.passkey}"
         }
         try:
-            response = requests.get(url=self.search_url, params=params)
+            response = requests.post(url=self.search_url, params=params)
             response = response.json()
             for each in response['data']:
                 result = each['name']
