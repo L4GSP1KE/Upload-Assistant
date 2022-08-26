@@ -197,7 +197,7 @@ async def do_the_thing(base_dir):
         #######  Upload to Trackers  #######
         ####################################
         common = COMMON(config=config)
-        unit3d_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'TDB']
+        api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'TDB']
         http_trackers = ['HDB', 'TTG', 'FL']
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
@@ -211,7 +211,7 @@ async def do_the_thing(base_dir):
             else:
                 debug = ""
             
-            if tracker in unit3d_trackers:
+            if tracker in api_trackers:
                 tracker_class = tracker_class_map[tracker](config=config)
                 if meta['unattended']:
                     upload_to_tracker = True
@@ -252,7 +252,7 @@ async def do_the_thing(base_dir):
                         if manual_tracker != 'MANUAL':
                             manual_tracker = manual_tracker.replace(" ", "").upper().strip()
                             tracker_class = tracker_class_map[manual_tracker](config=config)
-                            if manual_tracker in unit3d_trackers:
+                            if manual_tracker in api_trackers:
                                 await common.unit3d_edit_desc(meta, tracker_class.tracker, tracker_class.signature)
                             else:
                                 await tracker_class.edit_desc(meta)
