@@ -2864,9 +2864,6 @@ class Prep():
             }
             url = f"https://api.tvmaze.com/search/shows"
         resp = requests.get(url=url, params=params).json()
-        console.print(resp)
-        console.print(url)
-        console.print(params)
         if lookup == True:
             show = resp
         else:

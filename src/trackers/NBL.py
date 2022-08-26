@@ -79,7 +79,6 @@ class NBL():
                     console.print(response)
                     console.print(response.text)
             except:
-                console.print(response.text)
                 console.print("[bold yellow]It may have uploaded, go check")
                 return 
         else:
