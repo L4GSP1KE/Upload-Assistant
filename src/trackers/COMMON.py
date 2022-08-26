@@ -166,9 +166,9 @@ class COMMON():
         new_dupes = []
         for each in dupes:
             if meta.get('sd', 0) == 1:
-                remove_set = {}
+                remove_set = set()
             else:
-                remove_set = {meta['resolution']}
+                remove_set = set({meta['resolution']})
             search_combos = [
                 {
                     'search' : meta['hdr'],
