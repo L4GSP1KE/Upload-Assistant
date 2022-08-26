@@ -142,7 +142,7 @@ class TDB():
             'tvdb' : meta['tvdb_id'],
             'mal' : meta['mal_id'],
             
-            'anonymous' : anon, 
+            'anon' : anon, 
             'internal' : 0,
             'featured' : 0,
             'free' : 0,
@@ -197,7 +197,7 @@ class TDB():
         try:
             response = requests.post(url=self.search_url, params=params, headers=headers)
             response = response.json()
-            for each in response['data']:
+            for each in response:
                 result = each['name']
                 # difference = SequenceMatcher(None, meta['clean_name'], result).ratio()
                 # if difference >= 0.05:
