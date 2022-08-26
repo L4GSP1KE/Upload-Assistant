@@ -197,7 +197,7 @@ class TDB():
             'Authorization' : f"Bearer {self.passkey}"
         }
         try:
-            response = requests.post(url=self.search_url, params=params)
+            response = requests.post(url=self.search_url, params=params, headers=headers)
             response = response.json()
             for each in response['data']:
                 result = each['name']
@@ -241,7 +241,7 @@ class TDB():
             descfile.close()
         return 
 
-    async def get_screen_array(meta):
+    async def get_screen_array(self, meta):
         screen_array = []
         images = meta['image_list']
         if len(images) > 0: 
