@@ -128,7 +128,7 @@ class TDB():
             'name' : tdb_name,
             'media_info' : mi_dump,
             # 'bdinfo' : bd_dump, 
-            'screenshot_urls' : tdb_screens,
+            'screenshot_urls[]' : tdb_screens,
             'description' : desc,
 
             'category_id' : cat_id,
