@@ -109,7 +109,7 @@ class TDB():
         type_id = await self.get_type_id(meta)
 
         await self.edit_desc(meta)
-        tdb_name = await self.edit_name(meta)
+        tdb_name, is_foreign = await self.edit_name(meta)
         tdb_screens = await self.get_screen_array(meta)
 
         if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
@@ -118,27 +118,25 @@ class TDB():
             anon = 1
 
         if meta['bdinfo'] != None:
-            mi_dump = None
-            bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
+            mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
-            bd_dump = None
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read().strip().rstrip()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
-        files = {'dot_torrent': open_torrent}
+        files = {'torrent': open_torrent}
         data = {
-            'torrent_title' : tdb_name,
-            'mediainfo' : mi_dump,
-            'bdinfo' : bd_dump, 
-            'url_images' : tdb_screens,
+            'name' : tdb_name,
+            'media_info' : mi_dump,
+            # 'bdinfo' : bd_dump, 
+            'screenshot_urls' : tdb_screens,
             'description' : desc,
 
-            'type' : cat_id,
+            'category_id' : cat_id,
             'source' : source_id,
-            'hybrid_type' : type_id,
+            'type_id' : type_id,
             'resolution' : resolution_id,
-            '3d' : '0',
-
+            'threeD' : '0',
+            'foreign' : is_foreign,
             'tmdb' : meta['tmdb'],
             'imdb' : meta['imdb_id'].replace('tt', ''),
             'tvdb' : meta['tvdb_id'],
@@ -157,8 +155,8 @@ class TDB():
                 data['internal'] = 1
                 
         if meta.get('category') == "TV":
-            data['season_number'] = meta.get('season_int', '0')
-            data['episode_number'] = meta.get('episode_int', '0')
+            data['season'] = meta.get('season_int', '0')
+            data['episode'] = meta.get('episode_int', '0')
             data['complete_season'] = meta.get('tv_pack', '0')
 
         headers = {
@@ -337,7 +335,7 @@ class TDB():
         name = ' '.join(name.split())
         name_notag = name
         name = name_notag + tag
-
+        is_foreign = '0'
         has_eng_audio = False
         if meta['is_disc'] != "BDMV":
             with open(f"{meta.get('base_dir')}/tmp/{meta.get('uuid')}/MediaInfo.json", 'r', encoding='utf-8') as f:
@@ -350,6 +348,7 @@ class TDB():
             if not has_eng_audio:
                 audio_lang = mi['media']['track'][2].get('Language_String', "")
                 if audio_lang != "":
+                    is_foreign = '1'
                     name = name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
         else:
             for audio in meta['bdinfo']['audio']:
@@ -358,9 +357,10 @@ class TDB():
             if not has_eng_audio:
                 audio_lang = meta['bdinfo']['audio'][0]['language']
                 if audio_lang != "":
+                    is_foreign = '1'
                     name = name.replace(meta['resolution'], f"{audio_lang} {meta['resolution']}")
 
-        return name
+        return name, is_foreign
 
 
     def get_bdsize(self, meta):
