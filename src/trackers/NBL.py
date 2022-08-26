@@ -62,15 +62,17 @@ class NBL():
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
         files = {'file_input': open_torrent}
-        data = {
+        params = {
             'apikey' : self.api_key,
+        }
+        data = {
             'tvmazeid' : int(meta.get('tvmaze_id', 0)),
             'mediainfo' : mi_dump,
             'category' : await self.get_cat_id(meta)
         }
         
         if meta['debug'] == False:
-            response = requests.post(url=self.upload_url, files=files, data=data)
+            response = requests.post(url=self.upload_url, files=files, data=data, params=params)
             try:
                 if response.status_code == 200:
                     response = response.json()
