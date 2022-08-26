@@ -61,7 +61,7 @@ class NBL():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
-        files = {'torrent': open_torrent}
+        files = {'file_input': open_torrent}
         data = {
             'apikey' : self.api_key,
             'tvmazeid' : int(meta.get('tvmaze_id', 0)),
