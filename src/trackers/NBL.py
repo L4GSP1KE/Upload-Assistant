@@ -75,8 +75,12 @@ class NBL():
                 if response.status_code == 200:
                     response = response.json()
                     console.print(response['message'])
+                else:
+                    console.print(response)
+                    console.print(response.text)
             except:
-                console.print("It may have uploaded, go check")
+                console.print(response.text)
+                console.print("[bold yellow]It may have uploaded, go check")
                 return 
         else:
             console.print(f"[cyan]Request Data:")
@@ -114,7 +118,6 @@ class NBL():
                     elif int(guessit(each['rls_name'])) == meta.get('episode_int'):
                         dupes.append(each['rls_name'])
         except Exception:
-            console.print_exception()
             console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
 
