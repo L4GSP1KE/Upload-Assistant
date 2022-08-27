@@ -278,7 +278,7 @@ class TDB():
             dvd_size = meta.get('dvd_size', "")
         else:
             video_codec = meta.get('video_codec', "")
-            video_encode = meta.get('video_encode', "")
+            video_encode = meta.get('video_encode', "").replace('Hi10P', '')
             if meta.get('bit_depth', '0') == '10':
                 video_encode = f"10Bit {video_encode}"
         edition = meta.get('edition', "")
