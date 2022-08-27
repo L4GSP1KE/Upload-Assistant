@@ -265,12 +265,12 @@ class HDB():
             # aniDB
 
 
+            url = "https://hdbits.org/upload/upload"
             # Submit
             if meta['debug']:
                 console.print(url)
                 console.print(data)
             else:
-                url = "https://hdbits.org/upload/upload"
                 with requests.Session() as session:
                     cookiefile = f"{meta['base_dir']}/data/cookies/HDB.txt"
                     session.cookies.update(await common.parseCookieFile(cookiefile))
