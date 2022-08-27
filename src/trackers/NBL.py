@@ -72,7 +72,7 @@ class NBL():
         if meta['debug'] == False:
             response = requests.post(url=self.upload_url, files=files, data=data)
             try:
-                if response.status_code == 200:
+                if response.status_code in (200, 201):
                     response = response.json()
                     console.print(response['message'])
                 else:
