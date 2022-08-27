@@ -32,7 +32,7 @@ class TDB():
         self.upload_url = 'https://torrentdb.net/api/torrent/upload'
         self.search_url = 'https://torrentdb.net/api/torrent/search'
         self.passkey = self.config['TRACKERS'][self.tracker].get('passkey')
-        self.signature = None
+        self.signature = "[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by L4G's Upload Assistant[/url][/center]"
         pass
     
     async def get_cat_id(self, category_name):
@@ -136,6 +136,7 @@ class TDB():
             'type_id' : type_id,
             'resolution' : resolution_id,
             'threeD' : '0',
+            'skip_duplicate_check' : '1',
             'foreign' : is_foreign,
             'tmdb' : meta['tmdb'],
             'imdb' : meta['imdb_id'].replace('tt', ''),
