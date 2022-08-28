@@ -84,15 +84,15 @@ class FL():
             fl_name = fl_name.replace(meta['title'], meta['imdb_info']['aka'])
             if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']):
                 fl_name = fl_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
-        if meta['type'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '':
+        if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '':
             fl_name = meta['episode'].replace(f"{meta['episode']} {meta['episode_title_storage']}", meta['episode'])
 
         fl_name = fl_name.replace('DD+', 'DDP')
         fl_name = fl_name.replace('PQ10', 'HDR').replace('HDR10+', 'HDR')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
-        fl_name = re.sub("[^0-9a-zA-Z. +'\-\[\]]+", "", fl_name)
-        fl_name = fl_name.replace(' ', '.')
+        fl_name = re.sub("[^0-9a-zA-Z. &+'\-\[\]]+", "", fl_name)
+        fl_name = fl_name.replace(' ', '.').replace('..', '.')
         return fl_name 
 
     
