@@ -297,39 +297,39 @@ class TDB():
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {region} {uhd} {bd_size} {source} {hdr} {video_codec} {audio}"
+                    name = f"{title} {alt_title} {year} {three_d} {edition} {resolution} {repack} {region} {uhd} {bd_size} {source} {hdr} {video_codec} {audio}"
                 elif meta['is_disc'] == 'DVD': 
-                    name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {source} {dvd_size} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {resolution} {repack} {source} {dvd_size} {audio}"
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {source} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {resolution} {repack} {source} {audio}"
             elif type == "REMUX":
-                name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} Remux {hdr} {video_codec} {audio}" 
+                name = f"{title} {alt_title} {year} {three_d} {edition} {resolution} {repack} {uhd} {source} Remux {hdr} {video_codec} {audio}" 
             elif type == "ENCODE": #Encode
-                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {source} {hdr} {video_encode} {audio}"  
+                name = f"{title} {alt_title} {year} {edition} {resolution} {repack} {uhd} {source} {hdr} {video_encode} {audio}"  
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEB-DL {hdr} {video_encode} {audio}"
+                name = f"{title} {alt_title} {year} {edition} {resolution} {repack} {uhd} {service} WEB-DL {hdr} {video_encode} {audio}"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEBRip {hdr} {video_encode} {audio}"
+                name = f"{title} {alt_title} {year} {edition} {resolution} {repack} {uhd} {service} WEBRip {hdr} {video_encode} {audio}"
             elif type == "HDTV": #HDTV
-                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} HDTV {video_encode} {audio}"
+                name = f"{title} {alt_title} {year} {edition} {resolution} {repack} HDTV {video_encode} {audio}"
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} {year} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {region} {uhd} {bd_size} {source} {hdr} {video_codec} {audio}"
+                    name = f"{title} {year} {alt_title} {season}{episode} {three_d} {edition} {resolution} {repack} {region} {uhd} {bd_size} {source} {hdr} {video_codec} {audio}"
                 if meta['is_disc'] == 'DVD':
-                    name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
+                    name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {resolution} {repack} {source} {dvd_size} {audio}"
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {source} {repack} {audio}"
             elif type == "REMUX":
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {resolution} {repack} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
             elif type == "ENCODE": #Encode
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {source} {hdr} {video_encode} {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {resolution} {repack} {uhd} {source} {hdr} {video_encode} {audio}" #SOURCE
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEB-DL {hdr} {video_encode} {audio}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {resolution} {repack} {uhd} {service} WEB-DL {hdr} {video_encode} {audio}"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEBRip {hdr} {video_encode} {audio}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {resolution} {repack} {uhd} {service} WEBRip {hdr} {video_encode} {audio}"
             elif type == "HDTV": #HDTV
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} HDTV {hdr} {video_encode} {audio}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {resolution} {repack} HDTV {hdr} {video_encode} {audio}"
 
 
     
