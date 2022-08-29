@@ -216,7 +216,7 @@ class ACM():
             mi_dump = None
             bd_dump = ""
             for each in meta['discs']:
-                bd_dump = bd_dump + each['summary'].strip().rstrip() + "\n\n"
+                bd_dump = bd_dump + each['summary'].strip() + "\n\n"
         else:   
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
             bd_dump = None

@@ -299,7 +299,7 @@ class TTG():
 
             if int(meta.get('imdb_id', '0').replace('tt', '')) != 0:
                 ptgen = await self.ptgen(meta)
-                if ptgen.strip().rstrip() != '':
+                if ptgen.strip() != '':
                     descfile.write(ptgen)   
 
             # Add This line for all web-dls

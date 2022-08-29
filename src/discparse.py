@@ -61,9 +61,9 @@ class DiscParse():
                             text = f.read()
                             result = text.split("QUICK SUMMARY:", 2)
                             files = result[0].split("FILES:", 2)[1].split("CHAPTERS:", 2)[0].split("-------------")
-                            result2 = result[1].rstrip("\n")
+                            result2 = result[1].rstrip(" \n")
                             result = result2.split("********************", 1)
-                            bd_summary = result[0].rstrip("\n")
+                            bd_summary = result[0].rstrip(" \n")
                             f.close()
                         try:
                             shutil.copyfile(bdinfo_text, f"{save_dir}/BD_FULL_{str(i).zfill(2)}.txt")
@@ -76,13 +76,13 @@ class DiscParse():
                         continue
                     break
                 with open(f"{save_dir}/BD_SUMMARY_{str(i).zfill(2)}.txt", 'w') as f:
-                    f.write(bd_summary.rstrip().strip())
+                    f.write(bd_summary.strip())
                     f.close()
                 
                 bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
         
-                discs[i]['summary'] = bd_summary.rstrip().strip()
-                discs[i]['bdinfo'] = bdinfo.rstrip().strip()
+                discs[i]['summary'] = bd_summary.strip()
+                discs[i]['bdinfo'] = bdinfo.strip()
                 # shutil.rmtree(f"{base_dir}/tmp")
             else:
                 discs = meta_discs

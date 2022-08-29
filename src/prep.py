@@ -2552,13 +2552,13 @@ class Prep():
                 if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
                     ptp = PTP(config=self.config)
                     ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
-                    if ptp_desc.rstrip().strip().replace('\r\n', '').replace('\n', '') != "":
+                    if ptp_desc.strip().replace('\r\n', '').replace('\n', '') != "":
                         description.write(ptp_desc)
                         description.write("\n")
                         meta['description'] = 'PTP'
 
                 if ptp_desc == "" and meta.get('blu_desc', '').rstrip() not in [None, ''] and desc_source in ['BLU', None]:
-                    if meta.get('blu_desc', '').rstrip().strip().replace('\r\n', '').replace('\n', '') != '':
+                    if meta.get('blu_desc', '').strip().replace('\r\n', '').replace('\n', '') != '':
                         description.write(meta['blu_desc'])
                         meta['description'] = 'BLU'
 
@@ -2567,7 +2567,7 @@ class Prep():
                 with open(f"{meta['base_dir']}/data/templates/{meta['desc_template']}.txt", 'r') as f:
                     desc_templater = Template(f.read())
                     template_desc = desc_templater.render(meta)
-                    if template_desc.strip().rstrip() != "":
+                    if template_desc.strip() != "":
                         description.write(template_desc)
                         description.write("\n")
 

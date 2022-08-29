@@ -135,11 +135,11 @@ class BBCODE:
         desc = self.convert_collapse_to_comparison(desc, "hide", hides)
 
         # Strip blank lines:
-        desc = desc.rstrip()
+        desc = desc.strip('\n')
         desc = re.sub("\n\n+", "\n\n", desc)
         while desc.startswith('\n'):
             desc = desc.replace('\n', '', 1)
-        desc = desc.rstrip()
+        desc = desc.strip('\n')
 
         if desc.replace('\n', '') == '':
             return ""
@@ -214,11 +214,11 @@ class BBCODE:
         desc = self.convert_collapse_to_comparison(desc, "spoiler", spoilers)
                 
         # Strip blank lines:
-        desc = desc.rstrip()
+        desc = desc.strip('\n')
         desc = re.sub("\n\n+", "\n\n", desc)
         while desc.startswith('\n'):
             desc = desc.replace('\n', '', 1)
-        desc = desc.rstrip()
+        desc = desc.strip('\n')
 
         if desc.replace('\n', '') == '':
             return "", imagelist

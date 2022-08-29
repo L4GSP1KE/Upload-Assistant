@@ -124,7 +124,7 @@ class FL():
             data = {
                 'name' : fl_name,
                 'type' : cat_id,
-                'descr' : fl_desc.rstrip(),
+                'descr' : fl_desc.strip(),
                 'nfo' : mi_dump
             }
 
@@ -303,7 +303,7 @@ class FL():
             else:
                 # TO DO: BD Description Generator
                 final_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
-            if desc.strip().rstrip() != "":
+            if desc.strip() != "":
                 final_desc = final_desc.replace('[/pre][/quote]', f'[/pre][/quote]\n\n{desc}\n', 1)
             descfile.write(final_desc)
 

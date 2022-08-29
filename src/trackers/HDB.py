@@ -404,7 +404,7 @@ class HDB():
                     descfile.write(f"[quote=VOB MediaInfo]{discs[0]['vob_mi']}[/quote]\n")
                     descfile.write("\n")
                 if discs[0]['type'] == "BDMV":
-                    descfile.write(f"[quote]{discs[0]['summary'].rstrip()}[/quote]\n")
+                    descfile.write(f"[quote]{discs[0]['summary'].strip()}[/quote]\n")
                     descfile.write("\n")
                 if len(discs) >= 2:
                     for each in discs[1:]:
