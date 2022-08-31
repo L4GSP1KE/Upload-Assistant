@@ -99,12 +99,14 @@ async def do_the_thing(base_dir):
             escaped_path = path.replace('[', '[[]')
             globs = glob.glob(escaped_path)
             queue = globs
-            md_text = "\n - ".join(queue)
-            console.print("\n[bold green]Queuing these files:[/bold green]", end='')
-            console.print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
-            console.print("\n\n")
-        elif len(paths) == 0:
-            console.print(f"[red]Path: [bold red]{path}[/bold red] does not exist")
+            if len(queue) != 0:
+                md_text = "\n - ".join(queue)
+                console.print("\n[bold green]Queuing these files:[/bold green]", end='')
+                console.print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
+                console.print("\n\n")
+            else:
+                console.print(f"[red]Path: [bold red]{path}[/bold red] does not exist")
+                
         elif len(paths) != 1:
             queue = paths
             md_text = "\n - ".join(queue)
