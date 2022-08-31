@@ -259,7 +259,7 @@ class TDB():
         resolution = meta.get('resolution', "")
         if resolution == "OTHER":
             resolution = ""
-        audio = meta.get('audio', "").replace('DD+', 'DDP').replace('Dual-Audio', 'DualAudio')
+        audio = meta.get('audio', "").replace('DD+', 'DDP').replace('Dual-Audio', 'DualAudio').replace(f"{meta.get('channels', '')} Atmos", f"Atmos {meta.get('channels', '')}")
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
