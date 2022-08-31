@@ -103,6 +103,8 @@ async def do_the_thing(base_dir):
             console.print("\n[bold green]Queuing these files:[/bold green]", end='')
             console.print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
             console.print("\n\n")
+        elif len(paths) == 0:
+            console.print(f"[red]Path: [bold red]{path}[/bold red] does not exist")
         elif len(paths) != 1:
             queue = paths
             md_text = "\n - ".join(queue)
@@ -111,7 +113,6 @@ async def do_the_thing(base_dir):
             console.print("\n\n")
         else:
             # Add Search Here
-            console.print(f"[red]Path: {path} does not exist")
             exit()
 
 
