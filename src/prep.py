@@ -2876,7 +2876,7 @@ class Prep():
                     if premier_date != None:
                         if premier_date.startswith(str(year)):
                             show = each['show']
-            elif len(show) >= 1:
+            elif len(resp) >= 1:
                 show = resp[0]['show']
         if show != None:
             tvmazeID = show.get('id')
