@@ -82,7 +82,7 @@ class DiscParse():
                 bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
         
                 discs[i]['summary'] = bd_summary.strip()
-                discs[i]['bdinfo'] = bdinfo.strip()
+                discs[i]['bdinfo'] = bdinfo
                 # shutil.rmtree(f"{base_dir}/tmp")
             else:
                 discs = meta_discs
