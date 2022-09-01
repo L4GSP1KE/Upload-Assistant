@@ -2716,7 +2716,7 @@ class Prep():
                 original_language = None
             elif len(original_language) == 1:
                 original_language = original_language[0]
-        aka = result.get('original title', result.get('localized title', "")).replace(' - IMDb', '')
+        aka = result.get('original title', result.get('localized title', "")).replace(' - IMDb', '').replace('\u00ae', '')
         if aka != "":
             aka = f" AKA {aka}"
         return aka, original_language
