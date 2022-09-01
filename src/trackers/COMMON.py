@@ -20,7 +20,7 @@ class COMMON():
             Torrent.copy(new_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent", overwrite=True)
 
     
-    async def unit3d_edit_desc(self, meta, tracker, signature):
+    async def unit3d_edit_desc(self, meta, tracker, signature, comparison=False):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]DESCRIPTION.txt", 'w') as descfile:
             bbcode = BBCODE()
@@ -41,7 +41,8 @@ class COMMON():
             desc = base
             desc = bbcode.convert_pre_to_code(desc)
             desc = bbcode.convert_hide_to_spoiler(desc)
-            desc = bbcode.convert_comparison_to_collapse(desc, 1000)
+            if comparison == False:
+                desc = bbcode.convert_comparison_to_collapse(desc, 1000)
             desc = desc.replace('[img]', '[img=300]')
             descfile.write(desc)
             images = meta['image_list']
