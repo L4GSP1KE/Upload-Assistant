@@ -302,7 +302,7 @@ class TDB():
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {hybrid} {region} {uhd} {bd_size} {source} {hdr} {video_codec} {audio}"
+                    name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {hybrid} {region} {uhd} {bd_size} {hdr} {video_codec} {audio}"
                 elif meta['is_disc'] == 'DVD': 
                     name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {hybrid} {source} {dvd_size} {audio}"
                 elif meta['is_disc'] == 'HDDVD':
@@ -320,7 +320,7 @@ class TDB():
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} {year} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {hybrid} {region} {uhd} {bd_size} {source} {hdr} {video_codec} {audio}"
+                    name = f"{title} {year} {alt_title} {season}{episode} {three_d} {edition} {repack} {resolution} {hybrid} {region} {uhd} {bd_size} {hdr} {video_codec} {audio}"
                 if meta['is_disc'] == 'DVD':
                     name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {resolution} {hybrid} {source} {dvd_size} {audio}"
                 elif meta['is_disc'] == 'HDDVD':
