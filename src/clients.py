@@ -98,46 +98,53 @@ class Clients():
             elif torrent_client == 'rtorrent':
                 torrenthash = torrenthash.upper()
             torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
-            reuse = None
-            wrong_file = False
-            if os.path.exists(torrent_path):
-                # Reuse if disc
-                if meta.get('is_disc', None) != None:
-                    reuse = torrent_path
-                torrent = Torrent.read(torrent_path)
-                # If one file, check for folder
-                if len(torrent.files) == len(meta['filelist']) == 1:
-                    if os.path.basename(torrent.files[0]) == os.path.basename(meta['filelist'][0]):
-                        if str(torrent.files[0]) == os.path.basename(torrent.files[0]):
-                            reuse = torrent_path
-                    else:
-                        wrong_file = True
-                # Check if number of files matches number of videos
-                elif len(torrent.files) == len(meta['filelist']):
-                    torrent_filepath = os.path.commonpath(torrent.files)
-                    actual_filepath = os.path.commonpath(meta['filelist'])
-                    if torrent_filepath in actual_filepath:
-                        reuse = torrent_path
-            else:
-                console.print(f'[bold yellow]NO .torrent WITH INFOHASH {torrenthash} FOUND')
-            if reuse != None:
-                 if os.path.exists(torrent_path):
-                    reuse_torrent = Torrent.read(torrent_path)
-                    if reuse_torrent.pieces >= 5000 and reuse_torrent.piece_size < 8388608:
-                        console.print("[bold yellow]Too many pieces exist in current hash. REHASHING")
-                        reuse = None
-                    elif reuse_torrent.piece_size < 32768:
-                        console.print("[bold yellow]Piece size too small to reuse")
-                        reuse = None
-                    elif wrong_file == True:
-                        console.print("[bold red] Provided .torrent has files that were not expected")
-                        reuse = None
-                    else:
-                        console.print(f'[bold green]REUSING .torrent with infohash: [bold yellow]{torrenthash}')
-            else:
-                console.print('[bold yellow]Unwanted Files/Folders Identified')
-            return reuse
+            if self.is_valid_torrent(meta, torrent_path, torrenthash, print_err=True):
+                return torrent_path
         return None
+
+
+    async def is_valid_torrent(self, meta, torrent_path, torrenthash, print_err=False):
+        valid = False
+        wrong_file = False
+        if os.path.exists(torrent_path):
+            # Reuse if disc
+            if meta.get('is_disc', None) != None:
+                valid = True
+            torrent = Torrent.read(torrent_path)
+            # If one file, check for folder
+            if len(torrent.files) == len(meta['filelist']) == 1:
+                if os.path.basename(torrent.files[0]) == os.path.basename(meta['filelist'][0]):
+                    if str(torrent.files[0]) == os.path.basename(torrent.files[0]):
+                        valid = True
+                else:
+                    wrong_file = True
+            # Check if number of files matches number of videos
+            elif len(torrent.files) == len(meta['filelist']):
+                torrent_filepath = os.path.commonpath(torrent.files)
+                actual_filepath = os.path.commonpath(meta['filelist'])
+                if torrent_filepath in actual_filepath:
+                    valid = True
+        else:
+            console.print(f'[bold yellow]NO .torrent WITH INFOHASH {torrenthash} FOUND')
+        if valid:
+            if os.path.exists(torrent_path):
+                reuse_torrent = Torrent.read(torrent_path)
+                if reuse_torrent.pieces >= 5000 and reuse_torrent.piece_size < 8388608:
+                    err_print = "[bold yellow]Too many pieces exist in current hash. REHASHING"
+                    valid = False
+                elif reuse_torrent.piece_size < 32768:
+                    err_print = "[bold yellow]Piece size too small to reuse"
+                    valid = False
+                elif wrong_file == True:
+                    err_print = "[bold red] Provided .torrent has files that were not expected"
+                    valid = False
+                else:
+                    err_print = f'[bold green]REUSING .torrent with infohash: [bold yellow]{torrenthash}'
+        else:
+            err_print = '[bold yellow]Unwanted Files/Folders Identified'
+        if print_err:
+            console.print(err_print)
+        return valid
 
 
     async def search_qbit_for_torrent(self, meta, client):
@@ -175,11 +182,13 @@ class Clients():
                 torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
+                    if self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
+                        console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
+                        return torrent.hash
+            elif meta['path'] == torrent_path:
+                if self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
                     console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                     return torrent.hash
-            elif meta['path'] == torrent_path:
-                console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
-                return torrent.hash
         return None
 
 
