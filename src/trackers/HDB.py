@@ -183,6 +183,8 @@ class HDB():
         hdb_name = hdb_name.replace('PQ10', 'HDR')
         hdb_name = hdb_name.replace('Dubbed', '').replace('Dual-Audio', '')
         hdb_name = ' '.join(hdb_name.split())
+        hdb_name = re.sub("[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", hdb_name)
+        hdb_name = hdb_name.replace(' ', '.').replace('..', '.')
 
         return hdb_name 
 
