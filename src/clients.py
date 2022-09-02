@@ -106,6 +106,7 @@ class Clients():
     async def is_valid_torrent(self, meta, torrent_path, torrenthash, print_err=False):
         valid = False
         wrong_file = False
+        err_print = ""
         if os.path.exists(torrent_path):
             # Reuse if disc
             if meta.get('is_disc', None) != None:
