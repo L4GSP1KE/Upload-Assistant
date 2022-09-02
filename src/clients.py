@@ -83,6 +83,7 @@ class Clients():
         torrent_client = client.get('torrent_client', None).lower()
         if torrent_storage_dir == None and torrent_client != "watch":
             console.print(f'[bold red]Missing torrent_storage_dir for {default_torrent_client}')
+            return None
         torrenthash = None
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
@@ -152,6 +153,10 @@ class Clients():
         console.print("[green]Searching qbittorrent for an existing .torrent")
         local_path = list_local_path = client.get('local_path','/LocalPath')
         remote_path = list_remote_path = client.get('remote_path', '/RemotePath')
+        torrent_storage_dir = client.get('torrent_storage_dir', None)
+        if torrent_storage_dir == None and client.get("torrent_client", None) != "watch":
+            console.print(f"[bold red]Missing torrent_storage_dir for {self.config['DEFAULT']['default_torrent_client']}")
+            return None
         if isinstance(local_path, list):
             for i in range(len(local_path)):
                 if os.path.normpath(local_path[i]).lower() in meta['path'].lower():
@@ -183,11 +188,11 @@ class Clients():
                 torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
-                    if await self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
+                    if await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, print_err=False):
                         console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                         return torrent.hash
             elif meta['path'] == torrent_path:
-                if await self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
+                if await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, print_err=False):
                     console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                     return torrent.hash
         return None
