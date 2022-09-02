@@ -98,7 +98,7 @@ class Clients():
             elif torrent_client == 'rtorrent':
                 torrenthash = torrenthash.upper()
             torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
-            if self.is_valid_torrent(meta, torrent_path, torrenthash, print_err=True):
+            if await self.is_valid_torrent(meta, torrent_path, torrenthash, print_err=True):
                 return torrent_path
         return None
 
@@ -183,11 +183,11 @@ class Clients():
                 torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
-                    if self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
+                    if await self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
                         console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                         return torrent.hash
             elif meta['path'] == torrent_path:
-                if self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
+                if await self.is_valid_torrent(meta, torrent_path, torrent.hash, print_err=False):
                     console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                     return torrent.hash
         return None
