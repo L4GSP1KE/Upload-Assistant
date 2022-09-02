@@ -92,6 +92,8 @@ class Clients():
                 torrenthash = meta['ext_torrenthash']
             if torrent_client == 'qbit' and torrenthash == None and client.get('enable_search') == True:
                 torrenthash = await self.search_qbit_for_torrent(meta, client)
+                if not torrenthash:
+                    console.print("[bold yellow]No Valid .torrent found")
             if not torrenthash:
                 return None
             if torrent_client in ('qbit', 'deluge'):
