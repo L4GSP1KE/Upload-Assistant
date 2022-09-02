@@ -164,6 +164,9 @@ class COMMON():
         return cookies
 
     async def filter_dupes(self, dupes, meta):
+        if meta['debug']:
+            console.log("[cyan]Pre-filtered dupes")
+            console.log(dupes)
         new_dupes = []
         for each in dupes:
             if meta.get('sd', 0) == 1:
