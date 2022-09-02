@@ -109,10 +109,12 @@ class Clients():
         wrong_file = False
         err_print = ""
         if os.path.exists(torrent_path):
-            # Reuse if disc
-            if meta.get('is_disc', None) != None:
-                valid = True
             torrent = Torrent.read(torrent_path)
+            # Reuse if disc and basename matches
+            if meta.get('is_disc', None) != None:
+                torrent_filepath = os.path.commonpath(torrent.files)
+                if os.path.basename(meta['path']) in torrent_filepath:
+                    valid = True
             # If one file, check for folder
             if len(torrent.files) == len(meta['filelist']) == 1:
                 if os.path.basename(torrent.files[0]) == os.path.basename(meta['filelist'][0]):
