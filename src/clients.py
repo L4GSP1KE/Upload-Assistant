@@ -285,7 +285,7 @@ class Clients():
                 if os.path.normpath(each).lower() in os.path.normpath(path).lower(): 
                     auto_management = True
         else:
-            if os.path.normpath(each).lower() in os.path.normpath(path).lower() and am_config.strip() != "": 
+            if os.path.normpath(am_config).lower() in os.path.normpath(path).lower() and am_config.strip() != "": 
                 auto_management = True
 
         qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout='Original')
