@@ -278,7 +278,17 @@ class Clients():
         except qbittorrentapi.LoginFailed:
             console.print("[bold red]INCORRECT QBIT LOGIN CREDENTIALS")
             return
-        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=False, is_skip_checking=True, content_layout='Original')
+        auto_management = False
+        am_config = client.get('automatic_management_paths', '')
+        if isinstance(am_config, list):
+            for each in am_config:
+                if os.path.normpath(each).lower() in os.path.normpath(path).lower(): 
+                    auto_management = True
+        else:
+            if os.path.normpath(each).lower() in os.path.normpath(path).lower() and am_config.strip() != "": 
+                auto_management = True
+
+        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout='Original')
         qbt_client.torrents_resume(torrent.infohash)
         if client.get('qbit_tag', None) != None:
             qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)

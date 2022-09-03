@@ -156,6 +156,12 @@ config = {
             # "qbit_tag" : "tag",
             # "torrent_storage_dir" : "path/to/BT_backup folder"
             
+            # Enable automatic torrent management if path(s) are set
+                # If using remote path mapping, use remote path
+                # For using multiple paths, use a list ["path1", "path2"] 
+            # "automatic_management_paths" : ""
+
+
             # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "E:\\downloads\\tv",
             # "remote_path" : "/remote/downloads/tv"
