@@ -2130,6 +2130,8 @@ class Prep():
                 year = meta['year']
             else:
                 year = ""
+        if meta.get('no_season', False) == True:
+            season = ''
         if meta.get('no_year', False) == True:
             year = ''
         if meta.get('no_aka', False) == True:
