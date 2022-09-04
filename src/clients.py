@@ -87,10 +87,10 @@ class Clients():
         torrenthash = None
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
-                if self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", torrent_client, print_err=False):
+                if self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", meta['torrenthash'], torrent_client, print_err=False):
                     torrenthash = meta['torrenthash']
             elif meta.get('ext_torrenthash', None) != None:
-                if self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['ext_torrenthash']}.torrent", torrent_client, print_err=False):
+                if self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['ext_torrenthash']}.torrent", meta['ext_torrenthash'], torrent_client, print_err=False):
                     torrenthash = meta['ext_torrenthash']
             if torrent_client == 'qbit' and torrenthash == None and client.get('enable_search') == True:
                 torrenthash = await self.search_qbit_for_torrent(meta, client)
