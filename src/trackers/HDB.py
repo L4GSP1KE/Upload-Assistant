@@ -475,6 +475,7 @@ class HDB():
                 response = response.json()
                 if response['data'] != []:
                     hdb_imdb = str(response['data'][0].get('imdb', {'id' : None}).get('id'))
+                    hdb_tvdb = str(response['data'][0].get('tvdb', {'id' : None}).get('id'))
                     hdb_name = response['data'][0]['name']
                     hdb_torrenthash = response['data'][0]['hash']
 
@@ -482,10 +483,10 @@ class HDB():
                 console.print_exception()
         else:
             console.print("Failed to get info from HDB ID. Either the site is down or your credentials are invalid")
-        return hdb_imdb, hdb_name, hdb_torrenthash
+        return hdb_imdb, hdb_tvdb, hdb_name, hdb_torrenthash
 
     async def search_filename(self, filelist):
-        hdb_imdb = hdb_name = hdb_torrenthash = hdb_id = None
+        hdb_imdb = hdb_tvdb = hdb_name = hdb_torrenthash = hdb_id = None
         url = "https://hdbits.org/api/torrents"
         data = {
             "username" : self.username,
@@ -502,14 +503,15 @@ class HDB():
                     for each in response['data']:
                         if each['numfiles'] == len(filelist):
                             hdb_imdb = str(each.get('imdb', {'id' : None}).get('id'))
+                            hdb_tvdb = str(each.get('tvdb', {'id' : None}).get('id'))
                             hdb_name = each['name']
                             hdb_torrenthash = each['hash']
                             hdb_id = each['id']
                             console.print(f'[bold green]Matched release with HDB ID: [yellow]{hdb_id}[/yellow][/bold green]')
-                            return hdb_imdb, hdb_name, hdb_torrenthash, hdb_id
+                            return hdb_imdb, hdb_tvdb, hdb_name, hdb_torrenthash, hdb_id
             except:
                 console.print_exception()
         else:
             console.print("Failed to get info from HDB ID. Either the site is down or your credentials are invalid")
         console.print(f'[yellow]Could not find a matching release on HDB')
-        return hdb_imdb, hdb_name, hdb_torrenthash, hdb_id
+        return hdb_imdb, hdb_tvdb, hdb_name, hdb_torrenthash, hdb_id

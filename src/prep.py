@@ -225,15 +225,17 @@ class Prep():
                 hdb_id = meta.get('hdb')
                 if hdb_id != None:
                     meta['hdb_manual'] = hdb_id
-                    hdb_imdb, meta['hdb_name'], meta['ext_torrenthash'] = await hdb.get_info_from_torrent_id(hdb_id)
+                    hdb_imdb, hdb_tvdb, meta['hdb_name'], meta['ext_torrenthash'] = await hdb.get_info_from_torrent_id(hdb_id)
                 else:
                     if meta['is_disc'] in [None, ""]:
-                        hdb_imdb, meta['hdb_name'], meta['ext_torrenthash'], hdb_id = await hdb.search_filename(meta['filelist'])
+                        hdb_imdb, hdb_tvdb, meta['hdb_name'], meta['ext_torrenthash'], hdb_id = await hdb.search_filename(meta['filelist'])
                     else:
                         # Somehow search for disc
                         pass
                 if hdb_imdb != None:
                     meta['imdb'] = hdb_imdb
+                if hdb_tvdb != None:
+                    meta['tvdb_id'] = hdb_tvdb
                 if hdb_id != None:
                     meta['hdb'] = hdb_id
         
@@ -247,7 +249,7 @@ class Prep():
                 if blu_imdb not in [None, '0']:
                     meta['imdb'] = blu_imdb
                 if blu_tvdb not in [None, '0']:
-                    meta['tmdb_id'] = blu_tvdb
+                    meta['tvdb_id'] = blu_tvdb
                 if blu_mal not in [None, '0']:
                     meta['mal'] = blu_mal
                 if blu_desc not in [None, '0', '']:
