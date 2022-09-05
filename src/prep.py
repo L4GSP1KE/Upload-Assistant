@@ -233,9 +233,9 @@ class Prep():
                         # Somehow search for disc
                         pass
                 if hdb_imdb != None:
-                    meta['imdb'] = hdb_imdb
+                    meta['imdb'] = str(hdb_imdb)
                 if hdb_tvdb != None:
-                    meta['tvdb_id'] = hdb_tvdb
+                    meta['tvdb_id'] = str(hdb_tvdb)
                 if hdb_id != None:
                     meta['hdb'] = hdb_id
         

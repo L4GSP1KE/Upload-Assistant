@@ -474,8 +474,8 @@ class HDB():
             try:
                 response = response.json()
                 if response['data'] != []:
-                    hdb_imdb = str(response['data'][0].get('imdb', {'id' : None}).get('id'))
-                    hdb_tvdb = str(response['data'][0].get('tvdb', {'id' : None}).get('id'))
+                    hdb_imdb = response['data'][0].get('imdb', {'id' : None}).get('id')
+                    hdb_tvdb = response['data'][0].get('tvdb', {'id' : None}).get('id')
                     hdb_name = response['data'][0]['name']
                     hdb_torrenthash = response['data'][0]['hash']
 
@@ -502,8 +502,8 @@ class HDB():
                 if response['data'] != []:
                     for each in response['data']:
                         if each['numfiles'] == len(filelist):
-                            hdb_imdb = str(each.get('imdb', {'id' : None}).get('id'))
-                            hdb_tvdb = str(each.get('tvdb', {'id' : None}).get('id'))
+                            hdb_imdb = each.get('imdb', {'id' : None}).get('id')
+                            hdb_tvdb = each.get('tvdb', {'id' : None}).get('id')
                             hdb_name = each['name']
                             hdb_torrenthash = each['hash']
                             hdb_id = each['id']
