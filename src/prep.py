@@ -4,6 +4,7 @@ from src.console import console
 from src.exceptions import *
 from src.trackers.PTP import PTP
 from src.trackers.BLU import BLU
+from src.trackers.HDB import HDB
 from src.trackers.COMMON import COMMON
 
 try:
@@ -199,7 +200,6 @@ class Prep():
 
 
         # Reuse information from other trackers
-
         if self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
             ptp = PTP(config=self.config)
             if meta.get('ptp', None) != None:
@@ -217,6 +217,25 @@ class Prep():
                     meta['imdb'] = ptp_imdb
                 if ptp_id != None:
                     meta['ptp'] = ptp_id
+        
+        if self.config['TRACKERS'].get('HDB', {}).get('useAPI') == True:
+            hdb = HDB(config=self.config)
+            if meta.get('ptp', None) == None or meta.get('hdb', None) != None:
+                hdb_imdb = None
+                hdb_id = meta.get('hdb')
+                if hdb_id != None:
+                    meta['hdb_manual'] = hdb_id
+                    hdb_imdb, meta['hdb_name'], meta['ext_torrenthash'] = await hdb.get_info_from_torrent_id(hdb_id)
+                else:
+                    if meta['is_disc'] in [None, ""]:
+                        hdb_imdb, meta['hdb_name'], meta['ext_torrenthash'], hdb_id = await hdb.search_filename(meta['filelist'])
+                    else:
+                        # Somehow search for disc
+                        pass
+                if hdb_imdb != None:
+                    meta['imdb'] = hdb_imdb
+                if hdb_id != None:
+                    meta['hdb'] = hdb_id
         
         if self.config['TRACKERS'].get('BLU', {}).get('useAPI') == True:
             blu = BLU(config=self.config)
@@ -2554,7 +2573,7 @@ class Prep():
                 if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
                     ptp = PTP(config=self.config)
                     ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
-                    if ptp_desc.strip().replace('\r\n', '').replace('\n', '') != "":
+                    if ptp_desc.replace('\r\n', '').replace('\n', '').strip() != "":
                         description.write(ptp_desc)
                         description.write("\n")
                         meta['description'] = 'PTP'

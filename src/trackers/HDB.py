@@ -458,3 +458,58 @@ class HDB():
         r = requests.post(url=url, data=data, files=files)
         image_bbcode = r.text
         return image_bbcode
+
+
+
+    async def get_info_from_torrent_id(self, hdb_id):
+        hdb_imdb = hdb_name = hdb_torrenthash = None
+        url = "https://hdbits.org/api/torrents"
+        data = {
+            "username" : self.username,
+            "passkey" : self.passkey,
+            "id" : hdb_id
+        }
+        response = requests.get(url, json=data)
+        if response.ok:
+            try:
+                response = response.json()
+                if response['data'] != []:
+                    hdb_imdb = str(response['data'][0].get('imdb', {'id' : None}).get('id'))
+                    hdb_name = response['data'][0]['name']
+                    hdb_torrenthash = response['data'][0]['hash']
+
+            except:
+                console.print_exception()
+        else:
+            console.print("Failed to get info from HDB ID. Either the site is down or your credentials are invalid")
+        return hdb_imdb, hdb_name, hdb_torrenthash
+
+    async def search_filename(self, filelist):
+        hdb_imdb = hdb_name = hdb_torrenthash = hdb_id = None
+        url = "https://hdbits.org/api/torrents"
+        data = {
+            "username" : self.username,
+            "passkey" : self.passkey,
+            "limit" : 100,
+            "file_in_torrent" : os.path.basename(filelist[0])
+        }
+        response = requests.get(url, json=data)
+        console.print(f"[green]Searching HDB for: [bold yellow]{os.path.basename(filelist[0])}[/bold yellow]")
+        if response.ok:
+            try:
+                response = response.json()
+                if response['data'] != []:
+                    for each in response['data']:
+                        if each['numfiles'] == len(filelist):
+                            hdb_imdb = str(each.get('imdb', {'id' : None}).get('id'))
+                            hdb_name = each['name']
+                            hdb_torrenthash = each['hash']
+                            hdb_id = each['id']
+                            console.print(f'[bold green]Matched release with HDB ID: [yellow]{hdb_id}[/yellow][/bold green]')
+                            return hdb_imdb, hdb_name, hdb_torrenthash, hdb_id
+            except:
+                console.print_exception()
+        else:
+            console.print("Failed to get info from HDB ID. Either the site is down or your credentials are invalid")
+        console.print(f'[yellow]Could not find a matching release on HDB')
+        return hdb_imdb, hdb_name, hdb_torrenthash, hdb_id

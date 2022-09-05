@@ -42,6 +42,7 @@ class Args():
         parser.add_argument('-year', '--year', dest='manual_year', nargs='?', required=False, help="Year", type=int, default=0)
         parser.add_argument('-ptp', '--ptp', nargs='*', required=False, help="PTP torrent id/permalink", type=str)
         parser.add_argument('-blu', '--blu', nargs='*', required=False, help="BLU torrent id/link", type=str)
+        parser.add_argument('-hdb', '--hdb', nargs='*', required=False, help="HDB torrent id/link", type=str)
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
         parser.add_argument('-pb', '--desclink', nargs='*', required=False, help="Custom Description (link to hastebin/pastebin)")
         parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
@@ -113,6 +114,17 @@ class Args():
                                 console.print('[red]Continuing without --blu')
                         else:
                             meta['blu'] = value2
+                    elif key == 'hdb':
+                        if value2.startswith('http'):
+                            parsed = urllib.parse.urlparse(value2)
+                            try:
+                                meta['hdb'] = urllib.parse.parse_qs(parsed.query)['id'][0]
+                            except:
+                                console.print('[red]Your terminal ate  part of the url, please surround in quotes next time, or pass only the torrentid')
+                                console.print('[red]Continuing without -hdb')
+                        else:
+                            meta['hdb'] = value2
+
                     else:
                         meta[key] = value2
                 else:
