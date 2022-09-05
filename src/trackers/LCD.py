@@ -168,14 +168,6 @@ class LCD():
             params['name'] = params['name'] + f" {meta.get('season', '')}{meta.get('episode', '')}"
         if meta.get('edition', "") != "":
             params['name'] = params['name'] + f" {meta['edition']}"
-        if meta.get('disc', '') == 'BDMV':
-            if meta.get('hdr', '').strip() != '':
-                params['name'] = params['name'] + f" {meta['hdr']}"
-            params['name'] = params['name']
-        else:
-            if meta.get('hdr', '').strip() != '':
-                params['name'] = params['name'] + f" {meta['hdr']}"
-            params['name'] = params['name']
         try:
             response = requests.get(url=self.search_url, params=params)
             response = response.json()

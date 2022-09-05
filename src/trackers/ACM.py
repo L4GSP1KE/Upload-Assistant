@@ -293,11 +293,6 @@ class ACM():
             # 'name' : ""
         }
         # Adding Name to search seems to override tmdb
-        # if meta['category'] == 'TV':
-        #     params['name'] = params['name'] + f"{meta.get('season', '')}{meta.get('episode', '')}"
-        # if meta.get('edition', "") != "":
-        #     params['name'] = params['name'] + meta['edition']
-        # params['name'] + meta['audio']
         try:
             response = requests.get(url=self.search_url, params=params)
             response = response.json()
