@@ -27,7 +27,7 @@ class LT():
     def __init__(self, config):
         self.config = config
         self.tracker = 'LT'
-        self.source_flag = 'lat-team.com'
+        self.source_flag = 'Lat-Team "Poder Latino"'
         self.upload_url = 'https://lat-team.com/api/torrents/upload'
         self.search_url = 'https://lat-team.com/api/torrents/filter'
         self.signature = ''
