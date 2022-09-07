@@ -110,8 +110,10 @@ class Clients():
         err_print = ""
         if torrent_client in ('qbit', 'deluge'):
             torrenthash = torrenthash.lower().strip()
+            torrent_path = torrent_path.replace(torrenthash.upper(), torrenthash)
         elif torrent_client == 'rtorrent':
             torrenthash = torrenthash.upper().strip()
+            torrent_path = torrent_path.replace(torrenthash.upper(), torrenthash)
         if meta['debug']:
             console.log(torrent_path)
         if os.path.exists(torrent_path):
