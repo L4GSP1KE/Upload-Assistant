@@ -87,10 +87,12 @@ class Clients():
         torrenthash = None
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
-                if await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", meta['torrenthash'], torrent_client, print_err=False):
+                valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", meta['torrenthash'], torrent_client, print_err=False)
+                if valid:
                     torrenthash = meta['torrenthash']
             elif meta.get('ext_torrenthash', None) != None:
-                if await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['ext_torrenthash']}.torrent", meta['ext_torrenthash'], torrent_client, print_err=False):
+                valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['ext_torrenthash']}.torrent", meta['ext_torrenthash'], torrent_client, print_err=False)
+                if valid:
                     torrenthash = meta['ext_torrenthash']
             if torrent_client == 'qbit' and torrenthash == None and client.get('enable_search') == True:
                 torrenthash = await self.search_qbit_for_torrent(meta, client)
@@ -99,7 +101,8 @@ class Clients():
             if not torrenthash:
                 return None
             torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
-            if await self.is_valid_torrent(meta, torrent_path, torrenthash, torrent_client, print_err=True):
+            valid2, torrent_path = await self.is_valid_torrent(meta, torrent_path, torrenthash, torrent_client, print_err=True)
+            if valid2:
                 return torrent_path
         return None
 
@@ -156,7 +159,7 @@ class Clients():
             err_print = '[bold yellow]Unwanted Files/Folders Identified'
         if print_err:
             console.print(err_print)
-        return valid
+        return valid, torrent_path
 
 
     async def search_qbit_for_torrent(self, meta, client):
@@ -198,11 +201,13 @@ class Clients():
                 torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
-                    if await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False):
+                    valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
+                    if valid:
                         console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                         return torrent.hash
             elif meta['path'] == torrent_path:
-                if await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False):
+                valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
+                if valid:
                     console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                     return torrent.hash
         return None
