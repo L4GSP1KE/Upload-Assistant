@@ -109,9 +109,9 @@ class Clients():
         wrong_file = False
         err_print = ""
         if torrent_client in ('qbit', 'deluge'):
-                torrenthash = torrenthash.lower()
+            torrenthash = torrenthash.lower().strip()
         elif torrent_client == 'rtorrent':
-            torrenthash = torrenthash.upper()
+            torrenthash = torrenthash.upper().strip()
         if os.path.exists(torrent_path):
             torrent = Torrent.read(torrent_path)
             # Reuse if disc and basename matches
