@@ -58,9 +58,9 @@ class TDB():
     async def get_res_id(self, resolution):
         resolution_id = {
             '8640p':'Other/Mixed', 
-            '4320p': '4320p (8k)', 
-            '2160p': '2160p (4k)', 
-            '1440p': '2160p (4k)',
+            '4320p': '4320p (8K)', 
+            '2160p': '2160p (4K)', 
+            '1440p': '2160p (4K)',
             '1080p': '1080p',
             '1080i': '1080p', 
             '720p': '720p',  
