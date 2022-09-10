@@ -144,6 +144,10 @@ class FL():
                 data['epenis'] = self.uploader_name
             if has_ro_audio:
                 data['materialro'] = 'on'
+            if meta['is_disc'] == "BDMV" or meta['type'] == "REMUX":
+                data['freeleech'] = 'on'
+            if int(meta.get('tv_pack', '0')) != 0:
+                data['freeleech'] = 'on'
             if int(meta.get('freeleech', '0')) != 0:
                 data['freeleech'] = 'on'
 
