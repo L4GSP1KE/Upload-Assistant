@@ -67,6 +67,11 @@ class LT():
             }.get(resolution, '10')
         return resolution_id
 
+    async def edit_name(self, meta):
+        lt_name = meta['name']
+        lt_name = lt_name.replace('Dubbed', '').replace('Dual-Audio', '')
+        return lt_name
+
     ###############################################################
     ######   STOP HERE UNLESS EXTRA MODIFICATION IS NEEDED   ######
     ###############################################################
@@ -80,6 +85,7 @@ class LT():
         await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         region_id = await common.unit3d_region_ids(meta.get('region'))
         distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
+        lt_name = await self.edit_name(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
             anon = 0
         else:
@@ -95,7 +101,7 @@ class LT():
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': open_torrent}
         data = {
-            'name' : meta['name'],
+            'name' : lt_name,
             'description' : desc,
             'mediainfo' : mi_dump,
             'bdinfo' : bd_dump, 
