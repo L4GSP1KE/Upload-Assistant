@@ -101,7 +101,7 @@ class Clients():
             if not torrenthash:
                 return None
             torrent_path = f"{torrent_storage_dir}/{torrenthash}.torrent"
-            valid2, torrent_path = await self.is_valid_torrent(meta, torrent_path, torrenthash, torrent_client, print_err=True)
+            valid2, torrent_path = await self.is_valid_torrent(meta, torrent_path, torrenthash, torrent_client, print_err=False)
             if valid2:
                 return torrent_path
         return None
