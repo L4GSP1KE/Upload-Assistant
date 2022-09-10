@@ -91,7 +91,7 @@ class Clients():
                 if valid:
                     torrenthash = meta['torrenthash']
             elif meta.get('ext_torrenthash', None) != None:
-                valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['ext_torrenthash']}.torrent", meta['ext_torrenthash'], torrent_client, print_err=False)
+                valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['ext_torrenthash']}.torrent", meta['ext_torrenthash'], torrent_client, print_err=True)
                 if valid:
                     torrenthash = meta['ext_torrenthash']
             if torrent_client == 'qbit' and torrenthash == None and client.get('enable_search') == True:
@@ -144,7 +144,7 @@ class Clients():
         if valid:
             if os.path.exists(torrent_path):
                 reuse_torrent = Torrent.read(torrent_path)
-                if reuse_torrent.pieces >= 5000 and reuse_torrent.piece_size < 8388608:
+                if reuse_torrent.pieces >= 7000 and reuse_torrent.piece_size < 8388608:
                     err_print = "[bold yellow]Too many pieces exist in current hash. REHASHING"
                     valid = False
                 elif reuse_torrent.piece_size < 32768:
