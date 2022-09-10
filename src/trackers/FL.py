@@ -111,6 +111,12 @@ class FL():
         cat_id = await self.get_category_id(meta)
         has_ro_audio, has_ro_sub = await self.get_ro_tracks(meta)
         
+        # Confirm the correct naming order for FL
+        cli_ui.info(f"Filelist name: {fl_name}")
+        fl_confirm = cli_ui.ask_yes_no("Correct?", default=False)
+        if fl_confirm != True:
+            console.print("Aborting...")
+            exit()
 
         # Download new .torrent from site
         fl_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r', newline='').read()
