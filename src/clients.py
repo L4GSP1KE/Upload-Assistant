@@ -87,7 +87,7 @@ class Clients():
         torrenthash = None
         if torrent_storage_dir != None:
             if meta.get('torrenthash', None) != None:
-                valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", meta['torrenthash'], torrent_client, print_err=False)
+                valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", meta['torrenthash'], torrent_client, print_err=True)
                 if valid:
                     torrenthash = meta['torrenthash']
             elif meta.get('ext_torrenthash', None) != None:
