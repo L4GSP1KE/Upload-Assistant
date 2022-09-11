@@ -82,7 +82,7 @@ class FL():
         fl_name = fl_name.replace(meta.get('aka', ''), '')
         if meta.get('imdb_info'):
             fl_name = fl_name.replace(meta['title'], meta['imdb_info']['aka'])
-            if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']):
+            if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']) and meta['year'].strip() != '':
                 fl_name = fl_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
         if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '':
             fl_name = fl_name.replace(meta['episode'], f"{meta['episode']} {meta['episode_title_storage']}")
@@ -116,7 +116,7 @@ class FL():
         fl_confirm = cli_ui.ask_yes_no("Correct?", default=False)
         if fl_confirm != True:
             console.print("Aborting...")
-            exit()
+            return
 
         # Download new .torrent from site
         fl_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r', newline='').read()
