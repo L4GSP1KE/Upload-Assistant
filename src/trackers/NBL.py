@@ -37,9 +37,9 @@ class NBL():
 
     async def get_cat_id(self, meta):
         if meta.get('tv_pack', 0) == 1:
-            cat_id = 1
-        else:
             cat_id = 3
+        else:
+            cat_id = 1
         return cat_id
 
     ###############################################################
