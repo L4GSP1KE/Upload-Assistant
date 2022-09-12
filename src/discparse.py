@@ -65,6 +65,13 @@ class DiscParse():
                             result = result2.split("********************", 1)
                             bd_summary = result[0].rstrip(" \n")
                             f.close()
+                        with open(bdinfo_text, 'r') as f: # parse extended BDInfo
+                            text = f.read()
+                            result = text.split("[code]", 3)
+                            result2 = result[2].rstrip(" \n")
+                            result = result2.split("FILES:", 1)
+                            ext_bd_summary = result[0].rstrip(" \n")
+                            f.close()
                         try:
                             shutil.copyfile(bdinfo_text, f"{save_dir}/BD_FULL_{str(i).zfill(2)}.txt")
                             os.remove(bdinfo_text)
@@ -77,6 +84,9 @@ class DiscParse():
                     break
                 with open(f"{save_dir}/BD_SUMMARY_{str(i).zfill(2)}.txt", 'w') as f:
                     f.write(bd_summary.strip())
+                    f.close()
+                with open(f"{save_dir}/BD_SUMMARY_EXT.txt", 'w') as f: # write extended BDInfo file
+                    f.write(ext_bd_summary.strip())
                     f.close()
                 
                 bdinfo = self.parse_bdinfo(bd_summary, files[1], path)
