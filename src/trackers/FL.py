@@ -35,7 +35,7 @@ class FL():
         if meta['category'] == 'MOVIE':
             # 4 = Movie HD
             cat_id = 4
-            if meta['is_disc'] == "BDMV":
+            if meta['is_disc'] == "BDMV" or meta['type'] == "REMUX":
                 # 20 = BluRay
                 cat_id = 20
                 if meta['resolution'] == '2160p':
@@ -88,6 +88,9 @@ class FL():
             fl_name = fl_name.replace(meta['episode'], f"{meta['episode']} {meta['episode_title_storage']}")
 
         fl_name = fl_name.replace('DD+', 'DDP')
+        fl_name = fl_name.replace('BluRay REMUX', 'Remux').replace('BluRay Remux', 'Remux').replace('Bluray Remux', 'Remux')
+        fl_name = fl_name.replace('DoVi HDR HEVC', 'HEVC DoVi').replace('HDR HEVC', 'HEVC HDR').replace('DoVi HEVC', 'HEVC DoVi')
+        fl_name = fl_name.replace('DTS7.1', 'DTS').replace('DTS5.1', 'DTS').replace('DTS2.0', 'DTS').replace('DTS1.0', 'DTS')
         fl_name = fl_name.replace('PQ10', 'HDR').replace('HDR10+', 'HDR')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
@@ -108,6 +111,12 @@ class FL():
         cat_id = await self.get_category_id(meta)
         has_ro_audio, has_ro_sub = await self.get_ro_tracks(meta)
         
+        # Confirm the correct naming order for FL
+        cli_ui.info(f"Filelist name: {fl_name}")
+        fl_confirm = cli_ui.ask_yes_no("Correct?", default=False)
+        if fl_confirm != True:
+            console.print("Aborting...")
+            return
 
         # Download new .torrent from site
         fl_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r', newline='').read()
@@ -135,6 +144,10 @@ class FL():
                 data['epenis'] = self.uploader_name
             if has_ro_audio:
                 data['materialro'] = 'on'
+            if meta['is_disc'] == "BDMV" or meta['type'] == "REMUX":
+                data['freeleech'] = 'on'
+            if int(meta.get('tv_pack', '0')) != 0:
+                data['freeleech'] = 'on'
             if int(meta.get('freeleech', '0')) != 0:
                 data['freeleech'] = 'on'
 
