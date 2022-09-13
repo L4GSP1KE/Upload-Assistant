@@ -93,7 +93,7 @@ class Prep():
         
         # If BD:
         if meta['is_disc'] == "BDMV":
-            video, meta['scene'] = self.is_scene(meta['path'])
+            video, meta['scene'], meta['imdb'] = self.is_scene(meta['path'])
             meta['filelist'] = []
             try:
                 guess_name = bdinfo['title'].replace('-',' ')
@@ -121,7 +121,7 @@ class Prep():
             mi_dump = None
         #IF DVD
         elif meta['is_disc'] == "DVD":
-            video, meta['scene'] = self.is_scene(meta['path'])
+            video, meta['scene'], meta['imdb'] = self.is_scene(meta['path'])
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
@@ -142,7 +142,7 @@ class Prep():
             meta['resolution'] = self.get_resolution(guessit(video), meta['uuid'], base_dir)
             meta['sd'] = self.is_sd(meta['resolution'])
         elif meta['is_disc'] == "HDDVD":
-            video, meta['scene'] = self.is_scene(meta['path'])
+            video, meta['scene'], meta['imdb'] = self.is_scene(meta['path'])
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-','')
             filename = guessit(guess_name)['title']
@@ -166,8 +166,8 @@ class Prep():
         #If NOT BD/DVD/HDDVD
         else:
             videopath, meta['filelist'] = self.get_video(videoloc, meta.get('mode', 'discord')) 
-
-            video, meta['scene'] = self.is_scene(videopath)
+            console.print(meta)
+            video, meta['scene'], meta['imdb'] = self.is_scene(videopath)
             guess_name = ntpath.basename(video).replace('-',' ')
             filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))["title"]
             untouched_filename = os.path.basename(video)
@@ -614,6 +614,7 @@ class Prep():
     Is a scene release?
     """
     def is_scene(self, video):
+        imdb = None
         scene = False
         base = os.path.basename(video)
         base = os.path.splitext(base)[0]
@@ -625,12 +626,16 @@ class Prep():
             if int(response.get('resultsCount', 0)) != 0:
                 video = f"{response['results'][0]['release']}.mkv"
                 scene = True
+                r = requests.get(f"https://api.srrdb.com/v1/imdb/{base}")
+                r = r.json()
+                if r['releases'] != []:
+                    imdb = r['releases'][0].get('imdb')
                 console.print(f"[green]SRRDB: Matched to {response['results'][0]['release']}")
         except Exception:
             video = video
             scene = False
             console.print("[yellow]SRRDB: No match found, or request has timed out")
-        return video, scene
+        return video, scene, imdb
 
 
 
