@@ -166,7 +166,6 @@ class Prep():
         #If NOT BD/DVD/HDDVD
         else:
             videopath, meta['filelist'] = self.get_video(videoloc, meta.get('mode', 'discord')) 
-            console.print(meta)
             video, meta['scene'], meta['imdb'] = self.is_scene(videopath)
             guess_name = ntpath.basename(video).replace('-',' ')
             filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))["title"]
