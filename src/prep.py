@@ -220,7 +220,7 @@ class Prep():
         if self.config['TRACKERS'].get('HDB', {}).get('useAPI') == True:
             hdb = HDB(config=self.config)
             if meta.get('ptp', None) == None or meta.get('hdb', None) != None:
-                hdb_imdb = None
+                hdb_imdb = hdb_tvdb = hdb_id = None
                 hdb_id = meta.get('hdb')
                 if hdb_id != None:
                     meta['hdb_manual'] = hdb_id
@@ -230,7 +230,6 @@ class Prep():
                         hdb_imdb, hdb_tvdb, meta['hdb_name'], meta['ext_torrenthash'], hdb_id = await hdb.search_filename(meta['filelist'])
                     else:
                         # Somehow search for disc
-                        hdb_imdb = hdb_tvdb = hdb_id = None
                         pass
                 if hdb_imdb != None:
                     meta['imdb'] = str(hdb_imdb)
