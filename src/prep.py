@@ -230,6 +230,7 @@ class Prep():
                         hdb_imdb, hdb_tvdb, meta['hdb_name'], meta['ext_torrenthash'], hdb_id = await hdb.search_filename(meta['filelist'])
                     else:
                         # Somehow search for disc
+                        hdb_imdb = hdb_tvdb = hdb_id = None
                         pass
                 if hdb_imdb != None:
                     meta['imdb'] = str(hdb_imdb)
@@ -683,6 +684,9 @@ class Prep():
                 if bool(ffdebug) == True:
                     loglevel = 'verbose'
                     debug = False
+                else:
+                    loglevel = 'quiet'
+                    debug = True
                 with Progress(
                         TextColumn("[bold green]Saving Screens..."),
                         BarColumn(),
@@ -700,8 +704,8 @@ class Prep():
                                 .input(file, ss=ss_times[-1], skip_frame=keyframe)
                                 .output(image, vframes=1, pix_fmt="rgb24")
                                 .overwrite_output()
-                                .global_args('-loglevel', 'quiet')
-                                .run(quiet=True)
+                                .global_args('-loglevel', loglevel)
+                                .run(quiet=debug)
                             )
                         except Exception:
                             console.print(traceback.format_exc())
@@ -719,7 +723,7 @@ class Prep():
                         else:
                             console.print("[red]Image too large for your image host, retaking")
                             time.sleep(1)
-                    progress.advance(screen_task)
+                        progress.advance(screen_task)
                 #remove smallest image
                 smallest = ""
                 smallestsize = 99 ** 99
