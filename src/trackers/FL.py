@@ -301,7 +301,7 @@ class FL():
             desc = desc.replace('[img]', '[img]').replace('[/img]', '[/img]')
             desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
             if meta['is_disc'] != 'BDMV':
-                url = "https://up.fltools.club/api/description"
+                url = "https://upload.fltools.club/api/description"
                 data = {
                     'mediainfo' : open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r').read(),
                 }
