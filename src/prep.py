@@ -1839,6 +1839,7 @@ class Prep():
         if video.lower().startswith('dc'):
             video = video.replace('dc', '', 1)
         guess = guessit(video)
+        tag = guess.get('release_group', 'NOGROUP')
         repack = ""
         edition = ""
         if bdinfo != None:
@@ -1856,7 +1857,10 @@ class Prep():
             edition = " ".join(edition)
         if len(filelist) == 1:
             video = os.path.basename(video)
-        if "open matte" in video.replace('.', ' ').lower():
+
+        video = video.upper().replace('.', ' ').replace(tag, '').replace('-', '')
+
+        if "OPEN MATTE" in video:
             edition = edition + "Open Matte"
 
         if manual_edition != None:
@@ -1864,19 +1868,14 @@ class Prep():
                 manual_edition = " ".join(manual_edition)
             edition = str(manual_edition)
             
-        if "REPACK" in (video.upper() or edition) or "V2" in video.upper():
+        if "REPACK" in (video or edition) or "V2" in video:
             repack = "REPACK"
-        if "REPACK2" in (video.upper() or edition) or "V3" in video.upper():
+        if "REPACK2" in (video or edition) or "V3" in video:
             repack = "REPACK2"
-        if "REPACK3" in (video.upper() or edition) or "V4" in video.upper():
+        if "REPACK3" in (video or edition) or "V4" in video:
             repack = "REPACK3"
-        name_parts = video.upper().split('-')
-        release_group_index = len(name_parts) - 1
-        i = 0
-        while i < release_group_index:
-            if "PROPER" in name_parts[i] or edition:
-                repack = "PROPER"
-            i += 1
+        if "PROPER" in (video or edition):
+            repack = "PROPER"
         if "RERIP" in (video.upper() or edition):
             repack = "RERIP"
         # if "HYBRID" in video.upper() and "HYBRID" not in title.upper():
