@@ -414,7 +414,7 @@ def dupe_check(dupes, meta):
         if meta['unattended']:
             if meta.get('dupe', False) == False:
                 console.print("[red]Found potential dupes. Aborting. If this is not a dupe, or you would like to upload anyways, pass --skip-dupe-check")
-                exit()
+                upload = False
             else:
                 console.print("[yellow]Found potential dupes. --skip-dupe-check was passed. Uploading anyways")
                 upload = True
