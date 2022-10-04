@@ -72,8 +72,7 @@ config = {
             # "anon" : "False"
         },
         "SN": {
-            "PHPSESSID": "GET FROM DEV TOOLS ON YOUR BROWSER",
-            "swarmazon_remember": "GET FROM DEV TOOLS ON YOUR BROWSER",
+            "api_key": "6Z1tMrXzcYpIeSdGZueQWqb3BowlS6YuIoZLHe3dvIqkSfY0Ws5SHx78oGSTazG0jQ1agduSqe07FPPE8sdWTg",
             "announce_url": "https://tracker.swarmazon.club:8443/<YOUR_PASSKEY>/announce",
         },
         "HP" :{
@@ -114,13 +113,12 @@ config = {
             "announce_url" : "https://lst.gg/announce/customannounceurl",
             # "anon" : "False"
         },
-
-	    "LT" : {
+	"LT" : {
             "api_key" : "LT api key",
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
             # "anon" : "False"
         },
-	    "TDB" : {
+	"TDB" : {
             "passkey" : "TDB api key",
             "announce_url" : "https://torrentdb.net/announce/customannounceurl",
             # "anon" : "False"
