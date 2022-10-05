@@ -2504,7 +2504,10 @@ class Prep():
             }
         
         
-        video_name = re.sub("[.()]", " ", video.replace(tag, '').replace(guess_title, ''))
+        if len(guess_title) != 1:
+            video_name = re.sub("[.()]", " ", video.replace(tag, '').replace(guess_title[1], ''))
+        else:
+            video_name = re.sub("[.()]", " ", video.replace(tag, '').replace(guess_title, ''))
         if "DTS-HD MA" in audio:
             video_name = video_name.replace("DTS-HD.MA.", "").replace("DTS-HD MA ", "")
         for key, value in services.items():
