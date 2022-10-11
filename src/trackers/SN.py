@@ -118,7 +118,7 @@ class SN():
                 for each in range(len(images)):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img]{img_url}[/img][/url]")
+                    desc.write(f"[url={web_url}][img=720]{img_url}[/img][/url]")
                 desc.write("[/center]")
             desc.write(f"\n[center][url={self.forum_link}]Simplicity, Socializing and Sharing![/url][/center]")
             desc.close()
