@@ -76,7 +76,7 @@ class Clients():
             default_torrent_client = self.config['DEFAULT']['default_torrent_client']
         else:
             default_torrent_client = meta['client']
-        if meta.get('client', None) == 'none':
+        if meta.get('client', None) == 'none' or default_torrent_client == 'none':
             return None
         client = self.config['TORRENT_CLIENTS'][default_torrent_client]
         torrent_storage_dir = client.get('torrent_storage_dir', None)
