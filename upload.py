@@ -209,6 +209,8 @@ async def do_the_thing(base_dir):
             }
 
         for tracker in trackers:
+            if meta['name'].endswith('DUPE?'):
+                meta['name'] = meta['name'].replace(' DUPE?', '')
             tracker = tracker.replace(" ", "").upper().strip()
             if meta['debug']:
                 debug = "(DEBUG)"
