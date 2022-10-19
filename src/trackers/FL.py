@@ -301,7 +301,7 @@ class FL():
             desc = desc.replace('[img]', '[img]').replace('[/img]', '[/img]')
             desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
             if meta['is_disc'] != 'BDMV':
-                url = "https://upload.fltools.club/api/description"
+                url = "https://up.img4k.net/api/description"
                 data = {
                     'mediainfo' : open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r').read(),
                 }
@@ -321,7 +321,7 @@ class FL():
                     final_desc = final_desc.replace('DISC INFO:', '[pre][quote=BD_Info][b][color=#FF0000]DISC INFO:[/color][/b]').replace('PLAYLIST REPORT:', '[b][color=#FF0000]PLAYLIST REPORT:[/color][/b]').replace('VIDEO:', '[b][color=#FF0000]VIDEO:[/color][/b]').replace('AUDIO:', '[b][color=#FF0000]AUDIO:[/color][/b]').replace('SUBTITLES:', '[b][color=#FF0000]SUBTITLES:[/color][/b]')
                     final_desc += "[/pre][/quote]\n" # Closed bbcode tags
                     # Upload screens and append to the end of the description
-                    url = "https://up.fltools.club/api/description"
+                    url = "https://up.img4k.net/api/description"
                     screen_glob = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}", f"{meta['filename']}-*.png")
                     files = []
                     for screen in screen_glob:
