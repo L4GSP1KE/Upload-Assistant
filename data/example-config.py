@@ -113,12 +113,12 @@ config = {
             "announce_url" : "https://lst.gg/announce/customannounceurl",
             # "anon" : "False"
         },
-	"LT" : {
+	    "LT" : {
             "api_key" : "LT api key",
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
             # "anon" : "False"
         },
-	"TDB" : {
+	    "TDB" : {
             "passkey" : "TDB api key",
             "announce_url" : "https://torrentdb.net/announce/customannounceurl",
             # "anon" : "False"
