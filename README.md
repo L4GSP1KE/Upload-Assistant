@@ -50,8 +50,10 @@ A simple tool to take the work out of uploading. Now with a Discord Bot interfac
   - To update first navigate into the Upload-Assistant directory: `cd Upload-Assistant`
   - Run a `git pull` to grab latest updates
   - Run `pip3 install --user -U -r requirements.txt` to ensure dependencies are up to date
-  ## **CLI Usage:**
+## **CLI Usage:**
   
   `python3 upload.py /downloads/path/to/content --args`
   
   Args are OPTIONAL, for a list of acceptable args, pass `--help`
+## **Docker Usage:**
+  Visit our wonderful [docker usage wiki page](https://github.com/L4GSP1KE/Upload-Assistant/wiki/Docker)
