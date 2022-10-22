@@ -1151,11 +1151,14 @@ class Prep():
                 meta['tvdb_id'] = external.get('tvdb_id', '0')
                 if meta['tvdb_id'] in ["", None, " ", "None"]:
                     meta['tvdb_id'] = '0'
-            videos = movie.videos()
-            for each in videos.get('results', []):
-                if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
-                    meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
-                    break
+            try:
+                videos = movie.videos()
+                for each in videos.get('results', []):
+                    if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
+                        meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
+                        break
+            except Exception:
+                pass
             
             meta['aka'], original_language = await self.get_imdb_aka(meta['imdb_id'])
             if original_language != None:
@@ -1195,12 +1198,14 @@ class Prep():
                 meta['tvdb_id'] = external.get('tvdb_id', '0')
                 if meta['tvdb_id'] in ["", None, " ", "None"]:
                     meta['tvdb_id'] = '0'
-            videos = tv.videos()
-            for each in videos.get('results', []):
-                if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
-                    meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
-                    break
-            
+            try:
+                videos = tv.videos()
+                for each in videos.get('results', []):
+                    if each.get('site', "") == 'YouTube' and each.get('type', "") == "Trailer":
+                        meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
+                        break
+            except Exception:
+                pass
             # meta['aka'] = f" AKA {response['original_name']}"
             meta['aka'], original_language = await self.get_imdb_aka(meta['imdb_id'])
             if original_language != None:
