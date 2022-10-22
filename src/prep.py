@@ -1158,7 +1158,7 @@ class Prep():
                         meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
                         break
             except Exception:
-                pass
+                console.print('[yellow]Unable to grab videos from TMDb.')
             
             meta['aka'], original_language = await self.get_imdb_aka(meta['imdb_id'])
             if original_language != None:
@@ -1205,7 +1205,8 @@ class Prep():
                         meta['youtube'] = f"https://www.youtube.com/watch?v={each.get('key')}"
                         break
             except Exception:
-                pass
+                console.print('[yellow]Unable to grab videos from TMDb.')
+
             # meta['aka'] = f" AKA {response['original_name']}"
             meta['aka'], original_language = await self.get_imdb_aka(meta['imdb_id'])
             if original_language != None:
