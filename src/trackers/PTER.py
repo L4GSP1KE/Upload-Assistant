@@ -1,0 +1,363 @@
+from bs4 import BeautifulSoup
+import requests
+import asyncio
+import re
+import os
+from pathlib import Path
+import traceback
+import json
+import distutils.util
+import cli_ui
+from unidecode import unidecode
+from urllib.parse import urlparse, quote
+from src.trackers.COMMON import COMMON
+from src.exceptions import *
+from src.console import console
+
+
+class PTER():
+
+    def __init__(self, config):
+        self.config = config
+        self.tracker = 'PTER'
+        self.source_flag = 'PTER'
+        self.passkey =  str(config['TRACKERS']['PTER'].get('passkey', '')).strip()
+        self.ptgen_api = config['TRACKERS']['PTER'].get('ptgen_api').strip()
+
+        self.ptgen_retry=3
+        self.signature = None
+
+    async def validate_credentials(self, meta):
+        vcookie = await self.validate_cookies(meta)
+        if vcookie != True:
+            console.print('[red]Failed to validate cookies. Please confirm that the site is up and your passkey is valid.')
+            return False
+        return True
+    
+    async def validate_cookies(self, meta):
+        common = COMMON(config=self.config)
+        url = "https://pterclub.com"
+        cookiefile = f"{meta['base_dir']}/data/cookies/PTER.txt"
+        if os.path.exists(cookiefile):
+            with requests.Session() as session:
+                session.cookies.update(await common.parseCookieFile(cookiefile))
+                resp = session.get(url=url)
+               
+                if meta['debug']:
+                    console.print('[cyan]Cookies:')
+                    console.print(session.cookies.get_dict())
+                    console.print("\n\n")
+                    console.print(resp.text)
+                if resp.text.find("""<a href="#" data-url="logout.php" id="logout-confirm">""") != -1:
+                    return True
+                else:
+                    return False
+        else:
+            console.print("[bold red]Missing Cookie File. (data/cookies/PTER.txt)")
+            return False
+    
+    async def search_existing(self, meta):
+        dupes = []
+        common = COMMON(config=self.config)
+        cookiefile = f"{meta['base_dir']}/data/cookies/PTER.txt"
+        if os.path.exists(cookiefile):
+            with requests.Session() as session:
+                session.cookies.update(await common.parseCookieFile(cookiefile))
+                if int(meta['imdb_id'].replace('tt', '')) != 0:
+                    imdb = 'tt'+meta['imdb_id']
+                else:
+                    imdb = ""
+                source = await self.get_type_medium_id(meta)
+                search_url = f"https://pterclub.com/torrents.php?search={imdb}&incldead=0&search_mode=0&source{source}=1"
+                r = session.get(search_url)
+                soup = BeautifulSoup(r.text, 'lxml')
+                rows = soup.select('table.torrents > tr:has(table.torrentname)')
+                for row in rows:
+                    text=row.select_one('a[href^="details.php?id="]')
+                    if text != None:
+                        release=text.attrs['title']
+                    if release:
+                        dupes.append(release)
+        else:
+            console.print("[bold red]Missing Cookie File. (data/cookies/PTER.txt)")
+            return False
+        return dupes
+
+    async def get_type_category_id(self, meta):
+        cat_id = "EXIT"
+        
+        if meta['category'] == 'MOVIE':
+            cat_id = 401
+       
+        if meta['category'] == 'TV':
+            cat_id = 404
+        
+        if 'documentary' in meta.get("genres", "").lower() or 'documentary' in meta.get("keywords", "").lower():
+            cat_id = 402
+        
+        if 'Animation' in meta.get("genres", "").lower() or 'Animation' in meta.get("keywords", "").lower():
+            cat_id = 403
+        
+        return cat_id
+    
+    async def get_area_id(self, meta):
+        
+        area_id=8
+        area_map = { #To do
+            "中国大陆": 1, "中国香港": 2, "中国台湾": 3, "美国": 4, "日本": 6, "韩国": 5,
+            "印度": 7, "法国": 4, "意大利": 4, "德国": 4, "西班牙": 4, "葡萄牙": 4, 
+            "英国": 4, "阿根廷": 8, "澳大利亚": 4, "比利时": 4,
+            "巴西": 8, "加拿大": 4, "瑞士": 4, "智利": 8,
+        }
+        regions = meta['ptgen'].get("region", [])
+        for area in area_map.keys():
+            if area in regions:
+                return area_map[area]
+        return area_id
+        
+       
+
+    async def get_type_medium_id(self, meta):
+        medium_id = "EXIT"
+        # 1 = UHD Discs
+        if meta.get('is_disc', '') in ("BDMV", "HD DVD"):
+            if meta['resolution']=='2160p':
+                medium_id = 1
+            else:
+                medium_id = 2 #BD Discs
+        
+        if meta.get('is_disc', '') == "DVD":
+                medium_id = 7
+            
+        # 4 = HDTV
+        if meta.get('type', '') == "HDTV":
+            medium_id = 4
+            
+        # 6 = Encode
+        if meta.get('type', '') in ("ENCODE", "WEBRIP"):
+            medium_id = 6
+
+        # 3 = Remux
+        if meta.get('type', '') == "REMUX":
+            medium_id = 3
+
+        # 5 = WEB-DL
+        if meta.get('type', '') == "WEBDL":
+            medium_id = 5
+
+        return medium_id
+
+    async def ptgen(self, meta):
+        ptgen = ""
+        url = 'https://ptgen.zhenzhen.workers.dev'
+        if self.ptgen_api != '':
+            url = self.ptgen_api
+        params = {}
+        data={}
+        #get douban url 
+        if int(meta.get('imdb_id', '0')) != 0:
+            data['search'] = f"tt{meta['imdb_id']}"
+            ptgen = requests.get(url, params=data)
+            if ptgen.json()["error"] != None:
+                for retry in range(self.ptgen_retry):
+                    ptgen = requests.get(url, params=params)
+                    if ptgen.json()["error"] == None:
+                        break
+            params['url'] =  ptgen.json()['data'][0]['link'] 
+        else:
+            console.print("[red]No IMDb id was found.")
+            params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
+        try:
+            ptgen = requests.get(url, params=params)
+            if ptgen.json()["error"] != None:
+                for retry in range(self.ptgen_retry):
+                    ptgen = requests.get(url, params=params)
+                    if ptgen.json()["error"] == None:
+                        break
+            ptgen = ptgen.json()
+            meta['ptgen']=ptgen
+            with open (f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
+                json.dump(meta, f, indent=4)
+                f.close()
+            ptgen = ptgen['format']
+            if "[/img]" in ptgen:
+                ptgen = ptgen.split("[/img]")[1]
+            ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
+        except:
+            console.print_exception()
+            console.print("[bold red]There was an error getting the ptgen")
+            console.print(ptgen)
+        return ptgen
+
+    async def edit_desc(self, meta):
+        base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
+            from src.bbcode import BBCODE
+
+            if int(meta.get('imdb_id', '0').replace('tt', '')) != 0:
+                ptgen = await self.ptgen(meta)
+                if ptgen.strip() != '':
+                    descfile.write(ptgen)   
+
+            
+            bbcode = BBCODE()
+            if meta.get('discs', []) != []:
+                discs = meta['discs']
+                for each in discs:
+                    if each['type'] == "BDMV":
+                        descfile.write(f"[hide=BDInfo]{each['summary']}[/hide]\n")
+                        descfile.write("\n")
+                        pass
+                    if each['type'] == "DVD":
+                        descfile.write(f"{each['name']}:\n")
+                        descfile.write(f"[hide=mediainfo][{each['vob_mi']}[/hide] [hide=mediainfo][{each['ifo_mi']}[/hide]\n")
+                        descfile.write("\n")
+            else:
+                mi = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()
+                descfile.write(f"[hide=mediainfo]{mi}[/hide]")
+                descfile.write("\n")
+            desc = base
+            desc = bbcode.convert_code_to_quote(desc)
+            desc = bbcode.convert_spoiler_to_hide(desc)
+            desc = bbcode.convert_comparison_to_centered(desc, 1000)
+            desc = desc.replace('[img]', '[img]')
+            desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
+            descfile.write(desc)
+            images = meta['image_list']
+            if len(images) > 0: 
+                descfile.write("[center]")
+                for each in range(len(images[:int(meta['screens'])])):
+                    web_url = images[each]['web_url']
+                    img_url = images[each]['img_url']
+                    descfile.write(f"[url={web_url}][img]{img_url}[/img][/url]")
+                descfile.write("[/center]")
+            if self.signature != None:
+                descfile.write("\n\n")
+                descfile.write(self.signature)
+            descfile.close()
+
+    async def get_anon(self, anon):
+        if anon == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
+            anon = 'no'
+        else:
+            anon = 'yes'
+        return anon
+
+    async def edit_name(self, meta):
+        pter_name = meta['name']
+
+        remove_list = ['Dubbed', 'Dual-Audio']
+        for each in remove_list:
+            pter_name = pter_name.replace(each, '')
+
+        pter_name = pter_name.replace(meta["aka"], '')
+        pter_name = pter_name.replace('PQ10', 'HDR')
+
+        if meta['type'] == 'WEBDL' and meta.get('has_encode_settings', False) == True:
+            pter_name = pter_name.replace('H.264', 'x264')
+
+        return pter_name
+    
+    async def is_zhongzi(self, meta):
+        if meta.get('is_disc', '') != 'BDMV':
+            mi = meta['mediainfo']
+            for track in mi['media']['track']:
+                if track['@type'] == "Text":
+                    language = track.get('Language')
+                    if language == "zh":
+                        return 'yes'                        
+        else:
+            for language in meta['bdinfo']['subtitles']:
+                if language == "Chinese":
+                    return 'yes' 
+        return None
+
+    async def upload(self, meta):
+
+        common = COMMON(config=self.config)
+        await common.edit_torrent(meta, self.tracker, self.source_flag)
+
+        desc_file=f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt"
+        if not os.path.exists(desc_file):
+            await self.edit_desc(meta)
+        
+        pter_name = await self.edit_name(meta)
+       
+        if meta['bdinfo'] != None:
+            mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8')
+        else:
+            mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8')
+
+        pter_desc = open(desc_file, 'r').read()
+        torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
+        
+        with open(torrent_path, 'rb') as torrentFile:
+            if len(meta['filelist']) == 1:
+                torrentFileName = unidecode(os.path.basename(meta['video']).replace(' ', '.'))
+            else:
+                torrentFileName = unidecode(os.path.basename(meta['path']).replace(' ', '.'))
+            files = {
+                'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent"),
+            }
+
+            #use chinese small_descr
+            if meta['ptgen']["trans_title"] != ['']:
+                for title_ in meta['ptgen']["trans_title"]:
+                  small_descr=''
+                  small_descr+=f'{title_} / ' 
+                small_descr+="| 类别:"+meta['ptgen']["genre"][0] 
+                small_descr=small_descr.replace('/ |','|')
+            else:
+                small_descr=meta['title']
+            
+            data= {
+                "name": pter_name,
+                "small_descr": small_descr,
+                "descr": pter_desc,
+                "type": await self.get_type_category_id(meta),
+                "source_sel": await self.get_type_medium_id(meta),
+                "team_sel": await self.get_area_id(meta),
+                "uplver": await self.get_anon(meta['anon']),
+                "zhongzi": await self.is_zhongzi(meta)
+            }
+
+            if meta.get('personalrelease', False) == True:
+                data["pr"] = "yes"           
+
+            url = "https://pterclub.com/takeupload.php"
+            
+            # Submit
+            if meta['debug']:
+                console.print(url)
+                console.print(data)
+            else:
+                cookiefile = f"{meta['base_dir']}/data/cookies/PTER.txt"
+                if os.path.exists(cookiefile):
+                    with requests.Session() as session:
+                        session.cookies.update(await common.parseCookieFile(cookiefile))
+                        up = session.post(url=url, data=data, files=files)
+                        torrentFile.close()
+                        mi_dump.close()
+                        
+                        if up.url.startswith("https://pterclub.com/details.php?id="):
+                            console.print(f"[green]Uploaded to: [yellow]{up.url.replace('&uploaded=1','')}[/yellow][/green]")
+                            id = re.search(r"(id=)(\d+)", urlparse(up.url).query).group(2)
+                            await self.download_new_torrent(id, torrent_path)
+                        else:
+                            console.print(data)
+                            console.print("\n\n")
+                            raise UploadException(f"Upload to Pter Failed: result URL {up.url} ({up.status_code}) was not expected", 'red')
+        return
+
+    async def download_new_torrent(self, id, torrent_path):
+        download_url = f"https://pterclub.com/download.php?id={id}&passkey={self.passkey}"
+        r = requests.get(url=download_url)
+        if r.status_code == 200:
+            with open(torrent_path, "wb") as tor:
+                tor.write(r.content)
+        else:
+            console.print("[red]There was an issue downloading the new .torrent from pter")
+            console.print(r.text)
+
+
+    

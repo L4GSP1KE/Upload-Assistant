@@ -123,6 +123,11 @@ config = {
             "announce_url" : "https://torrentdb.net/announce/customannounceurl",
             # "anon" : "False"
         },
+        "PTER" : {
+            "passkey":'passkey',
+            'ptgen_api': '', 
+            'anon': True,
+        },
 
         "MANUAL" : {
             # Uncomment and replace link with filebrowser (https://github.com/filebrowser/filebrowser) link to the Upload-Assistant directory, this will link to your filebrowser instead of uploading to uguu.se
