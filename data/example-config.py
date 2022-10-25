@@ -125,8 +125,11 @@ config = {
         },
         "PTER" : {
             "passkey":'passkey',
-            'ptgen_api': '', 
-            'anon': True,
+            "img_rehost" : False,
+            "username" : "",
+            "password" : "",
+            "ptgen_api": "",
+            "anon": True,
         },
 
         "MANUAL" : {
