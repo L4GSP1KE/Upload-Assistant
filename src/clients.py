@@ -60,7 +60,7 @@ class Clients():
         if torrent_client.lower() == "rtorrent":
             self.rtorrent(meta['path'], torrent_path, torrent, meta, local_path, remote_path, client)
         elif torrent_client == "qbit":
-            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client, meta['is_disc'], meta['filelist'])
+            await self.qbittorrent(meta['path'], torrent, local_path, remote_path, client, meta['is_disc'], meta['filelist'], meta)
         elif torrent_client.lower() == "deluge":
             if meta['type'] == "DISC":
                 path = os.path.dirname(meta['path'])
@@ -267,7 +267,7 @@ class Clients():
         return
 
 
-    async def qbittorrent(self, path, torrent, local_path, remote_path, client, is_disc, filelist):
+    async def qbittorrent(self, path, torrent, local_path, remote_path, client, is_disc, filelist, meta):
         # infohash = torrent.infohash
         #Remote path mount
         isdir = os.path.isdir(path)
@@ -301,7 +301,8 @@ class Clients():
         qbt_client.torrents_resume(torrent.infohash)
         if client.get('qbit_tag', None) != None:
             qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
-        
+        if meta.get('qbit_tag') != None:
+            qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
         console.print(f"Added to: {path}")
         
 
