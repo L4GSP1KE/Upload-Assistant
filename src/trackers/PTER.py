@@ -6,8 +6,10 @@ import os
 from pathlib import Path
 import traceback
 import json
+import glob
 import distutils.util
 import cli_ui
+import pickle
 from unidecode import unidecode
 from urllib.parse import urlparse, quote
 from src.trackers.COMMON import COMMON
@@ -22,6 +24,9 @@ class PTER():
         self.tracker = 'PTER'
         self.source_flag = 'PTER'
         self.passkey =  str(config['TRACKERS']['PTER'].get('passkey', '')).strip()
+        self.username = config['TRACKERS']['PTER'].get('username', '').strip()
+        self.password = config['TRACKERS']['PTER'].get('password', '').strip()
+        self.rehost_images = config['TRACKERS']['PTER'].get('img_rehost', False)
         self.ptgen_api = config['TRACKERS']['PTER'].get('ptgen_api').strip()
 
         self.ptgen_retry=3
@@ -64,7 +69,7 @@ class PTER():
             with requests.Session() as session:
                 session.cookies.update(await common.parseCookieFile(cookiefile))
                 if int(meta['imdb_id'].replace('tt', '')) != 0:
-                    imdb = 'tt'+meta['imdb_id']
+                    imdb = f"tt{meta['imdb_id']}"
                 else:
                     imdb = ""
                 source = await self.get_type_medium_id(meta)
@@ -223,18 +228,103 @@ class PTER():
             desc = desc.replace('[img]', '[img]')
             desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
             descfile.write(desc)
-            images = meta['image_list']
-            if len(images) > 0: 
-                descfile.write("[center]")
-                for each in range(len(images[:int(meta['screens'])])):
-                    web_url = images[each]['web_url']
-                    img_url = images[each]['img_url']
-                    descfile.write(f"[url={web_url}][img]{img_url}[/img][/url]")
-                descfile.write("[/center]")
+            
+            if self.rehost_images == True:
+                console.print("[green]Rehosting Images...")
+                images = await self.pterimg_upload(meta)
+                if len(images) > 0: 
+                    descfile.write("[center]")
+                    for each in range(len(images[:int(meta['screens'])])):
+                        web_url = images[each]['web_url']
+                        img_url = images[each]['img_url']
+                        descfile.write(f"[url={web_url}][img]{img_url}[/img][/url]")
+                    descfile.write("[/center]")  
+            else:
+                images = meta['image_list']
+                if len(images) > 0: 
+                    descfile.write("[center]")
+                    for each in range(len(images[:int(meta['screens'])])):
+                        web_url = images[each]['web_url']
+                        img_url = images[each]['img_url']
+                        descfile.write(f"[url={web_url}][img]{img_url}[/img][/url]")
+                    descfile.write("[/center]")
+            
             if self.signature != None:
                 descfile.write("\n\n")
                 descfile.write(self.signature)
             descfile.close()
+
+    async def get_auth_token(self,meta):
+        if not os.path.exists(f"{meta['base_dir']}/data/cookies"):
+            Path(f"{meta['base_dir']}/data/cookies").mkdir(parents=True, exist_ok=True)
+        cookiefile = f"{meta['base_dir']}/data/cookies/Pterimg.pickle"
+        with requests.Session() as session:
+            loggedIn = False
+            if os.path.exists(cookiefile):
+                with open(cookiefile, 'rb') as cf:
+                    session.cookies.update(pickle.load(cf))
+                r = session.get("https://s3.pterclub.com")
+                loggedIn = await self.validate_login(r)
+            else:
+                console.print("[yellow]Pterimg Cookies not found. Creating new session.")
+            if loggedIn == True:
+                auth_token = re.search(r'auth_token.*?\"(\w+)\"', r.text).groups()[0]
+            else:
+                data = {
+                    'login-subject': self.username, 
+                    'password': self.password, 
+                    'keep-login': 1
+                }
+                r = session.get("https://s3.pterclub.com")
+                data['auth_token'] = re.search(r'auth_token.*?\"(\w+)\"', r.text).groups()[0]
+                loginresponse = session.post(url='https://s3.pterclub.com/login',data=data)
+                if not loginresponse.ok:
+                    raise LoginException("Failed to login to Pterimg. ")
+                auth_token = re.search(r'auth_token = *?\"(\w+)\"', loginresponse.text).groups()[0]
+                with open(cookiefile, 'wb') as cf:
+                    pickle.dump(session.cookies, cf)
+        
+        return auth_token
+
+    async def validate_login(self, response):
+        if response.text.find("""<a href="https://s3.pterclub.com/logout/?""") != -1:
+            loggedIn = True
+        else:
+            loggedIn = False
+        return loggedIn
+
+    async def pterimg_upload(self, meta):
+        images = glob.glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['filename']}-*.png")
+        url='https://s3.pterclub.com'
+        image_list=[]
+        data = {
+            'type': 'file',
+            'action': 'upload', 
+            'nsfw': 0, 
+            'auth_token': await self.get_auth_token(meta)
+            }
+        cookiefile = f"{meta['base_dir']}/data/cookies/Pterimg.pickle"
+        with requests.Session() as session:
+            if os.path.exists(cookiefile):
+                with open(cookiefile, 'rb') as cf:
+                    session.cookies.update(pickle.load(cf))
+                    files = {}
+                    for i in range(len(images)):
+                        files = {'source': open(images[i], 'rb')}
+                        req = session.post(f'{url}/json', data=data, files=files)
+                        try:
+                            res = req.json()
+                        except json.decoder.JSONDecodeError:
+                            res = {}
+                        if not req.ok:
+                            if res['error']['message'] in ('重复上传','Duplicated upload'): 
+                                continue
+                            raise(f'HTTP {req.status_code}, reason: {res["error"]["message"]}')
+                        image_dict = {}
+                        image_dict['web_url'] = res['image']['url']
+                        image_dict['img_url'] = res['image']['url']
+                        image_list.append(image_dict)           
+        return image_list
 
     async def get_anon(self, anon):
         if anon == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
@@ -302,14 +392,13 @@ class PTER():
 
             #use chinese small_descr
             if meta['ptgen']["trans_title"] != ['']:
+                small_descr=''
                 for title_ in meta['ptgen']["trans_title"]:
-                  small_descr=''
                   small_descr+=f'{title_} / ' 
                 small_descr+="| 类别:"+meta['ptgen']["genre"][0] 
                 small_descr=small_descr.replace('/ |','|')
             else:
                 small_descr=meta['title']
-            
             data= {
                 "name": pter_name,
                 "small_descr": small_descr,
