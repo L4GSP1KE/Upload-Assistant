@@ -1946,8 +1946,20 @@ class Prep():
             piece_size = 23
         else:
             piece_size = 24
-        torrent_creation = self.config['DEFAULT'].get('torrent_creation', 'torf')
-        if torrent_creation == 'mktorrent':
+        if meta.get('torrent_creation') != None:
+            torrent_creation = meta['torrent_creation']
+        else:
+            torrent_creation = self.config['DEFAULT'].get('torrent_creation', 'torf')
+        if torrent_creation == 'torrenttools':
+            args = ['torrenttools', 'create', '-a', 'https://fake.tracker', '--private', 'on', '--piece-size', 2**piece_size, '-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"]
+            if not meta['is_disc']:
+                args.extend(['--include', '^.*\.(mkv|mp4|ts)$'])
+            args.append(path)
+            err = subprocess.call(args)
+            if err != 0:
+                args[2] = "OMITTED"
+                console.print(f"[bold red]Process execution {args} returned with error code {err}.") 
+        elif torrent_creation == 'mktorrent':
             args = ['mktorrent', '-a', 'https://fake.tracker', '-p', f'-l {piece_size}', '-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", path]
             err = subprocess.call(args)
             if err != 0:
