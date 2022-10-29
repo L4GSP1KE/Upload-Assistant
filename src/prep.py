@@ -1431,6 +1431,8 @@ class Prep():
                 format_settings = ""
             #Channels
             channels = mi['media']['track'][track_num].get('Channels_Original', mi['media']['track'][track_num]['Channels'])
+            if not str(channels.isnumeric()):
+                channels = mi['media']['track'][track_num]['Channels']
             try:
                 channel_layout = mi['media']['track'][track_num]['ChannelLayout']
             except:
