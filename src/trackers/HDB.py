@@ -173,7 +173,9 @@ class HDB():
         if 'DV' in meta.get('hdr', ''):
             hdb_name = hdb_name.replace(' DV ', ' DoVi ')
         if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE'):
-            hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace(' ', '', 1))
+            hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace(' ', '', 1).replace('Atmos', ''))
+        else:
+            hdb_name = hdb_name.replace(meta['audio', meta['audio'].replace('Atmos', '')])
         hdb_name = hdb_name.replace(meta.get('aka', ''), '')
         if meta.get('imdb_info'):
             hdb_name = hdb_name.replace(meta['title'], meta['imdb_info']['aka'])
