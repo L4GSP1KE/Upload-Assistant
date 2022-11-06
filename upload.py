@@ -131,7 +131,7 @@ async def do_the_thing(base_dir):
                     overwrite_list = [
                         'trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 
                         'hdb', 'ptp', 'blu', 'no_aka', 'no_year', 'no_dub', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
-                        'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag'
+                        'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag', 'skip_imghost_upload'
                     ]
                     if meta.get(key, None) != value and key in overwrite_list:
                         saved_meta[key] = meta[key]
@@ -151,7 +151,7 @@ async def do_the_thing(base_dir):
         meta = await prep.gather_prep(meta=meta, mode='cli') 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
 
-        if meta.get('image_list', False) == False:
+        if meta.get('image_list', False) == False and meta.get('skip_imghost_upload', False) == False:
             return_dict = {}
             meta['image_list'], dummy_var = prep.upload_screens(meta, meta['screens'], 1, 0, meta['screens'],[], return_dict)
             if meta['debug']:
