@@ -1953,7 +1953,7 @@ class Prep():
         else:
             torrent_creation = self.config['DEFAULT'].get('torrent_creation', 'torf')
         if torrent_creation == 'torrenttools':
-            args = ['torrenttools', 'create', '-a', 'https://fake.tracker', '--private', 'on', '--piece-size', str(2**piece_size), '-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"]
+            args = ['torrenttools', 'create', '-a', 'https://fake.tracker', '--private', 'on', '--piece-size', str(2**piece_size), '--created-by', "L4G's Upload Assistant", '--no-cross-seed','-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"]
             if not meta['is_disc']:
                 args.extend(['--include', '^.*\.(mkv|mp4|ts)$'])
             args.append(path)

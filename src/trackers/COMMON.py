@@ -15,6 +15,9 @@ class COMMON():
     async def edit_torrent(self, meta, tracker, source_flag):
         if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
             new_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+            for each in list(new_torrent.metainfo):
+                if each not in ('announce', 'comment', 'created by', 'encoding', 'info'):
+                    new_torrent.metainfo.pop(each, None)
             new_torrent.metainfo['announce'] = self.config['TRACKERS'][tracker].get('announce_url', "https://fake.tracker").strip()
             new_torrent.metainfo['info']['source'] = source_flag
             Torrent.copy(new_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent", overwrite=True)
