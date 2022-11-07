@@ -172,6 +172,9 @@ class HDB():
             hdb_name = hdb_name.replace(f"{meta.get('service', '')} ", '')
         if 'DV' in meta.get('hdr', ''):
             hdb_name = hdb_name.replace(' DV ', ' DoVi ')
+        if 'HDR' in meta.get('hdr', ''):
+            if 'HDR10+' not in meta['hdr']:
+                hdb_name = hdb_name.replace('HDR', 'HDR10')
         if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE'):
             hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace(' ', '', 1).replace('Atmos', ''))
         else:
