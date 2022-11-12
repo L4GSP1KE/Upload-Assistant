@@ -1352,9 +1352,13 @@ class Prep():
 
         # Make the HTTP Api request
         url = 'https://graphql.anilist.co'
-        response = requests.post(url, json={'query': query, 'variables': variables})
-        json = response.json()
-        media = json['data']['Page']['media']
+        try:
+            response = requests.post(url, json={'query': query, 'variables': variables})
+            json = response.json()
+            media = json['data']['Page']['media']
+        except:
+            console.print('[red]Failed to get anime specific info from anilist. Continuing without it...')
+            media = []
         if media not in (None, []):
             result = {'title' : {}}
             difference = 0
