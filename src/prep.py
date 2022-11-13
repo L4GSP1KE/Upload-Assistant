@@ -1298,6 +1298,7 @@ class Prep():
 
     def get_romaji(self, tmdb_name, mal):
         if mal == None:
+            mal = 0
             tmdb_name = tmdb_name.replace('-', "").replace("The Movie", "")
             tmdb_name = ' '.join(tmdb_name.split())
             query = '''
@@ -1381,7 +1382,7 @@ class Prep():
             romaji = eng_title = season_year  = ""
             episodes = mal_id = 0
         if mal_id == None:
-            mal_id = 0
+            mal_id = mal
         return romaji, mal_id, eng_title, season_year, episodes
 
 
