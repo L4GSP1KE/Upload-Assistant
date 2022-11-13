@@ -1381,7 +1381,7 @@ class Prep():
         else:
             romaji = eng_title = season_year  = ""
             episodes = mal_id = 0
-        if mal_id == None:
+        if mal_id in [None, 0]:
             mal_id = mal
         return romaji, mal_id, eng_title, season_year, episodes
 
