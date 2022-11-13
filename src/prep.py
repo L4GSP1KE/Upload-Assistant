@@ -1294,6 +1294,8 @@ class Prep():
             mal_id = 0
         if meta.get('mal_id', 0) != 0:
             mal_id = meta.get('mal_id')
+        if meta.get('mal') not in ('0', 0, None):
+            mal_id = meta.get('mal', 0)
         return mal_id, alt_name, anime
 
     def get_romaji(self, tmdb_name, mal):
