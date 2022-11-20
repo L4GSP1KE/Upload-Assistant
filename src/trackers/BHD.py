@@ -300,6 +300,15 @@ class BHD():
             tags.append('Hybrid')
         if meta.get('has_commentary', False) == True:
             tags.append('Commentary')
+        if "DV" in meta.get('hdr', ''):
+            tags.append('DV')
+        if "HDR" in meta.get('hdr', ''):
+            if "HDR10+" in meta['hdr']:
+                tags.append('HDR10+')
+            else:
+                tags.append('HDR10')
+        if "HLG" in meta.get('hdr', ''):
+            tags.append('HLG')
         return tags
 
     async def edit_name(self, meta):
