@@ -74,6 +74,12 @@ class Args():
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
         # console.print(args)
+        if len(before_args) >= 1:
+            if any('.mkv' in x for x in before_args):
+                for each in before_args:
+                    args['path'].append(each)
+                    if '.mkv' in each:
+                        break
         
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
