@@ -171,6 +171,9 @@ config = {
             # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "E:\\downloads\\tv",
             # "remote_path" : "/remote/downloads/tv"
+
+            # Set to False to skip verify certificate for HTTPS connections; for instance, if the connection is using a self-signed certificate.
+            # "VERIFY_WEBUI_CERTIFICATE" : True
         },
 
         "rtorrent_sample" : {
