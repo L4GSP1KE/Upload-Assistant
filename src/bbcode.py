@@ -114,7 +114,7 @@ class BBCODE:
         # Replace comparison/hide tags with placeholder because sometimes uploaders use comp images as loose images
         for i in range(len(comps)):
             nocomp = nocomp.replace(comps[i], '')
-            desc = desc.replace(comps[i], f"COMPARISON_PLACEHOLDER-{i}")
+            desc = desc.replace(comps[i], f"COMPARISON_PLACEHOLDER-{i} ")
             comp_placeholders.append(comps[i])
 
 
@@ -130,7 +130,7 @@ class BBCODE:
         if comp_placeholders != []:
             for i, comp in enumerate(comp_placeholders):
                 comp = re.sub("\[\/?img[\s\S]*?\]", "",comp, flags=re.IGNORECASE)
-                desc = desc.replace(f"COMPARISON_PLACEHOLDER-{i}", comp)
+                desc = desc.replace(f"COMPARISON_PLACEHOLDER-{i} ", comp)
 
         # Convert hides with multiple images to comparison
         desc = self.convert_collapse_to_comparison(desc, "hide", hides)
@@ -173,7 +173,7 @@ class BBCODE:
         spoiler_placeholders = []
         for i in range(len(spoilers)):
             nospoil = nospoil.replace(spoilers[i], '')
-            desc = desc.replace(spoilers[i], f"SPOILER_PLACEHOLDER-{i}")
+            desc = desc.replace(spoilers[i], f"SPOILER_PLACEHOLDER-{i} ")
             spoiler_placeholders.append(spoilers[i])
         
         # Get Images from outside spoilers
@@ -198,7 +198,7 @@ class BBCODE:
         # Replace spoiler tags
         if spoiler_placeholders != []:
             for i, spoiler in enumerate(spoiler_placeholders):
-                desc = desc.replace(f"SPOILER_PLACEHOLDER-{i}", spoiler)
+                desc = desc.replace(f"SPOILER_PLACEHOLDER-{i} ", spoiler)
 
         # Check for empty [center] tags
         centers = re.findall("\[center[\s\S]*?\[\/center\]", desc)
@@ -223,7 +223,6 @@ class BBCODE:
 
         if desc.replace('\n', '') == '':
             return "", imagelist
-        
         return desc, imagelist
 
 

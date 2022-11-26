@@ -2598,7 +2598,7 @@ class Prep():
         descfile = meta.get('descfile', None)
         ptp_desc = blu_desc = ""
         desc_source = []
-        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="") as description:
+        with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'w', newline="", encoding='utf8') as description:
             description.seek(0)
             if (desclink, descfile, meta['desc']) == (None, None, None):
                 if meta.get('ptp_manual') != None:
