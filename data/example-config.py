@@ -94,7 +94,7 @@ config = {
             "announce_url" : "https://nebulance.io/customannounceurl",
         },
         "ANT" :{
-            "api_key" : "ANT",
+            "api_key" : "ANT api key",
             "announce_url" : "https://anthelion.me/announce/customannounceurl",
         },
         "THR" : {
