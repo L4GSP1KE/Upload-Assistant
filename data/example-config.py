@@ -93,6 +93,10 @@ config = {
             "api_key" : "NBL api key",
             "announce_url" : "https://nebulance.io/customannounceurl",
         },
+        "ANT" :{
+            "api_key" : "ANT",
+            "announce_url" : "https://anthelion.me/announce/customannounceurl",
+        },
         "THR" : {
             "username" : "username",
             "password" : "password",
