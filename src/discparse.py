@@ -166,13 +166,17 @@ class DiscParse():
                     fuckatmos = split2[2].strip()
                 else:
                     fuckatmos = ""
+                try:
+                    bit_depth = split2[n+5].strip()
+                except:
+                    bit_depth = ""
                 bdinfo['audio'].append({
                     'language' : split2[0].strip(), 
                     'codec' : split2[1].strip(), 
                     'channels' : split2[n+2].strip(), 
                     'sample_rate' : split2[n+3].strip(), 
                     'bitrate' : split2[n+4].strip(), 
-                    'bit_depth' : split2[n+5].strip(),
+                    'bit_depth' : bit_depth, # Also DialNorm, but is not in use anywhere yet
                     'atmos_why_you_be_like_this': fuckatmos,
                     })
             elif line.startswith("disc title:"):
