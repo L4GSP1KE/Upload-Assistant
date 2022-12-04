@@ -2,6 +2,7 @@
 # import discord
 import asyncio
 import requests
+import distutils.util
 
 
 from src.trackers.COMMON import COMMON
@@ -31,6 +32,26 @@ class ANT():
         pass
     
 
+    async def get_flags(self, meta):
+        flags = []
+        for each in ['Directors', 'Extended', 'Uncut', 'Unrated', '4KRemaster']:
+            if each in meta['edition'].replace("'", ""):
+                flags.append(each)
+        for each in ['Dual-Audio', 'Atmos']:
+            if each in meta['audio']:
+                flags.append(each.replace('-', ''))
+        if meta.get('has_commentary', False):
+            flags.append('Commentary')
+        if meta['3D'] == "3D":
+            flags.append('3D')
+        if "HDR" in meta['hdr']:
+            flags.append('HDR10')
+        if "DV" in meta['hdr']:
+            flags.append('DV')
+        if "Criterion" in meta.get('distributor', ''):
+            flags.append('Criterion')
+        return flags
+
     ###############################################################
     ######   STOP HERE UNLESS EXTRA MODIFICATION IS NEEDED   ######
     ###############################################################
@@ -38,6 +59,12 @@ class ANT():
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
+        flags = await self.get_flags(meta)
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
+            anon = 0
+        else:
+            anon = 1
+
         if meta['bdinfo'] != None:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
         else:
@@ -48,7 +75,9 @@ class ANT():
             'api_key' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'action' : 'upload',
             'tmdbid' : meta['tmdb'],
-            'mediainfo' : mi_dump
+            'mediainfo' : mi_dump,
+            'flags[]' : flags,
+            'anonymous' : anon
         }
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'

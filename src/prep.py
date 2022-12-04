@@ -2755,7 +2755,8 @@ class Prep():
                 url = urllib.parse.quote(url, safe="https://")
             else:
                 files = {
-                    "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))}
+                    "files[]" : (f"{meta['title']}.tar", open(f"{archive}.tar", 'rb'))
+                }
                 response = requests.post("https://uguu.se/upload.php", files=files).json()
                 if meta['debug']:
                     console.print(f"[cyan]{response}")

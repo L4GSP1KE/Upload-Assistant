@@ -24,7 +24,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD, LST, PTER",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD, LST, PTER, NBL, ANT",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -96,6 +96,7 @@ config = {
         "ANT" :{
             "api_key" : "ANT api key",
             "announce_url" : "https://anthelion.me/announce/customannounceurl",
+            # "anon" : False
         },
         "THR" : {
             "username" : "username",
