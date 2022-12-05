@@ -164,8 +164,8 @@ config = {
             "qbit_port" : "8080",
             "qbit_user" : "username",
             "qbit_pass" : "password",
-            # "qbit_tag" : "tag",
             # "torrent_storage_dir" : "path/to/BT_backup folder"
+            # "qbit_tag" : "tag",
             
             # Enable automatic torrent management if path(s) are set
                 # If using remote path mapping, use remote path
@@ -184,7 +184,8 @@ config = {
         "rtorrent_sample" : {
             "torrent_client" : "rtorrent",
             "rtorrent_url" : "https://user:password@server.host.tld:443/username/rutorrent/plugins/httprpc/action.php",
-            # "torrent_storage_dir" : "path/to/session folder"
+            # "torrent_storage_dir" : "path/to/session folder",
+            # "rtorrent_label" : "Add this label to all uploads"
 
             # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "/LocalPath",
@@ -197,6 +198,7 @@ config = {
             "deluge_port" : "8080",
             "deluge_user" : "username",
             "deluge_pass" : "password",
+            # "torrent_storage_dir" : "path/to/session folder",
             
             # Remote path mapping (docker/etc.) CASE SENSITIVE
             # "local_path" : "/LocalPath",

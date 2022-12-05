@@ -11,6 +11,7 @@ import errno
 import asyncio
 import ssl
 import shutil
+import time
 
 
 from src.console import console 
@@ -258,7 +259,13 @@ class Clients():
         
         console.print("[bold yellow]Adding and starting torrent")
         rtorrent.load.start_verbose('', fr_file, f"d.directory_base.set={path}")
-        
+        time.sleep(1)
+        # Add labels
+        if client.get('rtorrent_label', None) != None:
+            rtorrent.d.custom1.set(torrent.infohash, client['rtorrent_label'])
+        if meta.get('rtorrent_label') != None:
+            rtorrent.d.custom1.set(torrent.infohash, meta['rtorrent_label'])
+
         # Delete modified fr_file location
         if modified_fr:
             os.remove(f"{path_dir}/fr.torrent")
