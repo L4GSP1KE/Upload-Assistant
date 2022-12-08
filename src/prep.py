@@ -2060,7 +2060,7 @@ class Prep():
                     "[cyan]{task.completed}/{task.total}",
                     TimeRemainingColumn()
                 ) as progress:
-                    upload_task = progress.add_task("[green]Uploading Screens...", total = len(image_glob[-screens:]))
+                    upload_task = progress.add_task(f"[green]Uploading Screens to {img_host}...", total = len(image_glob[-screens:]))
                     for image in image_glob[-screens:]:        
                         if img_host == "imgbb":
                             url = "https://api.imgbb.com/1/upload"
