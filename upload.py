@@ -90,7 +90,7 @@ async def do_the_thing(base_dir):
     meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
     if meta['cleanup']:
         shutil.rmtree(f"{base_dir}/tmp")
-        console.print("[bold green] Sucessfully emptied tmp directory")
+        console.print("[bold green]Sucessfully emptied tmp directory")
     path = meta['path']
     path = os.path.abspath(path)
     if path.endswith('"'):

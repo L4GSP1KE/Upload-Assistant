@@ -2535,7 +2535,7 @@ class Prep():
         if "DTS-HD MA" in audio:
             video_name = video_name.replace("DTS-HD.MA.", "").replace("DTS-HD MA ", "")
         for key, value in services.items():
-            if (' ' + key + ' ') in (video_name):
+            if (' ' + key + ' ') in video_name and key not in guessit(video).get('title', ''):
                 service = value
             elif key == service:
                 service = value
