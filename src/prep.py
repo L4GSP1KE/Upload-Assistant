@@ -1105,7 +1105,7 @@ class Prep():
                 else:
                     console.print(f"[red]Unable to find TMDb match for {filename}")
                     if meta.get('mode', 'discord') == 'cli':
-                        tmdb_id = cli_ui.ask_string("Please enter tmdb id:")
+                        tmdb_id = cli_ui.ask_string("Please enter tmdb id in this format: tv/12345 or movie/12345")
                         parser = Args(config=self.config)
                         meta['category'], meta['tmdb'] = parser.parse_tmdb_id(id=tmdb_id, category=meta.get('category'))
                         meta['tmdb_manual'] = meta['tmdb']
