@@ -1146,7 +1146,7 @@ class Prep():
                 else:
                     meta['imdb_id'] = str(int(imdb_id.replace('tt', ''))).zfill(7)
             else:
-                meta['imdb_id'] = str(int(meta['imdb'].replace('tt', ''))).zfill(7)
+                meta['imdb_id'] = str(meta['imdb']).replace('tt', '').zfill(7)
             if meta.get('tvdb_id', '0') in ['', ' ', None, 'None', '0']:
                 meta['tvdb_id'] = external.get('tvdb_id', '0')
                 if meta['tvdb_id'] in ["", None, " ", "None"]:
