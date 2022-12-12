@@ -53,7 +53,7 @@ class MTV():
         elif new_torrent.piece_size == 16777216:  # 16 GiB
             print("Piece size is 16M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
         else:
-            print("Piece size is OVER 16M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
+            print("Piece size is OVER 8M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
 
 
         # getting category HD Episode, HD Movies, SD Season, HD Season, SD Episode, SD Movies
