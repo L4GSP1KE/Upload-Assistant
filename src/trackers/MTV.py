@@ -169,8 +169,8 @@ class MTV():
                 desc.write(f"[spoiler=Screenshots]")
                 for each in range(len(images)):
                     raw_url = images[each]['raw_url']
-                    th_url = images[each]['th_url']
-                    desc.write(f"[url={raw_url}][img=250]{th_url}[/img][/url]")
+                    img_url = images[each]['img_url']
+                    desc.write(f"[url={raw_url}][img=250]{img_url}[/img][/url]")
                 desc.write(f"[/spoiler]")
             desc.write(f"\n\n{base}")
             desc.close()
