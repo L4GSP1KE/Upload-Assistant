@@ -107,18 +107,6 @@ class MTV():
             'anonymous': '0'
         }
 
-        if meta['tag'] != '':
-            if meta['tag'].lower() if meta['tag'].lower()[0] != "-" else meta['tag'].lower()[1:] in self.config['TRACKERS'][self.tracker]['partial_banned_group'].lower() and (meta['type'] == "WEBDL" or meta['type'] == "DISC"):
-                console.print(f"[red]BANNED release Group {meta['tag']} but allowed as its a {meta['type']}")
-            elif meta['tag'].lower() if meta['tag'] != "" \
-                                        and meta['tag'].lower()[0] != "-" \
-                    else meta['tag'].lower()[1:] in self.config['TRACKERS'][self.tracker]['banned_groups'].lower() and meta['tag'] != "":
-                console.print(f"[red]Not Uploading. BANNED release Group {meta['tag']}", 'grey', 'on_red')
-                return
-        if meta['video_codec'] == "HEVC" and meta['hdr'] == "":
-            console.print(f"[red]Not Uploading. MTV does not allow X265 unless its has HDR/DV ")
-            return
-
         cookie = {'sid': self.config['TRACKERS'][self.tracker].get('sid'), 'cid': self.config['TRACKERS'][self.tracker].get('cid')}
 
         param = {
