@@ -1,4 +1,5 @@
 import requests
+from src.trackers.MTV import MTV
 from src.trackers.RF import RF
 from src.args import Args
 from src.clients import Clients
@@ -215,7 +216,7 @@ async def do_the_thing(base_dir):
         http_trackers = ['HDB', 'TTG', 'FL', 'PTER']
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
-            'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'TDB' : TDB, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER,
+            'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'TDB' : TDB, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'MTV': MTV,
             }
 
         for tracker in trackers:
@@ -363,7 +364,19 @@ async def do_the_thing(base_dir):
                             await client.add_to_client(meta, "PTP")
                     except:
                         console.print(traceback.print_exc())
-            
+            if tracker == "MTV":
+                if meta['unattended']:
+                    upload_to_mtv = True
+                else:
+                    upload_to_mtv = cli_ui.ask_yes_no(f"Upload to MTV? {debug}", default=meta['unattended'])
+                if upload_to_mtv:
+                    print("Uploading to MTV")
+                    mtv = MTV(config=config)
+                    dupes = await mtv.search_existing(meta)
+                    meta = dupe_check(dupes, meta)
+                    if meta['upload'] == True:
+                        await mtv.upload(meta)
+                        await client.add_to_client(meta, "MTV")
             
 
 
