@@ -291,7 +291,7 @@ class MTV():
 
 
     async def get_origin_id(self, meta):
-        if str(meta['tag']).lower().__contains__("swan"):
+        if meta['personalrelease']:
             return '4'
         elif meta['scene']:
             return '2'
@@ -318,9 +318,6 @@ class MTV():
         # movie tags
         tags += " " + "sd.movie" if meta['category'] == "MOVIE" and meta['sd'] == 1 else ""
         tags += " " + "hd.movie" if meta['category'] == "MOVIE" and meta['sd'] == 0 else ""
-
-        # sub tags
-        tags += " " + "subtitles" if str(meta['has_subs']) == 1 else ""
 
         # audio tags
         tags += " " + "ddp.audio" if str(meta['audio']).lower().__contains__('dd+')  else ""
