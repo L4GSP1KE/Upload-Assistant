@@ -113,13 +113,13 @@ class MTV():
         }
 
         if meta['imdb_id'] != "0":
-            param['imdbid'] = "tt" + meta['imdb_id']
+            param['imdbID'] = "tt" + meta['imdb_id']
         if meta['tmdb'] != 0:
-            param['tmdbid'] = meta['tmdb']
+            param['tmdbID'] = meta['tmdb']
         if meta['tvdb_id'] != 0:
-            param['thetvdbid'] = meta['tvdb_id']
+            param['thetvdbID'] = meta['tvdb_id']
         if meta['tvmaze_id'] != 0:
-            param['tvmazeid'] = meta['tvmaze_id']
+            param['tvmazeID'] = meta['tvmaze_id']
         # if meta['mal_id'] != 0:
         #     param['malid'] = meta['mal_id']
 
