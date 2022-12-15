@@ -110,7 +110,7 @@ config = {
         },
         "LCD" : {
             "api_key" : "LCD api key",
-            "announce_url" : "https://locadora.xyz/announce/customannounceurl",
+            "announce_url" : "https://locadora.cc/announce/customannounceurl",
             # "anon" : "False"
         },
         "LST" : {
