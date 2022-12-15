@@ -29,7 +29,7 @@ config = {
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
             "api_key" : "BLU api key",
-            "announce_url" : "https://blutopia.xyz/announce/customannounceurl",
+            "announce_url" : "https://blutopia.cc/announce/customannounceurl",
             # "anon" : "False"
         },
         "BHD" : {

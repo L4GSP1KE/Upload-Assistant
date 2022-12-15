@@ -20,10 +20,10 @@ class BLU():
         self.config = config
         self.tracker = 'BLU'
         self.source_flag = 'BLU'
-        self.search_url = 'https://blutopia.xyz/api/torrents/filter'
-        self.torrent_url = 'https://blutopia.xyz/api/torrents/'
-        self.upload_url = 'https://blutopia.xyz/api/torrents/upload' 
-        self.signature = f"\n[center][url=https://blutopia.xyz/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]"
+        self.search_url = 'https://blutopia.cc/api/torrents/filter'
+        self.torrent_url = 'https://blutopia.cc/api/torrents/'
+        self.upload_url = 'https://blutopia.cc/api/torrents/upload' 
+        self.signature = f"\n[center][url=https://blutopia.cc/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]"
         
         pass
     
