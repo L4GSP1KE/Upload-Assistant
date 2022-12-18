@@ -347,7 +347,7 @@ class Prep():
         if meta['tag'][1:].startswith(meta['channels']):
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
         meta['3D'] = self.is_3d(mi, bdinfo)
-        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
+        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):
             meta['service'], meta['service_longname'] = self.get_service(video, meta.get('tag', ''), meta['audio'], meta['filename'])
         meta['uhd'] = self.get_uhd(meta['type'], guessit(meta['path']), meta['resolution'], meta['path'])
@@ -1604,7 +1604,7 @@ class Prep():
         return tag
 
 
-    def get_source(self, type, video, path, mi, is_disc, meta):
+    def get_source(self, type, video, path, is_disc, meta):
         try:
             try:
                 source = guessit(video)['source']
@@ -1613,6 +1613,8 @@ class Prep():
                     source = guessit(path['source'])
                 except:
                     source = "BluRay"
+            if meta.get('manual_source', None):
+                source = meta['manual_source']
             if source in ("Blu-ray", "Ultra HD Blu-ray", "BluRay", "BR") or is_disc == "BDMV":
                 if type == "DISC":
                     source = "Blu-ray"
@@ -1644,7 +1646,7 @@ class Prep():
                     if type == "REMUX":
                         system = f"{system} DVD".strip()
                     source = system
-            if source in ("Web"):
+            if source in ("Web", "WEB"):
                 if type == "ENCODE":
                     type = "WEBRIP"
             if source in ("HD-DVD", "HD DVD", "HDDVD"):
@@ -2197,8 +2199,11 @@ class Prep():
         if meta.get('no_aka', False) == True:
             alt_title = ''
         if meta['debug']:
-            console.print("[cyan]get_name meta:")
-            console.print(meta)
+            console.log("[cyan]get_name cat/type")
+            console.log(f"CATEGORY: {meta['category']}")
+            console.log(f"TYPE: {meta['type']}")
+            console.log("[cyan]get_name meta:")
+            console.log(meta)
 
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
@@ -2261,8 +2266,15 @@ class Prep():
                 potential_missing = []
 
 
-    
-        name = ' '.join(name.split())
+        try:    
+            name = ' '.join(name.split())
+        except:
+            console.print("[bold red]Unable to generate name. Please re-run and correct any of the following args if needed.")
+            console.print(f"--category [yellow]{meta['category']}")
+            console.print(f"--type [yellow]{meta['type']}")
+            console.print(f"--source [yellow]{meta['source']}")
+
+            exit()
         name_notag = name
         name = name_notag + tag
         clean_name = self.clean_filename(name)
