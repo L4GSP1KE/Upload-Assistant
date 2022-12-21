@@ -104,8 +104,10 @@ class HUNO():
         alt_title = meta.get('aka', "")
         year = meta.get('year', "")
         resolution = meta.get('resolution', "")
-        audio = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "")
-        audio_lang = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English") if 'mediainfo' in meta else ""
+        audio = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "").replace("Dual-Audio", "DUAL")
+        audio_lang = ""
+        if 'DUAL' not in audio and 'mediainfo' in meta:
+            audio_lang = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English")
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
@@ -176,7 +178,7 @@ class HUNO():
             elif type == "HDTV": #HDTV
                 name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} HDTV {video_encode} {audio} {audio_lang} {tag}) {repack}"
 
-        return ' '.join(name.split()).replace("Dual-Audio", "DUAL").replace(": ", " - ")
+        return ' '.join(name.split()).replace(": ", " - ")
 
 
     async def get_cat_id(self, category_name):
