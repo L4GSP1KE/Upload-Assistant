@@ -282,7 +282,7 @@ class PTP():
         if imdb_info['type'] is not None:
             imdbType = imdb_info.get('type', 'movie').lower()
             if imdbType in ("movie", "tv movie"):
-                if int(imdb_info.get('runtime', '60')) >= 45:
+                if int(imdb_info.get('runtime', '60')) >= 45 or int(imdb_info.get('runtime', '60')) == 0:
                     ptpType = "Feature Film"
                 else:
                     ptpType = "Short Film"
@@ -298,7 +298,7 @@ class PTP():
             keywords = meta.get("keywords", "").lower()
             tmdb_type = meta.get("tmdb_type", "movie").lower()
             if tmdb_type == "movie":
-                if int(meta.get('runtime', 60)) >= 45:
+                if int(meta.get('runtime', 60)) >= 45 or int(meta.get('runtime', 60)) == 0:
                     ptpType = "Feature Film"
                 else:
                     ptpType = "Short Film"
