@@ -103,7 +103,7 @@ class NBL():
             'id' : 1,
             'method' : 'getTorrents',
             'params' : [
-                'apikey', 
+                self.api_key, 
                 search_term
             ]
         }
