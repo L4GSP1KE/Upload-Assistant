@@ -113,13 +113,14 @@ class NBL():
             for each in response['result']['items']:
                 if guessit(each['rls_name'])['screen_size'] == meta['resolution']:
                     if meta.get('tv_pack', 0) == 1:
-                        if each['cat'] == "Season" and int(guessit(each['rls_name']).get('season', '1')) == meta.get('season_int'):
+                        if each['cat'] == "Season" and int(guessit(each['rls_name']).get('season', '1')) == int(meta.get('season_int')):
                             dupes.append(each['rls_name'])
-                    elif int(guessit(each['rls_name']).get('episode', '0')) == meta.get('episode_int'):
+                    elif int(guessit(each['rls_name']).get('episode', '0')) == int(meta.get('episode_int')):
                         dupes.append(each['rls_name'])
-        except Exception:
-            # console.print_exception()
+        except requests.exceptions.JSONDecodeError:
             console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
+        except Exception:
+            console.print_exception()
 
         return dupes
