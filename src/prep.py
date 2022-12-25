@@ -246,7 +246,7 @@ class Prep():
                 if blu_tmdb not in [None, '0']:
                     meta['tmdb_manual'] = blu_tmdb
                 if blu_imdb not in [None, '0']:
-                    meta['imdb'] = blu_imdb
+                    meta['imdb'] = str(blu_imdb)
                 if blu_tvdb not in [None, '0']:
                     meta['tvdb_id'] = blu_tvdb
                 if blu_mal not in [None, '0']:
