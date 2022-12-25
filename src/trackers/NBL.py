@@ -94,10 +94,12 @@ class NBL():
     async def search_existing(self, meta):
         dupes = []
         console.print("[yellow]Searching for existing torrents on site...")
-        if int(meta.get('tvmaze_id', 0)) == 0:
-            search_term = {'series' : meta['title']}
+        if int(meta.get('tvmaze_id', 0)) != 0:
+            search_term = {'tvmaze' : int(meta['tvmaze_id'])}
+        elif int(meta.get('imdb_id', '0').replace('tt', '')) == 0:
+            search_term = {'imdb' : meta.get('imdb_id', '0').replace('tt', '')}
         else:
-            search_term = {'tvmaze' : meta['tvmaze_id']}
+            search_term = {'series' : meta['title']}
         json = {
             'jsonrpc' : '2.0',
             'id' : 1,
@@ -111,7 +113,7 @@ class NBL():
             response = requests.get(url=self.search_url, json=json)
             response = response.json()
             for each in response['result']['items']:
-                if guessit(each['rls_name'])['screen_size'] == meta['resolution']:
+                if meta['resolution'] in each['tags']:
                     if meta.get('tv_pack', 0) == 1:
                         if each['cat'] == "Season" and int(guessit(each['rls_name']).get('season', '1')) == int(meta.get('season_int')):
                             dupes.append(each['rls_name'])
@@ -120,6 +122,16 @@ class NBL():
         except requests.exceptions.JSONDecodeError:
             console.print('[bold red]Unable to search for existing torrents on site. Either the site is down or your API key is incorrect')
             await asyncio.sleep(5)
+        except KeyError as e:
+            console.print(response)
+            console.print("\n\n\n")
+            if e.args[0] == 'result':
+                console.print(f"Search Term: {search_term}")
+                console.print('[red]NBL API Returned an unexpected response, please manually check for dupes')
+                dupes.append("ERROR: PLEASE CHECK FOR EXISTING RELEASES MANUALLY")
+                await asyncio.sleep(5)
+            else:
+                console.print_exception()
         except Exception:
             console.print_exception()
 
