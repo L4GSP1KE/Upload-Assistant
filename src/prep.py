@@ -2484,10 +2484,8 @@ class Prep():
             meta['season_int'] = season_int
             meta['episode_int'] = episode_int
 
-            if meta['anime']:
-                meta['episode_title_storage'] = parsed = anitopy.parse(Path(video).name).get('episode_title', '')
-            else:
-                meta['episode_title_storage'] = guessit(video).get('episode_title', '')
+            
+            meta['episode_title_storage'] = guessit(video).get('episode_title', '')
             if meta['season'] == "S00" or meta['episode'] == "E00":
                 meta['episode_title'] = meta['episode_title_storage']
         return meta
