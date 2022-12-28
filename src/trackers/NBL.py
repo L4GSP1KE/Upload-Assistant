@@ -67,6 +67,7 @@ class NBL():
             'tvmazeid' : int(meta.get('tvmaze_id', 0)),
             'mediainfo' : mi_dump,
             'category' : await self.get_cat_id(meta),
+            'ignoredupes' : 'on'
         }
         
         if meta['debug'] == False:
