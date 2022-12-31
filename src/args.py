@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import urllib.parse
+import os
 import time
 import traceback
 
@@ -78,11 +79,10 @@ class Args():
         args = vars(args)
         # console.print(args)
         if len(before_args) >= 1:
-            if any('.mkv' in x for x in before_args):
-                for each in before_args:
-                    args['path'].append(each)
-                    if '.mkv' in each:
-                        break
+            for each in before_args:
+                args['path'].append(each)
+                if os.path.exists(''.join(args['path'])):
+                    break
         
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
