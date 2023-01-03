@@ -2088,6 +2088,26 @@ class Prep():
                             time.sleep(15)
                             progress.stop()
                             newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
+                        elif img_host == "pixhost":
+                            url = "https://api.pixhost.to/images"
+                            data = {
+                                'content_type': '0',
+                            }
+                            files = {
+                                'img': ('file-upload[0]', open(image, 'rb')),
+                                'content_type': '0',
+                            }
+                            try:
+                                response = requests.post(url, data=data, files=files)
+                                if response.status_code != 200:
+                                    console.print(response, 'red')
+                                raw_url = response.json()['th_url'].replace('https://t', 'https://img').replace('/thumbs/', '/images/')
+                                img_url = raw_url
+                                web_url = raw_url
+                            except Exception:
+                                console.print("[yellow]pixhost failed, trying next image host")
+                                progress.stop()
+                                newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "ptpimg":
                             payload = {
                                 'format' : 'json',
