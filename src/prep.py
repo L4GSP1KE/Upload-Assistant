@@ -711,7 +711,7 @@ class Prep():
                         self.optimize_images(image)
                         if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                             i += 1
-                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost']:
                             i += 1
                         elif os.path.getsize(Path(image)) <= 75000:
                             console.print("[bold yellow]Image is incredibly small, retaking")
@@ -840,7 +840,7 @@ class Prep():
                             try: 
                                 if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                                     i += 1
-                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost']:
                                     i += 1
                                 elif os.path.getsize(Path(image)) <= 75000:
                                     console.print("[yellow]Image is incredibly small (and is most likely to be a single color), retaking")
@@ -945,7 +945,7 @@ class Prep():
                                     time.sleep(1)
                                 if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb" and retake == False:
                                     i += 1
-                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox" and retake == False:
+                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost'] and retake == False:
                                     i += 1
                                 elif self.img_host == "ptpimg" and retake == False:
                                     i += 1
@@ -2092,18 +2092,19 @@ class Prep():
                             url = "https://api.pixhost.to/images"
                             data = {
                                 'content_type': '0',
+                                'max_th_size': 350,
                             }
                             files = {
                                 'img': ('file-upload[0]', open(image, 'rb')),
-                                'content_type': '0',
                             }
                             try:
                                 response = requests.post(url, data=data, files=files)
                                 if response.status_code != 200:
                                     console.print(response, 'red')
-                                raw_url = response.json()['th_url'].replace('https://t', 'https://img').replace('/thumbs/', '/images/')
-                                img_url = raw_url
-                                web_url = raw_url
+                                response = response.json()
+                                raw_url = response['th_url'].replace('https://t', 'https://img').replace('/thumbs/', '/images/')
+                                img_url = response['th_url']
+                                web_url = response['show_url']
                             except Exception:
                                 console.print("[yellow]pixhost failed, trying next image host")
                                 progress.stop()

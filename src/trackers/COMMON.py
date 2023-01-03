@@ -54,8 +54,8 @@ class COMMON():
                 descfile.write("[center]")
                 for each in range(len(images[:int(meta['screens'])])):
                     web_url = images[each]['web_url']
-                    img_url = images[each]['img_url']
-                    descfile.write(f"[url={web_url}][img=350]{img_url}[/img][/url]")
+                    raw_url = images[each]['raw_url']
+                    descfile.write(f"[url={web_url}][img=350]{raw_url}[/img][/url]")
                 descfile.write("[/center]")
             if signature != None:
                 descfile.write(signature)
