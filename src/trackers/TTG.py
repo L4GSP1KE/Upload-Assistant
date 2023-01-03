@@ -296,9 +296,10 @@ class TTG():
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
             from src.bbcode import BBCODE
-
+            from src.trackers.COMMON import COMMON
+            common = COMMON(config=self.config)
             if int(meta.get('imdb_id', '0').replace('tt', '')) != 0:
-                ptgen = await self.ptgen(meta)
+                ptgen = await common.ptgen(meta)
                 if ptgen.strip() != '':
                     descfile.write(ptgen)   
 
@@ -340,29 +341,6 @@ class TTG():
                 descfile.write("\n\n")
                 descfile.write(self.signature)
             descfile.close()
-
-    
-    async def ptgen(self, meta):
-        ptgen = ""
-        url = "https://api.iyuu.cn/App.Movie.Ptgen"
-        params = {}
-        if int(meta.get('imdb_id', '0')) != 0:
-            params['url'] = f"tt{meta['imdb_id']}"
-        else:
-            console.print("[red]No IMDb id was found.")
-            params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
-        try:
-            ptgen = requests.get(url, params=params)
-            ptgen = ptgen.json()
-            ptgen = ptgen['data']['format']
-            if "[/img]" in ptgen:
-                ptgen = ptgen.split("[/img]")[1]
-            ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
-        except:
-            console.print_exception()
-            console.print("[bold red]There was an error getting the ptgen")
-            console.print(ptgen)
-        return ptgen
 
     async def download_new_torrent(self, id, torrent_path):
         download_url = f"https://totheglory.im/dl/{id}/{self.passkey}"

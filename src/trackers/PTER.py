@@ -152,55 +152,15 @@ class PTER():
 
         return medium_id
 
-    async def ptgen(self, meta):
-        ptgen = ""
-        url = 'https://ptgen.zhenzhen.workers.dev'
-        if self.ptgen_api != '':
-            url = self.ptgen_api
-        params = {}
-        data={}
-        #get douban url 
-        if int(meta.get('imdb_id', '0')) != 0:
-            data['search'] = f"tt{meta['imdb_id']}"
-            ptgen = requests.get(url, params=data)
-            if ptgen.json()["error"] != None:
-                for retry in range(self.ptgen_retry):
-                    ptgen = requests.get(url, params=params)
-                    if ptgen.json()["error"] == None:
-                        break
-            params['url'] =  ptgen.json()['data'][0]['link'] 
-        else:
-            console.print("[red]No IMDb id was found.")
-            params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
-        try:
-            ptgen = requests.get(url, params=params)
-            if ptgen.json()["error"] != None:
-                for retry in range(self.ptgen_retry):
-                    ptgen = requests.get(url, params=params)
-                    if ptgen.json()["error"] == None:
-                        break
-            ptgen = ptgen.json()
-            meta['ptgen']=ptgen
-            with open (f"{meta['base_dir']}/tmp/{meta['uuid']}/meta.json", 'w') as f:
-                json.dump(meta, f, indent=4)
-                f.close()
-            ptgen = ptgen['format']
-            if "[/img]" in ptgen:
-                ptgen = ptgen.split("[/img]")[1]
-            ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
-        except:
-            console.print_exception()
-            console.print("[bold red]There was an error getting the ptgen")
-            console.print(ptgen)
-        return ptgen
-
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'w') as descfile:
             from src.bbcode import BBCODE
+            from src.trackers.COMMON import COMMON
+            common = COMMON(config=self.config)
 
             if int(meta.get('imdb_id', '0').replace('tt', '')) != 0:
-                ptgen = await self.ptgen(meta)
+                ptgen = await common.ptgen(meta, self.ptgen_api, self.ptgen_retry)
                 if ptgen.strip() != '':
                     descfile.write(ptgen)   
 
