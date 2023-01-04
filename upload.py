@@ -48,6 +48,7 @@ cli_ui.setup(color='always', title="L4G's Upload Assistant")
 import traceback
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
+print(base_dir)
 
 try:
     from data.config import config
@@ -70,8 +71,8 @@ except:
             cli_ui.info(cli_ui.red, "We have switched from .json to .py for config to have a much more lenient experience")
             cli_ui.info(cli_ui.red, "Looks like the auto updater didnt work though")
             cli_ui.info(cli_ui.red, "Updating is just 2 easy steps:")
-            cli_ui.info(cli_ui.red, "1: Rename", cli_ui.yellow, "data/config.json", cli_ui.red, "to", cli_ui.green, "data/config.py" )
-            cli_ui.info(cli_ui.red, "2: Add", cli_ui.green, "config = ", cli_ui.red, "to the beginning of", cli_ui.green, "data/config.py")
+            cli_ui.info(cli_ui.red, "1: Rename", cli_ui.yellow, os.path.abspath(f"{base_dir}/data/config.json"), cli_ui.red, "to", cli_ui.green, os.path.abspath(f"{base_dir}/data/config.py") )
+            cli_ui.info(cli_ui.red, "2: Add", cli_ui.green, "config = ", cli_ui.red, "to the beginning of", cli_ui.green, os.path.abspath(f"{base_dir}/data/config.py"))
             exit()
     else:
         console.print(traceback.print_exc())
