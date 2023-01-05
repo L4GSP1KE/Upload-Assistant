@@ -30,6 +30,8 @@ class MTV():
 
     async def upload(self, meta):
         common = COMMON(config=self.config)
+        cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/MTV.pkl")
+
         await common.edit_torrent(meta, self.tracker, self.source_flag)
 
         new_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
@@ -105,7 +107,7 @@ class MTV():
             'autocomplete_toggle': 'on',
             'fontfont': '-1',
             'fontsize': '-1',
-            'auth': self.config['TRACKERS'][self.tracker].get('auth'),
+            'auth': self.get_auth(cookiefile),
             'anonymous': '0'
         }
 
@@ -128,7 +130,6 @@ class MTV():
 
         if meta['debug'] == False:
             with requests.Session() as session:
-                cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/MTV.pkl")
                 with open(cookiefile, 'rb') as cf:
                     session.cookies.update(pickle.load(cf))
                 response = session.post(url=self.upload_url, data=data, files=files)
@@ -389,6 +390,15 @@ class MTV():
         else:
             return False
 
+    async def get_auth(self, cookiefile):
+        url = "https://www.morethantv.me/index.php"
+        if os.path.exists(cookiefile):
+            with requests.Session() as session:
+                with open(cookiefile, 'rb') as cf:
+                    session.cookies.update(pickle.load(cf))
+                resp = session.get(url=url)
+                auth = resp.text.rsplit('authkey=', 1)[1][:32]
+                return auth
 
     async def login(self, cookiefile):
         with requests.Session() as session:
@@ -461,7 +471,7 @@ class MTV():
                 else:
                     console.print(f"[red]Site Seems to be down or not responding to API")
         except:
-            console.print(f"[red]Unable to search for existing torrents on site. Most likely the site is down or Jackett is down.")
+            console.print(f"[red]Unable to search for existing torrents on site. Most likely the site is down.")
             dupes.append("FAILED SEARCH")
             print(traceback.print_exc())
             await asyncio.sleep(5)
