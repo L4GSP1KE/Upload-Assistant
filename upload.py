@@ -49,6 +49,7 @@ cli_ui.setup(color='always', title="L4G's Upload Assistant")
 import traceback
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
+print(base_dir)
 
 try:
     from data.config import config
@@ -71,8 +72,8 @@ except:
             cli_ui.info(cli_ui.red, "We have switched from .json to .py for config to have a much more lenient experience")
             cli_ui.info(cli_ui.red, "Looks like the auto updater didnt work though")
             cli_ui.info(cli_ui.red, "Updating is just 2 easy steps:")
-            cli_ui.info(cli_ui.red, "1: Rename", cli_ui.yellow, "data/config.json", cli_ui.red, "to", cli_ui.green, "data/config.py" )
-            cli_ui.info(cli_ui.red, "2: Add", cli_ui.green, "config = ", cli_ui.red, "to the beginning of", cli_ui.green, "data/config.py")
+            cli_ui.info(cli_ui.red, "1: Rename", cli_ui.yellow, os.path.abspath(f"{base_dir}/data/config.json"), cli_ui.red, "to", cli_ui.green, os.path.abspath(f"{base_dir}/data/config.py") )
+            cli_ui.info(cli_ui.red, "2: Add", cli_ui.green, "config = ", cli_ui.red, "to the beginning of", cli_ui.green, os.path.abspath(f"{base_dir}/data/config.py"))
             exit()
     else:
         console.print(traceback.print_exc())
@@ -137,7 +138,7 @@ async def do_the_thing(base_dir):
                     overwrite_list = [
                         'trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 
                         'hdb', 'ptp', 'blu', 'no_aka', 'no_year', 'no_dub', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
-                        'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag', 'skip_imghost_upload', 'imghost'
+                        'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag', 'skip_imghost_upload', 'imghost', 'manual_source'
                     ]
                     if meta.get(key, None) != value and key in overwrite_list:
                         saved_meta[key] = meta[key]

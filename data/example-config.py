@@ -8,7 +8,8 @@ config = {
         "img_host_1": "imgbb",
         "img_host_2": "ptpimg",
         "img_host_3": "imgbox",
-        # "img_host_4": "",
+	"img_host_4": "pixhost",
+        # "img_host_5": "",
 
 
         "screens" : "6",
@@ -29,7 +30,7 @@ config = {
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
             "api_key" : "BLU api key",
-            "announce_url" : "https://blutopia.xyz/announce/customannounceurl",
+            "announce_url" : "https://blutopia.cc/announce/customannounceurl",
             # "anon" : "False"
         },
         "BHD" : {

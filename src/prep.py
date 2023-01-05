@@ -246,7 +246,7 @@ class Prep():
                 if blu_tmdb not in [None, '0']:
                     meta['tmdb_manual'] = blu_tmdb
                 if blu_imdb not in [None, '0']:
-                    meta['imdb'] = blu_imdb
+                    meta['imdb'] = str(blu_imdb)
                 if blu_tvdb not in [None, '0']:
                     meta['tvdb_id'] = blu_tvdb
                 if blu_mal not in [None, '0']:
@@ -347,7 +347,7 @@ class Prep():
         if meta['tag'][1:].startswith(meta['channels']):
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
         meta['3D'] = self.is_3d(mi, bdinfo)
-        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], mi, meta['is_disc'], meta)
+        meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):
             meta['service'], meta['service_longname'] = self.get_service(video, meta.get('tag', ''), meta['audio'], meta['filename'])
         meta['uhd'] = self.get_uhd(meta['type'], guessit(meta['path']), meta['resolution'], meta['path'])
@@ -711,7 +711,7 @@ class Prep():
                         self.optimize_images(image)
                         if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                             i += 1
-                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                        elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost']:
                             i += 1
                         elif os.path.getsize(Path(image)) <= 75000:
                             console.print("[bold yellow]Image is incredibly small, retaking")
@@ -840,7 +840,7 @@ class Prep():
                             try: 
                                 if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb":
                                     i += 1
-                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox":
+                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost']:
                                     i += 1
                                 elif os.path.getsize(Path(image)) <= 75000:
                                     console.print("[yellow]Image is incredibly small (and is most likely to be a single color), retaking")
@@ -945,7 +945,7 @@ class Prep():
                                     time.sleep(1)
                                 if os.path.getsize(Path(image)) <= 31000000 and self.img_host == "imgbb" and retake == False:
                                     i += 1
-                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host == "imgbox" and retake == False:
+                                elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost'] and retake == False:
                                     i += 1
                                 elif self.img_host == "ptpimg" and retake == False:
                                     i += 1
@@ -1604,7 +1604,7 @@ class Prep():
         return tag
 
 
-    def get_source(self, type, video, path, mi, is_disc, meta):
+    def get_source(self, type, video, path, is_disc, meta):
         try:
             try:
                 source = guessit(video)['source']
@@ -1613,6 +1613,8 @@ class Prep():
                     source = guessit(path['source'])
                 except:
                     source = "BluRay"
+            if meta.get('manual_source', None):
+                source = meta['manual_source']
             if source in ("Blu-ray", "Ultra HD Blu-ray", "BluRay", "BR") or is_disc == "BDMV":
                 if type == "DISC":
                     source = "Blu-ray"
@@ -1644,7 +1646,7 @@ class Prep():
                     if type == "REMUX":
                         system = f"{system} DVD".strip()
                     source = system
-            if source in ("Web"):
+            if source in ("Web", "WEB"):
                 if type == "ENCODE":
                     type = "WEBRIP"
             if source in ("HD-DVD", "HD DVD", "HDDVD"):
@@ -1884,15 +1886,15 @@ class Prep():
                 manual_edition = " ".join(manual_edition)
             edition = str(manual_edition)
             
-        if "REPACK" in (video or edition) or "V2" in video:
+        if " REPACK " in (video or edition) or "V2" in video:
             repack = "REPACK"
-        if "REPACK2" in (video or edition) or "V3" in video:
+        if " REPACK2 " in (video or edition) or "V3" in video:
             repack = "REPACK2"
-        if "REPACK3" in (video or edition) or "V4" in video:
+        if " REPACK3 " in (video or edition) or "V4" in video:
             repack = "REPACK3"
-        if "PROPER" in (video or edition):
+        if " PROPER " in (video or edition):
             repack = "PROPER"
-        if "RERIP" in (video.upper() or edition):
+        if " RERIP " in (video.upper() or edition):
             repack = "RERIP"
         # if "HYBRID" in video.upper() and "HYBRID" not in title.upper():
         #     edition = "Hybrid " + edition
@@ -2086,6 +2088,27 @@ class Prep():
                             time.sleep(15)
                             progress.stop()
                             newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
+                        elif img_host == "pixhost":
+                            url = "https://api.pixhost.to/images"
+                            data = {
+                                'content_type': '0',
+                                'max_th_size': 350,
+                            }
+                            files = {
+                                'img': ('file-upload[0]', open(image, 'rb')),
+                            }
+                            try:
+                                response = requests.post(url, data=data, files=files)
+                                if response.status_code != 200:
+                                    console.print(response, 'red')
+                                response = response.json()
+                                raw_url = response['th_url'].replace('https://t', 'https://img').replace('/thumbs/', '/images/')
+                                img_url = response['th_url']
+                                web_url = response['show_url']
+                            except Exception:
+                                console.print("[yellow]pixhost failed, trying next image host")
+                                progress.stop()
+                                newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "ptpimg":
                             payload = {
                                 'format' : 'json',
@@ -2197,8 +2220,11 @@ class Prep():
         if meta.get('no_aka', False) == True:
             alt_title = ''
         if meta['debug']:
-            console.print("[cyan]get_name meta:")
-            console.print(meta)
+            console.log("[cyan]get_name cat/type")
+            console.log(f"CATEGORY: {meta['category']}")
+            console.log(f"TYPE: {meta['type']}")
+            console.log("[cyan]get_name meta:")
+            console.log(meta)
 
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
@@ -2261,8 +2287,15 @@ class Prep():
                 potential_missing = []
 
 
-    
-        name = ' '.join(name.split())
+        try:    
+            name = ' '.join(name.split())
+        except:
+            console.print("[bold red]Unable to generate name. Please re-run and correct any of the following args if needed.")
+            console.print(f"--category [yellow]{meta['category']}")
+            console.print(f"--type [yellow]{meta['type']}")
+            console.print(f"--source [yellow]{meta['source']}")
+
+            exit()
         name_notag = name
         name = name_notag + tag
         clean_name = self.clean_filename(name)
@@ -2472,10 +2505,8 @@ class Prep():
             meta['season_int'] = season_int
             meta['episode_int'] = episode_int
 
-            if meta['anime']:
-                meta['episode_title_storage'] = parsed = anitopy.parse(Path(video).name).get('episode_title', '')
-            else:
-                meta['episode_title_storage'] = guessit(video).get('episode_title', '')
+            
+            meta['episode_title_storage'] = guessit(video).get('episode_title', '')
             if meta['season'] == "S00" or meta['episode'] == "E00":
                 meta['episode_title'] = meta['episode_title_storage']
         return meta
@@ -2517,7 +2548,7 @@ class Prep():
             'PBSK': 'PBSK', 'PBS Kids': 'PBSK', 'PCOK': 'PCOK', 'Peacock': 'PCOK', 'PLAY': 'PLAY', 'PLUZ': 'PLUZ', 'Pluzz': 'PLUZ', 'PMNP': 'PMNP', 
             'PMNT': 'PMNT', 'PMTP' : 'PMTP', 'POGO': 'POGO', 'PokerGO': 'POGO', 'PSN': 'PSN', 'Playstation Network': 'PSN', 'PUHU': 'PUHU', 'QIBI': 'QIBI', 
             'RED': 'RED', 'YouTube Red': 'RED', 'RKTN': 'RKTN', 'Rakuten TV': 'RKTN', 'The Roku Channel': 'ROKU', 'RSTR': 'RSTR', 'RTE': 'RTE', 
-            'RTE One': 'RTE', 'RUUTU': 'RUUTU', 'SBS': 'SBS', 'Science Channel': 'SCI', 'SESO': 'SESO', 'SeeSo': 'SESO', 'SHMI': 'SHMI', 'Shomi': 'SHMI', 
+            'RTE One': 'RTE', 'RUUTU': 'RUUTU', 'SBS': 'SBS', 'Science Channel': 'SCI', 'SESO': 'SESO', 'SeeSo': 'SESO', 'SHMI': 'SHMI', 'Shomi': 'SHMI', 'SKST' : 'SKST', 'SkyShowtime': 'SKST',
             'SHO': 'SHO', 'Showtime': 'SHO', 'SNET': 'SNET', 'Sportsnet': 'SNET', 'Sony': 'SONY', 'SPIK': 'SPIK', 'Spike': 'SPIK', 'Spike TV': 'SPKE', 
             'SPRT': 'SPRT', 'Sprout': 'SPRT', 'STAN': 'STAN', 'Stan': 'STAN', 'STARZ': 'STARZ', 'STRP': 'STRP', 'Star+' : 'STRP', 'STZ': 'STZ', 'Starz': 'STZ', 'SVT': 'SVT', 
             'Sveriges Television': 'SVT', 'SWER': 'SWER', 'SwearNet': 'SWER', 'SYFY': 'SYFY', 'Syfy': 'SYFY', 'TBS': 'TBS', 'TEN': 'TEN', 

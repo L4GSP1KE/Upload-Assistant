@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import argparse
 import urllib.parse
+import os
 import time
 import traceback
 
@@ -25,6 +26,7 @@ class Args():
         parser.add_argument('-s', '--screens', nargs='*', required=False, help="Number of screenshots", default=int(self.config['DEFAULT']['screens']))
         parser.add_argument('-c', '--category', nargs='*', required=False, help="Category [MOVIE, TV, FANRES]", choices=['movie', 'tv', 'fanres'])
         parser.add_argument('-t', '--type', nargs='*', required=False, help="Type [DISC, REMUX, ENCODE, WEBDL, WEBRIP, HDTV]", choices=['disc', 'remux', 'encode', 'webdl', 'web-dl', 'webrip', 'hdtv'])
+        parser.add_argument('--source', nargs='*', required=False, help="Source [Blu-ray, BluRay, DVD, HDDVD, WEB]", choices=['Blu-ray', 'BluRay', 'DVD', 'HDDVD', 'WEB'], dest="manual_source")
         parser.add_argument('-res', '--resolution', nargs='*', required=False, help="Resolution [2160p, 1080p, 1080i, 720p, 576p, 576i, 480p, 480i, 8640p, 4320p, OTHER]", choices=['2160p', '1080p', '1080i', '720p', '576p', '576i', '480p', '480i', '8640p', '4320p', 'other'])
         parser.add_argument('-tmdb', '--tmdb', nargs='*', required=False, help="TMDb ID", type=str, dest='tmdb_manual')
         parser.add_argument('-imdb', '--imdb', nargs='*', required=False, help="IMDb ID", type=str)
@@ -32,7 +34,7 @@ class Args():
         parser.add_argument('-g', '--tag', nargs='?', required=False, help="Group Tag", type=str, const="")
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
         parser.add_argument('-dist', '--distributor', nargs='*', required=False, help="Disc Distributor e.g.(Criterion, BFI, etc.)", type=str)
-        parser.add_argument('-edition', '--edition', '--repack', nargs='*', required=False, help="Edition/Repack String e.g.(Director's Cut, REPACK, Uncut)", type=str, dest='manual_edition', default="")
+        parser.add_argument('-edition', '--edition', '--repack', nargs='*', required=False, help="Edition/Repack String e.g.(Director's Cut, Uncut, Hybrid, REPACK, REPACK3)", type=str, dest='manual_edition', default="")
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
         parser.add_argument('--no-season', dest='no_season', action='store_true', required=False, help="Remove Season from title")
@@ -46,7 +48,7 @@ class Args():
         parser.add_argument('-d', '--desc', nargs='*', required=False, help="Custom Description (string)")
         parser.add_argument('-pb', '--desclink', nargs='*', required=False, help="Custom Description (link to hastebin/pastebin)")
         parser.add_argument('-df', '--descfile', nargs='*', required=False, help="Custom Description (path to file)")
-        parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'imgbox'])
+        parser.add_argument('-ih', '--imghost', nargs='*', required=False, help="Image Host", choices=['imgbb', 'ptpimg', 'imgbox', 'pixhost'])
         parser.add_argument('-siu', '--skip-imagehost-upload', dest='skip_imghost_upload', action='store_true', required=False, help="Skip Uploading to an image host")
         parser.add_argument('-th', '--torrenthash', nargs='*', required=False, help="Torrent Hash to re-use from your client's session directory")
         parser.add_argument('-nfo', '--nfo', action='store_true', required=False, help="Use .nfo in directory for description")
@@ -76,12 +78,11 @@ class Args():
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
         # console.print(args)
-        if len(before_args) >= 1:
-            if any('.mkv' in x for x in before_args):
-                for each in before_args:
-                    args['path'].append(each)
-                    if '.mkv' in each:
-                        break
+        if len(before_args) >= 1 and not os.path.exists(args['path']):
+            for each in before_args:
+                args['path'].append(each)
+                if os.path.exists(''.join(args['path'])):
+                    break
         
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
