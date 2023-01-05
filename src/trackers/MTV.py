@@ -4,7 +4,9 @@ from src.console import console
 import traceback
 from torf import Torrent
 import xml.etree.ElementTree
-
+import os
+import cli_ui
+import pickle
 from src.trackers.COMMON import COMMON
 
 
@@ -107,12 +109,12 @@ class MTV():
             'anonymous': '0'
         }
 
-        cookie = {'sid': self.config['TRACKERS'][self.tracker].get('sid'), 'cid': self.config['TRACKERS'][self.tracker].get('cid')}
+        # cookie = {'sid': self.config['TRACKERS'][self.tracker].get('sid'), 'cid': self.config['TRACKERS'][self.tracker].get('cid')}
 
         param = {
         }
 
-        if meta['imdb_id'] != "0":
+        if meta['imdb_id'] not in ("0", "", None):
             param['imdbID'] = "tt" + meta['imdb_id']
         if meta['tmdb'] != 0:
             param['tmdbID'] = meta['tmdb']
@@ -125,30 +127,33 @@ class MTV():
 
 
         if meta['debug'] == False:
-            response = requests.request("POST", url=self.upload_url, data=data, files=files, cookies=cookie)
-            try:
-                if str(response.url).__contains__("torrents.php"):
-                    console.print(response.url)
-                else:
-                    if str(response.url).__contains__("authkey.php"):
-                        console.print(f"[red]No DL link in response, So unable to download torrent but It may have uploaded, go check")
-                        print(response.content)
-                        console.print(f"[red]Got response code = {response.status_code}")
-                        print(data)
+            with requests.Session() as session:
+                cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/MTV.pkl")
+                with open(cookiefile, 'rb') as cf:
+                    session.cookies.update(pickle.load(cf))
+                response = session.post(url=self.upload_url, data=data, files=files)
+                try:
+                    if "torrents.php" in response.url:
+                        console.print(response.url)
                     else:
-                        console.print(f"[red]Upload Failed, Doesnt look like you are logged in, Please check SID, CID and auth in config.py")
-                        print(response.content)
-                        print(data)
-            except:
-                console.print(f"[red]It may have uploaded, go check")
-                console.print(data)
-                print(traceback.print_exc())
-                return
+                        if "authkey.php" in response.url:
+                            console.print(f"[red]No DL link in response, So unable to download torrent but It may have uploaded, go check")
+                            print(response.content)
+                            console.print(f"[red]Got response code = {response.status_code}")
+                            print(data)
+                        else:
+                            console.print(f"[red]Upload Failed, Doesnt look like you are logged in")
+                            print(response.content)
+                            print(data)
+                except:
+                    console.print(f"[red]It may have uploaded, go check")
+                    console.print(data)
+                    print(traceback.print_exc())
         else:
-            # get stuff needed for uploading
-            self.login()
             console.print(f"[cyan]Request Data:")
             console.print(data)
+        return
+
 
     async def edit_desc(self, meta):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r').read()
@@ -178,7 +183,7 @@ class MTV():
 
     async def edit_group_desc(self, meta):
         description = ""
-        if meta['imdb_id'] != "0":
+        if meta['imdb_id'] not in ("0", "", None): 
             description += f"https://www.imdb.com/title/tt{meta['imdb_id']}"
         if meta['tmdb'] != 0:
             description += f"\nhttps://www.themoviedb.org/{str(meta['category'].lower())}/{str(meta['tmdb'])}"
@@ -320,47 +325,108 @@ class MTV():
         tags += " " + "hd.movie" if meta['category'] == "MOVIE" and meta['sd'] == 0 else ""
 
         # audio tags
-        tags += " " + "ddp.audio" if str(meta['audio']).lower().__contains__('dd+')  else ""
-        tags += " " + "atmos.audio" if str(meta['audio']).lower().__contains__('atmos') else ""
-        tags += " " + "aac.audio" if str(meta['audio']).lower().__contains__('aac') else ""
-        tags += " " + "truehd.audio" if str(meta['audio']).lower().__contains__('true') else ""
-        tags += " " + "mp3.audio" if str(meta['audio']).lower().__contains__('mp3') else ""
-        tags += " " + "mp2.audio" if str(meta['audio']).lower().__contains__('mp2') else ""
+        for each in ['ddp', 'atmos', 'aac', 'truehd', 'mp3', 'mp2']:
+            if each in meta['audio'].replace('+', 'p'):
+                tags += f" {each}.audio"
 
         # adding nogrp if no group detected
         tags += " " + str(meta['tag'])[1:].replace(' ', '.').lower() + ".release" if str(meta['tag']) != "" else " nogrp.release "
         return tags
 
-    def login(self):
-        url = 'https://www.morethantv.me/login'
-        payload = {
-            'username' : self.config['TRACKERS'][self.tracker].get('username'),
-            'password' : self.config['TRACKERS'][self.tracker].get('password'),
-            'keeploggedin' : 1,
-            'cinfo' : '1920|1080|24|0',
-            'submit' : 'login'
-            # 'ssl' : 'yes'
-        }
-        res = requests.get(url="https://www.morethantv.me/login")
-        token = str(res.content).rsplit('name="token" value="', 1)[1][:48]
-        # token and CID from cookie needed for post to login
-        payload["token"] = token
-        # cook = res.cookies
-        # adding token and cid from cookie to post.
-        resp = requests.request("POST", url=url, data=payload, cookies=res.cookies)
 
-        # checking if logged in
-        if str(resp.content).__contains__('authkey='):
-            auth = str(resp.content).rsplit('authkey=', 1)[1][:32]
-            #printing auth and cid so you can add to config
-            print('auth = ' + auth)
-            print('cid = ' + resp.cookies.get_dict()['cid'])
-            if 'sid' in resp.cookies.get_dict():
-                print('sid = ' + resp.cookies.get_dict()['sid'])
+
+    async def validate_credentials(self, meta):
+        cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/MTV.pkl")
+        if not os.path.exists(cookiefile):
+            await self.login(cookiefile)
+        vcookie = await self.validate_cookies(meta)
+        if vcookie != True:
+            console.print('[red]Failed to validate cookies. Please confirm that the site is up and your username and password is valid.')
+            recreate = cli_ui.ask_yes_no("Log in again and create new session?")
+            if recreate == True:
+                if os.path.exists(cookiefile):
+                    os.remove(cookiefile)
+                await self.login(cookiefile)
+                vcookie = await self.validate_cookies(meta, cookiefile)
+                return vcookie
             else:
-                test = resp.history[0].cookies.get_dict()
-                print('sid = ' + test['sid'])
-            console.print('[green]Successfully logged in')
+                return False
+        vapi = await self.validate_api()
+        if vapi != True:
+            console.print('[red]Failed to validate API. Please confirm that the site is up and your API key is valid.')
+        return True
+
+    async def validate_api(self):
+        url = self.search_url
+        params = {
+            'apikey' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
+        }
+        try:
+            r = requests.get(url, params=params)
+            if not r.ok:
+                if "unauthorized api key" in r.text.lower():
+                    console.print("[red]Invalid API Key")
+                return False
+            return True
+        except:
+            return False
+
+    async def validate_cookies(self, meta, cookiefile):
+        url = "https://www.morethantv.me/index.php"
+        if os.path.exists(cookiefile):
+            with requests.Session() as session:
+                with open(cookiefile, 'rb') as cf:
+                    session.cookies.update(pickle.load(cf))
+                resp = session.get(url=url)
+                if meta['debug']:
+                    console.print('[cyan]Cookies:')
+                    console.print(session.cookies.get_dict())
+                    console.print(resp.url)
+                if resp.text.find("Logout") != -1:
+                    return True
+                else:
+                    return False
+        else:
+            return False
+
+
+    async def login(self, cookiefile):
+        with requests.Session() as session:
+            url = 'https://www.morethantv.me/login'
+            payload = {
+                'username' : self.config['TRACKERS'][self.tracker].get('username'),
+                'password' : self.config['TRACKERS'][self.tracker].get('password'),
+                'keeploggedin' : 1,
+                'cinfo' : '1920|1080|24|0',
+                'submit' : 'login'
+                # 'ssl' : 'yes'
+            }
+            res = session.get(url="https://www.morethantv.me/login")
+            token = res.text.rsplit('name="token" value="', 1)[1][:48]
+            # token and CID from cookie needed for post to login
+            payload["token"] = token
+            # cook = res.cookies
+            # adding token and cid from cookie to post.
+            resp = session.post(url=url, data=payload)
+
+            # checking if logged in
+            if 'authkey=' in resp.text:
+                # auth = resp.text.rsplit('authkey=', 1)[1][:32]
+                # #printing auth and cid so you can add to config
+                # print('auth = ' + auth)
+                # print('cid = ' + resp.cookies.get_dict()['cid'])
+                # if 'sid' in resp.cookies.get_dict():
+                #     print('sid = ' + resp.cookies.get_dict()['sid'])
+                # else:
+                #     test = resp.history[0].cookies.get_dict()
+                #     print('sid = ' + test['sid'])
+                console.print('[green]Successfully logged in to MTV')
+                with open(cookiefile, 'wb') as cf:
+                    pickle.dump(session.cookies, cf)
+            else:
+                console.print('[bold red]Something went wrong while trying to log into FL')
+                await asyncio.sleep(1)
+                console.print(resp.url)
         return
 
     async def search_existing(self, meta):
@@ -371,38 +437,14 @@ class MTV():
             'apikey' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'q' : ""
         }
-        if meta['imdb_id'] != "0":
+        if meta['imdb_id'] not in ("0", "", None):
             params['imdbid'] = "tt" + meta['imdb_id']
-            if meta['category'] == 'TV':
-                params['season'] = meta.get('season_int', '')
-                if meta.get('episode_int', '') != "0":
-                    params['ep'] = meta.get('episode_int', '')
         elif meta['tmdb'] != "0":
             params['tmdbid'] = meta['tmdb']
-            if meta['category'] == 'TV':
-                params['season'] = meta.get('season_int', '')
-                if meta.get('episode_int', '') != "0":
-                    params['ep'] = meta.get('episode_int', '')
         elif meta['tvdb_id'] != 0:
             params['tvdbid'] = meta['tvdb_id']
-            if meta['category'] == 'TV':
-                params['season'] = meta.get('season_int', '')
-                if meta.get('episode_int', '') != "0":
-                    params['ep'] = meta.get('episode_int', '')
         else:
             params['q'] = meta['title'].replace(': ', ' ').replace('’', '').replace("'", '')
-            if meta['category'] == 'TV':
-                params['season'] = meta.get('season_int', '')
-                if meta.get('episode_int', '') != "0":
-                    params['ep'] = meta.get('episode_int', '')
-            else:
-                # params['q'] = params['q'] + f" {meta.get('year', '')}"
-                params['season'] = meta.get('season_int', '')
-                if meta.get('episode_int', '') != "0":
-                    params['ep'] = meta.get('episode_int', '')
-        if not meta['sd']:
-            params['q'] = params['q'] + f" {meta.get('resolution', '')}"
-
 
         try:
             rr = requests.get(url=self.search_url, params=params)

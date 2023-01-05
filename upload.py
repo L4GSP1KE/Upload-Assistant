@@ -1,6 +1,4 @@
 import requests
-from src.trackers.MTV import MTV
-from src.trackers.RF import RF
 from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
@@ -27,6 +25,8 @@ from src.trackers.TDB import TDB
 from src.trackers.NBL import NBL
 from src.trackers.ANT import ANT
 from src.trackers.PTER import PTER
+from src.trackers.MTV import MTV
+from src.trackers.RF import RF
 import json
 from pathlib import Path
 import asyncio
@@ -213,7 +213,7 @@ async def do_the_thing(base_dir):
         ####################################
         common = COMMON(config=config)
         api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'TDB', 'NBL', 'ANT']
-        http_trackers = ['HDB', 'TTG', 'FL', 'PTER']
+        http_trackers = ['HDB', 'TTG', 'FL', 'PTER', 'MTV']
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
             'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'TDB' : TDB, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'MTV': MTV,
@@ -364,19 +364,6 @@ async def do_the_thing(base_dir):
                             await client.add_to_client(meta, "PTP")
                     except:
                         console.print(traceback.print_exc())
-            if tracker == "MTV":
-                if meta['unattended']:
-                    upload_to_mtv = True
-                else:
-                    upload_to_mtv = cli_ui.ask_yes_no(f"Upload to MTV? {debug}", default=meta['unattended'])
-                if upload_to_mtv:
-                    print("Uploading to MTV")
-                    mtv = MTV(config=config)
-                    dupes = await mtv.search_existing(meta)
-                    meta = dupe_check(dupes, meta)
-                    if meta['upload'] == True:
-                        await mtv.upload(meta)
-                        await client.add_to_client(meta, "MTV")
             
 
 

@@ -61,10 +61,7 @@ config = {
             "announce_url" : "https://hawke.uno/announce/customannounceurl",
             # "anon" : "False"
         },
-	"MTV": {
-            "auth": "get-from-dev-tools-in-webbrowser-or-try-to-upload-in-debug-mode-to-MTV and copy values",
-            "cid": "get-from-dev-tools-in-webbrowser-or-try-to-upload-in-debug-mode-to-MTV and copy values",
-            "sid": "get-from-dev-tools-in-webbrowser-or-try-to-upload-in-debug-mode-to-MTV and copy values",
+	    "MTV": {
             'api_key' : 'get from security page',
             'username' : '<USERNAME>',
             'password' : '<PASSWORD>',
