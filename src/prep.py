@@ -167,7 +167,7 @@ class Prep():
         else:
             videopath, meta['filelist'] = self.get_video(videoloc, meta.get('mode', 'discord')) 
             video, meta['scene'], meta['imdb'] = self.is_scene(videopath, meta.get('imdb', None))
-            guess_name = ntpath.basename(video).replace('-',' ')
+            guess_name = ntpath.basename(video).replace('-',' ').replace('[',' ').replace(']',' ')
             filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))["title"]
             untouched_filename = os.path.basename(video)
             try:
