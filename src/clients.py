@@ -86,7 +86,7 @@ class Clients():
             console.print(f'[bold red]Missing torrent_storage_dir for {default_torrent_client}')
             return None
         torrenthash = None
-        if torrent_storage_dir != None:
+        if torrent_storage_dir != None and os.path.exists(torrent_storage_dir):
             if meta.get('torrenthash', None) != None:
                 valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", meta['torrenthash'], torrent_client, print_err=True)
                 if valid:
@@ -105,6 +105,8 @@ class Clients():
             valid2, torrent_path = await self.is_valid_torrent(meta, torrent_path, torrenthash, torrent_client, print_err=False)
             if valid2:
                 return torrent_path
+        elif not os.path.exists(torrent_storage_dir):
+            console.print(f"[bold red]Invalid torrent_storage_dir path: [bold yellow]{torrent_storage_dir}")
         return None
 
 
