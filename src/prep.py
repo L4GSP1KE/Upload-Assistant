@@ -199,7 +199,7 @@ class Prep():
 
 
         # Reuse information from other trackers
-        if self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
+        if str(self.config['TRACKERS'].get('PTP', {}).get('useAPI')).lower() == "true":
             ptp = PTP(config=self.config)
             if meta.get('ptp', None) != None:
                 meta['ptp_manual'] = meta['ptp']
@@ -217,7 +217,7 @@ class Prep():
                 if ptp_id != None:
                     meta['ptp'] = ptp_id
         
-        if self.config['TRACKERS'].get('HDB', {}).get('useAPI') == True:
+        if str(self.config['TRACKERS'].get('HDB', {}).get('useAPI')).lower() == "true":
             hdb = HDB(config=self.config)
             if meta.get('ptp', None) == None or meta.get('hdb', None) != None:
                 hdb_imdb = hdb_tvdb = hdb_id = None
@@ -238,7 +238,7 @@ class Prep():
                 if hdb_id != None:
                     meta['hdb'] = hdb_id
         
-        if self.config['TRACKERS'].get('BLU', {}).get('useAPI') == True:
+        if str(self.config['TRACKERS'].get('BLU', {}).get('useAPI')).lower() == "true":
             blu = BLU(config=self.config)
             if meta.get('blu', None) != None:
                 meta['blu_manual'] = meta['blu']
@@ -2641,7 +2641,7 @@ class Prep():
                 else:
                     desc_source = desc_source[0]
 
-                if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
+                if meta.get('ptp', None) != None and str(self.config['TRACKERS'].get('PTP', {}).get('useAPI')).lower() == "true" and desc_source in ['PTP', None]:
                     ptp = PTP(config=self.config)
                     ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
                     if ptp_desc.replace('\r\n', '').replace('\n', '').strip() != "":
