@@ -48,7 +48,6 @@ cli_ui.setup(color='always', title="L4G's Upload Assistant")
 import traceback
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-print(base_dir)
 
 try:
     from data.config import config
