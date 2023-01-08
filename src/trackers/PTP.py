@@ -32,7 +32,8 @@ class PTP():
         self.api_key = config['TRACKERS']['PTP'].get('ApiKey', '').strip()
         self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip() 
         self.username = config['TRACKERS']['PTP'].get('username', '').strip() 
-        self.password = config['TRACKERS']['PTP'].get('password', '').strip() 
+        self.password = config['TRACKERS']['PTP'].get('password', '').strip()
+        self.web_source = distutils.util.strtobool(str(config['TRACKERS']['PTP'].get('add_web_source_to_desc', True))) 
         self.user_agent = f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
     
     async def get_ptp_id_imdb(self, search_term, search_file_folder):
@@ -544,12 +545,12 @@ class PTP():
                 for i in range(len(discs)):
                     each = discs[i]
                     if each['type'] == "BDMV":
-                        desc.write(f"[mediainfo]{each['summary']}[/mediainfo]\n")
-                        desc.write("\n")
+                        desc.write(f"[mediainfo]{each['summary']}[/mediainfo]\n\n")
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
-                            desc.write(base2ptp)
-                            desc.write("\n\n")
+                            if base2ptp.strip() != "":
+                                desc.write(base2ptp)
+                                desc.write("\n\n")
                             mi_dump = each['summary']
                         else:
                             mi_dump = each['summary']
@@ -571,8 +572,9 @@ class PTP():
                         desc.write("\n")
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
-                            desc.write(base2ptp)
-                            desc.write("\n\n")
+                            if base2ptp.strip() != "":
+                                desc.write(base2ptp)
+                                desc.write("\n\n")
                         else:
                             ds = multiprocessing.Process(target=prep.dvd_screenshots, args=(meta, i, 2))
                             ds.start()
@@ -592,7 +594,7 @@ class PTP():
                     file = meta['filelist'][i]
                     if i == 0:
                         # Add This line for all web-dls
-                        if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None:
+                        if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None and self.web_source == True:
                             desc.write(f"[quote][align=center]This release is sourced from {meta['service_longname']}[/align][/quote]")
                         mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
                     else:
@@ -613,8 +615,9 @@ class PTP():
                     desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
                     if i == 0:
                         base2ptp = self.convert_bbcode(base)
-                        desc.write(base2ptp)
-                        desc.write("\n\n")    
+                        if base2ptp.strip() != "":
+                            desc.write(base2ptp)
+                            desc.write("\n\n")    
                     if len(images) > 0: 
                         for each in range(len(images[:int(meta['screens'])])):
                             raw_url = images[each]['raw_url']

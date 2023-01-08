@@ -41,6 +41,7 @@ config = {
         },
         "PTP" : {
             "useAPI" : False, # Set to True if using PTP
+            "add_web_source_to_desc" : True,
             "ApiUser" : "ptp api user",
             "ApiKey" : 'ptp api key',
             "username" : "",
