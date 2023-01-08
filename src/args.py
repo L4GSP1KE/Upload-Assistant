@@ -82,7 +82,11 @@ class Args():
             for each in before_args:
                 args['path'].append(each)
                 if os.path.exists(''.join(args['path'])):
-                    break
+                    if any(".mkv" in x for x in before_args):
+                        if ".mkv" in ''.join(args['path']):
+                            break
+                    else:
+                        break
         
         if meta.get('tmdb_manual') != None or meta.get('imdb') != None:
             meta['tmdb_manual'] = meta['imdb'] = None
