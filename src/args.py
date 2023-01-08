@@ -78,7 +78,7 @@ class Args():
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
         # console.print(args)
-        if len(before_args) >= 1 and not os.path.exists(args['path']):
+        if len(before_args) >= 1 and not os.path.exists(''.join(args['path'])):
             for each in before_args:
                 args['path'].append(each)
                 if os.path.exists(''.join(args['path'])):
