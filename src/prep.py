@@ -2063,6 +2063,7 @@ class Prep():
                     TimeRemainingColumn()
                 ) as progress:
                     upload_task = progress.add_task(f"[green]Uploading Screens to {img_host}...", total = len(image_glob[-screens:]))
+                    timeout=60
                     for image in image_glob[-screens:]:        
                         if img_host == "imgbb":
                             url = "https://api.imgbb.com/1/upload"
@@ -2071,7 +2072,7 @@ class Prep():
                                 'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
                             }
                             try:
-                                response = requests.post(url, data = data)
+                                response = requests.post(url, data = data,timeout=timeout)
                                 response = response.json()
                                 if response.get('success') != True:
                                     console.print(response, 'red')
@@ -2098,7 +2099,7 @@ class Prep():
                                 'img': ('file-upload[0]', open(image, 'rb')),
                             }
                             try:
-                                response = requests.post(url, data=data, files=files)
+                                response = requests.post(url, data=data, files=files,timeout=timeout)
                                 if response.status_code != 200:
                                     console.print(response, 'red')
                                 response = response.json()
