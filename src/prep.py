@@ -1836,7 +1836,7 @@ class Prep():
             elif format == 'HEVC':
                 codec = 'H.265'
             
-            if type == 'HDTV' and has_encode_settings == True:
+            if has_encode_settings == True:
                 codec = codec.replace('H.', 'x')
         elif format == "VP9":
             codec = "VP9"
