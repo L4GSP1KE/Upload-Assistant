@@ -78,12 +78,12 @@ class Args():
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
         # console.print(args)
-        if len(before_args) >= 1 and not os.path.exists(''.join(args['path'])):
+        if len(before_args) >= 1 and not os.path.exists(' '.join(args['path'])):
             for each in before_args:
                 args['path'].append(each)
-                if os.path.exists(''.join(args['path'])):
+                if os.path.exists(' '.join(args['path'])):
                     if any(".mkv" in x for x in before_args):
-                        if ".mkv" in ''.join(args['path']):
+                        if ".mkv" in ' '.join(args['path']):
                             break
                     else:
                         break
