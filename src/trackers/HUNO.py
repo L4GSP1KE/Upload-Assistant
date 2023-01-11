@@ -5,6 +5,7 @@ import requests
 from difflib import SequenceMatcher
 import distutils.util
 import os
+import re
 from src.trackers.COMMON import COMMON
 from src.console import console
 
@@ -108,6 +109,7 @@ class HUNO():
         audio_lang = ""
         if 'DUAL' not in audio and 'mediainfo' in meta:
             audio_lang = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English")
+            audio_lang = re.sub(r'\(.+\)', '', audio_lang)
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
