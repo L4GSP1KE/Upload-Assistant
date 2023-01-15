@@ -125,11 +125,6 @@ config = {
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
             # "anon" : "False"
         },
-	    "TDB" : {
-            "passkey" : "TDB api key",
-            "announce_url" : "https://torrentdb.net/announce/customannounceurl",
-            # "anon" : "False"
-        },
         "PTER" : {
             "passkey":'passkey',
             "img_rehost" : False,
