@@ -48,7 +48,7 @@ A simple tool to take the work out of uploading.
 ## **Updating:**
   - To update first navigate into the Upload-Assistant directory: `cd Upload-Assistant`
   - Run a `git pull` to grab latest updates
-  - Run `pip3 install --user -U -r requirements.txt` to ensure dependencies are up to date
+  - Run `python3 -m pip install --user -U -r requirements.txt` to ensure dependencies are up to date
 ## **CLI Usage:**
   
   `python3 upload.py /downloads/path/to/content --args`
