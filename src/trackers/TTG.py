@@ -30,7 +30,7 @@ class TTG():
         self.passkey = str(config['TRACKERS']['TTG'].get('announce_url', '')).strip().split('/')[-1]
         
         self.signature = None
-    
+        self.banned_groups = [""]
 
 
     async def edit_name(self, meta):

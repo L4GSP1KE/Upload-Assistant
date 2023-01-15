@@ -235,6 +235,8 @@ async def do_the_thing(base_dir):
                     upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker_class.tracker}? {debug}", default=meta['unattended'])
                 if upload_to_tracker:
                     console.print(f"Uploading to {tracker_class.tracker}")
+                    if check_banned_group(tracker_class.tracker, tracker_class.banned_groups, meta):
+                        continue
                     dupes = await tracker_class.search_existing(meta)
                     dupes = await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
@@ -250,6 +252,8 @@ async def do_the_thing(base_dir):
                     upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker_class.tracker}? {debug}", default=meta['unattended'])
                 if upload_to_tracker:
                     console.print(f"Uploading to {tracker}")
+                    if check_banned_group(tracker_class.tracker, tracker_class.banned_groups, meta):
+                        continue
                     if await tracker_class.validate_credentials(meta) == True:
                         dupes = await tracker_class.search_existing(meta)
                         dupes = await common.filter_dupes(dupes, meta)
@@ -292,6 +296,8 @@ async def do_the_thing(base_dir):
                     upload_to_bhd = cli_ui.ask_yes_no(f"Upload to BHD? ({draft}) {debug}", default=meta['unattended'])
                 if upload_to_bhd:
                     console.print("Uploading to BHD")
+                    if check_banned_group("BHD", bhd.banned_groups, meta):
+                        continue
                     dupes = await bhd.search_existing(meta)
                     dupes = await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
@@ -340,6 +346,8 @@ async def do_the_thing(base_dir):
                         imdb_id = cli_ui.ask_string("Unable to find IMDB id, please enter e.g.(tt1234567)")
                         meta['imdb_id'] = imdb_id.replace('tt', '').zfill(7)
                     ptp = PTP(config=config)
+                    if check_banned_group("PTP", ptp.banned_groups, meta):
+                        continue
                     try:
                         console.print("[yellow]Searching for Group ID")
                         groupID = await ptp.get_group_by_imdb(meta['imdb_id'])
@@ -445,6 +453,18 @@ def dupe_check(dupes, meta):
                     meta['name'] = f"{meta['name']} DUPE?"
 
         return meta
+
+
+# Return True if banned group
+def check_banned_group(tracker, banned_group_list, meta):
+    if meta['tag'] == "":
+        return False
+    else:
+        if any(meta['tag'][1:].lower() == group.lower() for group in banned_group_list):
+            console.print(f"[bold yellow]{meta['tag'][1:]}[/bold yellow][bold red] was found on [bold yellow]{tracker}'s[/bold yellow] list of banned groups.")
+            if not cli_ui.ask_yes_no(cli_ui.red, "Upload Anyways?", default=False):
+                return True
+    return False
 
 def get_missing(meta):
     info_notes = {

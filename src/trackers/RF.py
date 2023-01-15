@@ -4,6 +4,7 @@ import asyncio
 import requests
 import distutils.util
 import os
+import platform
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -27,6 +28,7 @@ class RF():
         self.upload_url = 'https://reelflix.xyz/api/torrents/upload'
         self.search_url = 'https://reelflix.xyz/api/torrents/filter'
         self.forum_link = 'https://reelflix.xyz/pages/1'
+        self.banned_groups = [""]
         pass
     
     async def upload(self, meta):
@@ -86,7 +88,7 @@ class RF():
         if distributor_id != 0:
             data['distributor_id'] = distributor_id
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         params = {
             'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()

@@ -6,6 +6,8 @@ from difflib import SequenceMatcher
 import distutils.util
 import urllib
 import os
+import platform
+
 from src.trackers.COMMON import COMMON
 from src.console import console
 
@@ -23,6 +25,7 @@ class BHD():
         self.source_flag = 'BHD'
         self.upload_url = 'https://beyond-hd.me/api/upload/'
         self.signature = f"\n[center][url=https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456]Created by L4G's Upload Assistant[/url][/center]"
+        self.banned_groups = ['Sicario', 'TOMMY', 'x0r', 'nikt0', 'FGT', 'd3g', 'MeGusta', 'YIFY', 'tigole', 'TEKNO3D', 'C4K', 'RARBG', '4K4U', 'EASports', 'ReaLHD']
         pass
     
     async def upload(self, meta):
@@ -91,7 +94,7 @@ class BHD():
         if len(tags) > 0:
             data['tags'] = ','.join(tags)
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         
         url = self.upload_url + self.config['TRACKERS'][self.tracker]['api_key'].strip()

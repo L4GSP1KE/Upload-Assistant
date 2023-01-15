@@ -4,6 +4,7 @@ import asyncio
 import requests
 import distutils.util
 import os
+import platform
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -26,7 +27,7 @@ class LCD():
         self.torrent_url = 'https://locadora.cc/api/torrents/'
         self.upload_url = 'https://locadora.cc/api/torrents/upload' 
         self.signature = f"\n[center]Criado usando L4G's Upload Assistant[/center]"
-        
+        self.banned_groups = [""]
         pass
     
     async def upload(self, meta):
@@ -90,7 +91,7 @@ class LCD():
             data['season_number'] = meta.get('season_int', '0')
             data['episode_number'] = meta.get('episode_int', '0')
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         params = {
             'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()

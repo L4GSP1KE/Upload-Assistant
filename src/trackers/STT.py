@@ -6,6 +6,7 @@ from difflib import SequenceMatcher
 import distutils.util
 import json
 import os
+import platform
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -25,6 +26,7 @@ class STT():
         self.search_url = 'https://skipthetrailers.xyz/api/torrents/filter'
         self.upload_url = 'https://skipthetrailers.xyz/api/torrents/upload'
         self.signature = '\n[center][url=https://skipthetrailers.xyz/pages/1]Please Seed[/url][/center]'
+        self.banned_groups = [""]
         pass
     
     async def upload(self, meta):
@@ -73,7 +75,7 @@ class STT():
             'sticky' : 0,
         }
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         params = {
             'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()

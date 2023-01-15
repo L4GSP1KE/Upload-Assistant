@@ -4,7 +4,7 @@ import asyncio
 import requests
 import distutils.util
 import os
-
+import platform
 from src.trackers.COMMON import COMMON
 from src.console import console
 
@@ -32,6 +32,7 @@ class ACM():
         self.upload_url = 'https://asiancinema.me/api/torrents/upload'
         self.search_url = 'https://asiancinema.me/api/torrents/filter'
         self.signature = None
+        self.banned_groups = [""]
         pass
     
     async def get_cat_id(self, category_name):
@@ -258,7 +259,7 @@ class ACM():
             data['season_number'] = meta.get('season_int', '0')
             data['episode_number'] = meta.get('episode_int', '0')
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         params = {
             'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip()

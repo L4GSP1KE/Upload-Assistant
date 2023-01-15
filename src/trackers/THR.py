@@ -9,6 +9,7 @@ import cli_ui
 import base64
 import os
 import re
+import platform
 
 from src.console import console 
 
@@ -25,6 +26,7 @@ class THR():
         self.config = config
         self.username = config['TRACKERS']['THR'].get('username')
         self.password = config['TRACKERS']['THR'].get('password')
+        self.banned_groups = [""]
         pass
     
     async def upload(self, session, meta):
@@ -69,7 +71,7 @@ class THR():
             'tube' : meta.get('youtube', '')
         }
         headers = {
-            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
+            'User-Agent' : f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         #If pronfo fails, put mediainfo into THR parser
         if meta.get('is_disc', '') != 'BDMV':
@@ -276,7 +278,7 @@ class THR():
             'ssl' : 'yes'
         }
         headers = {
-            'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:97.0) Gecko/20100101 Firefox/97.0'
+            'User-Agent' : f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         resp = session.post(url, headers=headers, data=payload)
         if resp.url == "https://www.torrenthr.org/index.php":

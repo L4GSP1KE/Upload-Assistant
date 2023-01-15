@@ -23,6 +23,7 @@ class HDB():
         self.passkey = config['TRACKERS']['HDB'].get('passkey', '').strip()
         self.rehost_images = config['TRACKERS']['HDB'].get('img_rehost', False)
         self.signature = None
+        self.banned_groups = [""]
     
 
     async def get_type_category_id(self, meta):
