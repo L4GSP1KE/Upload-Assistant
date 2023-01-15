@@ -98,6 +98,16 @@ class HUNO():
             console.print(data)
         open_torrent.close()
 
+    def get_audio(self, meta):
+        channels = meta.get('channels', "")
+        codec = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "").replace("Dual-Audio", "DUAL").replace(channels, "")
+        language = ""
+
+        if 'DUAL' not in codec and 'mediainfo' in meta:
+            language = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English")
+            language = re.sub(r'\(.+\)', '', language)
+
+        return f'{codec} {channels} {language}'
 
     async def get_name(self, meta):
         # Copied from Prep.get_name() then modified to match HUNO's naming convention.
@@ -108,11 +118,7 @@ class HUNO():
         alt_title = meta.get('aka', "")
         year = meta.get('year', "")
         resolution = meta.get('resolution', "")
-        audio = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "").replace("Dual-Audio", "DUAL")
-        audio_lang = ""
-        if 'DUAL' not in audio and 'mediainfo' in meta:
-            audio_lang = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English")
-            audio_lang = re.sub(r'\(.+\)', '', audio_lang)
+        audio = self.get_audio(meta)
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
@@ -146,43 +152,43 @@ class HUNO():
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} ({year}) {three_d} {edition} ({resolution} {region} {uhd} {source} {hybrid} {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                    name = f"{title} ({year}) {three_d} {edition} ({resolution} {region} {uhd} {source} {hybrid} {video_codec} {hdr} {audio} {tag}) {repack}"
                 elif meta['is_disc'] == 'DVD':
-                    name = f"{title} ({year}) {edition} ({resolution} {dvd_size} {hybrid} {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                    name = f"{title} ({year}) {edition} ({resolution} {dvd_size} {hybrid} {video_codec} {hdr} {audio} {tag}) {repack}"
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} ({year}) {edition} ({resolution} {source} {hybrid} {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                    name = f"{title} ({year}) {edition} ({resolution} {source} {hybrid} {video_codec} {hdr} {audio} {tag}) {repack}"
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} ({year}) {three_d} {edition} ({resolution} {uhd} {source} {hybrid} REMUX {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({year}) {three_d} {edition} ({resolution} {uhd} {source} {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}"
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} ({year}) {edition} (DVD {hybrid} REMUX {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({year}) {edition} (DVD {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}"
             elif type == "ENCODE": #Encode
-                name = f"{title} ({year}) {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({year}) {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} ({year}) {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({year}) {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} ({year}) {edition} ({resolution} {uhd} {service} WEBRip {hybrid} {video_encode} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({year}) {edition} ({resolution} {uhd} {service} WEBRip {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "HDTV": #HDTV
-                name = f"{title} ({year}) {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({year}) {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {tag}) {repack}"
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
                 if meta['is_disc'] == 'BDMV':
-                    name = f"{title} ({search_year}) {season}{episode} {three_d} {edition} ({resolution} {region} {uhd} {source} {hybrid} {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                    name = f"{title} ({search_year}) {season}{episode} {three_d} {edition} ({resolution} {region} {uhd} {source} {hybrid} {video_codec} {hdr} {audio} {tag}) {repack}"
                 if meta['is_disc'] == 'DVD':
-                    name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {dvd_size} {hybrid} {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                    name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {dvd_size} {hybrid} {video_codec} {hdr} {audio} {tag}) {repack}"
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {source} {hybrid} {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                    name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {source} {hybrid} {video_codec} {hdr} {audio} {tag}) {repack}"
             elif type == "REMUX" and source == "BluRay": #BluRay Remux
-                name = f"{title} ({search_year}) {season}{episode} {three_d} {edition} ({resolution} {uhd} {source} {hybrid} REMUX {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}" #SOURCE
+                name = f"{title} ({search_year}) {season}{episode} {three_d} {edition} ({resolution} {uhd} {source} {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}" #SOURCE
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} DVD {hybrid} REMUX {video_codec} {hdr} {audio} {audio_lang} {tag}) {repack}" #SOURCE
+                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} DVD {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}" #SOURCE
             elif type == "ENCODE": #Encode
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {audio_lang} {tag}) {repack}" #SOURCE
+                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}" #SOURCE
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {service} WEBRip {hybrid} {video_encode} {hdr} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {service} WEBRip {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "HDTV": #HDTV
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {audio_lang} {tag}) {repack}"
+                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {tag}) {repack}"
 
         return ' '.join(name.split()).replace(": ", " - ")
 
