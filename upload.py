@@ -22,7 +22,6 @@ from src.trackers.TTG import TTG
 from src.trackers.LST import LST
 from src.trackers.FL import FL
 from src.trackers.LT import LT
-from src.trackers.TDB import TDB
 from src.trackers.NBL import NBL
 from src.trackers.ANT import ANT
 from src.trackers.PTER import PTER
