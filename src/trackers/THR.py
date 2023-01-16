@@ -26,7 +26,7 @@ class THR():
         self.config = config
         self.username = config['TRACKERS']['THR'].get('username')
         self.password = config['TRACKERS']['THR'].get('password')
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def upload(self, session, meta):

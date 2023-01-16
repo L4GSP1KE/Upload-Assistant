@@ -32,7 +32,7 @@ class LT():
         self.upload_url = 'https://lat-team.com/api/torrents/upload'
         self.search_url = 'https://lat-team.com/api/torrents/filter'
         self.signature = ''
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def get_cat_id(self, category_name):

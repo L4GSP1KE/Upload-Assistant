@@ -27,7 +27,7 @@ class FL():
         self.fltools = config['TRACKERS'][self.tracker].get('fltools', {})
         self.uploader_name = config['TRACKERS'][self.tracker].get('uploader_name')
         self.signature = None
-        self.banned_groups = [""]
+        self.banned_groups = {}
     
 
     async def get_category_id(self, meta):

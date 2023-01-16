@@ -32,7 +32,7 @@ class UNIT3D_TEMPLATE():
         self.upload_url = 'https://domain.tld/api/torrents/upload'
         self.search_url = 'https://domain.tld/api/torrents/filter'
         self.signature = None
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def get_cat_id(self, category_name):

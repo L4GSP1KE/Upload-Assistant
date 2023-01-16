@@ -27,7 +27,7 @@ class LCD():
         self.torrent_url = 'https://locadora.cc/api/torrents/'
         self.upload_url = 'https://locadora.cc/api/torrents/upload' 
         self.signature = f"\n[center]Criado usando L4G's Upload Assistant[/center]"
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def upload(self, meta):

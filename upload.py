@@ -456,11 +456,11 @@ def dupe_check(dupes, meta):
 
 
 # Return True if banned group
-def check_banned_group(tracker, banned_group_list, meta):
+def check_banned_group(tracker, banned_group_set, meta):
     if meta['tag'] == "":
         return False
     else:
-        if any(meta['tag'][1:].lower() == group.lower() for group in banned_group_list):
+        if meta['tag'][1:].lower() in banned_group_set:
             console.print(f"[bold yellow]{meta['tag'][1:]}[/bold yellow][bold red] was found on [bold yellow]{tracker}'s[/bold yellow] list of banned groups.")
             if not cli_ui.ask_yes_no(cli_ui.red, "Upload Anyways?", default=False):
                 return True

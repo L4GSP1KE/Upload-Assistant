@@ -23,7 +23,7 @@ class SN():
         self.upload_url = 'https://swarmazon.club/api/upload.php'
         self.forum_link = 'https://swarmazon.club/php/forum.php?forum_page=2-swarmazon-rules'
         self.search_url = 'https://swarmazon.club/api/search.php'
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
 
     async def get_type_id(self, type):

@@ -32,7 +32,7 @@ class ACM():
         self.upload_url = 'https://asiancinema.me/api/torrents/upload'
         self.search_url = 'https://asiancinema.me/api/torrents/filter'
         self.signature = None
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def get_cat_id(self, category_name):

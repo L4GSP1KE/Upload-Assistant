@@ -32,7 +32,7 @@ class JPTV():
         self.upload_url = 'https://jptv.club/api/torrents/upload'
         self.search_url = 'https://jptv.club/api/torrents/filter'
         self.signature = None
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def get_cat_id(self, meta):

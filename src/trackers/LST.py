@@ -32,7 +32,7 @@ class LST():
         self.upload_url = 'https://lst.gg/api/torrents/upload'
         self.search_url = 'https://lst.gg/api/torrents/filter'
         self.signature = f"\n[center]Created by L4G's Upload Assistant[/center]"
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def get_cat_id(self, category_name, keywords, service):

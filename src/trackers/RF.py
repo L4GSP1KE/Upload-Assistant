@@ -28,7 +28,7 @@ class RF():
         self.upload_url = 'https://reelflix.xyz/api/torrents/upload'
         self.search_url = 'https://reelflix.xyz/api/torrents/filter'
         self.forum_link = 'https://reelflix.xyz/pages/1'
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def upload(self, meta):

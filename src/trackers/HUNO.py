@@ -26,7 +26,7 @@ class HUNO():
         self.search_url = 'https://hawke.uno/api/torrents/filter'
         self.upload_url = 'https://hawke.uno/api/torrents/upload'
         self.signature = "\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by HUNO's Upload Assistant[/url][/center]"
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
 
 

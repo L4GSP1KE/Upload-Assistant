@@ -25,7 +25,7 @@ class STC():
         self.upload_url = 'https://skipthecommericals.xyz/api/torrents/upload'
         self.search_url = 'https://skipthecommericals.xyz/api/torrents/filter'
         self.signature = '\n[center][url=https://skipthecommericals.xyz/pages/1]Please Seed[/url][/center]'
-        self.banned_groups = [""]
+        self.banned_groups = {}
         pass
     
     async def upload(self, meta):
