@@ -77,7 +77,7 @@ class Args():
         parser.add_argument('-fl', '--freeleech', nargs='*', required=False, help="Freeleech Percentage", default=0, dest="freeleech")
         args, before_args = parser.parse_known_args(input)
         args = vars(args)
-        console.print(args)
+        # console.print(args)
         if len(before_args) >= 1 and not os.path.exists(' '.join(args['path'])):
             for each in before_args:
                 args['path'].append(each)
