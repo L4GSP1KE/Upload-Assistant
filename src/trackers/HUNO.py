@@ -113,6 +113,7 @@ class HUNO():
         # Copied from Prep.get_name() then modified to match HUNO's naming convention.
         # It was much easier to build the name from scratch than to alter the existing name.
 
+        basename = os.path.basename(meta.get('path', ""))
         type = meta.get('type', "")
         title = meta.get('title',"")
         alt_title = meta.get('aka', "")
@@ -133,17 +134,14 @@ class HUNO():
         if not hdr.strip():
             hdr = "SDR"
         distributor = meta.get('distributor', "")
-        if meta.get('is_disc', "") == "BDMV": #Disk
-            video_codec = meta.get('video_codec', "")
-            region = meta.get('region', "")
-        elif meta.get('is_disc', "") == "DVD":
-            region = meta.get('region', "")
-            dvd_size = meta.get('dvd_size', "")
-        else:
-            video_codec = meta.get('video_codec', "")
-            video_encode = meta.get('video_encode', "").replace(".", "")
+        video_codec = meta.get('video_codec', "")
+        video_encode = meta.get('video_encode', "").replace(".", "")
+        if 'x264' in basename or 'x265' in basename:
+            video_encode = video_encode.replace('H', 'x')
+        region = meta.get('region', "")
+        dvd_size = meta.get('dvd_size', "")
         edition = meta.get('edition', "")
-        hybrid = "Hybrid" if "HYBRID" in meta.get('path', "").upper() else ""
+        hybrid = "Hybrid" if "HYBRID" in basename.upper() else ""
         search_year = meta.get('search_year', "")
         if not str(search_year).strip():
             search_year = year
