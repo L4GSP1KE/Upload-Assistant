@@ -166,8 +166,6 @@ class UNIT3D_TEMPLATE():
             'resolutions[]' : await self.get_res_id(meta['resolution']),
             'name' : ""
         }
-        if meta['category'] == 'TV':
-            params['name'] = params['name'] + f" {meta.get('season', '')}{meta.get('episode', '')}"
         if meta.get('edition', "") != "":
             params['name'] = params['name'] + f" {meta['edition']}"
         try:
