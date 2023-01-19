@@ -185,7 +185,11 @@ class COMMON():
                     ptgen = requests.get(url, params=params)
                     if ptgen.json()["error"] == None:
                         break
-            params['url'] =  ptgen.json()['data'][0]['link'] 
+            try:
+                params['url'] =  ptgen.json()['data'][0]['link'] 
+            except IndexError:
+                console.print("[red]Unable to get data from ptgen using IMDb")
+                params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
         else:
             console.print("[red]No IMDb id was found.")
             params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
