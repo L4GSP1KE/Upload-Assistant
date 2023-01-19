@@ -39,7 +39,7 @@ class JPTV():
         category_id = {
             'MOVIE': '1', 
             'TV': '2', 
-            }.get(meta['category'], '0')
+        }.get(meta['category'], '0')
         if meta['anime']:
             category_id = {
                 'MOVIE': '7', 
@@ -169,16 +169,17 @@ class JPTV():
         console.print("[yellow]Searching for existing torrents on site...")
         params = {
             'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip(),
-            'tmdbId' : meta['tmdb'],
-            'categories[]' : await self.get_cat_id(meta['category']),
+            'tmdb' : meta['tmdb'],
+            'categories[]' : await self.get_cat_id(meta),
             'types[]' : await self.get_type_id(meta['type']),
             'resolutions[]' : await self.get_res_id(meta['resolution']),
             'name' : ""
         }
-        if meta['category'] == 'TV':
-            params['name'] = params['name'] + f" {meta.get('season', '')}{meta.get('episode', '')}"
         if meta.get('edition', "") != "":
             params['name'] = params['name'] + f" {meta['edition']}"
+        if meta['debug']:
+            console.log("[cyan]Dupe Search Parameters")
+            console.log(params)
         try:
             response = requests.get(url=self.search_url, params=params)
             response = response.json()
