@@ -463,8 +463,18 @@ def check_banned_group(tracker, banned_group_list, meta):
     if meta['tag'] == "":
         return False
     else:
-        if any(meta['tag'][1:].lower() == group.lower() for group in banned_group_list):
-            console.print(f"[bold yellow]{meta['tag'][1:]}[/bold yellow][bold red] was found on [bold yellow]{tracker}'s[/bold yellow] list of banned groups.")
+        q = False
+        for tag in banned_group_list:
+            if isinstance(tag, list):
+                if meta['tag'][1:].lower() == tag[0].lower():
+                    console.print(f"[bold yellow]{meta['tag'][1:]}[/bold yellow][bold red] was found on [bold yellow]{tracker}'s[/bold yellow] list of banned groups.")
+                    console.print(f"[bold red]NOTE: [bold yellow]{tag[1]}")
+                    q = True
+            else:
+                if meta['tag'][1:].lower() == tag.lower():
+                    console.print(f"[bold yellow]{meta['tag'][1:]}[/bold yellow][bold red] was found on [bold yellow]{tracker}'s[/bold yellow] list of banned groups.")
+                    q = True
+        if q:
             if not cli_ui.ask_yes_no(cli_ui.red, "Upload Anyways?", default=False):
                 return True
     return False
