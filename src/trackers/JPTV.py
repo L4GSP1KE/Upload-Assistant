@@ -97,7 +97,7 @@ class JPTV():
             anon = 1
 
         if meta['bdinfo'] != None:
-            # mi_dump = None
+            mi_dump = ""
             for each in meta['discs']:
                 mi_dump = mi_dump + each['summary'].strip() + "\n\n"
         else:
