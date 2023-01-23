@@ -211,7 +211,7 @@ class COMMON():
             ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
         except:
             console.print_exception()
-            console.print(ptgen)
+            console.print(ptgen.text)
             console.print("[bold red]There was an error getting the ptgen \nUploading without ptgen")
             return ""
         return ptgen
