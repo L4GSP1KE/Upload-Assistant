@@ -182,9 +182,12 @@ class COMMON():
             ptgen = requests.get(url, params=data)
             if ptgen.json()["error"] != None:
                 for retry in range(ptgen_retry):
-                    ptgen = requests.get(url, params=params)
-                    if ptgen.json()["error"] == None:
-                        break
+                    try:
+                        ptgen = requests.get(url, params=params)
+                        if ptgen.json()["error"] == None:
+                            break
+                    except requests.exceptions.JSONDecodeError:
+                        continue
             try:
                 params['url'] =  ptgen.json()['data'][0]['link'] 
             except IndexError:
