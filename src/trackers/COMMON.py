@@ -196,7 +196,7 @@ class COMMON():
         try:
             ptgen = requests.get(url, params=params)
             if ptgen.json()["error"] != None:
-                for retry in range(self.ptgen_retry):
+                for retry in range(ptgen_retry):
                     ptgen = requests.get(url, params=params)
                     if ptgen.json()["error"] == None:
                         break
@@ -211,8 +211,9 @@ class COMMON():
             ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
         except:
             console.print_exception()
-            console.print("[bold red]There was an error getting the ptgen")
             console.print(ptgen)
+            console.print("[bold red]There was an error getting the ptgen \nUploading without ptgen")
+            return ""
         return ptgen
 
 
