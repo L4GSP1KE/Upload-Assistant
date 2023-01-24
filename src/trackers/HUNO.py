@@ -35,7 +35,7 @@ class HUNO():
         await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
         cat_id = await self.get_cat_id(meta['category'])
-        type_id = await self.get_type_id(meta['type'])
+        type_id = await self.get_type_id(meta)
         resolution_id = await self.get_res_id(meta['resolution'])
         if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['HUNO'].get('anon', "False"))) == False:
             anon = 0
@@ -199,16 +199,20 @@ class HUNO():
         return category_id
 
 
-    async def get_type_id(self, type):
-        type_id = {
-            'REMUX': '2',
-            'WEBDL': '3',
-            'WEBRIP': '3',
-            'ENCODE': '15',
-            'DISC': '1',
-            }.get(type, '0')
-        return type_id
+    async def get_type_id(self, meta):
+        basename = os.path.basename(meta.get('path', ""))
+        type = meta['type']
 
+        if type == 'REMUX':
+            return '2'
+        elif type in ('WEBDL', 'WEBRIP'):
+            return '15' if 'x264' in basename or 'x265' in basename else '3'
+        elif type == 'ENCODE':
+            return '15'
+        elif type == 'DISC':
+            return '1'
+        else:
+            return '0'
 
     async def get_res_id(self, resolution):
         resolution_id = {
@@ -266,7 +270,7 @@ class HUNO():
             'api_token' : self.config['TRACKERS']['HUNO']['api_key'].strip(),
             'tmdbId' : meta['tmdb'],
             'categories[]' : await self.get_cat_id(meta['category']),
-            'types[]' : await self.get_type_id(meta['type']),
+            'types[]' : await self.get_type_id(meta),
             'resolutions[]' : await self.get_res_id(meta['resolution']),
             'name' : ""
         }
