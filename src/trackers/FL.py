@@ -90,9 +90,9 @@ class FL():
 
         fl_name = fl_name.replace('DD+', 'DDP')
         fl_name = fl_name.replace('BluRay REMUX', 'Remux').replace('BluRay Remux', 'Remux').replace('Bluray Remux', 'Remux')
-        fl_name = fl_name.replace('DoVi HDR HEVC', 'HEVC DoVi').replace('HDR HEVC', 'HEVC HDR').replace('DoVi HEVC', 'HEVC DoVi').replace('DoVi HDR10+', 'DoVi').replace('DoVi HDR', 'DoVi')
-        fl_name = fl_name.replace('DTS7.1', 'DTS').replace('DTS5.1', 'DTS').replace('DTS2.0', 'DTS').replace('DTS1.0', 'DTS')
         fl_name = fl_name.replace('PQ10', 'HDR').replace('HDR10+', 'HDR')
+        fl_name = fl_name.replace('DoVi HDR HEVC', 'HEVC DoVi HDR').replace('HDR HEVC', 'HEVC HDR').replace('DoVi HEVC', 'HEVC DoVi')
+        fl_name = fl_name.replace('DTS7.1', 'DTS').replace('DTS5.1', 'DTS').replace('DTS2.0', 'DTS').replace('DTS1.0', 'DTS')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
         fl_name = re.sub("[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", fl_name)
