@@ -206,7 +206,7 @@ class HUNO():
         if type == 'REMUX':
             return '2'
         elif type in ('WEBDL', 'WEBRIP'):
-            return '15' if 'x264' in basename or 'x265' in basename else '3'
+            return '15' if 'x265' in basename else '3'
         elif type == 'ENCODE':
             return '15'
         elif type == 'DISC':
