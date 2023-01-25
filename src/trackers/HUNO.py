@@ -100,10 +100,13 @@ class HUNO():
 
     def get_audio(self, meta):
         channels = meta.get('channels', "")
-        codec = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "").replace("Dual-Audio", "DUAL").replace(channels, "")
+        codec = meta.get('audio', "").replace("DD+", "DDP").replace("EX", "").replace("Dual-Audio", "").replace(channels, "")
+        dual = "Dual-Audio" in meta.get('audio', "")
         language = ""
 
-        if 'DUAL' not in codec and 'mediainfo' in meta:
+        if dual:
+            language = "DUAL"
+        elif 'mediainfo' in meta:
             language = next(x for x in meta["mediainfo"]["media"]["track"] if x["@type"] == "Audio").get('Language_String', "English")
             language = re.sub(r'\(.+\)', '', language)
 
