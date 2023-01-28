@@ -461,7 +461,7 @@ class PTP():
             "Hardcoded Subs (Forced)" : 50,
             "No English Subs" : 14
         }
-        opts = cli_ui.select_choices("No subtitles found. Please select any applicable options:", choices=list(trumpable_values.keys()))
+        opts = cli_ui.select_choices("English subtitles not found. Please select any/all applicable options:", choices=list(trumpable_values.keys()))
         trumpable = []
         if opts:
             for t, v in trumpable_values.items():
@@ -709,7 +709,7 @@ class PTP():
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", "r").read()
         ptp_subtitles = self.get_subtitles(meta)
         ptp_trumpable = None
-        if ptp_subtitles in [[44], []]:
+        if not any(x in [3, 50] for x in ptp_subtitles):
             ptp_trumpable, ptp_subtitles = self.get_trumpable(ptp_subtitles)
         data = {
             "submit": "true",
