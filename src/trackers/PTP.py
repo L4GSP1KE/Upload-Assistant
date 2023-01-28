@@ -455,6 +455,24 @@ class PTP():
             sub_langs = [44] # No Subtitle
         return sub_langs
 
+    def get_trumpable(self, sub_langs):
+        trumpable_values = {
+            "Hardcoded Subs (Full)" : 4,
+            "Hardcoded Subs (Forced)" : 50,
+            "No English Subs" : 14
+        }
+        opts = cli_ui.select_choices("No subtitles found. Please select any applicable options:", choices=list(trumpable_values.keys()))
+        trumpable = []
+        if opts:
+            for t, v in trumpable_values.items():
+                if t in ''.join(opts):
+                    if v != 50: # Hardcoded, Forced
+                        trumpable.append(v)
+                    else:
+                        sub_langs = [v]
+        if trumpable == []:
+            trumpable = None
+        return trumpable, sub_langs
 
     def get_remaster_title(self, meta):
         remaster_title = []
@@ -689,6 +707,10 @@ class PTP():
         resolution, other_resolution = self.get_resolution(meta)
         await self.edit_desc(meta)
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", "r").read()
+        ptp_subtitles = self.get_subtitles(meta)
+        ptp_trumpable = None
+        if ptp_subtitles in [[44], []]:
+            ptp_trumpable, ptp_subtitles = self.get_trumpable(ptp_subtitles)
         data = {
             "submit": "true",
             "remaster_year": "",
@@ -703,7 +725,8 @@ class PTP():
             "other_source": self.get_source(meta['source']),
             "release_desc": desc,
             "nfo_text": "",
-            "subtitles[]" : self.get_subtitles(meta),
+            "subtitles[]" : ptp_subtitles,
+            "trumpable[]" : ptp_trumpable,
             "AntiCsrfToken" : await self.get_AntiCsrfToken(meta)
             }
         if data["remaster_year"] != "" or data["remaster_title"] != "":
@@ -769,8 +792,8 @@ class PTP():
                  "User-Agent": self.user_agent
             }
             if meta['debug']:
-                console.print(url)
-                console.print(data)
+                console.log(url)
+                console.log(data)
             else:
                 with requests.Session() as session:
                     cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"
