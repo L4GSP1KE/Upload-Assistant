@@ -471,7 +471,7 @@ class PTP():
                     else:
                         sub_langs = [v]
         if trumpable == []:
-            trumpable = None
+            trumpable = [14]
         return trumpable, sub_langs
 
     def get_remaster_title(self, meta):
