@@ -74,16 +74,20 @@ class HUNO():
             # 'double_up' : 0,
             # 'sticky' : 0,
         }
-        if self.config['TRACKERS'][self.tracker].get('internal', False) == True:
-            if meta['tag'] != "" and (
-                    meta['tag'][1:] in self.config['TRACKERS'][self.tracker].get('internal_groups', [])):
+
+        tracker_config = self.config['TRACKERS'][self.tracker]
+
+        if 'internal' in tracker_config:
+            if tracker_config['internal'] and meta['tag'] and meta['tag'][1:] in tracker_config.get('internal_groups', []):
                 data['internal'] = 1
+            else:
+                data['internal'] = 0
 
         headers = {
             'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         params = {
-            'api_token': self.config['TRACKERS'][self.tracker]['api_key'].strip()
+            'api_token': tracker_config['api_key'].strip()
         }
 
         if meta['debug'] == False:
