@@ -459,19 +459,22 @@ class PTP():
         trumpable_values = {
             "Hardcoded Subs (Full)" : 4,
             "Hardcoded Subs (Forced)" : 50,
-            "No English Subs" : 14
+            "No English Subs" : 14,
+            "English Softsubs Exist (mislabled)" : None
         }
         opts = cli_ui.select_choices("English subtitles not found. Please select any/all applicable options:", choices=list(trumpable_values.keys()))
         trumpable = []
         if opts:
             for t, v in trumpable_values.items():
                 if t in ''.join(opts):
-                    if v != 50: # Hardcoded, Forced
+                    if v == None:
+                        break
+                    elif v != 50: # Hardcoded, Forced
                         trumpable.append(v)
                     else:
                         sub_langs = [v]
         if trumpable == []:
-            trumpable = [14]
+            trumpable = None
         return trumpable, sub_langs
 
     def get_remaster_title(self, meta):

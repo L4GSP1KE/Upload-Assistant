@@ -144,7 +144,7 @@ class Clients():
                 if torrent_filepath in actual_filepath:
                     valid = True
         else:
-            console.print(f'[bold yellow]NO .torrent WITH INFOHASH {torrenthash} FOUND')
+            console.print(f'[bold yellow]{torrent_path} was not found')
         if valid:
             if os.path.exists(torrent_path):
                 reuse_torrent = Torrent.read(torrent_path)
