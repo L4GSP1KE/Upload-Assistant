@@ -758,9 +758,9 @@ class PTP():
             if cover != None and "ptpimg" not in cover:
                 cover = await self.ptpimg_url_rehost(cover)
             while cover == None:
-                cover_prompt = console.input("[red]No Poster was found. Please input a link to a poster: \n")
-                if "ptpimg" not in cover_prompt and cover_prompt.endswith(('.jpg', '.png')):
-                    cover = await self.ptpimg_url_rehost(cover_prompt)
+                cover = cli_ui.ask_string("No Poster was found. Please input a link to a poster: \n", default="")
+                if "ptpimg" not in str(cover) and str(cover).endswith(('.jpg', '.png')):
+                    cover = await self.ptpimg_url_rehost(cover)
             new_data = {
                 "title": tinfo.get("title", meta["imdb_info"].get("title", meta["title"])),
                 "year": tinfo.get("year", meta["imdb_info"].get("year", meta["year"])),
