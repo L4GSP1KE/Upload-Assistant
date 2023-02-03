@@ -2075,17 +2075,17 @@ class Prep():
                                 response = requests.post(url, data = data,timeout=timeout)
                                 response = response.json()
                                 if response.get('success') != True:
-                                    console.print(response, 'red')
+                                    progress.console.print(response)
                                 img_url = response['data'].get('medium', response['data']['image'])['url']
                                 web_url = response['data']['url_viewer']
                                 raw_url = response['data']['image']['url']
                             except Exception:
-                                console.print("[yellow]imgbb failed, trying next image host")
+                                progress.console.print("[yellow]imgbb failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "freeimage.host":
-                            console.print("[red]Support for freeimage.host has been removed. Please remove from your config")
-                            console.rint("continuing in 15 seconds")
+                            progress.console.print("[red]Support for freeimage.host has been removed. Please remove from your config")
+                            progress.console.print("continuing in 15 seconds")
                             time.sleep(15)
                             progress.stop()
                             newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
@@ -2101,13 +2101,13 @@ class Prep():
                             try:
                                 response = requests.post(url, data=data, files=files,timeout=timeout)
                                 if response.status_code != 200:
-                                    console.print(response, 'red')
+                                    progress.console.print(response)
                                 response = response.json()
                                 raw_url = response['th_url'].replace('https://t', 'https://img').replace('/thumbs/', '/images/')
                                 img_url = response['th_url']
                                 web_url = response['show_url']
                             except Exception:
-                                console.print("[yellow]pixhost failed, trying next image host")
+                                progress.console.print("[yellow]pixhost failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "ptpimg":
@@ -2129,7 +2129,7 @@ class Prep():
                                 web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                                 raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                             except:
-                                console.print("[yellow]ptpimg failed, trying next image host")
+                                progress.console.print("[yellow]ptpimg failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                         else:
