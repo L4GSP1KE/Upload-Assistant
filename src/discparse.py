@@ -271,6 +271,7 @@ class DiscParse():
                 file_size = os.path.getsize(file)
                 if file_size > size:
                     largest = file
+                    size = file_size
             each['evo_mi'] = MediaInfo.parse(os.path.basename(largest), output='STRING', full=False, mediainfo_options={'inform_version' : '1'})
             each['largest_evo'] = os.path.abspath(f"{path}/{largest}")
         return discs
