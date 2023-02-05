@@ -38,9 +38,13 @@ class COMMON():
                         if each['type'] == "BDMV":
                             descfile.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]\n")
                             descfile.write("\n")
-                        if each['type'] == "DVD":
+                        elif each['type'] == "DVD":
                             descfile.write(f"{each['name']}:\n")
                             descfile.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]\n")
+                            descfile.write("\n")
+                        elif each['type'] == "HDDVD":
+                            descfile.write(f"{each['name']}:\n")
+                            descfile.write(f"[spoiler={os.path.basename(each['largest_evo'])}][code][{each['evo_mi']}[/code][/spoiler]\n")
                             descfile.write("\n")
             desc = base
             desc = bbcode.convert_pre_to_code(desc)

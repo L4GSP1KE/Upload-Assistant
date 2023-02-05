@@ -198,9 +198,13 @@ class BHD():
                         if each['type'] == "BDMV":
                             desc.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
                             desc.write("\n")
-                        if each['type'] == "DVD":
+                        elif each['type'] == "DVD":
                             desc.write(f"{each['name']}:\n")
                             desc.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
+                            desc.write("\n")
+                        elif each['type'] == "HDDVD":
+                            desc.write(f"{each['name']}:\n")
+                            desc.write(f"[spoiler={os.path.basename(each['largest_evo'])}][code][{each['evo_mi']}[/code][/spoiler]\n")
                             desc.write("\n")
             desc.write(base.replace("[img]", "[img=300x300]"))
             images = meta['image_list']
