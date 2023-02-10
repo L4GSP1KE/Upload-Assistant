@@ -203,7 +203,7 @@ class PTP():
             "year" : meta.get("year", ""),
             "album_desc" : meta.get("overview", ""),
         }
-        tags = self.get_tags([meta.get("genres", ""), meta.get("keywords", "")])
+        tags = await self.get_tags([meta.get("genres", ""), meta.get("keywords", "")])
         tinfo['tags'] = ", ".join(tags)
         return tinfo
 
