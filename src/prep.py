@@ -1098,7 +1098,7 @@ class Prep():
                 elif attempted == 2:
                     attempted += 1
                     meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename)['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
-                else:
+                if meta['tmdb'] in (None, ""):
                     console.print(f"[red]Unable to find TMDb match for {filename}")
                     if meta.get('mode', 'discord') == 'cli':
                         tmdb_id = cli_ui.ask_string("Please enter tmdb id in this format: tv/12345 or movie/12345")
