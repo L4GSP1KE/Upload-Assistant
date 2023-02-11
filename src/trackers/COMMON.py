@@ -193,8 +193,8 @@ class COMMON():
                     except requests.exceptions.JSONDecodeError:
                         continue
             try:
-                params['url'] =  ptgen.json()['data'][0]['link'] 
-            except IndexError:
+                params['url'] = ptgen.json()['data'][0]['link'] 
+            except Exception:
                 console.print("[red]Unable to get data from ptgen using IMDb")
                 params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
         else:
@@ -216,7 +216,7 @@ class COMMON():
             if "[/img]" in ptgen:
                 ptgen = ptgen.split("[/img]")[1]
             ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
-        except:
+        except Exception:
             console.print_exception()
             console.print(ptgen.text)
             console.print("[bold red]There was an error getting the ptgen \nUploading without ptgen")
