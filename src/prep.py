@@ -2187,6 +2187,7 @@ class Prep():
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
+        part = meta.get('part', "")
         repack = meta.get('repack', "")
         three_d = meta.get('3D', "")
         tag = meta.get('tag', "")
@@ -2265,22 +2266,22 @@ class Prep():
                     name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {source} {video_codec} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
             elif type == "REMUX" and source in ("BluRay", "HDDVD"): #BluRay Remux
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {source} REMUX {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {source} REMUX {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "ENCODE": #Encode
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "HDTV": #HDTV
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
                 potential_missing = []
 
 
@@ -2506,6 +2507,14 @@ class Prep():
             meta['episode_title_storage'] = guessit(video).get('episode_title', '')
             if meta['season'] == "S00" or meta['episode'] == "E00":
                 meta['episode_title'] = meta['episode_title_storage']
+            
+            # Guess the part of the episode (if available)
+            meta['part'] = guessit(video).get('part')
+            if meta['part'] != None:
+                meta['part'] = f"Part {meta['part']}"
+            else:
+                meta['part'] = ''
+
         return meta
 
 
