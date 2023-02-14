@@ -873,8 +873,12 @@ class Prep():
             return
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
-            video_track = mi['media']['track'][1]
-            length = video_track['Duration']
+            try:
+                video_track = mi['media']['track'][1]
+                length = video_track['Duration']
+            except:
+                video_track = mi['media']['track'][0]
+                length = video_track['Duration']
             width = float(video_track.get('Width'))
             height = float(video_track.get('Height'))
             par = float(video_track.get('PixelAspectRatio', 1))
