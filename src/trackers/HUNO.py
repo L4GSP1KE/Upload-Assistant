@@ -68,7 +68,7 @@ class HUNO():
             'stream' : await self.is_plex_friendly(meta),
             'sd' : meta['sd'],
             'keywords' : meta['keywords'],
-            'season_pack': await self.is_season_pack(meta),
+            'season_pack': 1 if await common.is_season_pack(meta) else 0,
             # 'featured' : 0,
             # 'free' : 0,
             # 'double_up' : 0,
@@ -221,6 +221,7 @@ class HUNO():
         else:
             return '0'
 
+
     async def get_res_id(self, resolution):
         resolution_id = {
             'Other':'10',
@@ -242,29 +243,6 @@ class HUNO():
 
         if any(l in meta["audio"] for l in lossy_audio_codecs):
             return 1
-
-        return 0
-
-
-    async def is_season_pack(self, meta):
-        if meta["category"] == "TV" and os.path.isdir(meta["path"]):
-            ignored_directory_terms = ["extras", "featurettes", "sample"]
-            ignored_file_terms = ["sample"]
-            video_file_extensions = [".avi", ".flv", ".m4v", ".mkv", ".mp4", ".mpeg", ".rm", ".ts"]
-            video_files = []
-
-            for (dir_path, _, file_names) in os.walk(meta["path"]):
-                if os.path.basename(dir_path).lower() in ignored_directory_terms:
-                    continue
-                for f in file_names:
-                    if any(i in f.lower() for i in ignored_file_terms):
-                        continue
-                    if not any(f.lower().endswith(e) for e in video_file_extensions):
-                        continue
-                    video_files.append(f)
-
-            if len(video_files) > 1:
-                return 1
 
         return 0
 
