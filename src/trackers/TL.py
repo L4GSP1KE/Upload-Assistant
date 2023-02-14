@@ -5,6 +5,7 @@ import platform
 
 from src.trackers.COMMON import COMMON
 from src.console import console
+from pathlib import Path
 
 
 class TL():
@@ -82,7 +83,7 @@ class TL():
             bd_dump = None
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
-        files = {'torrent': (meta['name'] + '.torrent', open_torrent)}
+        files = {'torrent': (self.get_name(meta) + '.torrent', open_torrent)}
         data = {
             'description' : desc + '\n\n' + (bd_dump if meta['bdinfo'] != None else mi_dump),
             'announcekey' : self.announce_key,
@@ -100,3 +101,7 @@ class TL():
             console.print(f"[cyan]Request Data:")
             console.print(data)
         open_torrent.close()
+
+    def get_name(self, meta):
+        path = Path(meta['path'])
+        return path.stem if path.is_file() else path.name
