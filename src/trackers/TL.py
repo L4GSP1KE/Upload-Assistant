@@ -75,17 +75,21 @@ class TL():
         cat_id = await self.get_cat_id(common, meta)
         await common.unit3d_edit_desc(meta, self.tracker, self.signature)
 
-        if meta['bdinfo'] != None:
-            mi_dump = None
-            bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
-        else:
-            mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()
-            bd_dump = None
-        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
+        open_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'a+')
+        
+        info_filename = 'BD_SUMMARY_00' if meta['bdinfo'] != None else 'MEDIAINFO_CLEANPATH'
+        open_info = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/{info_filename}.txt", 'r', encoding='utf-8')
+        open_desc.write('\n\n')
+        open_desc.write(open_info.read())
+        open_info.close()
+        
+        open_desc.seek(0)
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
-        files = {'torrent': (self.get_name(meta) + '.torrent', open_torrent)}
+        files = {
+            'nfo': open_desc,
+            'torrent': (self.get_name(meta) + '.torrent', open_torrent)
+        }
         data = {
-            'description' : desc + '\n\n' + (bd_dump if meta['bdinfo'] != None else mi_dump),
             'announcekey' : self.announce_key,
             'category' : cat_id
         }
@@ -101,6 +105,7 @@ class TL():
             console.print(f"[cyan]Request Data:")
             console.print(data)
         open_torrent.close()
+        open_desc.close()
 
     def get_name(self, meta):
         path = Path(meta['path'])
