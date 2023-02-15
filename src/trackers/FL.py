@@ -114,10 +114,16 @@ class FL():
         
         # Confirm the correct naming order for FL
         cli_ui.info(f"Filelist name: {fl_name}")
-        fl_confirm = cli_ui.ask_yes_no("Correct?", default=False)
-        if fl_confirm != True:
-            console.print("Aborting...")
-            return
+        if meta.get('unattended', False) == False:
+            fl_confirm = cli_ui.ask_yes_no("Correct?", default=False)
+            if fl_confirm != True:
+                fl_name_manually = cli_ui.ask_string("Please enter a proper name", default="")
+                if fl_name_manually == "":
+                    console.print('No proper name given')
+                    console.print("Aborting...")
+                    return
+                else:
+                    fl_name = fl_name_manually
 
         # Download new .torrent from site
         fl_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r', newline='').read()
