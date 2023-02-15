@@ -156,14 +156,6 @@ async def do_the_thing(base_dir):
         meta = await prep.gather_prep(meta=meta, mode='cli') 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
 
-        if meta.get('image_list', False) == False and meta.get('skip_imghost_upload', False) == False:
-            return_dict = {}
-            meta['image_list'], dummy_var = prep.upload_screens(meta, meta['screens'], 1, 0, meta['screens'],[], return_dict)
-            if meta['debug']:
-                console.print(meta['image_list'])
-            # meta['uploaded_screens'] = True
-
-
         if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
             reuse_torrent = None
             if meta.get('rehash', False) == False:

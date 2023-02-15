@@ -368,7 +368,12 @@ class Prep():
         meta.get('anon', False)
         meta['anon'] = self.is_anon(meta['anon'])
             
-        
+        if meta.get('image_list', False) == False and meta.get('skip_imghost_upload', False) == False:
+            return_dict = {}
+            meta['image_list'], dummy_var = self.upload_screens(meta, meta['screens'], 1, 0, meta['screens'],[], return_dict)
+            if meta['debug']:
+                console.print(meta['image_list'])
+            # meta['uploaded_screens'] = True
         
         meta = await self.gen_desc(meta)
         return meta
