@@ -769,6 +769,8 @@ class PTP():
                 "album_desc": tinfo.get("plot", meta.get("overview", "")),
                 "trailer": meta.get("youtube", ""),
             }
+            if new_data['year'] in ['', '0', 0, None] and meta.get('manual_year') not in [0, '', None]:
+                new_data['year'] = meta['manual_year']
             while new_data["tags"] == "":
                  if meta.get('mode', 'discord') == 'cli':
                     console.print('[yellow]Unable to match any tags')

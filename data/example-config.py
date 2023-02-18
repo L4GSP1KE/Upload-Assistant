@@ -8,7 +8,7 @@ config = {
         "img_host_1": "imgbb",
         "img_host_2": "ptpimg",
         "img_host_3": "imgbox",
-	"img_host_4": "pixhost",
+	    "img_host_4": "pixhost",
         # "img_host_5": "",
 
 
