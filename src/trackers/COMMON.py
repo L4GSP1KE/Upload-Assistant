@@ -324,27 +324,3 @@ class COMMON():
             if allow and each not in new_dupes:
                 new_dupes.append(each)
         return new_dupes
-
-
-
-    async def is_season_pack(self, meta):
-        if meta["category"] == "TV" and os.path.isdir(meta["path"]):
-            ignored_directory_terms = ["extras", "featurettes", "sample"]
-            ignored_file_terms = ["sample"]
-            video_file_extensions = [".avi", ".flv", ".m4v", ".mkv", ".mp4", ".mpeg", ".rm", ".ts"]
-            video_files = []
-
-            for (dir_path, _, file_names) in os.walk(meta["path"]):
-                if os.path.basename(dir_path).lower() in ignored_directory_terms:
-                    continue
-                for f in file_names:
-                    if any(i in f.lower() for i in ignored_file_terms):
-                        continue
-                    if not any(f.lower().endswith(e) for e in video_file_extensions):
-                        continue
-                    video_files.append(f)
-
-            if len(video_files) > 1:
-                return True
-
-        return False

@@ -68,7 +68,7 @@ class HUNO():
             'stream' : await self.is_plex_friendly(meta),
             'sd' : meta['sd'],
             'keywords' : meta['keywords'],
-            'season_pack': 1 if await common.is_season_pack(meta) else 0,
+            'season_pack': meta.get('tv_pack', 0),
             # 'featured' : 0,
             # 'free' : 0,
             # 'double_up' : 0,

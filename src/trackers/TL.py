@@ -60,7 +60,7 @@ class TL():
         elif meta['category'] == 'TV':
             if meta['original_language'] != 'en': 
                 return self.CATEGORIES['TvForeign']
-            elif await common.is_season_pack(meta):
+            elif meta.get('tv_pack', 0):
                 return self.CATEGORIES['TvBoxsets']
             elif meta['sd']:
                 return self.CATEGORIES['TvEpisodes']
