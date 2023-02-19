@@ -622,7 +622,7 @@ class Prep():
                 scene = True
                 r = requests.get(f"https://api.srrdb.com/v1/imdb/{base}")
                 r = r.json()
-                if r['releases'] != []:
+                if r['releases'] != [] and imdb == None:
                     imdb = r['releases'][0].get('imdb', imdb) if r['releases'][0].get('imdb') is not None else imdb
                 console.print(f"[green]SRRDB: Matched to {response['results'][0]['release']}")
         except Exception:
