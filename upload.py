@@ -26,6 +26,7 @@ from src.trackers.NBL import NBL
 from src.trackers.ANT import ANT
 from src.trackers.PTER import PTER
 from src.trackers.JPTV import JPTV
+from src.trackers.TL import TL
 import json
 from pathlib import Path
 import asyncio
@@ -219,6 +220,7 @@ async def do_the_thing(base_dir):
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
             'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'JPTV' : JPTV,
+            'TL': TL,
             }
 
         for tracker in trackers:
@@ -337,7 +339,6 @@ async def do_the_thing(base_dir):
                     except:
                         console.print(traceback.print_exc())
 
-
             if tracker == "PTP":
                 if meta['unattended']:
                     upload_to_ptp = True
@@ -374,6 +375,19 @@ async def do_the_thing(base_dir):
                             await client.add_to_client(meta, "PTP")
                     except:
                         console.print(traceback.print_exc())
+
+            if tracker == "TL":
+                tracker_class = tracker_class_map[tracker](config=config)
+                if meta['unattended']:
+                    upload_to_tracker = True
+                else:
+                    upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker_class.tracker}? {debug}", default=meta['unattended'])
+                if upload_to_tracker:
+                    console.print(f"Uploading to {tracker_class.tracker}")
+                    if check_banned_group(tracker_class.tracker, tracker_class.banned_groups, meta):
+                        continue
+                    await tracker_class.upload(meta)
+                    await client.add_to_client(meta, tracker_class.tracker)
             
             
 
