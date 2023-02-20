@@ -379,6 +379,7 @@ class PTP():
             "HDDVD" : "HD-DVD",
             "Web" : "WEB",
             "HDTV" : "HDTV",
+            'UHDTV' : 'HDTV',
             "NTSC" : "DVD",
             "PAL" : "DVD"
         }
@@ -460,7 +461,7 @@ class PTP():
             "Hardcoded Subs (Full)" : 4,
             "Hardcoded Subs (Forced)" : 50,
             "No English Subs" : 14,
-            "English Softsubs Exist (mislabled)" : None
+            "English Softsubs Exist (Mislabeled)" : None
         }
         opts = cli_ui.select_choices("English subtitles not found. Please select any/all applicable options:", choices=list(trumpable_values.keys()))
         trumpable = []

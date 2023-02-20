@@ -139,6 +139,7 @@ class BHD():
             "HD DVD" : "HD-DVD",
             "Web" : "WEB",
             "HDTV" : "HDTV",
+            "UHDTV" : "HDTV",
             "NTSC" : "DVD",
             "PAL" : "DVD"
         }
