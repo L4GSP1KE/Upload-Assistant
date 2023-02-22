@@ -690,7 +690,7 @@ class PTP():
                         with open(cookiefile, 'wb') as cf:
                             pickle.dump(session.cookies, cf)
                     except Exception:
-                        raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {resp.text}")
+                        raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
                 except Exception:
                     raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
         return AntiCsrfToken
