@@ -207,14 +207,14 @@ class BHD():
                             desc.write(f"{each['name']}:\n")
                             desc.write(f"[spoiler={os.path.basename(each['largest_evo'])}][code][{each['evo_mi']}[/code][/spoiler]\n")
                             desc.write("\n")
-            desc.write(base.replace("[img]", "[img=300x300]"))
+            desc.write(base.replace("[img]", "[img width=300]"))
             images = meta['image_list']
             if len(images) > 0: 
                 desc.write("[center]")
                 for each in range(len(images[:int(meta['screens'])])):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img=350x350]{img_url}[/img][/url]")
+                    desc.write(f"[url={web_url}][img width=350]{img_url}[/img][/url]")
                 desc.write("[/center]")
             desc.write(self.signature)
             desc.close()

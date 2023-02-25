@@ -51,7 +51,7 @@ class COMMON():
             desc = bbcode.convert_hide_to_spoiler(desc)
             if comparison == False:
                 desc = bbcode.convert_comparison_to_collapse(desc, 1000)
-            desc = desc.replace('[img]', '[img=300]')
+            desc = desc.replace('[img]', '[img width=300]')
             descfile.write(desc)
             images = meta['image_list']
             if len(images) > 0: 
@@ -59,7 +59,7 @@ class COMMON():
                 for each in range(len(images[:int(meta['screens'])])):
                     web_url = images[each]['web_url']
                     raw_url = images[each]['raw_url']
-                    descfile.write(f"[url={web_url}][img=350]{raw_url}[/img][/url]")
+                    descfile.write(f"[url={web_url}][img width=350]{raw_url}[/img][/url]")
                 descfile.write("[/center]")
             if signature != None:
                 descfile.write(signature)
