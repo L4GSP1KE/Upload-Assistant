@@ -91,6 +91,7 @@ class JPTV():
         await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         region_id = await common.unit3d_region_ids(meta.get('region'))
         distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
+        jptv_name = await self.edit_name(meta)
         if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
             anon = 0
         else:
@@ -107,7 +108,7 @@ class JPTV():
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': open_torrent}
         data = {
-            'name' : meta['name'],
+            'name' : jptv_name,
             'description' : desc,
             'mediainfo' : mi_dump,
             # 'bdinfo' : bd_dump, 
@@ -194,3 +195,34 @@ class JPTV():
             await asyncio.sleep(5)
 
         return dupes
+    
+
+    async def edit_name(self, meta):
+        name = meta.get('name')
+        aka = meta.get('aka')
+        original_title = meta.get('original_title')
+        year = str(meta.get('year'))
+        audio = meta.get('audio')
+        source = meta.get('source')
+        is_disc = meta.get('is_disc')
+        subs = self.get_subtitles(meta)
+        if aka != '':
+            # ugly fix to remove the extra space in the title
+            aka = aka + ' '
+            name = name.replace(aka, f'{original_title} {chr(int("202A", 16))}')
+        elif aka == '':
+            if meta.get('title') != original_title:
+                # name = f'{name[:name.find(year)]}/ {original_title} {chr(int("202A", 16))}{name[name.find(year):]}'
+                name = name.replace(meta['title'], f"{original_title} {chr(int('202A', 16))} {meta['title']}")
+        if 'AAC' in audio:
+            name = name.replace(audio.strip().replace("  ", " "), audio.replace(" ", ""))
+        name = name.replace("DD+ ", "DD+")
+        name = name.replace ("UHD BluRay REMUX", "Remux")
+        name = name.replace ("BluRay REMUX", "Remux")
+        name = name.replace ("H.265", "HEVC")
+        if is_disc == 'DVD':
+            name = name.replace (f'{source} DVD5', f'DVD {source}')
+            name = name.replace (f'{source} DVD9', f'DVD {source}')
+
+        name = name + self.get_subs_tag(subs)
+        return name
