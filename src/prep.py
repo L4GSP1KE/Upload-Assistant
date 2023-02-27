@@ -1476,6 +1476,7 @@ class Prep():
                             # Check for additional, bloated Tracks
                             if audio_language != meta['original_language'] and audio_language != "en":
                                 if meta['original_language'] not in variants and audio_language not in variants:
+                                    audio_language = "und" if audio_language == "" else audio_language
                                     console.print(f"[bold red]This release has a(n) {audio_language} audio track, and may be considered bloated")
                                     time.sleep(5)
                     if eng and orig == True:
