@@ -714,6 +714,8 @@ class Prep():
                             time.sleep(1)
                         elif self.img_host == "ptpimg":
                             i += 1
+                        elif self.img_host == "lensdump":
+                            i += 1
                         else:
                             console.print("[red]Image too large for your image host, retaking")
                             time.sleep(1)
@@ -844,6 +846,8 @@ class Prep():
                                     time.sleep(1)
                                 elif self.img_host == "ptpimg":
                                     i += 1
+                                elif self.img_host == "lensdump":
+                                    i += 1
                                 else:
                                     console.print("[red]Image too large for your image host, retaking")
                                     retake = True
@@ -943,7 +947,7 @@ class Prep():
                                     i += 1
                                 elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost'] and retake == False:
                                     i += 1
-                                elif self.img_host == "ptpimg" and retake == False:
+                                elif self.img_host in ["ptpimg", "lensdump"] and retake == False:
                                     i += 1
                                 elif self.img_host == "freeimage.host":
                                     console.print("[bold red]Support for freeimage.host has been removed. Please remove from your config")
@@ -2131,6 +2135,24 @@ class Prep():
                                 progress.console.print("[yellow]ptpimg failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
+                        elif img_host == "lensdump":
+                            url = "https://lensdump.com/1/upload"
+                            data = {
+                                'key': self.config['DEFAULT']['lensdump_api'],
+                                'image': open(image, "rb").read()
+                            }
+                            try:
+                                response = requests.post(url, data = data,timeout=timeout)
+                                response = response.json()
+                                if response.get('success') != True:
+                                    progress.console.print(response)
+                                img_url = response['data'].get('medium', response['data']['image'])['url']
+                                web_url = response['data']['url_viewer']
+                                raw_url = response['data']['image']['url']
+                            except Exception:
+                                progress.console.print("[yellow]lensdump failed, trying next image host")
+                                progress.stop()
+                                newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         else:
                             console.print("[bold red]Please choose a supported image host in your config")
                             exit()
