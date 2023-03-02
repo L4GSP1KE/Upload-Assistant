@@ -205,7 +205,6 @@ class JPTV():
         audio = meta.get('audio')
         source = meta.get('source')
         is_disc = meta.get('is_disc')
-        subs = self.get_subtitles(meta)
         if aka != '':
             # ugly fix to remove the extra space in the title
             aka = aka + ' '
@@ -224,5 +223,4 @@ class JPTV():
             name = name.replace (f'{source} DVD5', f'DVD {source}')
             name = name.replace (f'{source} DVD9', f'DVD {source}')
 
-        name = name + self.get_subs_tag(subs)
         return name
