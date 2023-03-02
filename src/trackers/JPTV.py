@@ -216,8 +216,5 @@ class JPTV():
         if 'AAC' in audio:
             name = name.replace(audio.strip().replace("  ", " "), audio.replace(" ", ""))
         name = name.replace("DD+ ", "DD+")
-        if is_disc == 'DVD':
-            name = name.replace (f'{source} DVD5', f'DVD {source}')
-            name = name.replace (f'{source} DVD9', f'DVD {source}')
 
         return name
