@@ -10,6 +10,7 @@ import base64
 import os
 import re
 import platform
+from unidecode import unidecode
 
 from src.console import console 
 
@@ -30,11 +31,25 @@ class THR():
         pass
     
     async def upload(self, session, meta):
-        from unidecode import unidecode
         await self.edit_torrent(meta)
         cat_id = await self.get_cat_id(meta)
         subs = self.get_subtitles(meta)
         pronfo = await self.edit_desc(meta)
+        thr_name = unidecode(meta['name'].replace('DD+', 'DDP'))
+
+        # Confirm the correct naming order for FL
+        cli_ui.info(f"THR name: {thr_name}")
+        if meta.get('unattended', False) == False:
+            thr_confirm = cli_ui.ask_yes_no("Correct?", default=False)
+            if thr_confirm != True:
+                thr_name_manually = cli_ui.ask_string("Please enter a proper name", default="")
+                if thr_name_manually == "":
+                    console.print('No proper name given')
+                    console.print("Aborting...")
+                    return
+                else:
+                    thr_name = thr_name_manually
+        torrent_name = re.sub("[^0-9a-zA-Z. '\-\[\]]+", " ", thr_name)
 
 
         if meta.get('is_disc', '') == 'BDMV':
@@ -56,8 +71,6 @@ class THR():
             tfile = f.read()
             f.close()
         
-        thr_name = unidecode(meta['name'].replace('DD+', 'DDP'))
-        torrent_name = re.sub("[^0-9a-zA-Z. '\-\[\]]+", " ", thr_name)
         #Upload Form
         url = 'https://www.torrenthr.org/takeupload.php'
         files = {
@@ -178,6 +191,8 @@ class THR():
                 res = meta['resolution']
             desc.write("[quote=Info]")
             name_aka = f"{meta['title']} {meta['aka']} {meta['year']}"
+            name_aka = unidecode(name_aka)
+            # name_aka = re.sub("[^0-9a-zA-Z. '\-\[\]]+", " ", name_aka)
             desc.write(f"Name: {' '.join(name_aka.split())}\n\n")
             desc.write(f"Overview: {meta['overview']}\n\n")
             desc.write(f"{res} / {meta['type']}{tag}\n\n")
