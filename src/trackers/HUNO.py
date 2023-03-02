@@ -115,12 +115,16 @@ class HUNO():
             language = re.sub(r'\(.+\)', '', language)
 
         return f'{codec} {channels} {language}'
+    
+    def get_basename(self, meta):
+        path = next(iter(meta['filelist']), meta['path'])
+        return os.path.basename(path)
 
     async def get_name(self, meta):
         # Copied from Prep.get_name() then modified to match HUNO's naming convention.
         # It was much easier to build the name from scratch than to alter the existing name.
 
-        basename = os.path.basename(meta.get('path', ""))
+        basename = self.get_basename(meta)
         type = meta.get('type', "")
         title = meta.get('title',"")
         alt_title = meta.get('aka', "")
@@ -143,7 +147,7 @@ class HUNO():
         distributor = meta.get('distributor', "")
         video_codec = meta.get('video_codec', "")
         video_encode = meta.get('video_encode', "").replace(".", "")
-        if 'x264' in basename or 'x265' in basename:
+        if 'x265' in basename:
             video_encode = video_encode.replace('H', 'x')
         region = meta.get('region', "")
         dvd_size = meta.get('dvd_size', "")
@@ -168,10 +172,8 @@ class HUNO():
                 name = f"{title} ({year}) {edition} (DVD {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}"
             elif type == "ENCODE": #Encode
                 name = f"{title} ({year}) {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
-            elif type == "WEBDL": #WEB-DL
+            elif type in ("WEBDL", "WEBRIP"): #WEB
                 name = f"{title} ({year}) {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
-            elif type == "WEBRIP": #WEBRip
-                name = f"{title} ({year}) {edition} ({resolution} {uhd} {service} WEBRip {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "HDTV": #HDTV
                 name = f"{title} ({year}) {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {tag}) {repack}"
         elif meta['category'] == "TV": #TV SPECIFIC
@@ -188,10 +190,8 @@ class HUNO():
                 name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} DVD {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}" #SOURCE
             elif type == "ENCODE": #Encode
                 name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}" #SOURCE
-            elif type == "WEBDL": #WEB-DL
+            elif type in ("WEBDL", "WEBRIP"): #WEB
                 name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
-            elif type == "WEBRIP": #WEBRip
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {service} WEBRip {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "HDTV": #HDTV
                 name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {tag}) {repack}"
 
@@ -207,7 +207,7 @@ class HUNO():
 
 
     async def get_type_id(self, meta):
-        basename = os.path.basename(meta.get('path', ""))
+        basename = self.get_basename(meta)
         type = meta['type']
 
         if type == 'REMUX':
