@@ -2136,9 +2136,9 @@ class Prep():
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "lensdump":
-                            url = "https://lensdump.com/1/upload"
+                            url = "https://lensdump.com/api/1/upload"
                             data = {
-                                'image': open(image, "rb").read()
+                                'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
                             }
                             headers = {
                                 'X-API-Key': self.config['DEFAULT']['lensdump_api'],
