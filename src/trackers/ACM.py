@@ -324,6 +324,7 @@ class ACM():
         source = meta.get('source')
         is_disc = meta.get('is_disc')
         subs = self.get_subtitles(meta)
+        resolution = meta.get('resolution')
         if aka != '':
             # ugly fix to remove the extra space in the title
             aka = aka + ' '
@@ -339,8 +340,10 @@ class ACM():
         name = name.replace ("BluRay REMUX", "Remux")
         name = name.replace ("H.265", "HEVC")
         if is_disc == 'DVD':
-            name = name.replace (f'{source} DVD5', f'DVD {source}')
-            name = name.replace (f'{source} DVD9', f'DVD {source}')
+            name = name.replace (f'{source} DVD5', f'{resolution} DVD {source}')
+            name = name.replace (f'{source} DVD9', f'{resolution} DVD {source}')
+            if audio == meta.get('channels'):
+                name = name.replace (f'{audio}', f'MPEG {audio}')
 
         name = name + self.get_subs_tag(subs)
         return name
@@ -387,4 +390,4 @@ class ACM():
             if self.signature != None:
                 descfile.write(self.signature)
             descfile.close()
-        return 
+        return
