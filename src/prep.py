@@ -2138,11 +2138,13 @@ class Prep():
                         elif img_host == "lensdump":
                             url = "https://lensdump.com/api/1/upload"
                             data = {
-                                'key': self.config['DEFAULT']['lensdump_api'],
                                 'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
                             }
+                            headers = {
+                                'X-API-Key': self.config['DEFAULT']['lensdump_api'],
+                            }
                             try:
-                                response = requests.post(url, data = data,timeout=timeout)
+                                response = requests.post(url, data=data, headers=headers, timeout=timeout)
                                 response = response.json()
                                 if response.get('success') != True:
                                     progress.console.print(response)
