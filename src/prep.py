@@ -2146,7 +2146,7 @@ class Prep():
                             try:
                                 response = requests.post(url, data=data, headers=headers, timeout=timeout)
                                 response = response.json()
-                                if response.get('success') != True:
+                                if response.get('status_code') != 200:
                                     progress.console.print(response)
                                 img_url = response['data'].get('medium', response['data']['image'])['url']
                                 web_url = response['data']['url_viewer']
