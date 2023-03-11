@@ -31,7 +31,7 @@ class STC():
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature, img_width_format_revert=True)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta['type'], meta.get('tv_pack', 0), meta.get('sd', 0), meta.get('category', ""))
         resolution_id = await self.get_res_id(meta['resolution'])

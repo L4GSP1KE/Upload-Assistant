@@ -24,7 +24,7 @@ class COMMON():
             Torrent.copy(new_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent", overwrite=True)
 
     
-    async def unit3d_edit_desc(self, meta, tracker, signature, comparison=False):
+    async def unit3d_edit_desc(self, meta, tracker, signature, comparison=False, img_width_format_revert=False):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r', encoding='utf8').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]DESCRIPTION.txt", 'w', encoding='utf8') as descfile:
             bbcode = BBCODE()
@@ -51,6 +51,11 @@ class COMMON():
             desc = bbcode.convert_hide_to_spoiler(desc)
             if comparison == False:
                 desc = bbcode.convert_comparison_to_collapse(desc, 1000)
+            
+            img_bbcode_format = "[img width=350]"
+            # If site does not like editing the [img width=350] format
+            if img_width_format_revert:
+                img_bbcode_format = "[img=350]"
             desc = desc.replace('[img]', '[img width=300]')
             descfile.write(desc)
             images = meta['image_list']
@@ -59,8 +64,9 @@ class COMMON():
                 for each in range(len(images[:int(meta['screens'])])):
                     web_url = images[each]['web_url']
                     raw_url = images[each]['raw_url']
-                    descfile.write(f"[url={web_url}][img width=350]{raw_url}[/img][/url]")
+                    descfile.write(f"[url={web_url}]{img_bbcode_format}{raw_url}[/img][/url]")
                 descfile.write("[/center]")
+
             if signature != None:
                 descfile.write(signature)
             descfile.close()
