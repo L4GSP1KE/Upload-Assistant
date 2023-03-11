@@ -339,7 +339,7 @@ class PTP():
                 "H.265" : "H.265",
             }
             searchcodec = meta.get('video_codec', meta.get('video_encode'))
-            codec = codecmap.get(searchcodec)
+            codec = codecmap.get(searchcodec, searchcodec)
             if meta.get('has_encode_settings') == True:
                 codec = codec.replace("H.", "x")
         return codec
