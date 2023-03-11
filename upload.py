@@ -136,7 +136,7 @@ async def do_the_thing(base_dir):
                 for key, value in saved_meta.items():
                     overwrite_list = [
                         'trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 
-                        'hdb', 'ptp', 'blu', 'no_season', 'no_aka', 'no_year', 'no_dub', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
+                        'hdb', 'ptp', 'blu', 'no_season', 'no_aka', 'no_year', 'no_dub', 'no_tag', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
                         'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag', 'skip_imghost_upload', 'imghost', 'manual_source'
                     ]
                     if meta.get(key, None) != value and key in overwrite_list:

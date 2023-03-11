@@ -342,6 +342,8 @@ class Prep():
         meta['audio'], meta['channels'], meta['has_commentary'] = self.get_audio_v2(mi, meta, bdinfo)
         if meta['tag'][1:].startswith(meta['channels']):
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
+        if meta.get('no_tag', False):
+            meta['tag'] = ""
         meta['3D'] = self.is_3d(mi, bdinfo)
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):

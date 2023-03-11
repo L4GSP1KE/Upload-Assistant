@@ -31,7 +31,7 @@ class Args():
         parser.add_argument('-tmdb', '--tmdb', nargs='*', required=False, help="TMDb ID", type=str, dest='tmdb_manual')
         parser.add_argument('-imdb', '--imdb', nargs='*', required=False, help="IMDb ID", type=str)
         parser.add_argument('-mal', '--mal', nargs='*', required=False, help="MAL ID", type=str)
-        parser.add_argument('-g', '--tag', nargs='?', required=False, help="Group Tag", type=str, const="")
+        parser.add_argument('-g', '--tag', nargs='*', required=False, help="Group Tag", type=str)
         parser.add_argument('-serv', '--service', nargs='*', required=False, help="Streaming Service", type=str)
         parser.add_argument('-dist', '--distributor', nargs='*', required=False, help="Disc Distributor e.g.(Criterion, BFI, etc.)", type=str)
         parser.add_argument('-edition', '--edition', '--repack', nargs='*', required=False, help="Edition/Repack String e.g.(Director's Cut, Uncut, Hybrid, REPACK, REPACK3)", type=str, dest='manual_edition', default="")
@@ -41,6 +41,7 @@ class Args():
         parser.add_argument('--no-year', dest='no_year', action='store_true', required=False, help="Remove Year from title")
         parser.add_argument('--no-aka', dest='no_aka', action='store_true', required=False, help="Remove AKA from title")
         parser.add_argument('--no-dub', dest='no_dub', action='store_true', required=False, help="Remove Dubbed from title")
+        parser.add_argument('--no-tag', dest='no_tag', action='store_true', required=False, help="Remove Group Tag from title")
         parser.add_argument('-year', '--year', dest='manual_year', nargs='?', required=False, help="Year", type=int, default=0)
         parser.add_argument('-ptp', '--ptp', nargs='*', required=False, help="PTP torrent id/permalink", type=str)
         parser.add_argument('-blu', '--blu', nargs='*', required=False, help="BLU torrent id/link", type=str)
@@ -149,6 +150,8 @@ class Args():
                 meta[key] = value
             elif key in ("freeleech"):
                 meta[key] = 100
+            elif key in ("tag") and value == []:
+                meta[key] = ""
             else:
                 meta[key] = meta.get(key, None)
             if key in ('trackers'):
