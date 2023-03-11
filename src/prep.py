@@ -884,7 +884,7 @@ class Prep():
             par = float(video_track.get('PixelAspectRatio', 1))
             dar = float(video_track.get('DisplayAspectRatio'))
 
-            if par == 1:
+            if par >= 1 and par <= 1.005: #par == 1
                 sar = w_sar = h_sar = 1
             elif par < 1:
                 new_height = dar * height
