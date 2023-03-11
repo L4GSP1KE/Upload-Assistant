@@ -334,7 +334,7 @@ class ACM():
                 # name = f'{name[:name.find(year)]}/ {original_title} {chr(int("202A", 16))}{name[name.find(year):]}'
                 name = name.replace(meta['title'], f"{meta['title']} / {original_title} {chr(int('202A', 16))}")
         if 'AAC' in audio:
-            name = name.replace(audio.strip().replace("  ", " "), audio.replace(" ", ""))
+            name = name.replace(audio.strip().replace("  ", " "), audio.replace("AAC ", "AAC"))
         name = name.replace("DD+ ", "DD+")
         name = name.replace ("UHD BluRay REMUX", "Remux")
         name = name.replace ("BluRay REMUX", "Remux")
