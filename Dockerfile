@@ -7,8 +7,13 @@ RUN apk add --no-cache mono --repository http://dl-cdn.alpinelinux.org/alpine/ed
 RUN  apk add --no-cache --upgrade ffmpeg mediainfo python3 git py3-pip python3-dev g++ cargo mktorrent rust
 RUN pip3 install wheel
 
-# clone repo, install reqs
-RUN git clone https://github.com/L4GSP1KE/Upload-Assistant.git
-RUN pip3 install -r /Upload-Assistant/requirements.txt
+WORKDIR Upload-Assistant
+
+# install reqs
+COPY requirements.txt .
+RUN pip3 install -r requirements.txt
+
+# copy everything
+COPY . .
 
 ENTRYPOINT ["python3", "/Upload-Assistant/upload.py"]
