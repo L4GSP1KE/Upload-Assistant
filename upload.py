@@ -114,14 +114,17 @@ async def do_the_thing(base_dir):
             else:
                 console.print(f"[red]Path: [bold red]{path}[/bold red] does not exist")
                 
-        elif len(paths) != 1:
+        elif os.path.exists(os.path.dirname(path)) and len(paths) != 1:
             queue = paths
             md_text = "\n - ".join(queue)
             console.print("\n[bold green]Queuing these files:[/bold green]", end='')
             console.print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
             console.print("\n\n")
+        elif not os.path.exists(os.path.dirname(path)):
+            console.print(f"[red]Path: [bold red]{path}[/bold red] does not exist")
         else:
             # Add Search Here
+            console.print(f"[red]There was an issue with your input. If you think this was not an issue, please make a report that includes the full command used.")
             exit()
 
 
