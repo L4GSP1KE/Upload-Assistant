@@ -32,7 +32,7 @@ class HUNO():
 
     async def upload(self, meta):
         common = COMMON(config=self.config)
-        await common.unit3d_edit_desc(meta, self.tracker, self.signature, img_width_format_revert=True)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
         cat_id = await self.get_cat_id(meta['category'])
         type_id = await self.get_type_id(meta)

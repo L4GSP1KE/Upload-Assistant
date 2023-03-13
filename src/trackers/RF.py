@@ -34,7 +34,7 @@ class RF():
     async def upload(self, meta):
         common = COMMON(config=self.config)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link, img_width_format_revert=True)
+        await common.unit3d_edit_desc(meta, self.tracker, self.forum_link)
         region_id = await common.unit3d_region_ids(meta.get('region'))
         distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
         cat_id = await self.get_cat_id(meta['category'])

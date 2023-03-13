@@ -88,7 +88,7 @@ class JPTV():
         cat_id = await self.get_cat_id(meta)
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
-        await common.unit3d_edit_desc(meta, self.tracker, self.signature, img_width_format_revert=True)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature)
         region_id = await common.unit3d_region_ids(meta.get('region'))
         distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
         jptv_name = await self.edit_name(meta)
