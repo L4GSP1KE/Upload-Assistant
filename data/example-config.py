@@ -1,5 +1,11 @@
 config = {
     "DEFAULT" : {
+    
+        # ------ READ THIS ------
+        # Any lines starting with the # symbol are commented and will not be used.
+        # If you change any of these options, remove the #
+        # -----------------------
+
         "tmdb_api" : "tmdb_api key",
         "imgbb_api" : "imgbb api key",
         "ptpimg_api" : "ptpimg api key",
