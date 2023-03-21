@@ -2538,6 +2538,7 @@ class Prep():
             else:
                 episode_int = meta['manual_episode'].lower().replace('e', '')
                 meta['episode'] = f"E{meta['manual_episode'].lower().replace('e', '').zfill(2)}"
+                meta['tv_pack'] = 0
             
             # if " COMPLETE " in Path(video).name.replace('.', ' '):
             #     meta['season'] = "COMPLETE"
