@@ -26,7 +26,7 @@ class TDC():
         self.source_flag = 'TDC'
         self.upload_url = 'https://thedarkcommunity.cc/api/torrents/upload'
         self.search_url = 'https://thedarkcommunity.cc/api/torrents/filter'
-        self.signature = 'Created by L4G's Upload Assistant'
+        self.signature = "Created by L4G's Upload Assistant"
         self.banned_groups = [""]
         pass
     
