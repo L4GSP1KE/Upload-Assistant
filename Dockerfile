@@ -4,8 +4,11 @@ FROM alpine:latest
 RUN apk add --no-cache mono --repository http://dl-cdn.alpinelinux.org/alpine/edge/testing
 
 # install requirements
-RUN  apk add --no-cache --upgrade ffmpeg mediainfo python3 git py3-pip python3-dev g++ cargo mktorrent rust
+RUN apk add --no-cache --upgrade ffmpeg mediainfo python3 git py3-pip python3-dev g++ cargo rust make
 RUN pip3 install wheel
+
+# Compile mktorrent with pthreads instead of using packaged version (that doesn't HAVE PTHREADS!)
+RUN cd /tmp && git clone https://github.com/pobrn/mktorrent.git && cd mktorrent && git checkout tags/v1.1 && USE_PTHREADS=1 make install && cd /tmp && rm -Rfv mktorrent
 
 WORKDIR Upload-Assistant
 
