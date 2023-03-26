@@ -815,7 +815,7 @@ class Prep():
                                             n -= num_screens
                                         if loops < 6:
                                             loops = loops + 1
-                                            voblength, n = _is_vob_good(n, loops)
+                                            voblength, n = _is_vob_good(n, loops, num_screens)
                                             return voblength, n
                                         else:
                                             return 300, n
