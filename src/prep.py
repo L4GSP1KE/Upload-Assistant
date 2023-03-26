@@ -1980,7 +1980,7 @@ class Prep():
                 args[3] = "OMITTED"
                 console.print(f"[bold red]Process execution {args} returned with error code {err}.") 
         elif torrent_creation == 'mktorrent':
-            args = ['mktorrent', '-a', 'https://fake.tracker', '-p', f'-l {piece_size}', '-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", path]
+            args = ['mktorrent', '-a', 'https://fake.tracker', '-t', '-p', f'-l {piece_size}', '-o', f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", path]
             err = subprocess.call(args)
             if err != 0:
                 args[2] = "OMITTED"
