@@ -68,6 +68,7 @@ class Args():
         parser.add_argument('-tc', '--torrent-creation', dest='torrent_creation', nargs='*', required=False, help="What tool should be used to create the base .torrent", choices=['torf', 'torrenttools', 'mktorrent'])
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Use this torrent client instead of default")
         parser.add_argument('-qbt', '--qbit-tag', dest='qbit_tag', nargs='*', required=False, help="Add to qbit with this tag")
+        parser.add_argument('-qbc', '--qbit-cat', dest='qbit_cat', nargs='*', required=False, help="Add to qbit with this category")
         parser.add_argument('-rtl', '--rtorrent-label', dest='rtorrent_label', nargs='*', required=False, help="Add to rtorrent with this label")
         parser.add_argument('-tk', '--trackers', nargs='*', required=False, help="Upload to these trackers, space seperated (--trackers blu bhd)")
         parser.add_argument('-rt', '--randomized', nargs='*', required=False, help="Number of extra, torrents with random infohash", default=0)
