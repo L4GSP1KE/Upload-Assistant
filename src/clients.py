@@ -306,8 +306,8 @@ class Clients():
         else:
             if os.path.normpath(am_config).lower() in os.path.normpath(path).lower() and am_config.strip() != "": 
                 auto_management = True
-
-        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout='Original', category=(client.get('qbit_cat', None) or meta.get('qbit_cat', None))
+        qbt_category = client.get('qbit_cat', meta.get('qbit_cat', None))
+        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout='Original', category=qbt_category)
         qbt_client.torrents_resume(torrent.infohash)
         if client.get('qbit_tag', None) != None:
             qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
