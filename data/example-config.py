@@ -178,6 +178,7 @@ config = {
             "qbit_pass" : "password",
             # "torrent_storage_dir" : "path/to/BT_backup folder"
             # "qbit_tag" : "tag",
+            # "qbit_cat" : "category"
             
             # Enable automatic torrent management if path(s) are set
                 # If using remote path mapping, use remote path
