@@ -433,7 +433,7 @@ def get_confirmation(meta):
     console.print()
     if meta.get('unattended', False) == False:
         get_missing(meta)
-        cli_ui.info_section(cli_ui.yellow, "Is this correct?")
+        cli_ui.info_section(cli_ui.yellow, "Is this correct?\a") # \a rings the bell
         cli_ui.info(f"Name: {meta['name']}")
         confirm = cli_ui.ask_yes_no("Correct?", default=False)
     else:
