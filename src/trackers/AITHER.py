@@ -26,7 +26,7 @@ class AITHER():
         self.search_url = 'https://aither.cc/api/torrents/filter'
         self.upload_url = 'https://aither.cc/api/torrents/upload'
         self.signature = f"\n[center][url=https://aither.cc/forums/topics/1349]Created by L4G's Upload Assistant[/url][/center]"
-        self.banned_groups = ['4K4U', 'AROMA', 'EMBER', 'FGT', 'Hi10', 'ION10', 'Judas', 'MeGusta', 'RARBG', 'SPDVD', 'STUTTERSHIT', 'SWTYBLZ', 'Sicario', 'TAoE', 'TGx', 'TSP', 'TSPxL', 'Tigole', 'Will1869', 'YIFY', 'd3g', 'nikt0', 'x0r']
+        self.banned_groups = ['4K4U', 'AROMA', 'EMBER', 'FGT', 'Hi10', 'ION10', 'Judas', 'LAMA', 'MeGusta', 'QxR', 'RARBG', 'SPDVD', 'STUTTERSHIT', 'SWTYBLZ', 'Sicario', 'TAoE', 'TGx', 'TSP', 'TSPxL', 'Tigole', 'Weasley[HONE]', 'Will1869', 'YIFY', 'd3g', 'nikt0', 'x0r']
         pass
     
     async def upload(self, meta):
