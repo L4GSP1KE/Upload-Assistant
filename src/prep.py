@@ -3005,26 +3005,28 @@ class Prep():
                 "q" : filename
             }
             url = f"https://api.tvmaze.com/search/shows"
-        resp = requests.get(url=url, params=params).json()
-        if resp == None:
-            return tvmazeID, imdbID, tvdbID
-        if lookup == True:
-            show = resp
-        else:
-            if year not in (None, ''):
-                for each in resp:
-                    premier_date = each['show'].get('premiered', '')
-                    if premier_date != None:
-                        if premier_date.startswith(str(year)):
-                            show = each['show']
-            elif len(resp) >= 1:
-                show = resp[0]['show']
-        if show != None:
-            tvmazeID = show.get('id')
-            if int(imdbID) == 0:
-                if show.get('externals', {}).get('imdb', '0') != None:
-                    imdbID = str(show.get('externals', {}).get('imdb', '0')).replace('tt', '')
-            if int(tvdbID) == 0:
-                if show.get('externals', {}).get('tvdb', '0') != None:
-                    tvdbID = show.get('externals', {}).get('tvdb', '0')
+        resp = requests.get(url=url, params=params)
+        if resp.ok:
+            resp = resp.json()
+            if resp == None:
+                return tvmazeID, imdbID, tvdbID
+            if lookup == True:
+                show = resp
+            else:
+                if year not in (None, ''):
+                    for each in resp:
+                        premier_date = each['show'].get('premiered', '')
+                        if premier_date != None:
+                            if premier_date.startswith(str(year)):
+                                show = each['show']
+                elif len(resp) >= 1:
+                    show = resp[0]['show']
+            if show != None:
+                tvmazeID = show.get('id')
+                if int(imdbID) == 0:
+                    if show.get('externals', {}).get('imdb', '0') != None:
+                        imdbID = str(show.get('externals', {}).get('imdb', '0')).replace('tt', '')
+                if int(tvdbID) == 0:
+                    if show.get('externals', {}).get('tvdb', '0') != None:
+                        tvdbID = show.get('externals', {}).get('tvdb', '0')
         return tvmazeID, imdbID, tvdbID
