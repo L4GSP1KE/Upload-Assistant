@@ -313,7 +313,7 @@ class Clients():
         for _ in range(0, 30):
             if len(qbt_client.torrents_info(torrent_hashes=torrent.infohash)) > 0:
                 break
-            time.sleep(1)
+            await asyncio.sleep(1)
         qbt_client.torrents_resume(torrent.infohash)
         if client.get('qbit_tag', None) != None:
             qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
