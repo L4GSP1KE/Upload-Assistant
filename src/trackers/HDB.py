@@ -461,7 +461,11 @@ class HDB():
             'thumbsize' : 'w300'
         }
         files = {}
-        for i in range(len(images)):
+
+        # Set maximum screenshots to 3 for tv singles and 6 for everthing else
+        hdbimg_screen_count = 3 if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 else 6 
+        
+        for i in range(hdbimg_screen_count):
             files[f'images_files[{i}]'] = open(images[i], 'rb')
         r = requests.post(url=url, data=data, files=files)
         image_bbcode = r.text
