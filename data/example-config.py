@@ -25,8 +25,10 @@ config = {
 
 
         # The name of your default torrent client, set in the torrent client sections below
-        "default_torrent_client" : "Client1"
+        "default_torrent_client" : "Client1",
 
+        # Play the bell sound effect when asking for confirmation
+        "sfx_on_prompt" : True,
 
     },
 
