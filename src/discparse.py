@@ -4,9 +4,7 @@ import traceback
 import sys
 import asyncio
 from glob import glob
-from natsort import natsorted
 from pymediainfo import MediaInfo
-from collections import OrderedDict
 import json
 
 from src.console import console
@@ -15,6 +13,8 @@ from src.console import console
 class DiscParse():
     def __init__(self):
         pass
+
+
 
     """
     Get and parse bdinfo
@@ -217,39 +217,30 @@ class DiscParse():
             path = each.get('path')
             os.chdir(path)
             files = glob(f"VTS_*.VOB")
-            # Switch to natural sorting
-            files = natsorted(files)
-            # Switch to ordered dictionary
-            filesdict = OrderedDict()
+            files.sort()
+            filesdict = [[]]
             main_set = []
-            # Use ordered dictionary in place of list of lists
-            for file in files:
-                trimmed = file[4:]
-                if trimmed[:2] not in filesdict:
-                    filesdict[trimmed[:2]] = []
-                filesdict[trimmed[:2]].append(trimmed)
-                
-            for _, vob_set in filesdict.items():
-                # Parse media info for this VOB set
-                vob_set_mi = MediaInfo.parse(f"VTS_{vob_set[0][:2]}_0.IFO", output='JSON')
-                vob_set_mi = json.loads(vob_set_mi)
-                vob_set_duration = vob_set_mi['media']['track'][1]['Duration']
-                
-                # If no main set is identified yet, go ahead and define it and skip to next loop
-                if len(main_set) < 1:
+            for i in range(len(files)):
+                trimmed = files[i][4:]
+                set = int(trimmed[:2]) - 1
+                try:
+                    filesdict[set].append(trimmed)
+                except:
+                    filesdict.append([])
+                    filesdict[set].append(trimmed)
+            for vob_set in filesdict:
+                if len(vob_set) > len(main_set):
                     main_set = vob_set
-                    continue
+                elif len(vob_set) == len(main_set):
+                    vob_set_mi = MediaInfo.parse(f"VTS_{vob_set[0][:2]}_0.IFO", output='JSON')
+                    vob_set_mi = json.loads(vob_set_mi)
+                    vob_set_duration = vob_set_mi['media']['track'][1]['Duration']
                     
-                # Get media info for the existing main set
-                main_set_mi = MediaInfo.parse(f"VTS_{main_set[0][:2]}_0.IFO", output='JSON')
-                main_set_mi = json.loads(main_set_mi)
-                main_set_duration = main_set_mi['media']['track'][1]['Duration']
-                
-                # If the duration of the new vob set > main set by more than 10% then it's our new main set
-                # This should make it so TV shows pick the first episode 
-                if (float(vob_set_duration) * 1.00) > (float(main_set_duration) * 1.10):
-                    main_set = vob_set
-            
+                    main_set_mi = MediaInfo.parse(f"VTS_{main_set[0][:2]}_0.IFO", output='JSON')
+                    main_set_mi = json.loads(main_set_mi)
+                    main_set_duration = main_set_mi['media']['track'][1]['Duration']
+                    if vob_set_duration > main_set_duration:
+                        main_set = vob_set
             each['main_set'] = main_set
             set = main_set[0][:2]
             each['vob'] = vob = f"{path}/VTS_{set}_1.VOB"

@@ -18,4 +18,3 @@ beautifulsoup4
 pyoxipng
 rich
 Jinja2
-natsort
