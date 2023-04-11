@@ -437,7 +437,7 @@ class PTP():
             mi = meta['mediainfo']
             for track in mi['media']['track']:
                 if track['@type'] == "Text":
-                    language = track.get('Language')
+                    language = track.get('Language_String2', track.get('Language'))
                     if language == "en":
                         if track.get('Forced', "") == "Yes":
                             language = "en (Forced)"
