@@ -97,7 +97,7 @@ class Prep():
             meta['filelist'] = []
             try:
                 guess_name = bdinfo['title'].replace('-',' ')
-                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name), {"excludes" : ["country", "language"]})['title']
                 untouched_filename = bdinfo['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
@@ -105,7 +105,7 @@ class Prep():
                     meta['search_year'] = ""
             except Exception:
                 guess_name = bdinfo['label'].replace('-',' ')
-                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name), {"excludes" : ["country", "language"]})['title']
                 untouched_filename = bdinfo['label']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
@@ -125,7 +125,7 @@ class Prep():
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
-            filename = guessit(guess_name)['title']
+            filename = guessit(guess_name, {"excludes" : ["country", "language"]})['title']
             untouched_filename = os.path.basename(os.path.dirname(meta['discs'][0]['path']))
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
@@ -145,7 +145,7 @@ class Prep():
             video, meta['scene'], meta['imdb'] = self.is_scene(meta['path'], meta.get('imdb', None))
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-','')
-            filename = guessit(guess_name)['title']
+            filename = guessit(guess_name, {"excludes" : ["country", "language"]})['title']
             untouched_filename = os.path.basename(meta['discs'][0]['path'])
             videopath = meta['discs'][0]['largest_evo']
             try:
@@ -164,7 +164,7 @@ class Prep():
             videopath, meta['filelist'] = self.get_video(videoloc, meta.get('mode', 'discord')) 
             video, meta['scene'], meta['imdb'] = self.is_scene(videopath, meta.get('imdb', None))
             guess_name = ntpath.basename(video).replace('-',' ')
-            filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name)).get("title", guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))["title"])
+            filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name), {"excludes" : ["country", "language"]}).get("title", guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name), {"excludes" : ["country", "language"]})["title"])
             untouched_filename = os.path.basename(video)
             try:
                 meta['search_year'] = guessit(video)['year']
@@ -1103,7 +1103,7 @@ class Prep():
                     meta = await self.get_tmdb_id(filename, search_year, meta, category, untouched_filename, attempted)
                 elif attempted == 2:
                     attempted += 1
-                    meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename)['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
+                    meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename, {"excludes" : ["country", "language"]})['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
                 if meta['tmdb'] in (None, ""):
                     console.print(f"[red]Unable to find TMDb match for {filename}")
                     if meta.get('mode', 'discord') == 'cli':
@@ -1119,9 +1119,9 @@ class Prep():
         
         if meta['tmdb'] == "0":
             try:
-                title = guessit(meta['path'])['title'].lower()
+                title = guessit(meta['path'], {"excludes" : ["country", "language"]})['title'].lower()
                 title = title.split('aka')[0]
-                meta = await self.get_tmdb_id(guessit(title)['title'], meta['search_year'], meta)
+                meta = await self.get_tmdb_id(guessit(title, {"excludes" : ["country", "language"]})['title'], meta['search_year'], meta)
                 if meta['tmdb'] == "0":
                     meta = await self.get_tmdb_id(title, "", meta, meta['category'])
             except:
@@ -2392,13 +2392,13 @@ class Prep():
             else:
                 #If Anime
                 parsed = anitopy.parse(Path(video).name)
-                # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
+                # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'], {"excludes" : ["country", "language"]})['title'])
                 romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(parsed['anime_title'], meta.get('mal', None))
                 if mal_id:
                     meta['mal_id'] = mal_id
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
-                    meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
+                    meta = await self.get_tmdb_id(guessit(parsed['anime_title'], {"excludes" : ["country", "language"]})['title'], year, meta, meta['category'])
                 meta = await self.tmdb_other_meta(meta)
                 if meta['category'] != "TV":
                     return meta
@@ -2614,7 +2614,7 @@ class Prep():
         if "DTS-HD MA" in audio:
             video_name = video_name.replace("DTS-HD.MA.", "").replace("DTS-HD MA ", "")
         for key, value in services.items():
-            if (' ' + key + ' ') in video_name and key not in guessit(video).get('title', ''):
+            if (' ' + key + ' ') in video_name and key not in guessit(video, {"excludes" : ["country", "language"]}).get('title', ''):
                 service = value
             elif key == service:
                 service = value
