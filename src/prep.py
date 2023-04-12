@@ -2546,7 +2546,7 @@ class Prep():
             meta['episode_int'] = episode_int
 
             
-            meta['episode_title_storage'] = guessit(video).get('episode_title', '')
+            meta['episode_title_storage'] = guessit(video,{"excludes" : "part"}).get('episode_title', '')
             if meta['season'] == "S00" or meta['episode'] == "E00":
                 meta['episode_title'] = meta['episode_title_storage']
             
