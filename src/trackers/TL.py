@@ -79,7 +79,7 @@ class TL():
         cat_id = await self.get_cat_id(common, meta)
         await common.unit3d_edit_desc(meta, self.tracker, self.signature)
 
-        open_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'a+')
+        open_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'a+', encoding='utf-8')
         
         info_filename = 'BD_SUMMARY_00' if meta['bdinfo'] != None else 'MEDIAINFO_CLEANPATH'
         open_info = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/{info_filename}.txt", 'r', encoding='utf-8')
