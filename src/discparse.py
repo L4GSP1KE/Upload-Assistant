@@ -216,6 +216,7 @@ class DiscParse():
             path = each.get('path')
             os.chdir(path)
             files = glob(f"VTS_*.VOB")
+            files.sort()
             # Switch to ordered dictionary
             filesdict = OrderedDict()
             main_set = []
@@ -225,7 +226,6 @@ class DiscParse():
                 if trimmed[:2] not in filesdict:
                     filesdict[trimmed[:2]] = []
                 filesdict[trimmed[:2]].append(trimmed)
-            
             main_set_duration = 0
             for vob_set in filesdict.values():
                 # Parse media info for this VOB set
@@ -239,7 +239,6 @@ class DiscParse():
                 if (float(vob_set_duration) * 1.00) > (float(main_set_duration) * 1.10) or len(main_set) < 1:
                     main_set = vob_set
                     main_set_duration = vob_set_duration
-            
             each['main_set'] = main_set
             set = main_set[0][:2]
             each['vob'] = vob = f"{path}/VTS_{set}_1.VOB"
