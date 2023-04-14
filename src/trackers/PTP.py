@@ -435,6 +435,8 @@ class PTP():
         sub_langs = []
         if meta.get('is_disc', '') != 'BDMV':
             mi = meta['mediainfo']
+            if meta.get('is_disc', '') == "DVD":
+                mi = MediaInfo.parse(meta['discs'][0]['ifo'], output='JSON')
             for track in mi['media']['track']:
                 if track['@type'] == "Text":
                     language = track.get('Language_String2', track.get('Language'))
