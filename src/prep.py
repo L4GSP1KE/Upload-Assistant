@@ -1825,7 +1825,7 @@ class Prep():
         has_encode_settings = False
         try:
             format = mi['media']['track'][1]['Format']
-            format_profile = mi['media']['track'][1]['Format_Profile']
+            format_profile = mi['media']['track'][1].get('Format_Profile', format)
             if mi['media']['track'][1].get('Encoded_Library_Settings', None):
                 has_encode_settings = True
             bit_depth = mi['media']['track'][1].get('BitDepth', '0')
