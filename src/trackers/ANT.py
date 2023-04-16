@@ -52,6 +52,8 @@ class ANT():
             flags.append('DV')
         if "Criterion" in meta.get('distributor', ''):
             flags.append('Criterion')
+        if "REMUX" in meta['type']:
+            flags.append('Remux')
         return flags
 
     ###############################################################
