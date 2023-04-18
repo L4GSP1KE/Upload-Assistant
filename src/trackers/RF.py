@@ -27,7 +27,7 @@ class RF():
         self.source_flag = 'ReelFliX'
         self.upload_url = 'https://reelflix.xyz/api/torrents/upload'
         self.search_url = 'https://reelflix.xyz/api/torrents/filter'
-        self.forum_link = 'https://reelflix.xyz/pages/1'
+        self.forum_link = "\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by Upload Assistant[/url][/center]"
         self.banned_groups = [""]
         pass
     
