@@ -41,7 +41,7 @@ class TL():
         pass
     
     async def get_cat_id(self, common, meta):
-        if meta.get('anime', 0) and not meta.get('tv_pack', 0): 
+        if meta.get('anime', 0): 
             return self.CATEGORIES['Anime']
 
         if meta['category'] == 'MOVIE':
@@ -62,7 +62,7 @@ class TL():
             elif 'WEB' in meta['type']:
                 return self.CATEGORIES['MovieWebrip']
         elif meta['category'] == 'TV':
-            if meta['original_language'] != 'en' and not meta.get('anime', 0): 
+            if meta['original_language'] != 'en': 
                 return self.CATEGORIES['TvForeign']
             elif meta.get('tv_pack', 0):
                 return self.CATEGORIES['TvBoxsets']
