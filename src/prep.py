@@ -1615,7 +1615,7 @@ class Prep():
                 source = guessit(video)['source']
             except:
                 try:
-                    source = guessit(path['source'])
+                    source = guessit(path)['source']
                 except:
                     source = "BluRay"
             if meta.get('manual_source', None):
