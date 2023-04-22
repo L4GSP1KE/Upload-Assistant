@@ -2551,11 +2551,10 @@ class Prep():
                 meta['episode_title'] = meta['episode_title_storage']
             
             # Guess the part of the episode (if available)
-            part = guessit(video).get('part')
-            if part != None and meta['tv_pack'] == 1:
-                meta['part'] = f"Part {part}"
-            else:
-                meta['part'] = ''
+            meta['part'] = ""
+            if meta['tv_pack'] == 1:
+                part = guessit(os.path.dirname(video)).get('part')
+                meta['part'] = f"Part {part}" if part else ""
 
         return meta
 
