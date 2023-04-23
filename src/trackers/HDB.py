@@ -464,7 +464,8 @@ class HDB():
 
         # Set maximum screenshots to 3 for tv singles and 6 for everthing else
         hdbimg_screen_count = 3 if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 else 6 
-        
+        if len(images) < hdbimg_screen_count:
+            hdbimg_screen_count = len(images) 
         for i in range(hdbimg_screen_count):
             files[f'images_files[{i}]'] = open(images[i], 'rb')
         r = requests.post(url=url, data=data, files=files)
