@@ -2,7 +2,7 @@
 import argparse
 import urllib.parse
 import os
-import time
+import datetime
 import traceback
 
 from src.console import console
@@ -37,6 +37,7 @@ class Args():
         parser.add_argument('-edition', '--edition', '--repack', nargs='*', required=False, help="Edition/Repack String e.g.(Director's Cut, Uncut, Hybrid, REPACK, REPACK3)", type=str, dest='manual_edition', default="")
         parser.add_argument('-season', '--season', nargs='*', required=False, help="Season (number)", type=str)
         parser.add_argument('-episode', '--episode', nargs='*', required=False, help="Episode (number)", type=str)
+        parser.add_argument('-daily', '--daily', nargs=1, required=False, help="Air date of this episode (YYYY-MM-DD)", type=datetime.date.fromisoformat, dest="manual_date")
         parser.add_argument('--no-season', dest='no_season', action='store_true', required=False, help="Remove Season from title")
         parser.add_argument('--no-year', dest='no_year', action='store_true', required=False, help="Remove Year from title")
         parser.add_argument('--no-aka', dest='no_aka', action='store_true', required=False, help="Remove AKA from title")
@@ -107,6 +108,8 @@ class Args():
                         meta['manual_season'] = value2
                     elif key == 'episode':
                         meta['manual_episode'] = value2
+                    elif key == 'manual_date':
+                        meta['manual_date'] = value2
                     elif key == 'tmdb_manual':
                         meta['category'], meta['tmdb_manual'] = self.parse_tmdb_id(value2, meta.get('category'))
                     elif key == 'ptp':
@@ -163,6 +166,8 @@ class Args():
 
 
     def list_to_string(self, list):
+        if len(list) == 1:
+            return str(list[0])
         try:
             result = " ".join(list)
         except:
