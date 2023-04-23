@@ -2340,6 +2340,8 @@ class Prep():
             is_daily = False
             if meta['anime'] == False:
                 try:
+                    if meta.get('manual_date'):
+                        raise ManualDateException
                     try:
                         guess_year = guessit(video)['year']
                     except Exception:
@@ -2357,7 +2359,7 @@ class Prep():
 
                 except Exception:
                     try:
-                        guess_date = guessit(video)['date']
+                        guess_date = datetime.fromisoformat(meta.get('manual_date', guessit(video)['date'])) if meta.get('manual_date') else guessit(video)['date']
                         season_int, episode_int = self.daily_to_tmdb_season_episode(meta.get('tmdb'), guess_date)
                         # season = f"S{season_int.zfill(2)}"
                         # episode = f"E{episode_int.zfill(2)}"
@@ -2897,6 +2899,7 @@ class Prep():
         show = tmdb.TV(tmdbid)
         seasons = show.info().get('seasons')
         season = '1'
+        episode = '1'
         for each in seasons:
             air_date = date.fromisoformat(each['air_date'])
             if air_date <= date:
@@ -2905,6 +2908,9 @@ class Prep():
         for each in season_info:
             if str(each['air_date']) == str(date):
                 episode = str(each['episode_number'])
+                break
+        else:
+            console.print(f"[yellow]Unable to map the date ([bold yellow]{str(date)}[/bold yellow]) to a Season/Episode number")
         return season, episode
 
 
