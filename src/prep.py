@@ -735,7 +735,7 @@ class Prep():
     def dvd_screenshots(self, meta, disc_num, num_screens=None):
         if num_screens == None:
             num_screens = self.screens
-        if num_screens == 0 or len(meta.get('image_list', [])) >= num_screens:
+        if num_screens == 0 or (len(meta.get('image_list', [])) >= num_screens and disc_num == 0):
             return
         ifo_mi = MediaInfo.parse(f"{meta['discs'][disc_num]['path']}/VTS_{meta['discs'][disc_num]['main_set'][0][:2]}_0.IFO", mediainfo_options={'inform_version' : '1'})
         sar = 1
@@ -767,7 +767,7 @@ class Prep():
         n = 0
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         i = 0        
-        if len(glob.glob("*.png")) >= num_screens:
+        if len(glob.glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][disc_num]['name']}-*.png")) >= num_screens:
             i = num_screens
             console.print('[bold green]Reusing screenshots')
         else:
@@ -783,6 +783,7 @@ class Prep():
                     TimeRemainingColumn()
                 ) as progress:
                     screen_task = progress.add_task("[green]Saving Screens...", total=num_screens + 1)
+                    ss_times = []
                     for i in range(num_screens + 1):
                         if n >= len(main_set):
                             n = 0
@@ -822,8 +823,8 @@ class Prep():
                             try:
                                 voblength, n = _is_vob_good(n, 0, num_screens)
                                 img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
-
-                                ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
+                                ss_times = self.valid_ss_time(ss_times, num_screens+1, voblength)
+                                ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=ss_times[-1])
                                 if w_sar != 1 or h_sar != 1:
                                     ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                 (
@@ -869,7 +870,7 @@ class Prep():
                 if screensize < smallestsize:
                     smallestsize = screensize
                     smallest = screens
-            os.remove(smallest)   
+            os.remove(smallest)
 
     def screenshots(self, path, filename, folder_id, base_dir, meta, num_screens=None):
         if num_screens == None:

@@ -605,7 +605,7 @@ class PTP():
                             ds.start()
                             while ds.is_alive() == True:
                                 await asyncio.sleep(1)
-                            new_screens = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}",f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][i]['name']}-*.png")
+                            new_screens = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}", f"{meta['discs'][i]['name']}-*.png")
                             images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})  
                         
                     if len(images) > 0: 
