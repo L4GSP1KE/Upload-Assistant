@@ -182,10 +182,14 @@ config = {
             # "qbit_tag" : "tag",
             # "qbit_cat" : "category"
             
-            # Enable automatic torrent management if path(s) are set
+            # Content Layout for adding .torrents: "Original"(recommended)/"Subfolder"/"NoSubfolder"
+            "content_layout" : "Original"
+            
+            # Enable automatic torrent management if listed path(s) are present in the path
                 # If using remote path mapping, use remote path
                 # For using multiple paths, use a list ["path1", "path2"] 
             # "automatic_management_paths" : ""
+
 
 
             # Remote path mapping (docker/etc.) CASE SENSITIVE

@@ -307,7 +307,10 @@ class Clients():
             if os.path.normpath(am_config).lower() in os.path.normpath(path).lower() and am_config.strip() != "": 
                 auto_management = True
         qbt_category = client.get("qbit_cat") if not meta.get("qbit_cat") else meta.get('qbit_cat')
-        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout='Original', category=qbt_category)
+
+        content_layout = client.get('content_layout', 'Original')
+        
+        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout=content_layout, category=qbt_category)
         # Wait for up to 30 seconds for qbit to actually return the download
         # there's an async race conditiion within qbt that it will return ok before the torrent is actually added
         for _ in range(0, 30):
