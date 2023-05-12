@@ -210,9 +210,8 @@ class FL():
             soup = BeautifulSoup(r.text, 'html.parser')
             find = soup.find_all('a', href=True)
             for each in find:
-                for each in find:
-                    if each['href'].startswith('details.php?id=') and "&" not in each['href']:
-                        dupes.append(each['title'])
+                if each['href'].startswith('details.php?id=') and "&" not in each['href']:
+                    dupes.append(each['title'])
 
         return dupes
 
