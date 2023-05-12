@@ -1949,6 +1949,7 @@ class Prep():
             private = True,
             exclude_globs = exclude or [],
             include_globs = include or [],
+            creation_date = datetime.now(),
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
         console.print("[bold yellow]Creating .torrent... (No valid --torrenthash was provided)")
