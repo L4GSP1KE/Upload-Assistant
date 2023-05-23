@@ -150,6 +150,12 @@ config = {
             "announce_url" : "https://thedarkcommunity.cc/announce/customannounceurl",
             # "anon" : "False"
         },
+        "HDT" : {
+            "username" : "username",
+            "password" : "password",
+            "announce_url" : "https://hdts-announce.ru/announce.php",
+            # "anon" : "False"
+        },
 
         "MANUAL" : {
             # Uncomment and replace link with filebrowser (https://github.com/filebrowser/filebrowser) link to the Upload-Assistant directory, this will link to your filebrowser instead of uploading to uguu.se
