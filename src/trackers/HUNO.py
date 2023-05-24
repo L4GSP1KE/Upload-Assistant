@@ -156,6 +156,7 @@ class HUNO():
         search_year = meta.get('search_year', "")
         if not str(search_year).strip():
             search_year = year
+        scale = "DS4K" if "DS4K" in basename.upper() else "RM4K" if "RM4K" in basename.upper() else ""
 
         #YAY NAMING FUN
         if meta['category'] == "MOVIE": #MOVIE SPECIFIC
@@ -171,9 +172,9 @@ class HUNO():
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
                 name = f"{title} ({year}) {edition} (DVD {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}"
             elif type == "ENCODE": #Encode
-                name = f"{title} ({year}) {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
+                name = f"{title} ({year}) {edition} ({resolution} {scale} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type in ("WEBDL", "WEBRIP"): #WEB
-                name = f"{title} ({year}) {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
+                name = f"{title} ({year}) {edition} ({resolution} {scale} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "HDTV": #HDTV
                 name = f"{title} ({year}) {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {tag}) {repack}"
         elif meta['category'] == "TV": #TV SPECIFIC
@@ -189,9 +190,9 @@ class HUNO():
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
                 name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} DVD {hybrid} REMUX {video_codec} {hdr} {audio} {tag}) {repack}" #SOURCE
             elif type == "ENCODE": #Encode
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}" #SOURCE
+                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {scale} {uhd} {source} {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}" #SOURCE
             elif type in ("WEBDL", "WEBRIP"): #WEB
-                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
+                name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} {scale} {uhd} {service} WEB-DL {hybrid} {video_encode} {hdr} {audio} {tag}) {repack}"
             elif type == "HDTV": #HDTV
                 name = f"{title} ({search_year}) {season}{episode} {edition} ({resolution} HDTV {hybrid} {video_encode} {audio} {tag}) {repack}"
 
