@@ -41,7 +41,7 @@ class BLU():
         blu_name = meta['name']
         desc_header = ""
         if meta['webdv']:
-            blu_name, desc_header = self.derived_dv_layer(meta)
+            blu_name, desc_header = await self.derived_dv_layer(meta)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
         await common.unit3d_edit_desc(meta, self.tracker, self.signature, comparison=True, desc_header=desc_header)
         cat_id = await self.get_cat_id(meta['category'], meta.get('edition', ''))
