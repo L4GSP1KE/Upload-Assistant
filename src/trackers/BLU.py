@@ -167,7 +167,7 @@ class BLU():
         if not all([x in meta['hdr'] for x in ['HDR', 'DV']]):
             return name, desc_header
         import cli_ui
-        console.print("[bold yellow]")
+        console.print("[bold yellow]Generating the required description addition for Derived DV Layers. Please respond appropriately.")
         ask_comp = True
         if meta['type'] == "WEBDL":
             if cli_ui.ask_yes_no("Is the DV Layer sourced from the same service as the video?"):
