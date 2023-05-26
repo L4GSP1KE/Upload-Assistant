@@ -24,9 +24,12 @@ class COMMON():
             Torrent.copy(new_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent", overwrite=True)
 
     
-    async def unit3d_edit_desc(self, meta, tracker, signature, comparison=False):
+    async def unit3d_edit_desc(self, meta, tracker, signature, comparison=False, desc_header=""):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r', encoding='utf8').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]DESCRIPTION.txt", 'w', encoding='utf8') as descfile:
+            if desc_header != "":
+                descfile.write(desc_header)
+            
             bbcode = BBCODE()
             if meta.get('discs', []) != []:
                 discs = meta['discs']

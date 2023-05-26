@@ -37,8 +37,13 @@ class BLU():
     
     async def upload(self, meta):
         common = COMMON(config=self.config)
+        
+        blu_name = meta['name']
+        desc_header = ""
+        if meta['webdv']:
+            blu_name, desc_header = self.derived_dv_layer(meta)
         await common.edit_torrent(meta, self.tracker, self.source_flag)
-        await common.unit3d_edit_desc(meta, self.tracker, self.signature, comparison=True)
+        await common.unit3d_edit_desc(meta, self.tracker, self.signature, comparison=True, desc_header=desc_header)
         cat_id = await self.get_cat_id(meta['category'], meta.get('edition', ''))
         type_id = await self.get_type_id(meta['type'])
         resolution_id = await self.get_res_id(meta['resolution'])
@@ -59,7 +64,7 @@ class BLU():
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[BLU]{meta['clean_name']}.torrent", 'rb')
         files = {'torrent': ("placeholder.torrent", open_torrent, "application/x-bittorrent")}
         data = {
-            'name' : meta['name'],
+            'name' : blu_name,
             'description' : desc,
             'mediainfo' : mi_dump,
             'bdinfo' : bd_dump, 
@@ -155,7 +160,31 @@ class BLU():
             }.get(resolution, '10')
         return resolution_id
 
-            
+    async def derived_dv_layer(self, meta):
+        name = meta['name']
+        desc_header = ""
+        # Exit if not DV + HDR
+        if not all([x in meta['hdr'] for x in ['HDR', 'DV']]):
+            return name, desc_header
+        import cli_ui
+        console.print("[bold yellow]")
+        ask_comp = True
+        if meta['type'] == "WEBDL":
+            if cli_ui.ask_yes_no("Is the DV Layer sourced from the same service as the video?"):
+                ask_comp = False
+                desc_header = "[code]This release contains a derived Dolby Vision profile 8 layer. Comparisons not required as DV and HDR are from same provider.[/code]"
+        
+        if ask_comp:
+            while desc_header == "":
+                desc_input = cli_ui.ask_string("Please provide comparisons between HDR masters. (link or bbcode)", default="")
+                desc_header = f"[code]This release contains a derived Dolby Vision profile 8 layer. Comparisons between HDR masters: {desc_input}[/code]"
+        
+        if "hybrid" not in name.lower():
+            if "REPACK" in name:
+                name = name.replace('REPACK', 'Hybrid REPACK')
+            else:
+                name = name.replace(meta['resolution'], f"Hybrid {meta['resolution']}")
+        return name, desc_header
 
 
     async def search_existing(self, meta):
