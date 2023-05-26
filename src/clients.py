@@ -168,21 +168,10 @@ class Clients():
 
     async def search_qbit_for_torrent(self, meta, client):
         console.print("[green]Searching qbittorrent for an existing .torrent")
-        local_path = list_local_path = client.get('local_path','/LocalPath')
-        remote_path = list_remote_path = client.get('remote_path', '/RemotePath')
         torrent_storage_dir = client.get('torrent_storage_dir', None)
         if torrent_storage_dir == None and client.get("torrent_client", None) != "watch":
             console.print(f"[bold red]Missing torrent_storage_dir for {self.config['DEFAULT']['default_torrent_client']}")
             return None
-        if isinstance(local_path, list):
-            for i in range(len(local_path)):
-                if os.path.normpath(local_path[i]).lower() in meta['path'].lower():
-                    list_local_path = local_path[i]
-                    list_remote_path = remote_path[i]
-        local_path = os.path.normpath(list_local_path)
-        remote_path = os.path.normpath(list_remote_path)
-        if local_path.endswith(os.sep):
-            remote_path = remote_path + os.sep
 
         try:
             qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'], VERIFY_WEBUI_CERTIFICATE=client.get('VERIFY_WEBUI_CERTIFICATE', True))
@@ -195,14 +184,8 @@ class Clients():
             return None
 
         torrents = qbt_client.torrents.info()
-        if local_path.lower() in meta['path'].lower() and local_path.lower() != remote_path.lower():
-            remote_path_map = True
-        else:
-            remote_path_map = False
         for torrent in torrents:
             torrent_path = torrent.content_path
-            if remote_path_map:
-                torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
                     valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
