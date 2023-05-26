@@ -119,6 +119,7 @@ class HDB():
             "HLMK" : 71,
             "HTSR" : 79,
             "CRAV" : 80,
+            'MAX' : 88
         }
         if meta.get('service') in service_dict.keys():
             tags.append(service_dict.get(meta['service']))
