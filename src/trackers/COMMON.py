@@ -312,7 +312,8 @@ class COMMON():
                     look_for = x.split('|')
                     for y in look_for:
                         if y.lower() in search:
-                            remove_set.remove(x)
+                            if x in remove_set:
+                                remove_set.remove(x)
                             remove_set.add(y)
 
             allow = True
