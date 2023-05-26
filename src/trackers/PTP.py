@@ -37,6 +37,53 @@ class PTP():
         self.user_agent = f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         self.banned_groups = ['aXXo', 'BRrip', 'CM8', 'CrEwSaDe', 'CTFOH', 'DNL', 'FaNGDiNG0', 'HD2DVD', 'HDTime', 'ION10', 'iPlanet', 'KiNGDOM', 'mHD', 'mSD', 'nHD', 'nikt0', 'nSD', 'NhaNc3', 'OFT', 'PRODJi', 'SANTi', 'STUTTERSHIT', 'ViSION', 'VXT', 'WAF', 'd3g', 'x0r', 'YIFY', 'BMDru']
     
+        self.sub_lang_map = {
+            ("Arabic", "ara", "ar") : 22,
+            ("Brazilian Portuguese", "Brazilian", "Portuguese-BR", 'pt-br') : 49,
+            ("Bulgarian", "bul", "bg") : 29,
+            ("Chinese", "chi", "zh", "Chinese (Simplified)", "Chinese (Traditional)") : 14,
+            ("Croatian", "hrv", "hr", "scr") : 23,
+            ("Czech", "cze", "cz", "cs") : 30,
+            ("Danish", "dan", "da") : 10,
+            ("Dutch", "dut", "nl") : 9,
+            ("English", "eng", "en", "English (CC)", "English - SDH") : 3,
+            ("English - Forced", "English (Forced)", "en (Forced)") : 50,
+            ("English Intertitles", "English (Intertitles)", "English - Intertitles", "en (Intertitles)") : 51,
+            ("Estonian", "est", "et") : 38,
+            ("Finnish", "fin", "fi") : 15,
+            ("French", "fre", "fr") : 5,
+            ("German", "ger", "de") : 6,
+            ("Greek", "gre", "el") : 26,
+            ("Hebrew", "heb", "he") : 40,
+            ("Hindi" "hin", "hi") : 41,
+            ("Hungarian", "hun", "hu") : 24,
+            ("Icelandic", "ice", "is") : 28,
+            ("Indonesian", "ind", "id") : 47,
+            ("Italian", "ita", "it") : 16,
+            ("Japanese", "jpn", "ja") : 8,
+            ("Korean", "kor", "ko") : 19,
+            ("Latvian", "lav", "lv") : 37,
+            ("Lithuanian", "lit", "lt") : 39,
+            ("Norwegian", "nor", "no") : 12,
+            ("Persian", "fa", "far") : 52,
+            ("Polish", "pol", "pl") : 17,
+            ("Portuguese", "por", "pt") : 21,
+            ("Romanian", "rum", "ro") : 13,
+            ("Russian", "rus", "ru") : 7,
+            ("Serbian", "srp", "sr", "scc") : 31,
+            ("Slovak", "slo", "sk") : 42,
+            ("Slovenian", "slv", "sl") : 43,
+            ("Spanish", "spa", "es") : 4,
+            ("Swedish", "swe", "sv") : 11,
+            ("Thai", "tha", "th") : 20,
+            ("Turkish", "tur", "tr") : 18,
+            ("Ukrainian", "ukr", "uk") : 34,
+            ("Vietnamese", "vie", "vi") : 25,
+        }
+
+
+
+
     async def get_ptp_id_imdb(self, search_term, search_file_folder):
         imdb_id = ptp_torrent_id = None
         filename = str(os.path.basename(search_term))
@@ -388,49 +435,7 @@ class PTP():
 
 
     def get_subtitles(self, meta):
-        sub_lang_map = {
-            ("Arabic", "ara", "ar") : 22,
-            ("Brazilian Portuguese", "Brazilian", "Portuguese-BR", 'pt-br') : 49,
-            ("Bulgarian", "bul", "bg") : 29,
-            ("Chinese", "chi", "zh", "Chinese (Simplified)", "Chinese (Traditional)") : 14,
-            ("Croatian", "hrv", "hr", "scr") : 23,
-            ("Czech", "cze", "cz", "cs") : 30,
-            ("Danish", "dan", "da") : 10,
-            ("Dutch", "dut", "nl") : 9,
-            ("English", "eng", "en", "English (CC)", "English - SDH") : 3,
-            ("English - Forced", "English (Forced)", "en (Forced)") : 50,
-            ("English Intertitles", "English (Intertitles)", "English - Intertitles", "en (Intertitles)") : 51,
-            ("Estonian", "est", "et") : 38,
-            ("Finnish", "fin", "fi") : 15,
-            ("French", "fre", "fr") : 5,
-            ("German", "ger", "de") : 6,
-            ("Greek", "gre", "el") : 26,
-            ("Hebrew", "heb", "he") : 40,
-            ("Hindi" "hin", "hi") : 41,
-            ("Hungarian", "hun", "hu") : 24,
-            ("Icelandic", "ice", "is") : 28,
-            ("Indonesian", "ind", "id") : 47,
-            ("Italian", "ita", "it") : 16,
-            ("Japanese", "jpn", "ja") : 8,
-            ("Korean", "kor", "ko") : 19,
-            ("Latvian", "lav", "lv") : 37,
-            ("Lithuanian", "lit", "lt") : 39,
-            ("Norwegian", "nor", "no") : 12,
-            ("Persian", "fa", "far") : 52,
-            ("Polish", "pol", "pl") : 17,
-            ("Portuguese", "por", "pt") : 21,
-            ("Romanian", "rum", "ro") : 13,
-            ("Russian", "rus", "ru") : 7,
-            ("Serbian", "srp", "sr", "scc") : 31,
-            ("Slovak", "slo", "sk") : 42,
-            ("Slovenian", "slv", "sl") : 43,
-            ("Spanish", "spa", "es") : 4,
-            ("Swedish", "swe", "sv") : 11,
-            ("Thai", "tha", "th") : 20,
-            ("Turkish", "tur", "tr") : 18,
-            ("Ukrainian", "ukr", "uk") : 34,
-            ("Vietnamese", "vie", "vi") : 25,
-        }
+        sub_lang_map = self.sub_lang_map
 
         sub_langs = []
         if meta.get('is_disc', '') != 'BDMV':
@@ -460,10 +465,11 @@ class PTP():
 
     def get_trumpable(self, sub_langs):
         trumpable_values = {
-            "Hardcoded Subs (Full)" : 4,
-            "Hardcoded Subs (Forced)" : 50,
+            "English Hardcoded Subs (Full)" : 4,
+            "English Hardcoded Subs (Forced)" : 50,
             "No English Subs" : 14,
-            "English Softsubs Exist (Mislabeled)" : None
+            "English Softsubs Exist (Mislabeled)" : None,
+            "Hardcoded Subs (Non-English)" : "OTHER"
         }
         opts = cli_ui.select_choices("English subtitles not found. Please select any/all applicable options:", choices=list(trumpable_values.keys()))
         trumpable = []
@@ -474,8 +480,18 @@ class PTP():
                         break
                     elif v != 50: # Hardcoded, Forced
                         trumpable.append(v)
+                    elif v == "OTHER": #Hardcoded, Non-English
+                        trumpable.append(14)
+                        hc_sub_langs = cli_ui.ask_string("Enter language code for HC Subtitle languages")
+                        for lang, subID in self.sub_lang_map.items():
+                            if any(hc_sub_langs.strip() == x for x in list(lang)):
+                                sub_langs.append(subID)
                     else:
-                        sub_langs = [v]
+                        sub_langs.append(v)
+                        trumpable.append(4)
+        
+        sub_langs = list(set(sub_langs))
+        trumpable = list(set(trumpable))
         if trumpable == []:
             trumpable = None
         return trumpable, sub_langs
@@ -715,7 +731,7 @@ class PTP():
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", "r").read()
         ptp_subtitles = self.get_subtitles(meta)
         ptp_trumpable = None
-        if not any(x in [3, 50] for x in ptp_subtitles):
+        if not any(x in [3, 50] for x in ptp_subtitles) or meta['hardcoded-subs']:
             ptp_trumpable, ptp_subtitles = self.get_trumpable(ptp_subtitles)
         data = {
             "submit": "true",
