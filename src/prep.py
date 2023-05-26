@@ -1949,6 +1949,7 @@ class Prep():
             private = True,
             exclude_globs = exclude or [],
             include_globs = include or [],
+            creation_date = datetime.now(),
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
         console.print("[bold yellow]Creating .torrent... (No valid --torrenthash was provided)")
@@ -2019,7 +2020,7 @@ class Prep():
                 if each not in ('files', 'length', 'name', 'piece length', 'pieces', 'private', 'source'):
                     base_torrent.metainfo['info'].pop(each, None)
             for each in list(base_torrent.metainfo):
-                if each not in ('announce', 'comment', 'created by', 'encoding', 'info'):
+                if each not in ('announce', 'comment', 'creation date', 'created by', 'encoding', 'info'):
                     base_torrent.metainfo.pop(each, None)
             base_torrent.source = 'L4G'
             base_torrent.private = True
