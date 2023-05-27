@@ -34,7 +34,7 @@ class HDT():
                 if meta['resolution'] == '2160p':
                     # 70 = Movie/UHD/Blu-Ray
                     cat_id = 70
-                if meta['resolution'] == '1080p':
+                if meta['resolution'] in ('1080p', '1080i'):
                     # 1 = Movie/Blu-Ray
                     cat_id = 1
             
@@ -52,7 +52,7 @@ class HDT():
                 if meta['resolution'] == '2160p':
                     # 64 = Movie/2160p
                     cat_id = 64
-                elif meta['resolution'] == '1080p':
+                elif meta['resolution'] in ('1080p', '1080i'):
                     # 5 = Movie/1080p/i
                     cat_id = 5
                 elif meta['resolution'] == '720p':
@@ -65,7 +65,7 @@ class HDT():
                 if meta['resolution'] == '2160p':
                     # 72 = TV Show/UHD/Blu-ray
                     cat_id = 72
-                if meta['resolution'] == '1080p':
+                if meta['resolution'] in ('1080p', '1080i'):
                     # 59 = TV Show/Blu-ray
                     cat_id = 59
             
@@ -83,7 +83,7 @@ class HDT():
                 if meta['resolution'] == '2160p':
                     # 65 = TV Show/2160p
                     cat_id = 65
-                elif meta['resolution'] == '1080p':
+                elif meta['resolution'] in ('1080p', '1080i'):
                     # 30 = TV Show/1080p/i
                     cat_id = 30
                 elif meta['resolution'] == '720p':
