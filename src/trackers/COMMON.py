@@ -310,7 +310,7 @@ class COMMON():
                         remove_set.add(a)
 
             search = each.lower().replace('-', '').replace(' ', '').replace('.', '')
-            for x in remove_set:
+            for x in remove_set.copy():
                 if "|" in x:
                     look_for = x.split('|')
                     for y in look_for:
