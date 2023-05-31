@@ -271,6 +271,8 @@ async def do_the_thing(base_dir):
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await tracker_class.upload(meta)
+                        if tracker == 'SN':
+                            time.sleep(16)
                         await client.add_to_client(meta, tracker_class.tracker)
             
             if tracker in http_trackers:
