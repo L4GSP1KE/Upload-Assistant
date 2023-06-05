@@ -17,16 +17,19 @@ class COMMON():
         if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
             new_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
             for each in list(new_torrent.metainfo):
-                if each not in ('announce', 'comment', 'created by', 'encoding', 'info'):
+                if each not in ('announce', 'comment', 'creation date', 'created by', 'encoding', 'info'):
                     new_torrent.metainfo.pop(each, None)
             new_torrent.metainfo['announce'] = self.config['TRACKERS'][tracker].get('announce_url', "https://fake.tracker").strip()
             new_torrent.metainfo['info']['source'] = source_flag
             Torrent.copy(new_torrent).write(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent", overwrite=True)
 
     
-    async def unit3d_edit_desc(self, meta, tracker, signature, comparison=False):
+    async def unit3d_edit_desc(self, meta, tracker, signature, comparison=False, desc_header=""):
         base = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/DESCRIPTION.txt", 'r', encoding='utf8').read()
         with open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]DESCRIPTION.txt", 'w', encoding='utf8') as descfile:
+            if desc_header != "":
+                descfile.write(desc_header)
+            
             bbcode = BBCODE()
             if meta.get('discs', []) != []:
                 discs = meta['discs']
@@ -38,15 +41,20 @@ class COMMON():
                         if each['type'] == "BDMV":
                             descfile.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]\n")
                             descfile.write("\n")
-                        if each['type'] == "DVD":
+                        elif each['type'] == "DVD":
                             descfile.write(f"{each['name']}:\n")
                             descfile.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]\n")
+                            descfile.write("\n")
+                        elif each['type'] == "HDDVD":
+                            descfile.write(f"{each['name']}:\n")
+                            descfile.write(f"[spoiler={os.path.basename(each['largest_evo'])}][code][{each['evo_mi']}[/code][/spoiler]\n")
                             descfile.write("\n")
             desc = base
             desc = bbcode.convert_pre_to_code(desc)
             desc = bbcode.convert_hide_to_spoiler(desc)
             if comparison == False:
                 desc = bbcode.convert_comparison_to_collapse(desc, 1000)
+        
             desc = desc.replace('[img]', '[img=300]')
             descfile.write(desc)
             images = meta['image_list']
@@ -57,6 +65,7 @@ class COMMON():
                     raw_url = images[each]['raw_url']
                     descfile.write(f"[url={web_url}][img=350]{raw_url}[/img][/url]")
                 descfile.write("[/center]")
+
             if signature != None:
                 descfile.write(signature)
             descfile.close()
@@ -182,17 +191,24 @@ class COMMON():
             ptgen = requests.get(url, params=data)
             if ptgen.json()["error"] != None:
                 for retry in range(ptgen_retry):
-                    ptgen = requests.get(url, params=params)
-                    if ptgen.json()["error"] == None:
-                        break
-            params['url'] =  ptgen.json()['data'][0]['link'] 
+                    try:
+                        ptgen = requests.get(url, params=params)
+                        if ptgen.json()["error"] == None:
+                            break
+                    except requests.exceptions.JSONDecodeError:
+                        continue
+            try:
+                params['url'] = ptgen.json()['data'][0]['link'] 
+            except Exception:
+                console.print("[red]Unable to get data from ptgen using IMDb")
+                params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
         else:
             console.print("[red]No IMDb id was found.")
             params['url'] = console.input(f"[red]Please enter [yellow]Douban[/yellow] link: ")
         try:
             ptgen = requests.get(url, params=params)
             if ptgen.json()["error"] != None:
-                for retry in range(self.ptgen_retry):
+                for retry in range(ptgen_retry):
                     ptgen = requests.get(url, params=params)
                     if ptgen.json()["error"] == None:
                         break
@@ -205,10 +221,11 @@ class COMMON():
             if "[/img]" in ptgen:
                 ptgen = ptgen.split("[/img]")[1]
             ptgen = f"[img]{meta.get('imdb_info', {}).get('cover', meta.get('cover', ''))}[/img]{ptgen}"
-        except:
+        except Exception:
             console.print_exception()
-            console.print("[bold red]There was an error getting the ptgen")
-            console.print(ptgen)
+            console.print(ptgen.text)
+            console.print("[bold red]There was an error getting the ptgen \nUploading without ptgen")
+            return ""
         return ptgen
 
 
@@ -293,12 +310,13 @@ class COMMON():
                         remove_set.add(a)
 
             search = each.lower().replace('-', '').replace(' ', '').replace('.', '')
-            for x in remove_set:
+            for x in remove_set.copy():
                 if "|" in x:
                     look_for = x.split('|')
                     for y in look_for:
                         if y.lower() in search:
-                            remove_set.remove(x)
+                            if x in remove_set:
+                                remove_set.remove(x)
                             remove_set.add(y)
 
             allow = True

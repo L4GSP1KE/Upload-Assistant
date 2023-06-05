@@ -97,7 +97,7 @@ class Prep():
             meta['filelist'] = []
             try:
                 guess_name = bdinfo['title'].replace('-',' ')
-                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name), {"excludes" : ["country", "language"]})['title']
                 untouched_filename = bdinfo['title']
                 try:
                     meta['search_year'] = guessit(bdinfo['title'])['year']
@@ -105,7 +105,7 @@ class Prep():
                     meta['search_year'] = ""
             except Exception:
                 guess_name = bdinfo['label'].replace('-',' ')
-                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))['title']
+                filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name), {"excludes" : ["country", "language"]})['title']
                 untouched_filename = bdinfo['label']
                 try:
                     meta['search_year'] = guessit(bdinfo['label'])['year']
@@ -125,7 +125,7 @@ class Prep():
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-',' ')
             # filename = guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name))['title']
-            filename = guessit(guess_name)['title']
+            filename = guessit(guess_name, {"excludes" : ["country", "language"]})['title']
             untouched_filename = os.path.basename(os.path.dirname(meta['discs'][0]['path']))
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
@@ -145,22 +145,18 @@ class Prep():
             video, meta['scene'], meta['imdb'] = self.is_scene(meta['path'], meta.get('imdb', None))
             meta['filelist'] = []
             guess_name = meta['discs'][0]['path'].replace('-','')
-            filename = guessit(guess_name)['title']
+            filename = guessit(guess_name, {"excludes" : ["country", "language"]})['title']
             untouched_filename = os.path.basename(meta['discs'][0]['path'])
+            videopath = meta['discs'][0]['largest_evo']
             try:
                 meta['search_year'] = guessit(meta['discs'][0]['path'])['year']
             except Exception:
                 meta['search_year'] = ""
             if meta.get('edit', False) == False:
-                mi = self.exportInfo(meta['largest_evo'], False, meta['uuid'], meta['base_dir'], export_text=False)
+                mi = self.exportInfo(meta['discs'][0]['largest_evo'], False, meta['uuid'], meta['base_dir'], export_text=False)
                 meta['mediainfo'] = mi
             else:
                 mi = meta['mediainfo']
-            if meta.get('edit', False) == False:
-                ds = multiprocessing.Process(target=self.screenshots, args=(meta['discs'][0]['largest_evo'], filename, meta['uuid'], base_dir))
-                ds.start()
-                while ds.is_alive() == True:
-                    await asyncio.sleep(1)
             meta['resolution'] = self.get_resolution(guessit(video), meta['uuid'], base_dir)
             meta['sd'] = self.is_sd(meta['resolution'])
         #If NOT BD/DVD/HDDVD
@@ -168,7 +164,7 @@ class Prep():
             videopath, meta['filelist'] = self.get_video(videoloc, meta.get('mode', 'discord')) 
             video, meta['scene'], meta['imdb'] = self.is_scene(videopath, meta.get('imdb', None))
             guess_name = ntpath.basename(video).replace('-',' ')
-            filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name))["title"]
+            filename = guessit(re.sub("[^0-9a-zA-Z\[\]]+", " ", guess_name), {"excludes" : ["country", "language"]}).get("title", guessit(re.sub("[^0-9a-zA-Z]+", " ", guess_name), {"excludes" : ["country", "language"]})["title"])
             untouched_filename = os.path.basename(video)
             try:
                 meta['search_year'] = guessit(video)['year']
@@ -199,7 +195,7 @@ class Prep():
 
 
         # Reuse information from other trackers
-        if self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True:
+        if str(self.config['TRACKERS'].get('PTP', {}).get('useAPI')).lower() == "true":
             ptp = PTP(config=self.config)
             if meta.get('ptp', None) != None:
                 meta['ptp_manual'] = meta['ptp']
@@ -217,7 +213,7 @@ class Prep():
                 if ptp_id != None:
                     meta['ptp'] = ptp_id
         
-        if self.config['TRACKERS'].get('HDB', {}).get('useAPI') == True:
+        if str(self.config['TRACKERS'].get('HDB', {}).get('useAPI')).lower() == "true":
             hdb = HDB(config=self.config)
             if meta.get('ptp', None) == None or meta.get('hdb', None) != None:
                 hdb_imdb = hdb_tvdb = hdb_id = None
@@ -238,7 +234,7 @@ class Prep():
                 if hdb_id != None:
                     meta['hdb'] = hdb_id
         
-        if self.config['TRACKERS'].get('BLU', {}).get('useAPI') == True:
+        if str(self.config['TRACKERS'].get('BLU', {}).get('useAPI')).lower() == "true":
             blu = BLU(config=self.config)
             if meta.get('blu', None) != None:
                 meta['blu_manual'] = meta['blu']
@@ -346,6 +342,8 @@ class Prep():
         meta['audio'], meta['channels'], meta['has_commentary'] = self.get_audio_v2(mi, meta, bdinfo)
         if meta['tag'][1:].startswith(meta['channels']):
             meta['tag'] = meta['tag'].replace(f"-{meta['channels']}", '')
+        if meta.get('no_tag', False):
+            meta['tag'] = ""
         meta['3D'] = self.is_3d(mi, bdinfo)
         meta['source'], meta['type'] = self.get_source(meta['type'], video, meta['path'], meta['is_disc'], meta)
         if meta.get('service', None) in (None, ''):
@@ -423,7 +421,7 @@ class Prep():
                         'evo_mi' : '',
                         'largest_evo' : ""
                     }
-
+                    discs.append(disc)
         if is_disc == "BDMV":
             if meta.get('edit', False) == False:
                 discs, bdinfo = await parse.get_bdinfo(discs, meta['uuid'], meta['base_dir'], meta.get('discs', []))
@@ -626,8 +624,8 @@ class Prep():
                 scene = True
                 r = requests.get(f"https://api.srrdb.com/v1/imdb/{base}")
                 r = r.json()
-                if r['releases'] != []:
-                    imdb = r['releases'][0].get('imdb')
+                if r['releases'] != [] and imdb == None:
+                    imdb = r['releases'][0].get('imdb', imdb) if r['releases'][0].get('imdb') is not None else imdb
                 console.print(f"[green]SRRDB: Matched to {response['results'][0]['release']}")
         except Exception:
             video = video
@@ -718,6 +716,8 @@ class Prep():
                             time.sleep(1)
                         elif self.img_host == "ptpimg":
                             i += 1
+                        elif self.img_host == "lensdump":
+                            i += 1
                         else:
                             console.print("[red]Image too large for your image host, retaking")
                             time.sleep(1)
@@ -735,7 +735,7 @@ class Prep():
     def dvd_screenshots(self, meta, disc_num, num_screens=None):
         if num_screens == None:
             num_screens = self.screens
-        if num_screens == 0 or len(meta.get('image_list', [])) >= num_screens:
+        if num_screens == 0 or (len(meta.get('image_list', [])) >= num_screens and disc_num == 0):
             return
         ifo_mi = MediaInfo.parse(f"{meta['discs'][disc_num]['path']}/VTS_{meta['discs'][disc_num]['main_set'][0][:2]}_0.IFO", mediainfo_options={'inform_version' : '1'})
         sar = 1
@@ -767,7 +767,7 @@ class Prep():
         n = 0
         os.chdir(f"{meta['base_dir']}/tmp/{meta['uuid']}")
         i = 0        
-        if len(glob.glob("*.png")) >= num_screens:
+        if len(glob.glob(f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][disc_num]['name']}-*.png")) >= num_screens:
             i = num_screens
             console.print('[bold green]Reusing screenshots')
         else:
@@ -783,6 +783,7 @@ class Prep():
                     TimeRemainingColumn()
                 ) as progress:
                     screen_task = progress.add_task("[green]Saving Screens...", total=num_screens + 1)
+                    ss_times = []
                     for i in range(num_screens + 1):
                         if n >= len(main_set):
                             n = 0
@@ -815,15 +816,15 @@ class Prep():
                                             n -= num_screens
                                         if loops < 6:
                                             loops = loops + 1
-                                            voblength, n = _is_vob_good(n, loops)
+                                            voblength, n = _is_vob_good(n, loops, num_screens)
                                             return voblength, n
                                         else:
                                             return 300, n
                             try:
                                 voblength, n = _is_vob_good(n, 0, num_screens)
                                 img_time = random.randint(round(voblength/5) , round(voblength - voblength/5))
-
-                                ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=img_time)
+                                ss_times = self.valid_ss_time(ss_times, num_screens+1, voblength)
+                                ff = ffmpeg.input(f"{meta['discs'][disc_num]['path']}/VTS_{main_set[n]}", ss=ss_times[-1])
                                 if w_sar != 1 or h_sar != 1:
                                     ff = ff.filter('scale', int(round(width * w_sar)), int(round(height * h_sar)))
                                 (
@@ -848,6 +849,8 @@ class Prep():
                                     time.sleep(1)
                                 elif self.img_host == "ptpimg":
                                     i += 1
+                                elif self.img_host == "lensdump":
+                                    i += 1
                                 else:
                                     console.print("[red]Image too large for your image host, retaking")
                                     retake = True
@@ -867,7 +870,7 @@ class Prep():
                 if screensize < smallestsize:
                     smallestsize = screensize
                     smallest = screens
-            os.remove(smallest)   
+            os.remove(smallest)
 
     def screenshots(self, path, filename, folder_id, base_dir, meta, num_screens=None):
         if num_screens == None:
@@ -878,7 +881,7 @@ class Prep():
         with open(f"{base_dir}/tmp/{folder_id}/MediaInfo.json", encoding='utf-8') as f:
             mi = json.load(f)
             video_track = mi['media']['track'][1]
-            length = video_track['Duration']
+            length = video_track.get('Duration', mi['media']['track'][0]['Duration'])
             width = float(video_track.get('Width'))
             height = float(video_track.get('Height'))
             par = float(video_track.get('PixelAspectRatio', 1))
@@ -947,7 +950,7 @@ class Prep():
                                     i += 1
                                 elif os.path.getsize(Path(image)) <= 10000000 and self.img_host in ["imgbox", 'pixhost'] and retake == False:
                                     i += 1
-                                elif self.img_host == "ptpimg" and retake == False:
+                                elif self.img_host in ["ptpimg", "lensdump"] and retake == False:
                                     i += 1
                                 elif self.img_host == "freeimage.host":
                                     console.print("[bold red]Support for freeimage.host has been removed. Please remove from your config")
@@ -1101,8 +1104,8 @@ class Prep():
                     meta = await self.get_tmdb_id(filename, search_year, meta, category, untouched_filename, attempted)
                 elif attempted == 2:
                     attempted += 1
-                    meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename)['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
-                else:
+                    meta = await self.get_tmdb_id(anitopy.parse(guessit(untouched_filename, {"excludes" : ["country", "language"]})['title'])['anime_title'], search_year, meta, meta['category'], untouched_filename, attempted)
+                if meta['tmdb'] in (None, ""):
                     console.print(f"[red]Unable to find TMDb match for {filename}")
                     if meta.get('mode', 'discord') == 'cli':
                         tmdb_id = cli_ui.ask_string("Please enter tmdb id in this format: tv/12345 or movie/12345")
@@ -1117,9 +1120,9 @@ class Prep():
         
         if meta['tmdb'] == "0":
             try:
-                title = guessit(meta['path'])['title'].lower()
+                title = guessit(meta['path'], {"excludes" : ["country", "language"]})['title'].lower()
                 title = title.split('aka')[0]
-                meta = await self.get_tmdb_id(guessit(title)['title'], meta['search_year'], meta)
+                meta = await self.get_tmdb_id(guessit(title, {"excludes" : ["country", "language"]})['title'], meta['search_year'], meta)
                 if meta['tmdb'] == "0":
                     meta = await self.get_tmdb_id(title, "", meta, meta['category'])
             except:
@@ -1385,6 +1388,8 @@ class Prep():
             episodes = mal_id = 0
         if mal_id in [None, 0]:
             mal_id = mal
+        if not episodes:
+            episodes = 0
         return romaji, mal_id, eng_title, season_year, episodes
 
 
@@ -1480,6 +1485,7 @@ class Prep():
                             # Check for additional, bloated Tracks
                             if audio_language != meta['original_language'] and audio_language != "en":
                                 if meta['original_language'] not in variants and audio_language not in variants:
+                                    audio_language = "und" if audio_language == "" else audio_language
                                     console.print(f"[bold red]This release has a(n) {audio_language} audio track, and may be considered bloated")
                                     time.sleep(5)
                     if eng and orig == True:
@@ -1610,7 +1616,7 @@ class Prep():
                 source = guessit(video)['source']
             except:
                 try:
-                    source = guessit(path['source'])
+                    source = guessit(path)['source']
                 except:
                     source = "BluRay"
             if meta.get('manual_source', None):
@@ -1656,6 +1662,8 @@ class Prep():
                     source = "HDDVD"
             if type in ("WEBDL", 'WEBRIP'):
                 source = "Web"
+            if source == "Ultra HDTV":
+                source = "UHDTV"
         except Exception:
             console.print(traceback.format_exc())
             source = "BluRay"
@@ -1818,7 +1826,7 @@ class Prep():
         has_encode_settings = False
         try:
             format = mi['media']['track'][1]['Format']
-            format_profile = mi['media']['track'][1]['Format_Profile']
+            format_profile = mi['media']['track'][1].get('Format_Profile', format)
             if mi['media']['track'][1].get('Encoded_Library_Settings', None):
                 has_encode_settings = True
             bit_depth = mi['media']['track'][1].get('BitDepth', '0')
@@ -1941,6 +1949,7 @@ class Prep():
             private = True,
             exclude_globs = exclude or [],
             include_globs = include or [],
+            creation_date = datetime.now(),
             comment = "Created by L4G's Upload Assistant",
             created_by = "L4G's Upload Assistant")
         console.print("[bold yellow]Creating .torrent... (No valid --torrenthash was provided)")
@@ -2011,7 +2020,7 @@ class Prep():
                 if each not in ('files', 'length', 'name', 'piece length', 'pieces', 'private', 'source'):
                     base_torrent.metainfo['info'].pop(each, None)
             for each in list(base_torrent.metainfo):
-                if each not in ('announce', 'comment', 'created by', 'encoding', 'info'):
+                if each not in ('announce', 'comment', 'creation date', 'created by', 'encoding', 'info'):
                     base_torrent.metainfo.pop(each, None)
             base_torrent.source = 'L4G'
             base_torrent.private = True
@@ -2063,6 +2072,7 @@ class Prep():
                     TimeRemainingColumn()
                 ) as progress:
                     upload_task = progress.add_task(f"[green]Uploading Screens to {img_host}...", total = len(image_glob[-screens:]))
+                    timeout=60
                     for image in image_glob[-screens:]:        
                         if img_host == "imgbb":
                             url = "https://api.imgbb.com/1/upload"
@@ -2071,20 +2081,20 @@ class Prep():
                                 'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
                             }
                             try:
-                                response = requests.post(url, data = data)
+                                response = requests.post(url, data = data,timeout=timeout)
                                 response = response.json()
                                 if response.get('success') != True:
-                                    console.print(response, 'red')
+                                    progress.console.print(response)
                                 img_url = response['data'].get('medium', response['data']['image'])['url']
                                 web_url = response['data']['url_viewer']
                                 raw_url = response['data']['image']['url']
                             except Exception:
-                                console.print("[yellow]imgbb failed, trying next image host")
+                                progress.console.print("[yellow]imgbb failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "freeimage.host":
-                            console.print("[red]Support for freeimage.host has been removed. Please remove from your config")
-                            console.rint("continuing in 15 seconds")
+                            progress.console.print("[red]Support for freeimage.host has been removed. Please remove from your config")
+                            progress.console.print("continuing in 15 seconds")
                             time.sleep(15)
                             progress.stop()
                             newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
@@ -2098,15 +2108,15 @@ class Prep():
                                 'img': ('file-upload[0]', open(image, 'rb')),
                             }
                             try:
-                                response = requests.post(url, data=data, files=files)
+                                response = requests.post(url, data=data, files=files,timeout=timeout)
                                 if response.status_code != 200:
-                                    console.print(response, 'red')
+                                    progress.console.print(response)
                                 response = response.json()
                                 raw_url = response['th_url'].replace('https://t', 'https://img').replace('/thumbs/', '/images/')
                                 img_url = response['th_url']
                                 web_url = response['show_url']
                             except Exception:
-                                console.print("[yellow]pixhost failed, trying next image host")
+                                progress.console.print("[yellow]pixhost failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         elif img_host == "ptpimg":
@@ -2128,9 +2138,29 @@ class Prep():
                                 web_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                                 raw_url = f"https://ptpimg.me/{ptpimg_code}.{ptpimg_ext}" 
                             except:
-                                console.print("[yellow]ptpimg failed, trying next image host")
+                                progress.console.print("[yellow]ptpimg failed, trying next image host")
                                 progress.stop()
                                 newhost_list, i = self.upload_screens(meta, screens - i, img_host_num + 1, i, total_screens, [], return_dict)
+                        elif img_host == "lensdump":
+                            url = "https://lensdump.com/api/1/upload"
+                            data = {
+                                'image': base64.b64encode(open(image, "rb").read()).decode('utf8')
+                            }
+                            headers = {
+                                'X-API-Key': self.config['DEFAULT']['lensdump_api'],
+                            }
+                            try:
+                                response = requests.post(url, data=data, headers=headers, timeout=timeout)
+                                response = response.json()
+                                if response.get('status_code') != 200:
+                                    progress.console.print(response)
+                                img_url = response['data'].get('medium', response['data']['image'])['url']
+                                web_url = response['data']['url_viewer']
+                                raw_url = response['data']['image']['url']
+                            except Exception:
+                                progress.console.print("[yellow]lensdump failed, trying next image host")
+                                progress.stop()
+                                newhost_list, i = self.upload_screens(meta, screens - i , img_host_num + 1, i, total_screens, [], return_dict)
                         else:
                             console.print("[bold red]Please choose a supported image host in your config")
                             exit()
@@ -2190,6 +2220,7 @@ class Prep():
         service = meta.get('service', "")
         season = meta.get('season', "")
         episode = meta.get('episode', "")
+        part = meta.get('part', "")
         repack = meta.get('repack', "")
         three_d = meta.get('3D', "")
         tag = meta.get('tag', "")
@@ -2236,7 +2267,7 @@ class Prep():
                     name = f"{title} {alt_title} {year} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition', 'distributor']
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {source} {video_codec} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
             elif type == "REMUX" and source in ("BluRay", "HDDVD"): #BluRay/HDDVD Remux
                 name = f"{title} {alt_title} {year} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" 
@@ -2254,7 +2285,7 @@ class Prep():
                 name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "HDTV": #HDTV
-                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
+                name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {source} {audio} {video_encode}"
                 potential_missing = []
         elif meta['category'] == "TV": #TV SPECIFIC
             if type == "DISC": #Disk
@@ -2265,25 +2296,25 @@ class Prep():
                     name = f"{title} {alt_title} {season}{episode}{three_d} {edition} {repack} {source} {dvd_size} {audio}"
                     potential_missing = ['edition', 'distributor']
                 elif meta['is_disc'] == 'HDDVD':
-                    name = f"{title} {alt_title} {year} {edition} {repack} {source} {audio}"
+                    name = f"{title} {alt_title} {year} {edition} {repack} {resolution} {source} {video_codec} {audio}"
                     potential_missing = ['edition', 'region', 'distributor']
             elif type == "REMUX" and source in ("BluRay", "HDDVD"): #BluRay Remux
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {three_d} {edition} {repack} {resolution} {uhd} {source} REMUX {hdr} {video_codec} {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "REMUX" and source in ("PAL DVD", "NTSC DVD"): #DVD Remux
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {source} REMUX {audio}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {source} REMUX {audio}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "ENCODE": #Encode
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} {uhd} {source} {audio} {hdr} {video_encode}" #SOURCE
                 potential_missing = ['edition', 'description']
             elif type == "WEBDL": #WEB-DL
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} {uhd} {service} WEB-DL {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "WEBRIP": #WEBRip
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} {uhd} {service} WEBRip {audio} {hdr} {video_encode}"
                 potential_missing = ['edition', 'service']
             elif type == "HDTV": #HDTV
-                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {edition} {repack} {resolution} HDTV {audio} {video_encode}"
+                name = f"{title} {year} {alt_title} {season}{episode} {episode_title} {part} {edition} {repack} {resolution} {source} {audio} {video_encode}"
                 potential_missing = []
 
 
@@ -2311,6 +2342,8 @@ class Prep():
             is_daily = False
             if meta['anime'] == False:
                 try:
+                    if meta.get('manual_date'):
+                        raise ManualDateException
                     try:
                         guess_year = guessit(video)['year']
                     except Exception:
@@ -2328,7 +2361,7 @@ class Prep():
 
                 except Exception:
                     try:
-                        guess_date = guessit(video)['date']
+                        guess_date = meta.get('manual_date', guessit(video)['date']) if meta.get('manual_date') else guessit(video)['date']
                         season_int, episode_int = self.daily_to_tmdb_season_episode(meta.get('tmdb'), guess_date)
                         # season = f"S{season_int.zfill(2)}"
                         # episode = f"E{episode_int.zfill(2)}"
@@ -2336,6 +2369,7 @@ class Prep():
                         episode = ""
                         is_daily = True
                     except Exception:
+                        console.print_exception()
                         season_int = "1"
                         season = "S01"
                 try:
@@ -2363,13 +2397,13 @@ class Prep():
             else:
                 #If Anime
                 parsed = anitopy.parse(Path(video).name)
-                # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'])['title'])
+                # romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(guessit(parsed['anime_title'], {"excludes" : ["country", "language"]})['title'])
                 romaji, mal_id, eng_title, seasonYear, anilist_episodes = self.get_romaji(parsed['anime_title'], meta.get('mal', None))
                 if mal_id:
                     meta['mal_id'] = mal_id
                 if meta.get('tmdb_manual', None) == None:
                     year = parsed.get('anime_year', str(seasonYear))
-                    meta = await self.get_tmdb_id(guessit(parsed['anime_title'])['title'], year, meta, meta['category'])
+                    meta = await self.get_tmdb_id(guessit(parsed['anime_title'], {"excludes" : ["country", "language"]})['title'], year, meta, meta['category'])
                 meta = await self.tmdb_other_meta(meta)
                 if meta['category'] != "TV":
                     return meta
@@ -2383,9 +2417,11 @@ class Prep():
                 tag = parsed.get('release_group', "")
                 if tag != "":
                     meta['tag'] = f"-{tag}"
-                try:
-                    if len(filelist) == 1:
-                        episodes = parsed['episode_number']
+                if len(filelist) == 1:
+                    try:
+                        episodes = parsed.get('episode_number', guessit(video).get('episode', '1'))
+                        if not isinstance(episodes, list) and not episodes.isnumeric():
+                            episodes = guessit(video)['episode']
                         if type(episodes) == list:
                             episode = ""
                             for item in episodes:
@@ -2395,34 +2431,38 @@ class Prep():
                         else:
                             episode_int = str(int(episodes))
                             episode = f"E{str(int(episodes)).zfill(2)}"
-                    else:
-                        episode = ""
-                        episode_int = "0"
-                        meta['tv_pack'] = 1
-                except Exception:
+                    except Exception:
+                        episode = "E01"
+                        episode_int = "1"
+                        console.print('[bold yellow]There was an error guessing the episode number. Guessing E01. Use [bold green]--episode #[/bold green] to correct if needed')
+                        await asyncio.sleep(1.5)
+                else:
                     episode = ""
                     episode_int = "0"
                     meta['tv_pack'] = 1
+                    
                 try:
                     if meta.get('season_int'):
                         season = meta.get('season_int')
                     else:
-                        season = parsed['anime_season']
+                        season = parsed.get('anime_season', guessit(video)['season'])
                     season_int = season
                     season = f"S{season.zfill(2)}"
                 except Exception:
                     try:
-                        if int(parsed['episode_number']) >= anilist_episodes:
+                        if int(episode_int) >= anilist_episodes:
                             params = {
                                 'id' : str(meta['tvdb_id']),
                                 'origin' : 'tvdb',
-                                'absolute' : str(parsed['episode_number']),
+                                'absolute' : str(episode_int),
                                 # 'destination' : 'tvdb'
                             }
                             url = "https://thexem.info/map/single"
                             response = requests.post(url, params=params).json()
                             if response['result'] == "failure":
                                 raise XEMNotFound
+                            if meta['debug']:
+                                console.log(f"[cyan]TheXEM Absolute -> Standard[/cyan]\n{response}")
                             season_int = str(response['data']['scene']['season'])
                             season = f"S{str(response['data']['scene']['season']).zfill(2)}"
                             if len(filelist) == 1:
@@ -2434,6 +2474,8 @@ class Prep():
                             season_int = "1"
                             names_url = f"https://thexem.info/map/names?origin=tvdb&id={str(meta['tvdb_id'])}"
                             names_response = requests.get(names_url).json()
+                            if meta['debug']:
+                                console.log(f'[cyan]Matching Season Number from TheXEM\n{names_response}')
                             difference = 0
                             if names_response['result'] == "success":
                                 for season_num, values in names_response['data'].items():
@@ -2469,6 +2511,8 @@ class Prep():
                             else:
                                 raise XEMNotFound
                     except Exception:
+                        if meta['debug']:
+                            console.print_exception()
                         try:
                             season = guessit(video)['season']
                             season_int = season
@@ -2499,6 +2543,7 @@ class Prep():
             else:
                 episode_int = meta['manual_episode'].lower().replace('e', '')
                 meta['episode'] = f"E{meta['manual_episode'].lower().replace('e', '').zfill(2)}"
+                meta['tv_pack'] = 0
             
             # if " COMPLETE " in Path(video).name.replace('.', ' '):
             #     meta['season'] = "COMPLETE"
@@ -2506,9 +2551,16 @@ class Prep():
             meta['episode_int'] = episode_int
 
             
-            meta['episode_title_storage'] = guessit(video).get('episode_title', '')
+            meta['episode_title_storage'] = guessit(video,{"excludes" : "part"}).get('episode_title', '')
             if meta['season'] == "S00" or meta['episode'] == "E00":
                 meta['episode_title'] = meta['episode_title_storage']
+            
+            # Guess the part of the episode (if available)
+            meta['part'] = ""
+            if meta['tv_pack'] == 1:
+                part = guessit(os.path.dirname(video)).get('part')
+                meta['part'] = f"Part {part}" if part else ""
+
         return meta
 
 
@@ -2541,7 +2593,7 @@ class Prep():
             'HMAX': 'HMAX', 'HBO Max': 'HMAX', 'HS': 'HTSR', 'HTSR' : 'HTSR', 'HSTR': 'Hotstar', 'HULU': 'HULU', 'Hulu': 'HULU', 'hoichoi': 'HoiChoi', 'ID': 'ID', 
             'Investigation Discovery': 'ID', 'IFC': 'IFC', 'iflix': 'IFX', 'National Audiovisual Institute': 'INA', 'ITV': 'ITV', 
             'KAYO': 'KAYO', 'KNOW': 'KNOW', 'Knowledge Network': 'KNOW', 'KNPY': 'KNPY', 'Kanopy' : 'KNPY', 'LIFE': 'LIFE', 'Lifetime': 'LIFE', 'LN': 'LN', 
-            'MA' : 'MA', 'Movies Anywhere' : 'MA','MBC': 'MBC', 'MNBC': 'MNBC', 'MSNBC': 'MNBC', 'MTOD': 'MTOD', 'Motor Trend OnDemand': 'MTOD', 'MTV': 'MTV', 'MUBI': 'MUBI', 
+            'MA' : 'MA', 'Movies Anywhere' : 'MA', 'MAX' : 'MAX', 'MBC': 'MBC', 'MNBC': 'MNBC', 'MSNBC': 'MNBC', 'MTOD': 'MTOD', 'Motor Trend OnDemand': 'MTOD', 'MTV': 'MTV', 'MUBI': 'MUBI', 
             'NATG': 'NATG', 'National Geographic': 'NATG', 'NBA': 'NBA', 'NBA TV': 'NBA', 'NBC': 'NBC', 'NF': 'NF', 'Netflix': 'NF', 
             'National Film Board': 'NFB', 'NFL': 'NFL', 'NFLN': 'NFLN', 'NFL Now': 'NFLN', 'NICK': 'NICK', 'Nickelodeon': 'NICK', 'NRK': 'NRK', 
             'Norsk Rikskringkasting': 'NRK', 'OnDemandKorea': 'ODK', 'Opto': 'OPTO', 'Oprah Winfrey Network': 'OWN', 'PA': 'PA', 'PBS': 'PBS', 
@@ -2566,7 +2618,7 @@ class Prep():
         if "DTS-HD MA" in audio:
             video_name = video_name.replace("DTS-HD.MA.", "").replace("DTS-HD MA ", "")
         for key, value in services.items():
-            if (' ' + key + ' ') in video_name and key not in guessit(video).get('title', ''):
+            if (' ' + key + ' ') in video_name and key not in guessit(video, {"excludes" : ["country", "language"]}).get('title', ''):
                 service = value
             elif key == service:
                 service = value
@@ -2641,7 +2693,7 @@ class Prep():
                 else:
                     desc_source = desc_source[0]
 
-                if meta.get('ptp', None) != None and self.config['TRACKERS'].get('PTP', {}).get('useAPI') == True and desc_source in ['PTP', None]:
+                if meta.get('ptp', None) != None and str(self.config['TRACKERS'].get('PTP', {}).get('useAPI')).lower() == "true" and desc_source in ['PTP', None]:
                     ptp = PTP(config=self.config)
                     ptp_desc = await ptp.get_ptp_description(meta['ptp'], meta['is_disc'])
                     if ptp_desc.replace('\r\n', '').replace('\n', '').strip() != "":
@@ -2850,14 +2902,19 @@ class Prep():
         show = tmdb.TV(tmdbid)
         seasons = show.info().get('seasons')
         season = '1'
+        episode = '1'
+        date = datetime.fromisoformat(date)
         for each in seasons:
-            air_date = date.fromisoformat(each['air_date'])
+            air_date = datetime.fromisoformat(each['air_date'])
             if air_date <= date:
                 season = str(each['season_number'])
         season_info = tmdb.TV_Seasons(tmdbid, season).info().get('episodes')
         for each in season_info:
             if str(each['air_date']) == str(date):
                 episode = str(each['episode_number'])
+                break
+        else:
+            console.print(f"[yellow]Unable to map the date ([bold yellow]{str(date)}[/bold yellow]) to a Season/Episode number")
         return season, episode
 
 
@@ -2957,26 +3014,28 @@ class Prep():
                 "q" : filename
             }
             url = f"https://api.tvmaze.com/search/shows"
-        resp = requests.get(url=url, params=params).json()
-        if resp == None:
-            return tvmazeID, imdbID, tvdbID
-        if lookup == True:
-            show = resp
-        else:
-            if year not in (None, ''):
-                for each in resp:
-                    premier_date = each['show'].get('premiered', '')
-                    if premier_date != None:
-                        if premier_date.startswith(str(year)):
-                            show = each['show']
-            elif len(resp) >= 1:
-                show = resp[0]['show']
-        if show != None:
-            tvmazeID = show.get('id')
-            if int(imdbID) == 0:
-                if show.get('externals', {}).get('imdb', '0') != None:
-                    imdbID = str(show.get('externals', {}).get('imdb', '0')).replace('tt', '')
-            if int(tvdbID) == 0:
-                if show.get('externals', {}).get('tvdb', '0') != None:
-                    tvdbID = show.get('externals', {}).get('tvdb', '0')
+        resp = requests.get(url=url, params=params)
+        if resp.ok:
+            resp = resp.json()
+            if resp == None:
+                return tvmazeID, imdbID, tvdbID
+            if lookup == True:
+                show = resp
+            else:
+                if year not in (None, ''):
+                    for each in resp:
+                        premier_date = each['show'].get('premiered', '')
+                        if premier_date != None:
+                            if premier_date.startswith(str(year)):
+                                show = each['show']
+                elif len(resp) >= 1:
+                    show = resp[0]['show']
+            if show != None:
+                tvmazeID = show.get('id')
+                if int(imdbID) == 0:
+                    if show.get('externals', {}).get('imdb', '0') != None:
+                        imdbID = str(show.get('externals', {}).get('imdb', '0')).replace('tt', '')
+                if int(tvdbID) == 0:
+                    if show.get('externals', {}).get('tvdb', '0') != None:
+                        tvdbID = show.get('externals', {}).get('tvdb', '0')
         return tvmazeID, imdbID, tvdbID

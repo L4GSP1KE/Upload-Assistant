@@ -21,12 +21,14 @@ from src.trackers.TTG import TTG
 from src.trackers.LST import LST
 from src.trackers.FL import FL
 from src.trackers.LT import LT
-from src.trackers.TDB import TDB
 from src.trackers.NBL import NBL
 from src.trackers.ANT import ANT
 from src.trackers.PTER import PTER
 from src.trackers.MTV import MTV
-from src.trackers.RF import RF
+from src.trackers.JPTV import JPTV
+from src.trackers.TL import TL
+from src.trackers.TDC import TDC
+from src.trackers.HDT import HDT
 import json
 from pathlib import Path
 import asyncio
@@ -49,7 +51,6 @@ cli_ui.setup(color='always', title="L4G's Upload Assistant")
 import traceback
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
-print(base_dir)
 
 try:
     from data.config import config
@@ -90,7 +91,7 @@ async def do_the_thing(base_dir):
         else:
             break
     meta, help, before_args = parser.parse(tuple(' '.join(sys.argv[1:]).split(' ')), meta)
-    if meta['cleanup']:
+    if meta['cleanup'] and os.path.exists(f"{base_dir}/tmp"):
         shutil.rmtree(f"{base_dir}/tmp")
         console.print("[bold green]Sucessfully emptied tmp directory")
     path = meta['path']
@@ -115,14 +116,36 @@ async def do_the_thing(base_dir):
             else:
                 console.print(f"[red]Path: [bold red]{path}[/bold red] does not exist")
                 
-        elif len(paths) != 1:
+        elif os.path.exists(os.path.dirname(path)) and len(paths) != 1:
             queue = paths
             md_text = "\n - ".join(queue)
             console.print("\n[bold green]Queuing these files:[/bold green]", end='')
             console.print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
             console.print("\n\n")
+        elif not os.path.exists(os.path.dirname(path)):
+            split_path = path.split()
+            p1 = split_path[0]
+            for i, each in enumerate(split_path):
+                try:
+                    if os.path.exists(p1) and not os.path.exists(f"{p1} {split_path[i+1]}"):
+                        queue.append(p1)
+                        p1 = split_path[i+1]
+                    else:
+                        p1 += f" {split_path[i+1]}"
+                except IndexError:
+                    if os.path.exists(p1):
+                        queue.append(p1)
+                    else:
+                        console.print(f"[red]Path: [bold red]{p1}[/bold red] does not exist")
+            if len(queue) >= 1:
+                md_text = "\n - ".join(queue)
+                console.print("\n[bold green]Queuing these files:[/bold green]", end='')
+                console.print(Markdown(f"- {md_text.rstrip()}\n\n", style=Style(color='cyan')))
+                console.print("\n\n")
+            
         else:
             # Add Search Here
+            console.print(f"[red]There was an issue with your input. If you think this was not an issue, please make a report that includes the full command used.")
             exit()
 
 
@@ -137,8 +160,8 @@ async def do_the_thing(base_dir):
                 for key, value in saved_meta.items():
                     overwrite_list = [
                         'trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 
-                        'hdb', 'ptp', 'blu', 'no_aka', 'no_year', 'no_dub', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
-                        'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag', 'skip_imghost_upload', 'imghost', 'manual_source'
+                        'hdb', 'ptp', 'blu', 'no_season', 'no_aka', 'no_year', 'no_dub', 'no_tag', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
+                        'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag', 'qbit_cat', 'skip_imghost_upload', 'imghost', 'manual_source', 'webdv', 'hardcoded-subs'
                     ]
                     if meta.get(key, None) != value and key in overwrite_list:
                         saved_meta[key] = meta[key]
@@ -167,6 +190,7 @@ async def do_the_thing(base_dir):
 
 
         if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
+            reuse_torrent = None
             if meta.get('rehash', False) == False:
                 reuse_torrent = await client.find_existing_torrent(meta)
                 if reuse_torrent != None:
@@ -175,6 +199,8 @@ async def do_the_thing(base_dir):
                 prep.create_torrent(meta, Path(meta['path']))
             if meta['nohash']:
                 meta['client'] = "none"
+        elif os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) and meta.get('rehash', False) == True and meta['nohash'] == False:
+            prep.create_torrent(meta, Path(meta['path']))
         if int(meta.get('randomized', 0)) >= 1:
             prep.create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'], meta['path'])
             
@@ -213,11 +239,12 @@ async def do_the_thing(base_dir):
         #######  Upload to Trackers  #######
         ####################################
         common = COMMON(config=config)
-        api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'TDB', 'NBL', 'ANT']
-        http_trackers = ['HDB', 'TTG', 'FL', 'PTER', 'MTV']
+        api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'NBL', 'ANT', 'JPTV', 'TDC']
+        http_trackers = ['HDB', 'TTG', 'FL', 'PTER', 'HDT']
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
-            'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'TDB' : TDB, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'MTV': MTV,
+            'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'JPTV' : JPTV,
+            'TL' : TL, 'TDC' : TDC, 'HDT' : HDT, 'MTV': MTV
             }
 
         for tracker in trackers:
@@ -237,11 +264,15 @@ async def do_the_thing(base_dir):
                     upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker_class.tracker}? {debug}", default=meta['unattended'])
                 if upload_to_tracker:
                     console.print(f"Uploading to {tracker_class.tracker}")
+                    if check_banned_group(tracker_class.tracker, tracker_class.banned_groups, meta):
+                        continue
                     dupes = await tracker_class.search_existing(meta)
                     dupes = await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await tracker_class.upload(meta)
+                        if tracker == 'SN':
+                            time.sleep(16)
                         await client.add_to_client(meta, tracker_class.tracker)
             
             if tracker in http_trackers:
@@ -252,6 +283,8 @@ async def do_the_thing(base_dir):
                     upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker_class.tracker}? {debug}", default=meta['unattended'])
                 if upload_to_tracker:
                     console.print(f"Uploading to {tracker}")
+                    if check_banned_group(tracker_class.tracker, tracker_class.banned_groups, meta):
+                        continue
                     if await tracker_class.validate_credentials(meta) == True:
                         dupes = await tracker_class.search_existing(meta)
                         dupes = await common.filter_dupes(dupes, meta)
@@ -294,6 +327,8 @@ async def do_the_thing(base_dir):
                     upload_to_bhd = cli_ui.ask_yes_no(f"Upload to BHD? ({draft}) {debug}", default=meta['unattended'])
                 if upload_to_bhd:
                     console.print("Uploading to BHD")
+                    if check_banned_group("BHD", bhd.banned_groups, meta):
+                        continue
                     dupes = await bhd.search_existing(meta)
                     dupes = await common.filter_dupes(dupes, meta)
                     meta = dupe_check(dupes, meta)
@@ -330,7 +365,6 @@ async def do_the_thing(base_dir):
                     except:
                         console.print(traceback.print_exc())
 
-
             if tracker == "PTP":
                 if meta['unattended']:
                     upload_to_ptp = True
@@ -342,6 +376,8 @@ async def do_the_thing(base_dir):
                         imdb_id = cli_ui.ask_string("Unable to find IMDB id, please enter e.g.(tt1234567)")
                         meta['imdb_id'] = imdb_id.replace('tt', '').zfill(7)
                     ptp = PTP(config=config)
+                    if check_banned_group("PTP", ptp.banned_groups, meta):
+                        continue
                     try:
                         console.print("[yellow]Searching for Group ID")
                         groupID = await ptp.get_group_by_imdb(meta['imdb_id'])
@@ -365,6 +401,19 @@ async def do_the_thing(base_dir):
                             await client.add_to_client(meta, "PTP")
                     except:
                         console.print(traceback.print_exc())
+
+            if tracker == "TL":
+                tracker_class = tracker_class_map[tracker](config=config)
+                if meta['unattended']:
+                    upload_to_tracker = True
+                else:
+                    upload_to_tracker = cli_ui.ask_yes_no(f"Upload to {tracker_class.tracker}? {debug}", default=meta['unattended'])
+                if upload_to_tracker:
+                    console.print(f"Uploading to {tracker_class.tracker}")
+                    if check_banned_group(tracker_class.tracker, tracker_class.banned_groups, meta):
+                        continue
+                    await tracker_class.upload(meta)
+                    await client.add_to_client(meta, tracker_class.tracker)
             
 
 
@@ -405,7 +454,8 @@ def get_confirmation(meta):
     console.print()
     if meta.get('unattended', False) == False:
         get_missing(meta)
-        cli_ui.info_section(cli_ui.yellow, "Is this correct?")
+        ring_the_bell = "\a" if config['DEFAULT'].get("sfx_on_prompt", True) == True else "" # \a rings the bell
+        cli_ui.info_section(cli_ui.yellow, f"Is this correct?{ring_the_bell}") 
         cli_ui.info(f"Name: {meta['name']}")
         confirm = cli_ui.ask_yes_no("Correct?", default=False)
     else:
@@ -446,6 +496,28 @@ def dupe_check(dupes, meta):
                     meta['name'] = f"{meta['name']} DUPE?"
 
         return meta
+
+
+# Return True if banned group
+def check_banned_group(tracker, banned_group_list, meta):
+    if meta['tag'] == "":
+        return False
+    else:
+        q = False
+        for tag in banned_group_list:
+            if isinstance(tag, list):
+                if meta['tag'][1:].lower() == tag[0].lower():
+                    console.print(f"[bold yellow]{meta['tag'][1:]}[/bold yellow][bold red] was found on [bold yellow]{tracker}'s[/bold yellow] list of banned groups.")
+                    console.print(f"[bold red]NOTE: [bold yellow]{tag[1]}")
+                    q = True
+            else:
+                if meta['tag'][1:].lower() == tag.lower():
+                    console.print(f"[bold yellow]{meta['tag'][1:]}[/bold yellow][bold red] was found on [bold yellow]{tracker}'s[/bold yellow] list of banned groups.")
+                    q = True
+        if q:
+            if not cli_ui.ask_yes_no(cli_ui.red, "Upload Anyways?", default=False):
+                return True
+    return False
 
 def get_missing(meta):
     info_notes = {

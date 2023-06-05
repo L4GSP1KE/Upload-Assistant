@@ -1,15 +1,22 @@
 config = {
     "DEFAULT" : {
+    
+        # ------ READ THIS ------
+        # Any lines starting with the # symbol are commented and will not be used.
+        # If you change any of these options, remove the #
+        # -----------------------
+
         "tmdb_api" : "tmdb_api key",
         "imgbb_api" : "imgbb api key",
         "ptpimg_api" : "ptpimg api key",
+        "lensdump_api" : "lensdump api key",
 
         # Order of image hosts, and backup image hosts
         "img_host_1": "imgbb",
         "img_host_2": "ptpimg",
         "img_host_3": "imgbox",
-	"img_host_4": "pixhost",
-        # "img_host_5": "",
+	    "img_host_4": "pixhost",
+        "img_host_5": "lensdump",
 
 
         "screens" : "6",
@@ -18,8 +25,10 @@ config = {
 
 
         # The name of your default torrent client, set in the torrent client sections below
-        "default_torrent_client" : "Client1"
+        "default_torrent_client" : "Client1",
 
+        # Play the bell sound effect when asking for confirmation
+        "sfx_on_prompt" : True,
 
     },
 
@@ -41,6 +50,7 @@ config = {
         },
         "PTP" : {
             "useAPI" : False, # Set to True if using PTP
+            "add_web_source_to_desc" : True,
             "ApiUser" : "ptp api user",
             "ApiKey" : 'ptp api key',
             "username" : "",
@@ -132,11 +142,6 @@ config = {
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
             # "anon" : "False"
         },
-	    "TDB" : {
-            "passkey" : "TDB api key",
-            "announce_url" : "https://torrentdb.net/announce/customannounceurl",
-            # "anon" : "False"
-        },
         "PTER" : {
             "passkey":'passkey',
             "img_rehost" : False,
@@ -144,6 +149,20 @@ config = {
             "password" : "",
             "ptgen_api": "",
             "anon": True,
+        },
+        "TL": {
+            "announce_key": "TL announce key",
+        },
+        "TDC" :{
+            "api_key" : "TDC api key",
+            "announce_url" : "https://thedarkcommunity.cc/announce/customannounceurl",
+            # "anon" : "False"
+        },
+        "HDT" : {
+            "username" : "username",
+            "password" : "password",
+            "announce_url" : "https://hdts-announce.ru/announce.php",
+            # "anon" : "False"
         },
 
         "MANUAL" : {
@@ -175,11 +194,16 @@ config = {
             "qbit_pass" : "password",
             # "torrent_storage_dir" : "path/to/BT_backup folder"
             # "qbit_tag" : "tag",
+            # "qbit_cat" : "category"
             
-            # Enable automatic torrent management if path(s) are set
+            # Content Layout for adding .torrents: "Original"(recommended)/"Subfolder"/"NoSubfolder"
+            "content_layout" : "Original"
+            
+            # Enable automatic torrent management if listed path(s) are present in the path
                 # If using remote path mapping, use remote path
                 # For using multiple paths, use a list ["path1", "path2"] 
             # "automatic_management_paths" : ""
+
 
 
             # Remote path mapping (docker/etc.) CASE SENSITIVE

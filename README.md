@@ -13,7 +13,7 @@ A simple tool to take the work out of uploading.
   - Can re-use existing torrents instead of hashing new
   - Generates proper name for your upload using Mediainfo/BDInfo and TMDb/IMDb conforming to site rules
   - Checks for existing releases already on site
-  - Uploads to PTP/BLU/BHD/Aither/THR/STC/R4E(limited)/STT/HP/ACM/LCD/LST/TDB/NBL/ANT/FL/HUNO/RF/SN
+  - Uploads to PTP/BLU/BHD/Aither/THR/STC/R4E(limited)/STT/HP/ACM/LCD/LST/NBL/ANT/FL/HUNO/RF/SN
   - Adds to your client with fast resume, seeding instantly (rtorrent/qbittorrent/deluge/watch folder)
   - ALL WITH MINIMAL INPUT!
   - Currently works with .mkv/.mp4/Blu-ray/DVD/HD-DVDs
@@ -48,7 +48,7 @@ A simple tool to take the work out of uploading.
 ## **Updating:**
   - To update first navigate into the Upload-Assistant directory: `cd Upload-Assistant`
   - Run a `git pull` to grab latest updates
-  - Run `pip3 install --user -U -r requirements.txt` to ensure dependencies are up to date
+  - Run `python3 -m pip install --user -U -r requirements.txt` to ensure dependencies are up to date
 ## **CLI Usage:**
   
   `python3 upload.py /downloads/path/to/content --args`

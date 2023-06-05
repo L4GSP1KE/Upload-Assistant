@@ -27,6 +27,7 @@ class FL():
         self.fltools = config['TRACKERS'][self.tracker].get('fltools', {})
         self.uploader_name = config['TRACKERS'][self.tracker].get('uploader_name')
         self.signature = None
+        self.banned_groups = [""]
     
 
     async def get_category_id(self, meta):
@@ -86,12 +87,15 @@ class FL():
                 fl_name = fl_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
         if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '':
             fl_name = fl_name.replace(meta['episode'], f"{meta['episode']} {meta['episode_title_storage']}")
+        if 'DD+' in meta.get('audio', '') and 'DDP' in meta['uuid']:
+            fl_name = fl_name.replace('DD+', 'DDP')
+        if 'Atmos' in meta.get('audio', '') and 'Atmos' not in meta['uuid']:
+            fl_name = fl_name.replace('Atmos', '')
 
-        fl_name = fl_name.replace('DD+', 'DDP')
         fl_name = fl_name.replace('BluRay REMUX', 'Remux').replace('BluRay Remux', 'Remux').replace('Bluray Remux', 'Remux')
-        fl_name = fl_name.replace('DoVi HDR HEVC', 'HEVC DoVi').replace('HDR HEVC', 'HEVC HDR').replace('DoVi HEVC', 'HEVC DoVi').replace('DoVi HDR', 'DoVi')
-        fl_name = fl_name.replace('DTS7.1', 'DTS').replace('DTS5.1', 'DTS').replace('DTS2.0', 'DTS').replace('DTS1.0', 'DTS')
         fl_name = fl_name.replace('PQ10', 'HDR').replace('HDR10+', 'HDR')
+        fl_name = fl_name.replace('DoVi HDR HEVC', 'HEVC DoVi HDR').replace('HDR HEVC', 'HEVC HDR').replace('DoVi HEVC', 'HEVC DoVi')
+        fl_name = fl_name.replace('DTS7.1', 'DTS').replace('DTS5.1', 'DTS').replace('DTS2.0', 'DTS').replace('DTS1.0', 'DTS')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
         fl_name = re.sub("[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", fl_name)
@@ -113,10 +117,27 @@ class FL():
         
         # Confirm the correct naming order for FL
         cli_ui.info(f"Filelist name: {fl_name}")
-        fl_confirm = cli_ui.ask_yes_no("Correct?", default=False)
-        if fl_confirm != True:
-            console.print("Aborting...")
-            return
+        if meta.get('unattended', False) == False:
+            fl_confirm = cli_ui.ask_yes_no("Correct?", default=False)
+            if fl_confirm != True:
+                fl_name_manually = cli_ui.ask_string("Please enter a proper name", default="")
+                if fl_name_manually == "":
+                    console.print('No proper name given')
+                    console.print("Aborting...")
+                    return
+                else:
+                    fl_name = fl_name_manually
+
+        # Torrent File Naming
+        # Note: Don't Edit .torrent filename after creation, SubsPlease anime releases (because of their weird naming) are an exception
+        if meta.get('anime', True) == True and meta.get('tag', '') == '-SubsPlease':
+            torrentFileName = fl_name
+        else:
+            if meta.get('isdir', False) == False:
+                torrentFileName = meta.get('uuid')
+                torrentFileName = os.path.splitext(torrentFileName)[0]
+            else:
+                torrentFileName = meta.get('uuid')
 
         # Download new .torrent from site
         fl_desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r', newline='').read()
@@ -126,7 +147,7 @@ class FL():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()
         with open(torrent_path, 'rb') as torrentFile:
-            torrentFileName = unidecode(fl_name)
+            torrentFileName = unidecode(torrentFileName)
             files = {
                 'file' : (f"{torrentFileName}.torrent", torrentFile, "application/x-bittorent")
             }
@@ -203,9 +224,8 @@ class FL():
             soup = BeautifulSoup(r.text, 'html.parser')
             find = soup.find_all('a', href=True)
             for each in find:
-                for each in find:
-                    if each['href'].startswith('details.php?id=') and "&" not in each['href']:
-                        dupes.append(each['title'])
+                if each['href'].startswith('details.php?id=') and "&" not in each['href']:
+                    dupes.append(each['title'])
 
         return dupes
 

@@ -6,6 +6,8 @@ from difflib import SequenceMatcher
 import distutils.util
 import urllib
 import os
+import platform
+
 from src.trackers.COMMON import COMMON
 from src.console import console
 
@@ -23,6 +25,7 @@ class BHD():
         self.source_flag = 'BHD'
         self.upload_url = 'https://beyond-hd.me/api/upload/'
         self.signature = f"\n[center][url=https://beyond-hd.me/forums/topic/toolpython-l4gs-upload-assistant.5456]Created by L4G's Upload Assistant[/url][/center]"
+        self.banned_groups = ['Sicario', 'TOMMY', 'x0r', 'nikt0', 'FGT', 'd3g', 'MeGusta', 'YIFY', 'tigole', 'TEKNO3D', 'C4K', 'RARBG', '4K4U', 'EASports', 'ReaLHD']
         pass
     
     async def upload(self, meta):
@@ -91,7 +94,7 @@ class BHD():
         if len(tags) > 0:
             data['tags'] = ','.join(tags)
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         
         url = self.upload_url + self.config['TRACKERS'][self.tracker]['api_key'].strip()
@@ -136,6 +139,7 @@ class BHD():
             "HD DVD" : "HD-DVD",
             "Web" : "WEB",
             "HDTV" : "HDTV",
+            "UHDTV" : "HDTV",
             "NTSC" : "DVD",
             "PAL" : "DVD"
         }
@@ -195,18 +199,22 @@ class BHD():
                         if each['type'] == "BDMV":
                             desc.write(f"[spoiler={each.get('name', 'BDINFO')}][code]{each['summary']}[/code][/spoiler]")
                             desc.write("\n")
-                        if each['type'] == "DVD":
+                        elif each['type'] == "DVD":
                             desc.write(f"{each['name']}:\n")
                             desc.write(f"[spoiler={os.path.basename(each['vob'])}][code][{each['vob_mi']}[/code][/spoiler] [spoiler={os.path.basename(each['ifo'])}][code][{each['ifo_mi']}[/code][/spoiler]")
                             desc.write("\n")
-            desc.write(base.replace("[img]", "[img=300x300]"))
+                        elif each['type'] == "HDDVD":
+                            desc.write(f"{each['name']}:\n")
+                            desc.write(f"[spoiler={os.path.basename(each['largest_evo'])}][code][{each['evo_mi']}[/code][/spoiler]\n")
+                            desc.write("\n")
+            desc.write(base.replace("[img]", "[img width=300]"))
             images = meta['image_list']
             if len(images) > 0: 
                 desc.write("[center]")
                 for each in range(len(images[:int(meta['screens'])])):
                     web_url = images[each]['web_url']
                     img_url = images[each]['img_url']
-                    desc.write(f"[url={web_url}][img=350x350]{img_url}[/img][/url]")
+                    desc.write(f"[url={web_url}][img width=350]{img_url}[/img][/url]")
                 desc.write("[/center]")
             desc.write(self.signature)
             desc.close()

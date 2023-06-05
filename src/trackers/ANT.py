@@ -3,7 +3,7 @@
 import asyncio
 import requests
 import distutils.util
-
+import platform
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -28,7 +28,9 @@ class ANT():
         self.config = config
         self.tracker = 'ANT'
         self.source_flag = 'ANT'
-        self.search_url = self.upload_url = 'https://anthelion.me/api.php'
+        self.search_url = 'https://anthelion.me/api.php'
+        self.upload_url = 'https://anthelion.me/api.php'
+        self.banned_groups = ['Ozlem', 'RARBG', 'FGT', 'STUTTERSHIT', 'LiGaS', 'DDR', 'Zeus', 'TBS', 'aXXo', 'CrEwSaDe', 'DNL', 'EVO', 'FaNGDiNG0', 'HD2DVD', 'HDTime', 'iPlanet', 'KiNGDOM', 'NhaNc3', 'PRoDJi', 'SANTi', 'ViSiON', 'WAF', 'YIFY', 'YTS', 'MkvCage', 'mSD']
         pass
     
 
@@ -50,6 +52,8 @@ class ANT():
             flags.append('DV')
         if "Criterion" in meta.get('distributor', ''):
             flags.append('Criterion')
+        if "REMUX" in meta['type']:
+            flags.append('Remux')
         return flags
 
     ###############################################################
@@ -80,7 +84,7 @@ class ANT():
             'anonymous' : anon
         }
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }        
         if meta['debug'] == False:
             response = requests.post(url=self.upload_url, files=files, data=data, headers=headers)

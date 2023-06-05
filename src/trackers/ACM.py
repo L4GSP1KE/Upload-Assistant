@@ -4,7 +4,7 @@ import asyncio
 import requests
 import distutils.util
 import os
-
+import platform
 from src.trackers.COMMON import COMMON
 from src.console import console
 
@@ -32,6 +32,7 @@ class ACM():
         self.upload_url = 'https://asiancinema.me/api/torrents/upload'
         self.search_url = 'https://asiancinema.me/api/torrents/filter'
         self.signature = None
+        self.banned_groups = [""]
         pass
     
     async def get_cat_id(self, category_name):
@@ -258,7 +259,7 @@ class ACM():
             data['season_number'] = meta.get('season_int', '0')
             data['episode_number'] = meta.get('episode_int', '0')
         headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:53.0) Gecko/20100101 Firefox/53.0'
+            'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }
         params = {
             'api_token' : self.config['TRACKERS'][self.tracker]['api_key'].strip()
@@ -323,6 +324,7 @@ class ACM():
         source = meta.get('source')
         is_disc = meta.get('is_disc')
         subs = self.get_subtitles(meta)
+        resolution = meta.get('resolution')
         if aka != '':
             # ugly fix to remove the extra space in the title
             aka = aka + ' '
@@ -332,14 +334,16 @@ class ACM():
                 # name = f'{name[:name.find(year)]}/ {original_title} {chr(int("202A", 16))}{name[name.find(year):]}'
                 name = name.replace(meta['title'], f"{meta['title']} / {original_title} {chr(int('202A', 16))}")
         if 'AAC' in audio:
-            name = name.replace(audio.strip().replace("  ", " "), audio.replace(" ", ""))
+            name = name.replace(audio.strip().replace("  ", " "), audio.replace("AAC ", "AAC"))
         name = name.replace("DD+ ", "DD+")
         name = name.replace ("UHD BluRay REMUX", "Remux")
         name = name.replace ("BluRay REMUX", "Remux")
         name = name.replace ("H.265", "HEVC")
         if is_disc == 'DVD':
-            name = name.replace (f'{source} DVD5', f'DVD {source}')
-            name = name.replace (f'{source} DVD9', f'DVD {source}')
+            name = name.replace (f'{source} DVD5', f'{resolution} DVD {source}')
+            name = name.replace (f'{source} DVD9', f'{resolution} DVD {source}')
+            if audio == meta.get('channels'):
+                name = name.replace (f'{audio}', f'MPEG {audio}')
 
         name = name + self.get_subs_tag(subs)
         return name
@@ -386,4 +390,4 @@ class ACM():
             if self.signature != None:
                 descfile.write(self.signature)
             descfile.close()
-        return 
+        return

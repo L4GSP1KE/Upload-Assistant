@@ -1,0 +1,24 @@
+General;%FileName%\n\n---GENERAL----\nSize...........: %FileSize/String%\nContainer......: %Format%\nDuration.......: %Duration/String3%\n\n
+Video;---VIDEO----\nCodec..........: %Format%$if(%Encoded_Library%,\, %Encoded_Library%)$if(%HDR_Format/String%,\, %HDR_Format/String%)$if(%transfer_characteristics%,\, %transfer_characteristics%)\nResolution.....: %Width%x%Height%\nBit rate.......: %BitRate/String%\nFrame rate.....: %FrameRate% fps\n\n
+Audio;---AUDIO----\nFormat.........: %Format_Commercial%\nChannels.......: %Channel(s)/String%\nSample rate....: %SamplingRate/String%\nBit rate.......: %BitRate/String%\nLanguage.......: %Language/String%$if(%Title%, \(%Title%\),)\n\n
+Text;Language.......: $if(%Language/String%,%Language/String%)$if(%Title%, \(%Title%\),), %Format/String%\n
+Chapters
+File_Begin
+File_End;
+Page_Begin
+Page_Middle
+Page_End
+General_Begin
+General_End
+Video_Begin
+Video_Middle
+Video_End
+Audio_Begin
+Audio_Middle
+Audio_End
+Text_Begin;---SUBTITLES---\r\n
+Text_Middle
+Text_End
+Chapters_Begin;
+Chapters_Middle
+Chapters_End

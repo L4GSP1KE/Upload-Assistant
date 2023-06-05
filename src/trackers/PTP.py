@@ -32,9 +32,58 @@ class PTP():
         self.api_key = config['TRACKERS']['PTP'].get('ApiKey', '').strip()
         self.announce_url = config['TRACKERS']['PTP'].get('announce_url', '').strip() 
         self.username = config['TRACKERS']['PTP'].get('username', '').strip() 
-        self.password = config['TRACKERS']['PTP'].get('password', '').strip() 
+        self.password = config['TRACKERS']['PTP'].get('password', '').strip()
+        self.web_source = distutils.util.strtobool(str(config['TRACKERS']['PTP'].get('add_web_source_to_desc', True))) 
         self.user_agent = f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
+        self.banned_groups = ['aXXo', 'BRrip', 'CM8', 'CrEwSaDe', 'CTFOH', 'DNL', 'FaNGDiNG0', 'HD2DVD', 'HDTime', 'ION10', 'iPlanet', 'KiNGDOM', 'mHD', 'mSD', 'nHD', 'nikt0', 'nSD', 'NhaNc3', 'OFT', 'PRODJi', 'SANTi', 'STUTTERSHIT', 'ViSION', 'VXT', 'WAF', 'd3g', 'x0r', 'YIFY', 'BMDru']
     
+        self.sub_lang_map = {
+            ("Arabic", "ara", "ar") : 22,
+            ("Brazilian Portuguese", "Brazilian", "Portuguese-BR", 'pt-br') : 49,
+            ("Bulgarian", "bul", "bg") : 29,
+            ("Chinese", "chi", "zh", "Chinese (Simplified)", "Chinese (Traditional)") : 14,
+            ("Croatian", "hrv", "hr", "scr") : 23,
+            ("Czech", "cze", "cz", "cs") : 30,
+            ("Danish", "dan", "da") : 10,
+            ("Dutch", "dut", "nl") : 9,
+            ("English", "eng", "en", "English (CC)", "English - SDH") : 3,
+            ("English - Forced", "English (Forced)", "en (Forced)") : 50,
+            ("English Intertitles", "English (Intertitles)", "English - Intertitles", "en (Intertitles)") : 51,
+            ("Estonian", "est", "et") : 38,
+            ("Finnish", "fin", "fi") : 15,
+            ("French", "fre", "fr") : 5,
+            ("German", "ger", "de") : 6,
+            ("Greek", "gre", "el") : 26,
+            ("Hebrew", "heb", "he") : 40,
+            ("Hindi" "hin", "hi") : 41,
+            ("Hungarian", "hun", "hu") : 24,
+            ("Icelandic", "ice", "is") : 28,
+            ("Indonesian", "ind", "id") : 47,
+            ("Italian", "ita", "it") : 16,
+            ("Japanese", "jpn", "ja") : 8,
+            ("Korean", "kor", "ko") : 19,
+            ("Latvian", "lav", "lv") : 37,
+            ("Lithuanian", "lit", "lt") : 39,
+            ("Norwegian", "nor", "no") : 12,
+            ("Persian", "fa", "far") : 52,
+            ("Polish", "pol", "pl") : 17,
+            ("Portuguese", "por", "pt") : 21,
+            ("Romanian", "rum", "ro") : 13,
+            ("Russian", "rus", "ru") : 7,
+            ("Serbian", "srp", "sr", "scc") : 31,
+            ("Slovak", "slo", "sk") : 42,
+            ("Slovenian", "slv", "sl") : 43,
+            ("Spanish", "spa", "es") : 4,
+            ("Swedish", "swe", "sv") : 11,
+            ("Thai", "tha", "th") : 20,
+            ("Turkish", "tur", "tr") : 18,
+            ("Ukrainian", "ukr", "uk") : 34,
+            ("Vietnamese", "vie", "vi") : 25,
+        }
+
+
+
+
     async def get_ptp_id_imdb(self, search_term, search_file_folder):
         imdb_id = ptp_torrent_id = None
         filename = str(os.path.basename(search_term))
@@ -201,7 +250,7 @@ class PTP():
             "year" : meta.get("year", ""),
             "album_desc" : meta.get("overview", ""),
         }
-        tags = self.get_tags([meta.get("genres", ""), meta.get("keywords", "")])
+        tags = await self.get_tags([meta.get("genres", ""), meta.get("keywords", "")])
         tinfo['tags'] = ", ".join(tags)
         return tinfo
 
@@ -337,7 +386,7 @@ class PTP():
                 "H.265" : "H.265",
             }
             searchcodec = meta.get('video_codec', meta.get('video_encode'))
-            codec = codecmap.get(searchcodec)
+            codec = codecmap.get(searchcodec, searchcodec)
             if meta.get('has_encode_settings') == True:
                 codec = codec.replace("H.", "x")
         return codec
@@ -377,6 +426,7 @@ class PTP():
             "HDDVD" : "HD-DVD",
             "Web" : "WEB",
             "HDTV" : "HDTV",
+            'UHDTV' : 'HDTV',
             "NTSC" : "DVD",
             "PAL" : "DVD"
         }
@@ -385,56 +435,16 @@ class PTP():
 
 
     def get_subtitles(self, meta):
-        sub_lang_map = {
-            ("Arabic", "ara", "ar") : 22,
-            ("Brazilian Portuguese", "Brazilian", "Portuguese-BR", 'pt-br') : 49,
-            ("Bulgarian", "bul", "bg") : 29,
-            ("Chinese", "chi", "zh", "Chinese (Simplified)", "Chinese (Traditional)") : 14,
-            ("Croatian", "hrv", "hr", "scr") : 23,
-            ("Czech", "cze", "cz", "cs") : 30,
-            ("Danish", "dan", "da") : 10,
-            ("Dutch", "dut", "nl") : 9,
-            ("English", "eng", "en", "English (CC)", "English - SDH") : 3,
-            ("English - Forced", "English (Forced)", "en (Forced)") : 50,
-            ("English Intertitles", "English (Intertitles)", "English - Intertitles", "en (Intertitles)") : 51,
-            ("Estonian", "est", "et") : 38,
-            ("Finnish", "fin", "fi") : 15,
-            ("French", "fre", "fr") : 5,
-            ("German", "ger", "de") : 6,
-            ("Greek", "gre", "el") : 26,
-            ("Hebrew", "heb", "he") : 40,
-            ("Hindi" "hin", "hi") : 41,
-            ("Hungarian", "hun", "hu") : 24,
-            ("Icelandic", "ice", "is") : 28,
-            ("Indonesian", "ind", "id") : 47,
-            ("Italian", "ita", "it") : 16,
-            ("Japanese", "jpn", "ja") : 8,
-            ("Korean", "kor", "ko") : 19,
-            ("Latvian", "lav", "lv") : 37,
-            ("Lithuanian", "lit", "lt") : 39,
-            ("Norwegian", "nor", "no") : 12,
-            ("Persian", "fa", "far") : 52,
-            ("Polish", "pol", "pl") : 17,
-            ("Portuguese", "por", "pt") : 21,
-            ("Romanian", "rum", "ro") : 13,
-            ("Russian", "rus", "ru") : 7,
-            ("Serbian", "srp", "sr", "scc") : 31,
-            ("Slovak", "slo", "sk") : 42,
-            ("Slovenian", "slv", "sl") : 43,
-            ("Spanish", "spa", "es") : 4,
-            ("Swedish", "swe", "sv") : 11,
-            ("Thai", "tha", "th") : 20,
-            ("Turkish", "tur", "tr") : 18,
-            ("Ukrainian", "ukr", "uk") : 34,
-            ("Vietnamese", "vie", "vi") : 25,
-        }
+        sub_lang_map = self.sub_lang_map
 
         sub_langs = []
         if meta.get('is_disc', '') != 'BDMV':
             mi = meta['mediainfo']
+            if meta.get('is_disc', '') == "DVD":
+                mi = json.loads(MediaInfo.parse(meta['discs'][0]['ifo'], output='JSON'))
             for track in mi['media']['track']:
                 if track['@type'] == "Text":
-                    language = track.get('Language')
+                    language = track.get('Language_String2', track.get('Language'))
                     if language == "en":
                         if track.get('Forced', "") == "Yes":
                             language = "en (Forced)"
@@ -453,6 +463,38 @@ class PTP():
             sub_langs = [44] # No Subtitle
         return sub_langs
 
+    def get_trumpable(self, sub_langs):
+        trumpable_values = {
+            "English Hardcoded Subs (Full)" : 4,
+            "English Hardcoded Subs (Forced)" : 50,
+            "No English Subs" : 14,
+            "English Softsubs Exist (Mislabeled)" : None,
+            "Hardcoded Subs (Non-English)" : "OTHER"
+        }
+        opts = cli_ui.select_choices("English subtitles not found. Please select any/all applicable options:", choices=list(trumpable_values.keys()))
+        trumpable = []
+        if opts:
+            for t, v in trumpable_values.items():
+                if t in ''.join(opts):
+                    if v == None:
+                        break
+                    elif v != 50: # Hardcoded, Forced
+                        trumpable.append(v)
+                    elif v == "OTHER": #Hardcoded, Non-English
+                        trumpable.append(14)
+                        hc_sub_langs = cli_ui.ask_string("Enter language code for HC Subtitle languages")
+                        for lang, subID in self.sub_lang_map.items():
+                            if any(hc_sub_langs.strip() == x for x in list(lang)):
+                                sub_langs.append(subID)
+                    else:
+                        sub_langs.append(v)
+                        trumpable.append(4)
+        
+        sub_langs = list(set(sub_langs))
+        trumpable = list(set(trumpable))
+        if trumpable == []:
+            trumpable = None
+        return trumpable, sub_langs
 
     def get_remaster_title(self, meta):
         remaster_title = []
@@ -544,12 +586,12 @@ class PTP():
                 for i in range(len(discs)):
                     each = discs[i]
                     if each['type'] == "BDMV":
-                        desc.write(f"[mediainfo]{each['summary']}[/mediainfo]\n")
-                        desc.write("\n")
+                        desc.write(f"[mediainfo]{each['summary']}[/mediainfo]\n\n")
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
-                            desc.write(base2ptp)
-                            desc.write("\n\n")
+                            if base2ptp.strip() != "":
+                                desc.write(base2ptp)
+                                desc.write("\n\n")
                             mi_dump = each['summary']
                         else:
                             mi_dump = each['summary']
@@ -571,14 +613,15 @@ class PTP():
                         desc.write("\n")
                         if i == 0:
                             base2ptp = self.convert_bbcode(base)
-                            desc.write(base2ptp)
-                            desc.write("\n\n")
+                            if base2ptp.strip() != "":
+                                desc.write(base2ptp)
+                                desc.write("\n\n")
                         else:
                             ds = multiprocessing.Process(target=prep.dvd_screenshots, args=(meta, i, 2))
                             ds.start()
                             while ds.is_alive() == True:
                                 await asyncio.sleep(1)
-                            new_screens = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}",f"{meta['base_dir']}/tmp/{meta['uuid']}/{meta['discs'][i]['name']}-*.png")
+                            new_screens = glob.glob1(f"{meta['base_dir']}/tmp/{meta['uuid']}", f"{meta['discs'][i]['name']}-*.png")
                             images, dummy = prep.upload_screens(meta, 2, 1, 0, 2, new_screens, {})  
                         
                     if len(images) > 0: 
@@ -592,7 +635,7 @@ class PTP():
                     file = meta['filelist'][i]
                     if i == 0:
                         # Add This line for all web-dls
-                        if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None:
+                        if meta['type'] == 'WEBDL' and meta.get('service_longname', '') != '' and meta.get('description', None) == None and self.web_source == True:
                             desc.write(f"[quote][align=center]This release is sourced from {meta['service_longname']}[/align][/quote]")
                         mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
                     else:
@@ -613,8 +656,9 @@ class PTP():
                     desc.write(f"[mediainfo]{mi_dump}[/mediainfo]\n")
                     if i == 0:
                         base2ptp = self.convert_bbcode(base)
-                        desc.write(base2ptp)
-                        desc.write("\n\n")    
+                        if base2ptp.strip() != "":
+                            desc.write(base2ptp)
+                            desc.write("\n\n")    
                     if len(images) > 0: 
                         for each in range(len(images[:int(meta['screens'])])):
                             raw_url = images[each]['raw_url']
@@ -664,7 +708,7 @@ class PTP():
                         with open(cookiefile, 'wb') as cf:
                             pickle.dump(session.cookies, cf)
                     except Exception:
-                        raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {resp.text}")
+                        raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
                 except Exception:
                     raise LoginException(f"Got exception while loading JSON login response from PTP. Response: {loginresponse.text}")
         return AntiCsrfToken
@@ -685,6 +729,10 @@ class PTP():
         resolution, other_resolution = self.get_resolution(meta)
         await self.edit_desc(meta)
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", "r").read()
+        ptp_subtitles = self.get_subtitles(meta)
+        ptp_trumpable = None
+        if not any(x in [3, 50] for x in ptp_subtitles) or meta['hardcoded-subs']:
+            ptp_trumpable, ptp_subtitles = self.get_trumpable(ptp_subtitles)
         data = {
             "submit": "true",
             "remaster_year": "",
@@ -699,7 +747,8 @@ class PTP():
             "other_source": self.get_source(meta['source']),
             "release_desc": desc,
             "nfo_text": "",
-            "subtitles[]" : self.get_subtitles(meta),
+            "subtitles[]" : ptp_subtitles,
+            "trumpable[]" : ptp_trumpable,
             "AntiCsrfToken" : await self.get_AntiCsrfToken(meta)
             }
         if data["remaster_year"] != "" or data["remaster_title"] != "":
@@ -728,9 +777,9 @@ class PTP():
             if cover != None and "ptpimg" not in cover:
                 cover = await self.ptpimg_url_rehost(cover)
             while cover == None:
-                cover_prompt = console.input("[red]No Poster was found. Please input a link to a poster: \n")
-                if "ptpimg" not in cover_prompt and cover_prompt.endswith(('.jpg', '.png')):
-                    cover = await self.ptpimg_url_rehost(cover_prompt)
+                cover = cli_ui.ask_string("No Poster was found. Please input a link to a poster: \n", default="")
+                if "ptpimg" not in str(cover) and str(cover).endswith(('.jpg', '.png')):
+                    cover = await self.ptpimg_url_rehost(cover)
             new_data = {
                 "title": tinfo.get("title", meta["imdb_info"].get("title", meta["title"])),
                 "year": tinfo.get("year", meta["imdb_info"].get("year", meta["year"])),
@@ -739,6 +788,8 @@ class PTP():
                 "album_desc": tinfo.get("plot", meta.get("overview", "")),
                 "trailer": meta.get("youtube", ""),
             }
+            if new_data['year'] in ['', '0', 0, None] and meta.get('manual_year') not in [0, '', None]:
+                new_data['year'] = meta['manual_year']
             while new_data["tags"] == "":
                  if meta.get('mode', 'discord') == 'cli':
                     console.print('[yellow]Unable to match any tags')
@@ -765,8 +816,8 @@ class PTP():
                  "User-Agent": self.user_agent
             }
             if meta['debug']:
-                console.print(url)
-                console.print(data)
+                console.log(url)
+                console.log(data)
             else:
                 with requests.Session() as session:
                     cookiefile = f"{meta['base_dir']}/data/cookies/PTP.pickle"

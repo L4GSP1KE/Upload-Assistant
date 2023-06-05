@@ -23,6 +23,7 @@ class HDB():
         self.passkey = config['TRACKERS']['HDB'].get('passkey', '').strip()
         self.rehost_images = config['TRACKERS']['HDB'].get('img_rehost', False)
         self.signature = None
+        self.banned_groups = [""]
     
 
     async def get_type_category_id(self, meta):
@@ -116,7 +117,9 @@ class HDB():
             "CRKL" : 73,
             "FUNI" : 74,
             "HLMK" : 71,
-            "HTSR" : 79
+            "HTSR" : 79,
+            "CRAV" : 80,
+            'MAX' : 88
         }
         if meta.get('service') in service_dict.keys():
             tags.append(service_dict.get(meta['service']))
@@ -175,10 +178,10 @@ class HDB():
         if 'HDR' in meta.get('hdr', ''):
             if 'HDR10+' not in meta['hdr']:
                 hdb_name = hdb_name.replace('HDR', 'HDR10')
-        if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE'):
+        if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE') and "DD" in meta['audio']:
             hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace(' ', '', 1).replace('Atmos', ''))
         else:
-            hdb_name = hdb_name.replace(meta['audio', meta['audio'].replace('Atmos', '')])
+            hdb_name = hdb_name.replace(meta['audio'], meta['audio'].replace('Atmos', ''))
         hdb_name = hdb_name.replace(meta.get('aka', ''), '')
         if meta.get('imdb_info'):
             hdb_name = hdb_name.replace(meta['title'], meta['imdb_info']['aka'])
@@ -189,8 +192,8 @@ class HDB():
         hdb_name = hdb_name.replace('Dubbed', '').replace('Dual-Audio', '')
         hdb_name = hdb_name.replace('REMUX', 'Remux')
         hdb_name = ' '.join(hdb_name.split())
-        hdb_name = re.sub("[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", hdb_name)
-        hdb_name = hdb_name.replace(' ', '.').replace('..', '.')
+        hdb_name = re.sub("[^0-9a-zA-ZÀ-ÿ. :&+'\-\[\]]+", "", hdb_name)
+        hdb_name = hdb_name.replace(' .', '.').replace('..', '.')
 
         return hdb_name 
 
@@ -459,7 +462,12 @@ class HDB():
             'thumbsize' : 'w300'
         }
         files = {}
-        for i in range(len(images)):
+
+        # Set maximum screenshots to 3 for tv singles and 6 for everthing else
+        hdbimg_screen_count = 3 if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 else 6 
+        if len(images) < hdbimg_screen_count:
+            hdbimg_screen_count = len(images) 
+        for i in range(hdbimg_screen_count):
             files[f'images_files[{i}]'] = open(images[i], 'rb')
         r = requests.post(url=url, data=data, files=files)
         image_bbcode = r.text

@@ -29,3 +29,5 @@ class XEMNotFound(Exception):
     pass
 class WeirdSystem(Exception):
     pass
+class ManualDateException(Exception):
+    pass

@@ -85,8 +85,10 @@ class Clients():
         if torrent_storage_dir == None and torrent_client != "watch":
             console.print(f'[bold red]Missing torrent_storage_dir for {default_torrent_client}')
             return None
+        elif not os.path.exists(str(torrent_storage_dir)) and torrent_client != "watch":
+            console.print(f"[bold red]Invalid torrent_storage_dir path: [bold yellow]{torrent_storage_dir}")
         torrenthash = None
-        if torrent_storage_dir != None:
+        if torrent_storage_dir != None and os.path.exists(torrent_storage_dir):
             if meta.get('torrenthash', None) != None:
                 valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{meta['torrenthash']}.torrent", meta['torrenthash'], torrent_client, print_err=True)
                 if valid:
@@ -105,6 +107,7 @@ class Clients():
             valid2, torrent_path = await self.is_valid_torrent(meta, torrent_path, torrenthash, torrent_client, print_err=False)
             if valid2:
                 return torrent_path
+        
         return None
 
 
@@ -141,11 +144,11 @@ class Clients():
                 if torrent_filepath in actual_filepath:
                     valid = True
         else:
-            console.print(f'[bold yellow]NO .torrent WITH INFOHASH {torrenthash} FOUND')
+            console.print(f'[bold yellow]{torrent_path} was not found')
         if valid:
             if os.path.exists(torrent_path):
                 reuse_torrent = Torrent.read(torrent_path)
-                if reuse_torrent.pieces >= 7000 and reuse_torrent.piece_size < 8388608:
+                if (reuse_torrent.pieces >= 7000 and reuse_torrent.piece_size < 8388608) or (reuse_torrent.pieces >= 4000 and reuse_torrent.piece_size < 4194304): # Allow up to 7k pieces at 8MiB or 4k pieces at 4MiB or less
                     err_print = "[bold yellow]Too many pieces exist in current hash. REHASHING"
                     valid = False
                 elif reuse_torrent.piece_size < 32768:
@@ -165,21 +168,10 @@ class Clients():
 
     async def search_qbit_for_torrent(self, meta, client):
         console.print("[green]Searching qbittorrent for an existing .torrent")
-        local_path = list_local_path = client.get('local_path','/LocalPath')
-        remote_path = list_remote_path = client.get('remote_path', '/RemotePath')
         torrent_storage_dir = client.get('torrent_storage_dir', None)
         if torrent_storage_dir == None and client.get("torrent_client", None) != "watch":
             console.print(f"[bold red]Missing torrent_storage_dir for {self.config['DEFAULT']['default_torrent_client']}")
             return None
-        if isinstance(local_path, list):
-            for i in range(len(local_path)):
-                if os.path.normpath(local_path[i]).lower() in meta['path'].lower():
-                    list_local_path = local_path[i]
-                    list_remote_path = remote_path[i]
-        local_path = os.path.normpath(list_local_path)
-        remote_path = os.path.normpath(list_remote_path)
-        if local_path.endswith(os.sep):
-            remote_path = remote_path + os.sep
 
         try:
             qbt_client = qbittorrentapi.Client(host=client['qbit_url'], port=client['qbit_port'], username=client['qbit_user'], password=client['qbit_pass'], VERIFY_WEBUI_CERTIFICATE=client.get('VERIFY_WEBUI_CERTIFICATE', True))
@@ -192,14 +184,8 @@ class Clients():
             return None
 
         torrents = qbt_client.torrents.info()
-        if local_path.lower() in meta['path'].lower() and local_path.lower() != remote_path.lower():
-            remote_path_map = True
-        else:
-            remote_path_map = False
         for torrent in torrents:
             torrent_path = torrent.content_path
-            if remote_path_map:
-                torrent_path = torrent_path.replace(local_path, remote_path).replace(os.sep, '/')
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
                     valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
@@ -303,8 +289,17 @@ class Clients():
         else:
             if os.path.normpath(am_config).lower() in os.path.normpath(path).lower() and am_config.strip() != "": 
                 auto_management = True
+        qbt_category = client.get("qbit_cat") if not meta.get("qbit_cat") else meta.get('qbit_cat')
 
-        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout='Original')
+        content_layout = client.get('content_layout', 'Original')
+        
+        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout=content_layout, category=qbt_category)
+        # Wait for up to 30 seconds for qbit to actually return the download
+        # there's an async race conditiion within qbt that it will return ok before the torrent is actually added
+        for _ in range(0, 30):
+            if len(qbt_client.torrents_info(torrent_hashes=torrent.infohash)) > 0:
+                break
+            await asyncio.sleep(1)
         qbt_client.torrents_resume(torrent.infohash)
         if client.get('qbit_tag', None) != None:
             qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
