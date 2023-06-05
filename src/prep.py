@@ -2361,7 +2361,7 @@ class Prep():
 
                 except Exception:
                     try:
-                        guess_date = datetime.fromisoformat(meta.get('manual_date', guessit(video)['date'])) if meta.get('manual_date') else guessit(video)['date']
+                        guess_date = meta.get('manual_date', guessit(video)['date']) if meta.get('manual_date') else guessit(video)['date']
                         season_int, episode_int = self.daily_to_tmdb_season_episode(meta.get('tmdb'), guess_date)
                         # season = f"S{season_int.zfill(2)}"
                         # episode = f"E{episode_int.zfill(2)}"
@@ -2369,6 +2369,7 @@ class Prep():
                         episode = ""
                         is_daily = True
                     except Exception:
+                        console.print_exception()
                         season_int = "1"
                         season = "S01"
                 try:
@@ -2902,8 +2903,9 @@ class Prep():
         seasons = show.info().get('seasons')
         season = '1'
         episode = '1'
+        date = datetime.fromisoformat(date)
         for each in seasons:
-            air_date = date.fromisoformat(each['air_date'])
+            air_date = datetime.fromisoformat(each['air_date'])
             if air_date <= date:
                 season = str(each['season_number'])
         season_info = tmdb.TV_Seasons(tmdbid, season).info().get('episodes')
