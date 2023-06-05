@@ -72,6 +72,14 @@ config = {
             "announce_url" : "https://hawke.uno/announce/customannounceurl",
             # "anon" : "False"
         },
+	    "MTV": {
+            'api_key' : 'get from security page',
+            'username' : '<USERNAME>',
+            'password' : '<PASSWORD>',
+            "announce_url": "get from https://www.morethantv.me/upload.php",
+            # not currently implemented
+            # "anon" : "False"
+        },
         "STC" :{
             "api_key" : "STC",
             "announce_url" : "https://skipthecommericals.xyz/announce/customannounceurl",

@@ -1,5 +1,4 @@
 import requests
-from src.trackers.RF import RF
 from src.args import Args
 from src.clients import Clients
 from src.prep import Prep
@@ -25,6 +24,7 @@ from src.trackers.LT import LT
 from src.trackers.NBL import NBL
 from src.trackers.ANT import ANT
 from src.trackers.PTER import PTER
+from src.trackers.MTV import MTV
 from src.trackers.JPTV import JPTV
 from src.trackers.TL import TL
 from src.trackers.TDC import TDC
@@ -244,7 +244,7 @@ async def do_the_thing(base_dir):
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
             'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'JPTV' : JPTV,
-            'TL' : TL, 'TDC' : TDC, 'HDT' : HDT,
+            'TL' : TL, 'TDC' : TDC, 'HDT' : HDT, 'MTV': MTV
             }
 
         for tracker in trackers:
@@ -414,7 +414,6 @@ async def do_the_thing(base_dir):
                         continue
                     await tracker_class.upload(meta)
                     await client.add_to_client(meta, tracker_class.tracker)
-            
             
 
 
