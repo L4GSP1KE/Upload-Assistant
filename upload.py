@@ -29,6 +29,7 @@ from src.trackers.JPTV import JPTV
 from src.trackers.TL import TL
 from src.trackers.TDC import TDC
 from src.trackers.HDT import HDT
+from src.trackers.RF import RF
 import json
 from pathlib import Path
 import asyncio
@@ -272,7 +273,7 @@ async def do_the_thing(base_dir):
                     if meta['upload'] == True:
                         await tracker_class.upload(meta)
                         if tracker == 'SN':
-                            time.sleep(16)
+                            await asyncio.sleep(16)
                         await client.add_to_client(meta, tracker_class.tracker)
             
             if tracker in http_trackers:
