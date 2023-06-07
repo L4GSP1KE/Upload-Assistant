@@ -326,6 +326,8 @@ class BHD():
             audio = ' '.join(audio.split())
             name = name.replace(audio, f"{meta.get('video_codec')} {audio}")
         name = name.replace("DD+", "DDP")
-        if meta['type'] == 'WEBDL' and meta.get('has_encode_settings', False) == True:
-            name = name.replace('H.264', 'x264')
+        # if meta['type'] == 'WEBDL' and meta.get('has_encode_settings', False) == True:
+        #     name = name.replace('H.264', 'x264')
+        if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '':
+            name = name.replace(meta['episode'], f"{meta['episode']} {meta['episode_title_storage']}")
         return name
