@@ -2903,7 +2903,7 @@ class Prep():
         seasons = show.info().get('seasons')
         season = '1'
         episode = '1'
-        date = datetime.fromisoformat(date)
+        date = datetime.fromisoformat(str(date))
         for each in seasons:
             air_date = datetime.fromisoformat(each['air_date'])
             if air_date <= date:
