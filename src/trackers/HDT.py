@@ -345,7 +345,7 @@ class HDT():
                 for each in range(len(images)):
                     img_url = images[each]['img_url']
                     raw_url = images[each]['raw_url']
-                    descfile.write(f"[url={raw_url}][imgw]{img_url}[/imgw][/url]\n")
+                    descfile.write(f"[url={raw_url}][img]{img_url}[/img][/url]\n")
 
             descfile.close()
 
