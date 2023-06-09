@@ -431,8 +431,7 @@ class HDB():
             desc = bbcode.convert_code_to_quote(desc)
             desc = bbcode.convert_spoiler_to_hide(desc)
             desc = bbcode.convert_comparison_to_centered(desc, 1000)
-            desc = desc.replace('[img]', '[imgw]').replace('[/img]', '[/imgw]')
-            desc = re.sub("(\[img=\d+)]", "[imgw]", desc, flags=re.IGNORECASE)
+            desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
             descfile.write(desc)
             if self.rehost_images == True:
                 console.print("[green]Rehosting Images...")
@@ -444,7 +443,8 @@ class HDB():
                     descfile.write("[center]")
                     for each in range(len(images[:int(meta['screens'])])):
                         img_url = images[each]['img_url']
-                        descfile.write(f"[imgw={img_url}]")
+                        web_url = images[each]['web_url']
+                        descfile.write(f"[url={web_url}][img width=350]{img_url}[/img][/url]")
                     descfile.write("[/center]")
             if self.signature != None:
                 descfile.write(self.signature)
