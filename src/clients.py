@@ -186,15 +186,12 @@ class Clients():
         torrents = qbt_client.torrents.info()
         for torrent in torrents:
             try:
-                torrent_path = torrent.content_path
+                torrent_path = torrent.get('content_path', torrent.save_path)
             except AttributeError:
-                try:
-                    torrent_path = torrent.save_path
-                except AttributeError:
-                    if meta['debug']:
-                        console.print(torrent)
-                        console.print_exception()
-                    continue
+                if meta['debug']:
+                    console.print(torrent)
+                    console.print_exception()
+                continue
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
                     valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
