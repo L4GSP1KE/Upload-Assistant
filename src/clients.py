@@ -188,10 +188,13 @@ class Clients():
             try:
                 torrent_path = torrent.content_path
             except AttributeError:
-                if meta['debug']:
-                    console.print(torrent)
-                    console.print_exception()
-                continue
+                try:
+                    torrent_path = torrent.save_path
+                except AttributeError:
+                    if meta['debug']:
+                        console.print(torrent)
+                        console.print_exception()
+                    continue
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
                     valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
