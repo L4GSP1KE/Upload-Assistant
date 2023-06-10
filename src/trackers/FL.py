@@ -85,7 +85,7 @@ class FL():
             fl_name = fl_name.replace(meta['title'], meta['imdb_info']['aka'])
             if meta['year'] != meta.get('imdb_info', {}).get('year', meta['year']) and str(meta['year']).strip() != '':
                 fl_name = fl_name.replace(str(meta['year']), str(meta['imdb_info']['year']))
-        if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '':
+        if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '' and meta['episode'].strip() != '':
             fl_name = fl_name.replace(meta['episode'], f"{meta['episode']} {meta['episode_title_storage']}")
         if 'DD+' in meta.get('audio', '') and 'DDP' in meta['uuid']:
             fl_name = fl_name.replace('DD+', 'DDP')
