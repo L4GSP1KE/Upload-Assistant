@@ -186,7 +186,7 @@ class Clients():
         torrents = qbt_client.torrents.info()
         for torrent in torrents:
             try:
-                torrent_path = torrent.get('content_path', torrent.save_path)
+                torrent_path = torrent.get('content_path', f"{torrent.save_path}{torrent.name}")
             except AttributeError:
                 if meta['debug']:
                     console.print(torrent)
