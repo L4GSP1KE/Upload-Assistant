@@ -181,7 +181,7 @@ class Clients():
 
         # Remote path map if needed
         remote_path_map = False
-        local_path, remote_path = await self.remote_path_map()
+        local_path, remote_path = await self.remote_path_map(meta)
         if local_path.lower() in meta['path'].lower() and local_path.lower() != remote_path.lower():
             remote_path_map = True
 
