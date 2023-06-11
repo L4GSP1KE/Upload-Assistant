@@ -130,7 +130,7 @@ class Clients():
             elif len(torrent.files) == len(meta['filelist']):
                 torrent_filepath = os.path.commonpath(torrent.files)
                 actual_filepath = os.path.commonpath(meta['filelist'])
-                local_path, remote_path = await self.remote_path_map()
+                local_path, remote_path = await self.remote_path_map(meta)
                 if local_path.lower() in meta['path'].lower() and local_path.lower() != remote_path.lower():
                     actual_filepath = torrent_path.replace(local_path, remote_path)
                     actual_filepath = torrent_path.replace(os.sep, '/')
