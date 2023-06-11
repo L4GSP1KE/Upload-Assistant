@@ -26,6 +26,7 @@ class MTV():
         self.upload_url = 'https://www.morethantv.me/upload.php'
         self.forum_link = 'https://www.morethantv.me/wiki.php?action=article&id=73'
         self.search_url = 'https://www.morethantv.me/api/torznab'
+        self.banned_groups = ['3LTON', '[Oj]', 'ZKBL', 'ViSiON', 'FUM', 'LOAD', 'ELiTE', 'ZmN', 'h65', 'mRS', 'PandaRG', 'DeadFish', 'JIVE', 'XS', 'TM', 'BDP', 'RARBG', 'ION10', 'QxR', 'mSD', 'x0r']
         pass
 
     async def upload(self, meta):
