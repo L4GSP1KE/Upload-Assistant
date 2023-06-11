@@ -444,7 +444,7 @@ class HDB():
                     for each in range(len(images[:int(meta['screens'])])):
                         img_url = images[each]['img_url']
                         web_url = images[each]['web_url']
-                        descfile.write(f"[url={web_url}][img width=350]{img_url}[/img][/url]")
+                        descfile.write(f"[url={web_url}][img]{img_url}[/img][/url]")
                     descfile.write("[/center]")
             if self.signature != None:
                 descfile.write(self.signature)
