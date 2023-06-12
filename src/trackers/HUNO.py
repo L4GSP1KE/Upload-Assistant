@@ -215,7 +215,7 @@ class HUNO():
             return '2'
         elif type in ('WEBDL', 'WEBRIP'):
             return '15' if 'x265' in basename else '3'
-        elif type == 'ENCODE':
+        elif type in ('ENCODE', 'HDTV'):
             return '15'
         elif type == 'DISC':
             return '1'
