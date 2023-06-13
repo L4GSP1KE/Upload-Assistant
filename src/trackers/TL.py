@@ -61,6 +61,8 @@ class TL():
                 return self.CATEGORIES['MovieDvdRip']
             elif 'WEB' in meta['type']:
                 return self.CATEGORIES['MovieWebrip']
+            elif meta['type'] == 'HDTV':
+                return self.CATEGORIES['MovieHdRip']
         elif meta['category'] == 'TV':
             if meta['original_language'] != 'en': 
                 return self.CATEGORIES['TvForeign']
