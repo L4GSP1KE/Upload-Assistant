@@ -199,16 +199,23 @@ class Clients():
                 torrent_path = torrent_path.replace(os.sep, '/').replace('/', os.sep)
 
             if meta['is_disc'] in ("", None) and len(meta['filelist']) == 1:
+                if meta['debug']:
+                    console.log(f"[yellow]{torrent_path=}\n{meta['path']=}\n")
                 if torrent_path == meta['filelist'][0] and len(torrent.files) == len(meta['filelist']):
                     valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
                     if valid:
                         console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                         return torrent.hash
             elif meta['path'] == torrent_path:
+                if meta['debug']:
+                    console.log(f"[yellow]{torrent_path=}\n{meta['path']=}\n")
                 valid, torrent_path = await self.is_valid_torrent(meta, f"{torrent_storage_dir}/{torrent.hash}.torrent", torrent.hash, 'qbit', print_err=False)
                 if valid:
                     console.print(f"[green]Found a matching .torrent with hash: [bold yellow]{torrent.hash}")
                     return torrent.hash
+            else:
+                if meta['debug']:
+                    console.log(f"[red]{torrent_path=}\n{meta['path']=}\n")
         return None
 
 
