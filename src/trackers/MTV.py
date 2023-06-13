@@ -7,6 +7,8 @@ import xml.etree.ElementTree
 import os
 import cli_ui
 import pickle
+import re
+import distutils.util
 from src.trackers.COMMON import COMMON
 
 
@@ -26,6 +28,13 @@ class MTV():
         self.upload_url = 'https://www.morethantv.me/upload.php'
         self.forum_link = 'https://www.morethantv.me/wiki.php?action=article&id=73'
         self.search_url = 'https://www.morethantv.me/api/torznab'
+        self.banned_groups = [
+            '3LTON', 'mRS', 'CM8', 'BRrip', 'Leffe', 'aXXo', 'FRDS', 'XS', 'KiNGDOM', 'WAF', 'nHD', 
+            'h65', 'CrEwSaDe', 'TM', 'ViSiON', 'x0r', 'PandaRG', 'HD2DVD', 'iPlanet', 'JIVE', 'ELiTE',
+            'nikt0', 'STUTTERSHIT', 'ION10', 'RARBG', 'FaNGDiNG0', 'YIFY', 'FUM', 'ViSION', 'NhaNc3', 
+            'nSD', 'PRODJi', 'DNL', 'DeadFish', 'HDTime', 'mHD', 'TERMiNAL', 
+            '[Oj]', 'QxR', 'ZmN', 'RDN', 'mSD', 'LOAD', 'BDP', 'SANTi', 'ZKBL', ['EVO', 'WEB-DL Only']
+        ]
         pass
 
     async def upload(self, meta):
@@ -36,28 +45,11 @@ class MTV():
 
         new_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
 
-        if new_torrent.piece_size == 262144:  # 256 MiB
-            # print("256k")
-            pass
-        elif new_torrent.piece_size == 524288:  # 1 GiB
-            # piece_size = "512K"
-            pass
-        elif new_torrent.piece_size == 1048576:  # 2 GiB
-            # piece_size = "1M"
-            pass
-        elif new_torrent.piece_size == 2097152:  # 4 GiB
-            # piece_size = "2M"
-            pass
-        elif new_torrent.piece_size == 4194304:  # 8 GiB
-            # piece_size = "4M"
-            pass
-        elif new_torrent.piece_size == 8388608:  # 16 GiB
-            # piece_size = "8M"
-            pass
-        elif new_torrent.piece_size == 16777216:  # 16 GiB
-            print("Piece size is 16M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
-        else:
+        
+        if not new_torrent.piece_size <= 8388608: 
             print("Piece size is OVER 8M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
+            pass
+   
 
 
         # getting category HD Episode, HD Movies, SD Season, HD Season, SD Episode, SD Movies
@@ -76,6 +68,15 @@ class MTV():
         group_desc = await self.edit_group_desc(meta)
         #poster is optional so no longer getting it as its a pain with having to use supported image provider
         # poster = await self.get_poster(meta)
+        
+        #edit name to match MTV standards
+        mtv_name = await self.edit_name(meta)
+
+        # anon
+        if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
+            anon = 0
+        else:
+            anon = 1
 
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
 
@@ -93,7 +94,7 @@ class MTV():
         data = {
             # 'image': poster,
             'image': '',
-            'title': meta['name'] + "-NoGrp".replace(' ','.').replace(':.','.').replace('’','').replace('\'','').replace('DD+', 'DDP') if meta['name'].lower().endswith("264") or meta['name'].lower().endswith("265") or meta['name'].lower().endswith("hvec") or meta['name'].lower().endswith("xvid") else meta['name'].replace(' ','.').replace(':.','.').replace('’','').replace('\'','').replace('DD+', 'DDP'),
+            'title': mtv_name,
             'category': cat_id,
             'Resolution': resolution_id,
             'source': source_id,
@@ -102,13 +103,13 @@ class MTV():
             'desc': desc,
             'groupDesc': group_desc,
             'ignoredupes': '1',
-            'submit': 'true',
             'genre_tags': '---',
             'autocomplete_toggle': 'on',
             'fontfont': '-1',
             'fontsize': '-1',
-            'auth': self.get_auth(cookiefile),
-            'anonymous': '0'
+            'auth': await self.get_auth(cookiefile),
+            'anonymous': anon,
+            'submit': 'true',
         }
 
         # cookie = {'sid': self.config['TRACKERS'][self.tracker].get('sid'), 'cid': self.config['TRACKERS'][self.tracker].get('cid')}
@@ -164,7 +165,7 @@ class MTV():
                 mi_dump = None
                 bd_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/BD_SUMMARY_00.txt", 'r', encoding='utf-8').read()
             else:
-                mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()
+                mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO_CLEANPATH.txt", 'r', encoding='utf-8').read()[:-65].strip()
                 bd_dump = None
             if bd_dump:
                 desc.write("[mediainfo]" + bd_dump + "[/mediainfo]\n\n")
@@ -196,6 +197,32 @@ class MTV():
             description += f"\nhttps://myanimelist.net/anime/{str(meta['mal_id'])}"
 
         return description
+
+
+    async def edit_name(self, meta):
+        mtv_name = meta['uuid']
+        # Try to use original filename if possible
+        if meta['source'].lower().replace('-', '') in mtv_name.replace('-', '').lower():
+            if not meta['isdir']:
+                mtv_name = os.path.splitext(mtv_name)[0]
+        else:
+            mtv_name = meta['name']
+            if meta.get('type') in ('WEBDL', 'WEBRIP', 'ENCODE') and "DD" in meta['audio']:
+                mtv_name = mtv_name.replace(meta['audio'], meta['audio'].replace(' ', '', 1))
+            mtv_name = mtv_name.replace(meta.get('aka', ''), '')
+            if meta['category'] == "TV" and meta.get('tv_pack', 0) == 0 and meta.get('episode_title_storage', '').strip() != '' and meta['episode'].strip() != '':
+                mtv_name = mtv_name.replace(meta['episode'], f"{meta['episode']} {meta['episode_title_storage']}")
+            if 'DD+' in meta.get('audio', '') and 'DDP' in meta['uuid']:
+                mtv_name = mtv_name.replace('DD+', 'DDP')
+            mtv_name = mtv_name.replace('Dubbed', '').replace('Dual-Audio', 'DUAL')
+        # Add -NoGrp if missing tag
+        if meta['tag'] == "":
+            mtv_name = f"{mtv_name}-NoGrp"
+        mtv_name = ' '.join(mtv_name.split())
+        mtv_name = re.sub("[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", mtv_name)
+        mtv_name = mtv_name.replace(' ', '.').replace('..', '.')
+        return mtv_name
+    
 
     # Not needed as its optional
     # async def get_poster(self, meta):
@@ -307,31 +334,83 @@ class MTV():
 
 
     async def get_tags(self, meta):
-        tags = ""
-        tags += str(meta['genres']).lower().replace(',', '')
-        tags += " " + str(meta['type']).lower()
-        tags += " " + str(meta['resolution']).lower()
-        tags += " " + str(meta['service_longname']).lower().replace(' ', '.') + ".source" if str(meta['service_longname']).lower() != "" else ""
-
+        tags = []
+        # Genres
+        tags.extend([x.strip().lower() for x in meta['genres'].split()])
+        # Resolution
+        tags.append(meta['resolution'].lower())
+        if meta['sd'] == 1:
+            tags.append('sd')
+        elif meta['resolution'] in ['2160p', '4320p']:
+            tags.append('uhd')
+        else:
+            tags.append('hd')
+        # Streaming Service
+        if str(meta['service_longname']) != "":
+            tags.append(f"{meta['service_longname'].lower().replace(' ', '.')}.source") 
+        # Release Type/Source
+        for each in ['remux', 'WEB.DL', 'WEBRip', 'HDTV', 'BluRay', 'DVD', 'HDDVD']:
+            if (each.lower().replace('.', '') in meta['type'].lower()) or (each.lower().replace('-', '') in meta['source']):
+                tags.append(each)
+            
+            
         # series tags
-        # series tags sd
-        tags += " " + "episode.release sd.episode" if meta['sd'] == 1 and meta['category'] == "TV" and 'tv_pack' in meta and meta['tv_pack'] != 1 else ""
-        # series tags hd
-        tags += " " + "episode.release hd.episode" if meta['category'] == "TV" and 'tv_pack' in meta and meta['tv_pack'] != 1 else ""
-        # series tag season
-        tags += " " + "sd.season" if meta['sd'] == 1 else " " + "hd.season" if 'tv_pack' in meta and meta['tv_pack'] == 1 else ""
-
+        if meta['category'] == "TV":
+            if meta.get('tv_pack', 0) == 0:
+                # Episodes
+                if meta['sd'] == 1:
+                    tags.extend(['episode.release', 'sd.episode'])
+                else:
+                    tags.extend(['episode.release', 'hd.episode'])
+            else:
+                # Seasons
+                if meta['sd'] == 1:
+                    tags.append('sd.season')
+                else:
+                    tags.append('hd.season')
+        
         # movie tags
-        tags += " " + "sd.movie" if meta['category'] == "MOVIE" and meta['sd'] == 1 else ""
-        tags += " " + "hd.movie" if meta['category'] == "MOVIE" and meta['sd'] == 0 else ""
+        if meta['category'] == 'MOVIE':
+            if meta['sd'] == 1:
+                tags.append('sd.movie')
+            else:
+                tags.append('hd.movie')
+        
 
-        # audio tags
-        for each in ['ddp', 'atmos', 'aac', 'truehd', 'mp3', 'mp2']:
-            if each in meta['audio'].replace('+', 'p'):
-                tags += f" {each}.audio"
 
-        # adding nogrp if no group detected
-        tags += " " + str(meta['tag'])[1:].replace(' ', '.').lower() + ".release" if str(meta['tag']) != "" else " nogrp.release "
+        # Audio tags
+        audio_tag = ""
+        for each in ['dd', 'ddp', 'aac', 'truehd', 'mp3', 'mp2', 'dts', 'dts.hd', 'dts.x']:
+            if each in meta['audio'].replace('+', 'p').replace('-', '.').replace(':', '.').replace(' ', '.').lower():
+                audio_tag = f'{each}.audio'
+        tags.append(audio_tag)
+        if 'atmos' in meta['audio'].lower():
+            tags.append('atmos.audio')
+
+        # Video tags
+        tags.append(meta.get('video_codec').replace('AVC', 'h264').replace('HEVC', 'h265').replace('-', ''))
+
+        # Group Tags
+        if meta['tag'] != "":
+            tags.append(f"{meta['tag'][1:].replace(' ', '.')}.release")
+        else:
+            tags.append('NOGRP.release')
+
+        # Scene/P2P
+        if meta['scene']:
+            tags.append('scene.group.release')
+        else:
+            tags.append('p2p.group.release')
+
+        # Has subtitles
+        if meta.get('is_disc', '') != "BDMV":
+            if any(track.get('@type', '') == "Text" for track in meta['mediainfo']['media']['track']):
+                tags.append('subtitles')
+        else:
+            if len(meta['bdinfo']['subtitles']) >= 1:
+                tags.append('subtitles')
+
+        tags = ' '.join(tags)
         return tags
 
 
@@ -340,7 +419,7 @@ class MTV():
         cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/MTV.pkl")
         if not os.path.exists(cookiefile):
             await self.login(cookiefile)
-        vcookie = await self.validate_cookies(meta)
+        vcookie = await self.validate_cookies(meta, cookiefile)
         if vcookie != True:
             console.print('[red]Failed to validate cookies. Please confirm that the site is up and your username and password is valid.')
             recreate = cli_ui.ask_yes_no("Log in again and create new session?")
@@ -380,9 +459,9 @@ class MTV():
                     session.cookies.update(pickle.load(cf))
                 resp = session.get(url=url)
                 if meta['debug']:
-                    console.print('[cyan]Cookies:')
-                    console.print(session.cookies.get_dict())
-                    console.print(resp.url)
+                    console.log('[cyan]Validate Cookies:')
+                    console.log(session.cookies.get_dict())
+                    console.log(resp.url)
                 if resp.text.find("Logout") != -1:
                     return True
                 else:
@@ -415,26 +494,23 @@ class MTV():
             token = res.text.rsplit('name="token" value="', 1)[1][:48]
             # token and CID from cookie needed for post to login
             payload["token"] = token
-            # cook = res.cookies
-            # adding token and cid from cookie to post.
             resp = session.post(url=url, data=payload)
 
+            # handle 2fa
+            if resp.url.endswith('twofactor/login'):
+                two_factor_payload = {
+                    'token' : resp.text.rsplit('name="token" value="', 1)[1][:48],
+                    'code' : console.input('[yellow]MTV 2FA Code: '),
+                    'submit' : 'login'
+                }
+                resp = session.post(url="https://www.morethantv.me/twofactor/login", data=two_factor_payload)
             # checking if logged in
             if 'authkey=' in resp.text:
-                # auth = resp.text.rsplit('authkey=', 1)[1][:32]
-                # #printing auth and cid so you can add to config
-                # print('auth = ' + auth)
-                # print('cid = ' + resp.cookies.get_dict()['cid'])
-                # if 'sid' in resp.cookies.get_dict():
-                #     print('sid = ' + resp.cookies.get_dict()['sid'])
-                # else:
-                #     test = resp.history[0].cookies.get_dict()
-                #     print('sid = ' + test['sid'])
                 console.print('[green]Successfully logged in to MTV')
                 with open(cookiefile, 'wb') as cf:
                     pickle.dump(session.cookies, cf)
             else:
-                console.print('[bold red]Something went wrong while trying to log into FL')
+                console.print('[bold red]Something went wrong while trying to log into MTV')
                 await asyncio.sleep(1)
                 console.print(resp.url)
         return
