@@ -188,7 +188,8 @@ async def do_the_thing(base_dir):
             if meta['debug']:
                 console.print(meta['image_list'])
             # meta['uploaded_screens'] = True
-
+        elif meta.get('skip_imghost_upload', False):
+            meta['image_list'] = []
 
         if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
             reuse_torrent = None
