@@ -48,7 +48,7 @@ class MTV():
         
         if not new_torrent.piece_size <= 8388608: 
             console.print("[red]Piece size is OVER 8M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
-            pass
+            return
    
 
 
@@ -66,6 +66,7 @@ class MTV():
         approved_imghosts = ['ptpimg', 'imgbox', 'empornium']
         if not all(any(x in image['raw_url'] for x in approved_imghosts) for image in meta['image_list']):
             console.print("[red]Unsupported image host detected, please use one of the approved imagehosts")
+            return
         # getting description
         await self.edit_desc(meta)
         # getting groups des so things like imdb link, tmdb link etc..
