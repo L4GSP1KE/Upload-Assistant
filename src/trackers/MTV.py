@@ -47,7 +47,7 @@ class MTV():
 
         
         if not new_torrent.piece_size <= 8388608: 
-            print("Piece size is OVER 8M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
+            console.print("[red]Piece size is OVER 8M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
             pass
    
 
@@ -62,6 +62,10 @@ class MTV():
         origin_id = await self.get_origin_id(meta)
         # getting tags
         des_tags = await self.get_tags(meta)
+        # check for approved imghosts
+        approved_imghosts = ['ptpimg', 'imgbox', 'empornium']
+        if not all(any(x in image['raw_url'] for x in approved_imghosts) for image in meta['image_list']):
+            console.print("[red]Unsupported image host detected, please use one of the approved imagehosts")
         # getting description
         await self.edit_desc(meta)
         # getting groups des so things like imdb link, tmdb link etc..
