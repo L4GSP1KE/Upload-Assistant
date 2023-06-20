@@ -2012,6 +2012,7 @@ class Prep():
     def create_base_from_existing_torrent(self, torrentpath, base_dir, uuid):
         if os.path.exists(torrentpath):
             base_torrent = Torrent.read(torrentpath)
+            base_torrent.creation_date = datetime.now()
             base_torrent.trackers = ['https://fake.tracker']
             base_torrent.comment = "Created by L4G's Upload Assistant"
             base_torrent.created_by = "Created by L4G's Upload Assistant"
