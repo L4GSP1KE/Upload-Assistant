@@ -63,7 +63,7 @@ class MTV():
         # getting tags
         des_tags = await self.get_tags(meta)
         # check for approved imghosts
-        approved_imghosts = ['ptpimg', 'imgbox', 'empornium']
+        approved_imghosts = ['ptpimg', 'imgbox', 'empornium', 'ibb']
         if not all(any(x in image['raw_url'] for x in approved_imghosts) for image in meta['image_list']):
             console.print("[red]Unsupported image host detected, please use one of the approved imagehosts")
             return
@@ -492,7 +492,8 @@ class MTV():
                 'password' : self.config['TRACKERS'][self.tracker].get('password'),
                 'keeploggedin' : 1,
                 'cinfo' : '1920|1080|24|0',
-                'submit' : 'login'
+                'submit' : 'login',
+                'iplocked' : 1,
                 # 'ssl' : 'yes'
             }
             res = session.get(url="https://www.morethantv.me/login")
