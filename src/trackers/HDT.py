@@ -194,8 +194,8 @@ class HDT():
                     # Match url to verify successful upload
                     search = re.search(r"download\.php\?id\=([a-z0-9]+)", up.text).group(1)
                     if search:
-                        id = search
-                        await self.download_new_torrent(session, id, torrent_path)
+                        # modding existing torrent for adding to client instead of downloading torrent from site.
+                        await common.add_tracker_torrent(meta, self.tracker, self.source_flag, self.config['TRACKERS']['HDT'].get('my_announce_url'), "https://hd-torrents.org/details.php?id=" + meta['torrenthash'])
                     else:
                         console.print(data)
                         console.print("\n\n")
