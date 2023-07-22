@@ -195,7 +195,7 @@ class HDT():
                     search = re.search(r"download\.php\?id\=([a-z0-9]+)", up.text).group(1)
                     if search:
                         # modding existing torrent for adding to client instead of downloading torrent from site.
-                        await common.add_tracker_torrent(meta, self.tracker, self.source_flag, self.config['TRACKERS']['HDT'].get('my_announce_url'), "https://hd-torrents.org/details.php?id=" + meta['torrenthash'])
+                        await common.add_tracker_torrent(meta, self.tracker, self.source_flag, self.config['TRACKERS']['HDT'].get('my_announce_url'), "https://hd-torrents.org/details.php?id=" + search)
                     else:
                         console.print(data)
                         console.print("\n\n")
