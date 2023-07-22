@@ -72,7 +72,7 @@ config = {
             "announce_url" : "https://hawke.uno/announce/customannounceurl",
             # "anon" : False
         },
-	    "MTV": {
+	"MTV": {
             'api_key' : 'get from security page',
             'username' : '<USERNAME>',
             'password' : '<PASSWORD>',
@@ -136,7 +136,7 @@ config = {
             "announce_url" : "https://lst.gg/announce/customannounceurl",
             # "anon" : False
         },
-	    "LT" : {
+	"LT" : {
             "api_key" : "LT api key",
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
             # "anon" : False
@@ -161,6 +161,7 @@ config = {
             "username" : "username",
             "password" : "password",
             "announce_url" : "https://hdts-announce.ru/announce.php",
+            "my_announce_url": "https://hdts-announce.ru/announce.php?pid=<PASS_KEY/PID>",
             # "anon" : "False"
         },
 
