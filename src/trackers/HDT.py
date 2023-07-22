@@ -300,17 +300,17 @@ class HDT():
                 await asyncio.sleep(1)
                 console.print(response.url)
         return
-    
-    async def download_new_torrent(self, session, id, torrent_path):
-        download_url = f"https://hd-torrents.org/download.php?id={id}"
-        r = session.get(url=download_url)
-        if r.status_code == 200:
-            with open(torrent_path, "wb") as tor:
-                tor.write(r.content)
-        else:
-            console.print("[red]There was an issue downloading the new .torrent from HDT")
-            console.print(r.text)
-        return
+    #  No longer used as torrent is modified instead of downloaded.
+    # async def download_new_torrent(self, session, id, torrent_path):
+    #     download_url = f"https://hd-torrents.org/download.php?id={id}"
+    #     r = session.get(url=download_url)
+    #     if r.status_code == 200:
+    #         with open(torrent_path, "wb") as tor:
+    #             tor.write(r.content)
+    #     else:
+    #         console.print("[red]There was an issue downloading the new .torrent from HDT")
+    #         console.print(r.text)
+    #     return
     
     async def get_csrfToken(self, session, url):
         r = session.get(url)
