@@ -13,9 +13,9 @@ class COMMON():
         self.config = config
         pass
 
-    async def edit_torrent(self, meta, tracker, source_flag):
-        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent"):
-            new_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
+    async def edit_torrent(self, meta, tracker, source_flag, torrent_filename="BASE"):
+        if os.path.exists(f"{meta['base_dir']}/tmp/{meta['uuid']}/{torrent_filename}.torrent"):
+            new_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/{torrent_filename}.torrent")
             for each in list(new_torrent.metainfo):
                 if each not in ('announce', 'comment', 'creation date', 'created by', 'encoding', 'info'):
                     new_torrent.metainfo.pop(each, None)

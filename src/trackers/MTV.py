@@ -9,6 +9,7 @@ import cli_ui
 import pickle
 import re
 import distutils.util
+from pathlib import Path
 from src.trackers.COMMON import COMMON
 
 
@@ -41,17 +42,16 @@ class MTV():
         common = COMMON(config=self.config)
         cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/MTV.pkl")
 
-        await common.edit_torrent(meta, self.tracker, self.source_flag)
 
-        new_torrent = Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")
-
-        
-        if not new_torrent.piece_size <= 8388608: 
-            console.print("[red]Piece size is OVER 8M and wont Work on MTV, Please Generate a new torrent and replace BASE.torrent")
+        if not Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent").piece_size <= 8388608: 
+            console.print("[red]Piece size is OVER 8M and does not work on MTV. Generating a new .torrent")
+            from src.prep import Prep
+            prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=self.config)
+            prep.create_torrent(meta, Path(meta['path']), "MTV", piece_size_max=8)
+            # Hash to f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
             return
+        await common.edit_torrent(meta, self.tracker, self.source_flag, torrent_filename="MTV")
    
-
-
         # getting category HD Episode, HD Movies, SD Season, HD Season, SD Episode, SD Movies
         cat_id = await self.get_cat_id(meta)
         # res 480 720 1080 1440 2160 4k 6k Other

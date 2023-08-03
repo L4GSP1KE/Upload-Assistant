@@ -67,6 +67,7 @@ class Args():
         parser.add_argument('-m', '--manual', action='store_true', required=False, help="Manual Mode. Returns link to ddl screens/base.torrent")
         parser.add_argument('-nh', '--nohash', action='store_true', required=False, help="Don't hash .torrent")
         parser.add_argument('-rh', '--rehash', action='store_true', required=False, help="DO hash .torrent")
+        parser.add_argument('-ps', '--piece-size-max', dest='piece_size_max', nargs='*', required=False, help="Maximum piece size in MiB", choices=[1, 2, 4, 8, 16], type=int)
         parser.add_argument('-dr', '--draft', action='store_true', required=False, help="Send to drafts (BHD)")
         parser.add_argument('-tc', '--torrent-creation', dest='torrent_creation', nargs='*', required=False, help="What tool should be used to create the base .torrent", choices=['torf', 'torrenttools', 'mktorrent'])
         parser.add_argument('-client', '--client', nargs='*', required=False, help="Use this torrent client instead of default")

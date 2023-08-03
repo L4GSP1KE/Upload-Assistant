@@ -198,11 +198,11 @@ async def do_the_thing(base_dir):
                 if reuse_torrent != None:
                     prep.create_base_from_existing_torrent(reuse_torrent, meta['base_dir'], meta['uuid'])
             if meta['nohash'] == False and reuse_torrent == None:
-                prep.create_torrent(meta, Path(meta['path']))
+                prep.create_torrent(meta, Path(meta['path']), "BASE", meta.get('piece_size_max', 0))
             if meta['nohash']:
                 meta['client'] = "none"
         elif os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")) and meta.get('rehash', False) == True and meta['nohash'] == False:
-            prep.create_torrent(meta, Path(meta['path']))
+            prep.create_torrent(meta, Path(meta['path']), "BASE", meta.get('piece_size_max', 0))
         if int(meta.get('randomized', 0)) >= 1:
             prep.create_random_torrents(meta['base_dir'], meta['uuid'], meta['randomized'], meta['path'])
             
