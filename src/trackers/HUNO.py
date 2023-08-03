@@ -139,6 +139,8 @@ class HUNO():
             repack = f"[{repack}]"
         three_d = meta.get('3D', "")
         tag = meta.get('tag', "").replace("-", "- ")
+        if tag == "":
+            tag = "- NOGRP"
         source = meta.get('source', "")
         uhd = meta.get('uhd', "")
         hdr = meta.get('hdr', "")
