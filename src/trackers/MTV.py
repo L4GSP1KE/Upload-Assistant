@@ -42,15 +42,15 @@ class MTV():
         common = COMMON(config=self.config)
         cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/MTV.pkl")
 
-
+        torrent_filename = "BASE"
         if not Torrent.read(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent").piece_size <= 8388608: 
             console.print("[red]Piece size is OVER 8M and does not work on MTV. Generating a new .torrent")
             from src.prep import Prep
             prep = Prep(screens=meta['screens'], img_host=meta['imghost'], config=self.config)
             prep.create_torrent(meta, Path(meta['path']), "MTV", piece_size_max=8)
+            torrent_filename = "MTV"
             # Hash to f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
-            return
-        await common.edit_torrent(meta, self.tracker, self.source_flag, torrent_filename="MTV")
+        await common.edit_torrent(meta, self.tracker, self.source_flag, torrent_filename=torrent_filename)
    
         # getting category HD Episode, HD Movies, SD Season, HD Season, SD Episode, SD Movies
         cat_id = await self.get_cat_id(meta)
