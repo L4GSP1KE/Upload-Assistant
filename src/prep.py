@@ -1929,7 +1929,7 @@ class Prep():
     Create Torrent
     """
     def create_torrent(self, meta, path, output_filename, piece_size_max):
-        piece_size_max = int(piece_size_max)
+        piece_size_max = int(piece_size_max) if piece_size_max is not None else 0
         if meta['isdir'] == True:
             os.chdir(path)
             globs = glob.glob1(path, "*.mkv") + glob.glob1(path, "*.mp4") + glob.glob1(path, "*.ts")
