@@ -31,6 +31,7 @@ class ANT():
         self.search_url = 'https://anthelion.me/api.php'
         self.upload_url = 'https://anthelion.me/api.php'
         self.banned_groups = ['Ozlem', 'RARBG', 'FGT', 'STUTTERSHIT', 'LiGaS', 'DDR', 'Zeus', 'TBS', 'aXXo', 'CrEwSaDe', 'DNL', 'EVO', 'FaNGDiNG0', 'HD2DVD', 'HDTime', 'iPlanet', 'KiNGDOM', 'NhaNc3', 'PRoDJi', 'SANTi', 'ViSiON', 'WAF', 'YIFY', 'YTS', 'MkvCage', 'mSD']
+        self.signature = None
         pass
     
 
