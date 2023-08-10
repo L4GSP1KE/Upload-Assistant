@@ -160,9 +160,9 @@ config = {
         "HDT" : {
             "username" : "username",
             "password" : "password",
-            "announce_url" : "https://hdts-announce.ru/announce.php",
             "my_announce_url": "https://hdts-announce.ru/announce.php?pid=<PASS_KEY/PID>",
             # "anon" : "False"
+            "announce_url" : "https://hdts-announce.ru/announce.php", #DO NOT EDIT THIS LINE
         },
 
         "MANUAL" : {
