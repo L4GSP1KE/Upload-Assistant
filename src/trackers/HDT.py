@@ -21,7 +21,7 @@ class HDT():
     def __init__(self, config):
         self.config = config
         self.tracker = 'HDT'
-        self.source_flag = 'HDT'
+        self.source_flag = 'hd-torrents.org'
         self.username = config['TRACKERS'][self.tracker].get('username', '').strip()
         self.password = config['TRACKERS'][self.tracker].get('password', '').strip()
         self.signature = None
@@ -194,8 +194,8 @@ class HDT():
                     # Match url to verify successful upload
                     search = re.search(r"download\.php\?id\=([a-z0-9]+)", up.text).group(1)
                     if search:
-                        id = search
-                        await self.download_new_torrent(session, id, torrent_path)
+                        # modding existing torrent for adding to client instead of downloading torrent from site.
+                        await common.add_tracker_torrent(meta, self.tracker, self.source_flag, self.config['TRACKERS']['HDT'].get('my_announce_url'), "https://hd-torrents.org/details.php?id=" + search)
                     else:
                         console.print(data)
                         console.print("\n\n")
@@ -300,17 +300,17 @@ class HDT():
                 await asyncio.sleep(1)
                 console.print(response.url)
         return
-    
-    async def download_new_torrent(self, session, id, torrent_path):
-        download_url = f"https://hd-torrents.org/download.php?id={id}"
-        r = session.get(url=download_url)
-        if r.status_code == 200:
-            with open(torrent_path, "wb") as tor:
-                tor.write(r.content)
-        else:
-            console.print("[red]There was an issue downloading the new .torrent from HDT")
-            console.print(r.text)
-        return
+    #  No longer used as torrent is modified instead of downloaded.
+    # async def download_new_torrent(self, session, id, torrent_path):
+    #     download_url = f"https://hd-torrents.org/download.php?id={id}"
+    #     r = session.get(url=download_url)
+    #     if r.status_code == 200:
+    #         with open(torrent_path, "wb") as tor:
+    #             tor.write(r.content)
+    #     else:
+    #         console.print("[red]There was an issue downloading the new .torrent from HDT")
+    #         console.print(r.text)
+    #     return
     
     async def get_csrfToken(self, session, url):
         r = session.get(url)
