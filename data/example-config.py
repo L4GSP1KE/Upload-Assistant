@@ -164,7 +164,16 @@ config = {
             # "anon" : "False"
             "announce_url" : "https://hdts-announce.ru/announce.php", #DO NOT EDIT THIS LINE
         },
-
+        "OE" : {
+            "api_key" : "OE api key",
+            "announce_url" : "https://onlyencodes.cc/announce/customannounceurl",
+            # "anon" : False
+        },
+        "RF" : {
+            "api_key" : "RF api key",
+            "announce_url" : "https://reelflix.xyz/announce/customannounceurl",
+            # "anon" : False
+        },
         "MANUAL" : {
             # Uncomment and replace link with filebrowser (https://github.com/filebrowser/filebrowser) link to the Upload-Assistant directory, this will link to your filebrowser instead of uploading to uguu.se
             # "filebrowser" : "https://domain.tld/filebrowser/files/Upload-Assistant/"
