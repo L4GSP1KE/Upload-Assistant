@@ -27,7 +27,8 @@ class BHDTV():
         self.config = config
         self.tracker = 'BHDTV'
         self.source_flag = 'BIT-HDTV'
-        self.search_url = 'https://api.bit-hdtv.com/torrent/search/advanced'
+        #search not implemented
+        #self.search_url = 'https://api.bit-hdtv.com/torrent/search/advanced'
         self.upload_url = 'https://www.bit-hdtv.com/takeupload.php'
         #self.forum_link = 'https://www.bit-hdtv.com/rules.php'
         self.banned_groups = []

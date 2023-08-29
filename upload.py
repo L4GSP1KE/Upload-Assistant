@@ -272,6 +272,7 @@ async def do_the_thing(base_dir):
                         continue
                     dupes = await tracker_class.search_existing(meta)
                     dupes = await common.filter_dupes(dupes, meta)
+                    # note BHDTV does not have search implemented.
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await tracker_class.upload(meta)
