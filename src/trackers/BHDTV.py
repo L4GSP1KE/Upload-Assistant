@@ -9,6 +9,7 @@ from pprint import pprint
 import os
 import traceback
 from src.trackers.COMMON import COMMON
+from pymediainfo import MediaInfo
 
 
 # from pprint import pprint
@@ -67,6 +68,14 @@ class BHDTV():
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
         files = {'file': open_torrent}
 
+        if meta['is_disc'] != 'BDMV':
+            # Beautify MediaInfo for HDT using custom template
+            video = meta['filelist'][0]
+            mi_template = os.path.abspath(f"{meta['base_dir']}/data/templates/MEDIAINFO.txt")
+            if os.path.exists(mi_template):
+                media_info = MediaInfo.parse(video, output="STRING", full=False,
+                                             mediainfo_options={"inform": f"file://{mi_template}"})
+
         data = {
             'api_key': self.config['TRACKERS'][self.tracker]['api_key'].strip(),
             'name': meta['name'].replace(' ', '.').replace(':.', '.').replace(':', '.').replace('DD+', 'DDP'),
@@ -77,7 +86,7 @@ class BHDTV():
             #'anon': anon,
             # admins asked to remove short description.
             'sdescr': " ",
-            'descr': meta['info'],
+            'descr': media_info if bd_dump == None else "",
             'screen': desc,
             'url': f"https://www.tvmaze.com/shows/{meta['tvmaze_id']}" if meta['category'] == 'TV' else f"https://www.imdb.com/title/tt{meta['imdb_id']}",
             'format': 'json'
