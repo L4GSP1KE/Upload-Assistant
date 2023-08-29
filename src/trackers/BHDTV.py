@@ -86,7 +86,7 @@ class BHDTV():
             #'anon': anon,
             # admins asked to remove short description.
             'sdescr': " ",
-            'descr': media_info if bd_dump == None else "",
+            'descr': media_info if bd_dump == None else "Disc so Check Mediainfo dump ",
             'screen': desc,
             'url': f"https://www.tvmaze.com/shows/{meta['tvmaze_id']}" if meta['category'] == 'TV' else f"https://www.imdb.com/title/tt{meta['imdb_id']}",
             'format': 'json'
@@ -106,7 +106,7 @@ class BHDTV():
         else:
             console.print(f"[cyan]Request Data:")
             pprint(data)
-        # # adding my announce url to torrent.
+        # # adding my anounce url to torrent.
         if 'view' in response.json()['data']:
             await common.add_tracker_torrent(meta, self.tracker, self.source_flag, self.config['TRACKERS']['BHDTV'].get('my_announce_url'), response.json()['data']['view'])
         else:

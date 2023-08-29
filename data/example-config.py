@@ -48,6 +48,14 @@ config = {
             "draft_default" : "True",
             # "anon" : False
         },
+        "BHDTV": {
+            "api_key": "found under https://www.bit-hdtv.com/my.php",
+            "announce_url": "https://trackerr.bit-hdtv.com/announce",
+            #passkey found under https://www.bit-hdtv.com/my.php
+            "my_announce_url": "https://trackerr.bit-hdtv.com/passkey/announce",
+            "tag": "BIT-HDTV, 7d"
+            # "anon" : "False"
+        },
         "PTP" : {
             "useAPI" : False, # Set to True if using PTP
             "add_web_source_to_desc" : True,
