@@ -31,6 +31,7 @@ from src.trackers.TDC import TDC
 from src.trackers.HDT import HDT
 from src.trackers.RF import RF
 from src.trackers.OE import OE
+from src.trackers.BHDTV import BHDTV
 import json
 from pathlib import Path
 import asyncio
@@ -242,12 +243,12 @@ async def do_the_thing(base_dir):
         #######  Upload to Trackers  #######
         ####################################
         common = COMMON(config=config)
-        api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'NBL', 'ANT', 'JPTV', 'TDC', 'OE']
+        api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'NBL', 'ANT', 'JPTV', 'TDC', 'OE', 'BHDTV']
         http_trackers = ['HDB', 'TTG', 'FL', 'PTER', 'HDT', 'MTV']
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
             'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'JPTV' : JPTV,
-            'TL' : TL, 'TDC' : TDC, 'HDT' : HDT, 'MTV': MTV, 'OE': OE
+            'TL' : TL, 'TDC' : TDC, 'HDT' : HDT, 'MTV': MTV, 'OE': OE, 'BHDTV': BHDTV
             }
 
         for tracker in trackers:
@@ -271,6 +272,7 @@ async def do_the_thing(base_dir):
                         continue
                     dupes = await tracker_class.search_existing(meta)
                     dupes = await common.filter_dupes(dupes, meta)
+                    # note BHDTV does not have search implemented.
                     meta = dupe_check(dupes, meta)
                     if meta['upload'] == True:
                         await tracker_class.upload(meta)
