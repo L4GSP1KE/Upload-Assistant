@@ -11,7 +11,6 @@ import re
 import distutils.util
 from pathlib import Path
 from src.trackers.COMMON import COMMON
-import pyotp
 
 class MTV():
     """
@@ -506,6 +505,7 @@ class MTV():
             if resp.url.endswith('twofactor/login'):
                 otp_uri = self.config['TRACKERS'][self.tracker].get('otp_uri')
                 if otp_uri:
+                    import pyotp
                     mfa_code = pyotp.parse_uri(otp_uri).now()
                 else:
                     mfa_code = console.input('[yellow]MTV 2FA Code: ')
