@@ -82,7 +82,8 @@ class ANT():
             'tmdbid' : meta['tmdb'],
             'mediainfo' : mi_dump,
             'flags[]' : flags,
-            'anonymous' : anon
+            'anonymous' : anon,
+            'screenshots' : [x['raw_url'] for x in meta['image_list']][:2]
         }
         headers = {
             'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
