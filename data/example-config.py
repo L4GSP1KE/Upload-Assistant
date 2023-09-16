@@ -80,7 +80,7 @@ config = {
             "announce_url" : "https://hawke.uno/announce/customannounceurl",
             # "anon" : False
         },
-	"MTV": {
+	    "MTV": {
             'api_key' : 'get from security page',
             'username' : '<USERNAME>',
             'password' : '<PASSWORD>',
@@ -176,6 +176,12 @@ config = {
             "api_key" : "OE api key",
             "announce_url" : "https://onlyencodes.cc/announce/customannounceurl",
             # "anon" : False
+        },
+        "RTF": {
+            "api_key": 'get_it_by_running_/api/ login command from https://retroflix.club/api/doc',
+            "announce_url": "get from upload page",
+            # "tag": "RetroFlix, nd",
+            "anon": "False"
         },
         "RF" : {
             "api_key" : "RF api key",
