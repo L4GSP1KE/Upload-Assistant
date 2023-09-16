@@ -32,6 +32,7 @@ from src.trackers.HDT import HDT
 from src.trackers.RF import RF
 from src.trackers.OE import OE
 from src.trackers.BHDTV import BHDTV
+from src.trackers.RTF import RTF
 import json
 from pathlib import Path
 import asyncio
@@ -248,8 +249,8 @@ async def do_the_thing(base_dir):
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
             'ACM' : ACM, 'HDB' : HDB, 'LCD': LCD, 'TTG' : TTG, 'LST' : LST, 'HUNO': HUNO, 'FL' : FL, 'LT' : LT, 'NBL' : NBL, 'ANT' : ANT, 'PTER': PTER, 'JPTV' : JPTV,
-            'TL' : TL, 'TDC' : TDC, 'HDT' : HDT, 'MTV': MTV, 'OE': OE, 'BHDTV': BHDTV
-            }
+            'TL' : TL, 'TDC' : TDC, 'HDT' : HDT, 'MTV': MTV, 'OE': OE, 'BHDTV': BHDTV, 'RTF':RTF}
+
 
         for tracker in trackers:
             if meta['name'].endswith('DUPE?'):
@@ -419,6 +420,27 @@ async def do_the_thing(base_dir):
                         continue
                     await tracker_class.upload(meta)
                     await client.add_to_client(meta, tracker_class.tracker)
+
+        if tracker == "RTF":
+            tracker_class = tracker_class_map[tracker](config=config)
+            if meta['unattended']:
+                upload_to_rtf = True
+            else:
+                upload_to_rtf = cli_ui.ask_yes_no(f"Upload to {tracker}? {debug}", default=meta['unattended'])
+            if upload_to_rtf:
+                print(f"Uploading to {tracker}")
+                rtf = RTF(config=config)
+                # dupes = await potuk.search_existing(meta, "potuk")
+                # dupes = await potuk.search_existing(meta)
+                console.print("[bold red]Can not check for dupes. Please check Manually")
+                dupes = False
+                meta = dupe_check(dupes, meta)
+                if meta['upload'] == True:
+                    try:
+                        await rtf.upload(meta)
+                        await client.add_to_client(meta, tracker_class.tracker)
+                    except:
+                        print(traceback.print_exc())
             
 
 
