@@ -85,6 +85,9 @@ class ANT():
             'anonymous' : anon,
             'screenshots' : '\n'.join([x['raw_url'] for x in meta['image_list']][:4])
         }
+        if meta['scene']:
+            # ID of "Scene?" checkbox on upload form is actually "censored"
+            data['censored'] = 1
         headers = {
             'User-Agent': f'Upload Assistant/2.1 ({platform.system()} {platform.release()})'
         }        
