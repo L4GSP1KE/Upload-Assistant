@@ -244,7 +244,7 @@ async def do_the_thing(base_dir):
         #######  Upload to Trackers  #######
         ####################################
         common = COMMON(config=config)
-        api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'NBL', 'ANT', 'JPTV', 'TDC', 'OE', 'BHDTV']
+        api_trackers = ['BLU', 'AITHER', 'STC', 'R4E', 'STT', 'RF', 'ACM','LCD','LST','HUNO', 'SN', 'LT', 'NBL', 'ANT', 'JPTV', 'TDC', 'OE', 'BHDTV', 'RTF']
         http_trackers = ['HDB', 'TTG', 'FL', 'PTER', 'HDT', 'MTV']
         tracker_class_map = {
             'BLU' : BLU, 'BHD': BHD, 'AITHER' : AITHER, 'STC' : STC, 'R4E' : R4E, 'THR' : THR, 'STT' : STT, 'HP' : HP, 'PTP' : PTP, 'RF' : RF, 'SN' : SN, 
@@ -421,26 +421,26 @@ async def do_the_thing(base_dir):
                     await tracker_class.upload(meta)
                     await client.add_to_client(meta, tracker_class.tracker)
 
-        if tracker == "RTF":
-            tracker_class = tracker_class_map[tracker](config=config)
-            if meta['unattended']:
-                upload_to_rtf = True
-            else:
-                upload_to_rtf = cli_ui.ask_yes_no(f"Upload to {tracker}? {debug}", default=meta['unattended'])
-            if upload_to_rtf:
-                print(f"Uploading to {tracker}")
-                rtf = RTF(config=config)
-                # dupes = await potuk.search_existing(meta, "potuk")
-                # dupes = await potuk.search_existing(meta)
-                console.print("[bold red]Can not check for dupes. Please check Manually")
-                dupes = False
-                meta = dupe_check(dupes, meta)
-                if meta['upload'] == True:
-                    try:
-                        await rtf.upload(meta)
-                        await client.add_to_client(meta, tracker_class.tracker)
-                    except:
-                        print(traceback.print_exc())
+        # if tracker == "RTF":
+        #     tracker_class = tracker_class_map[tracker](config=config)
+        #     if meta['unattended']:
+        #         upload_to_rtf = True
+        #     else:
+        #         upload_to_rtf = cli_ui.ask_yes_no(f"Upload to {tracker}? {debug}", default=meta['unattended'])
+        #     if upload_to_rtf:
+        #         print(f"Uploading to {tracker}")
+        #         rtf = RTF(config=config)
+        #         # dupes = await potuk.search_existing(meta, "potuk")
+        #         # dupes = await potuk.search_existing(meta)
+        #         console.print("[bold red]Can not check for dupes. Please check Manually")
+        #         dupes = False
+        #         meta = dupe_check(dupes, meta)
+        #         if meta['upload'] == True:
+        #             try:
+        #                 await rtf.upload(meta)
+        #                 await client.add_to_client(meta, tracker_class.tracker)
+        #             except:
+        #                 print(traceback.print_exc())
             
 
 
