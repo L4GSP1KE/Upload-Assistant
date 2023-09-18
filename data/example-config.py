@@ -181,7 +181,7 @@ config = {
             "api_key": 'get_it_by_running_/api/ login command from https://retroflix.club/api/doc',
             "announce_url": "get from upload page",
             # "tag": "RetroFlix, nd",
-            "anon": "False"
+            "anon": True
         },
         "RF" : {
             "api_key" : "RF api key",
