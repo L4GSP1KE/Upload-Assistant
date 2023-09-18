@@ -2,9 +2,8 @@
 # import discord
 import asyncio
 import requests
-import distutils.util
 import base64
-import os
+import re
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -27,8 +26,7 @@ class RTF():
         self.source_flag = 'sunshine'
         self.upload_url = 'https://retroflix.club/api/upload'
         self.search_url = 'https://retroflix.club/api/torrent'
-        self.forum_link = 'https://retroflix.club/forums.php?action=viewtopic&topicid=3619'
-        self.banned_groups = []
+        self.forum_link = 'https://reelflix.xyz/pages/1'
         pass
 
     async def upload(self, meta):
@@ -43,19 +41,25 @@ class RTF():
             bd_dump = None
         desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
         open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
+        files = {'torrent': open_torrent}
+        file = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
 
         screenshots = []
         for image in meta['image_list']:
             if image['raw_url'] != None:
                 screenshots.append(image['raw_url'])
 
+
         json_data = {
             'name' : meta['name'],
+            # description does not work for some reason
             'description' : meta['overview'] + "\n\n" + desc + "\n\n" + "Uploaded by L4G Upload Assistant",
-            'mediaInfo': f"{mi_dump}" if bd_dump == None else f"{bd_dump}",
+            # editing mediainfo so that instead of 1 080p its 1,080p as site mediainfo parser wont work other wise.
+            'mediaInfo': re.sub("(\d+)\s+(\d+)", r"\1,\2", mi_dump) if bd_dump == None else f"{bd_dump}",
             "nfo": "",
             "url": "https://www.imdb.com/title/" + (meta['imdb_id'] if str(meta['imdb_id']).startswith("tt") else "tt" + meta['imdb_id']) + "/",
-            "descr": "test description",
+            # auto pulled from IMDB
+            "descr": "",
             "poster": meta["poster"] if meta["poster"] == None else "",
             "type": "401" if meta['category'] == 'MOVIE'else "402",
             "screenshots": screenshots,
