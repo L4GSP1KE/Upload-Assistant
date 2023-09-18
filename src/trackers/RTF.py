@@ -26,7 +26,8 @@ class RTF():
         self.source_flag = 'sunshine'
         self.upload_url = 'https://retroflix.club/api/upload'
         self.search_url = 'https://retroflix.club/api/torrent'
-        self.forum_link = 'https://reelflix.xyz/pages/1'
+        self.forum_link = 'https://retroflix.club/forums.php?action=viewtopic&topicid=3619'
+        self.banned_groups = []
         pass
 
     async def upload(self, meta):
