@@ -4,6 +4,7 @@ import asyncio
 import requests
 import base64
 import re
+import datetime
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -40,28 +41,24 @@ class RTF():
         else:
             mi_dump = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/MEDIAINFO.txt", 'r', encoding='utf-8').read()
             bd_dump = None
-        desc = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]DESCRIPTION.txt", 'r').read()
-        open_torrent = open(f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent", 'rb')
-        files = {'torrent': open_torrent}
-        file = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{self.tracker}]{meta['clean_name']}.torrent"
 
         screenshots = []
         for image in meta['image_list']:
             if image['raw_url'] != None:
                 screenshots.append(image['raw_url'])
 
-
         json_data = {
             'name' : meta['name'],
             # description does not work for some reason
-            'description' : meta['overview'] + "\n\n" + desc + "\n\n" + "Uploaded by L4G Upload Assistant",
+            # 'description' : meta['overview'] + "\n\n" + desc + "\n\n" + "Uploaded by L4G Upload Assistant",
+            'description': "this is a description",
             # editing mediainfo so that instead of 1 080p its 1,080p as site mediainfo parser wont work other wise.
             'mediaInfo': re.sub("(\d+)\s+(\d+)", r"\1,\2", mi_dump) if bd_dump == None else f"{bd_dump}",
             "nfo": "",
             "url": "https://www.imdb.com/title/" + (meta['imdb_id'] if str(meta['imdb_id']).startswith("tt") else "tt" + meta['imdb_id']) + "/",
             # auto pulled from IMDB
-            "descr": "",
-            "poster": meta["poster"] if meta["poster"] == None else "",
+            "descr": "This is short description",
+            "poster": meta["poster"] if meta["poster"] != None else "",
             "type": "401" if meta['category'] == 'MOVIE'else "402",
             "screenshots": screenshots,
             'isAnonymous': self.config['TRACKERS'][self.tracker]["anon"],
@@ -79,6 +76,12 @@ class RTF():
             'Authorization': self.config['TRACKERS'][self.tracker]['api_key'].strip(),
         }
 
+
+        if datetime.date.today().year - meta['year'] <= 9:
+            console.print(f"[red]ERROR: Not uploading!\nMust be older than 10 Years as per rules")
+            return
+
+
         if meta['debug'] == False:
             response = requests.post(url=self.upload_url, json=json_data, headers=headers)
             try:
@@ -89,7 +92,7 @@ class RTF():
         else:
             console.print(f"[cyan]Request Data:")
             console.print(json_data)
-        open_torrent.close()
+
 
     async def search_existing(self, meta):
         dupes = []
