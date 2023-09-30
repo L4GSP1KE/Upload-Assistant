@@ -106,6 +106,7 @@ class RTF():
             'includingDead' : '1'
         }
 
+        # search is intentionally vague and just uses IMDB if available as many releases are not named properly on site.
         if meta['imdb_id'] != "0":
             params['imdbId'] = meta['imdb_id'] if str(meta['imdb_id']).startswith("tt") else "tt" + meta['imdb_id']
         else:
