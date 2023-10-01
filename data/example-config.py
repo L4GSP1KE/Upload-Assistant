@@ -53,7 +53,6 @@ config = {
             "announce_url": "https://trackerr.bit-hdtv.com/announce",
             #passkey found under https://www.bit-hdtv.com/my.php
             "my_announce_url": "https://trackerr.bit-hdtv.com/passkey/announce",
-            "tag": "BIT-HDTV, 7d"
             # "anon" : "False"
         },
         "PTP" : {
@@ -80,12 +79,13 @@ config = {
             "announce_url" : "https://hawke.uno/announce/customannounceurl",
             # "anon" : False
         },
-	    "MTV": {
+        "MTV": {
             'api_key' : 'get from security page',
             'username' : '<USERNAME>',
             'password' : '<PASSWORD>',
-            "announce_url": "get from https://www.morethantv.me/upload.php",
-            "anon" : False
+            'announce_url' : "get from https://www.morethantv.me/upload.php",
+            'anon' : False,
+            # 'otp_uri' : 'OTP URI, read the following for more information https://github.com/google/google-authenticator/wiki/Key-Uri-Format'
         },
         "STC" :{
             "api_key" : "STC",
@@ -144,7 +144,7 @@ config = {
             "announce_url" : "https://lst.gg/announce/customannounceurl",
             # "anon" : False
         },
-	"LT" : {
+        "LT" : {
             "api_key" : "LT api key",
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
             # "anon" : False
