@@ -98,6 +98,7 @@ async def do_the_thing(base_dir):
     if meta['cleanup'] and os.path.exists(f"{base_dir}/tmp"):
         shutil.rmtree(f"{base_dir}/tmp")
         console.print("[bold green]Sucessfully emptied tmp directory")
+        exit(0)
     path = meta['path']
     path = os.path.abspath(path)
     if path.endswith('"'):
@@ -164,7 +165,7 @@ async def do_the_thing(base_dir):
                 for key, value in saved_meta.items():
                     overwrite_list = [
                         'trackers', 'dupe', 'debug', 'anon', 'category', 'type', 'screens', 'nohash', 'manual_edition', 'imdb', 'tmdb_manual', 'mal', 'manual', 
-                        'hdb', 'ptp', 'blu', 'no_season', 'no_aka', 'no_year', 'no_dub', 'no_tag', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
+                        'hdb', 'ptp', 'blu', 'no_season', 'no_aka', 'no_year', 'no_dub', 'no_tag', 'no_seed', 'client', 'desclink', 'descfile', 'desc', 'draft', 'region', 'freeleech', 
                         'personalrelease', 'unattended', 'season', 'episode', 'torrent_creation', 'qbit_tag', 'qbit_cat', 'skip_imghost_upload', 'imghost', 'manual_source', 'webdv', 'hardcoded-subs'
                     ]
                     if meta.get(key, None) != value and key in overwrite_list:
@@ -185,13 +186,13 @@ async def do_the_thing(base_dir):
         meta = await prep.gather_prep(meta=meta, mode='cli') 
         meta['name_notag'], meta['name'], meta['clean_name'], meta['potential_missing'] = await prep.get_name(meta)
 
-        if meta.get('image_list', False) == False and meta.get('skip_imghost_upload', False) == False:
+        if meta.get('image_list', False) in (False, []) and meta.get('skip_imghost_upload', False) == False:
             return_dict = {}
             meta['image_list'], dummy_var = prep.upload_screens(meta, meta['screens'], 1, 0, meta['screens'],[], return_dict)
             if meta['debug']:
                 console.print(meta['image_list'])
             # meta['uploaded_screens'] = True
-        elif meta.get('skip_imghost_upload', False):
+        elif meta.get('skip_imghost_upload', False) == True and meta.get('image_list', False) == False:
             meta['image_list'] = []
 
         if not os.path.exists(os.path.abspath(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent")):
