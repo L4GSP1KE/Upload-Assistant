@@ -177,6 +177,12 @@ config = {
             "announce_url" : "https://onlyencodes.cc/announce/customannounceurl",
             # "anon" : False
         },
+        "RTF": {
+            "api_key": 'get_it_by_running_/api/ login command from https://retroflix.club/api/doc',
+            "announce_url": "get from upload page",
+            # "tag": "RetroFlix, nd",
+            "anon": True
+        },
         "RF" : {
             "api_key" : "RF api key",
             "announce_url" : "https://reelflix.xyz/announce/customannounceurl",
