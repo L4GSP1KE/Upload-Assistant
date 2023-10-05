@@ -10,7 +10,7 @@ from src.trackers.COMMON import COMMON
 from src.console import console
 
 
-class UNIT3D_TEMPLATE():
+class ULCX():
     """
     Edit for Tracker:
         Edit BASE.torrent with announce and source
