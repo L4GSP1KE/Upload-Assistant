@@ -189,7 +189,7 @@ config = {
             # "anon" : False
         },
         "ULCX" : {
-            "api_key" : "ULCX api key",
+            "api_key" : "upload.cx api key",
             "announce_url" : "https://upload.cx/announce/customannounceurl",
             # "anon" : False
         },
