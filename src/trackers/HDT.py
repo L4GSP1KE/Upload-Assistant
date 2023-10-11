@@ -342,10 +342,10 @@ class HDT():
             # Add Screenshots
             images = meta['image_list']
             if len(images) > 0:
-                for each in range(len(images)):
+                for each in range(min(2, len(images))):
                     img_url = images[each]['img_url']
                     raw_url = images[each]['raw_url']
-                    descfile.write(f"[url={raw_url}][img]{img_url}[/img][/url]\n")
+                    descfile.write(f'<a href="{raw_url}"><img src="{img_url}" height=137></a> ')
 
             descfile.close()
 
