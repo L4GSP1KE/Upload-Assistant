@@ -98,6 +98,7 @@ async def do_the_thing(base_dir):
     if meta['cleanup'] and os.path.exists(f"{base_dir}/tmp"):
         shutil.rmtree(f"{base_dir}/tmp")
         console.print("[bold green]Sucessfully emptied tmp directory")
+    if not meta['path']:
         exit(0)
     path = meta['path']
     path = os.path.abspath(path)
