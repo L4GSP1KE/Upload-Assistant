@@ -48,6 +48,13 @@ config = {
             "draft_default" : "True",
             # "anon" : False
         },
+        "BHDTV": {
+            "api_key": "found under https://www.bit-hdtv.com/my.php",
+            "announce_url": "https://trackerr.bit-hdtv.com/announce",
+            #passkey found under https://www.bit-hdtv.com/my.php
+            "my_announce_url": "https://trackerr.bit-hdtv.com/passkey/announce",
+            # "anon" : "False"
+        },
         "PTP" : {
             "useAPI" : False, # Set to True if using PTP
             "add_web_source_to_desc" : True,
@@ -72,12 +79,13 @@ config = {
             "announce_url" : "https://hawke.uno/announce/customannounceurl",
             # "anon" : False
         },
-	"MTV": {
+        "MTV": {
             'api_key' : 'get from security page',
             'username' : '<USERNAME>',
             'password' : '<PASSWORD>',
-            "announce_url": "get from https://www.morethantv.me/upload.php",
-            "anon" : False
+            'announce_url' : "get from https://www.morethantv.me/upload.php",
+            'anon' : False,
+            # 'otp_uri' : 'OTP URI, read the following for more information https://github.com/google/google-authenticator/wiki/Key-Uri-Format'
         },
         "STC" :{
             "api_key" : "STC",
@@ -136,7 +144,7 @@ config = {
             "announce_url" : "https://lst.gg/announce/customannounceurl",
             # "anon" : False
         },
-	"LT" : {
+        "LT" : {
             "api_key" : "LT api key",
             "announce_url" : "https://lat-team.com/announce/customannounceurl",
             # "anon" : False
@@ -168,6 +176,12 @@ config = {
             "api_key" : "OE api key",
             "announce_url" : "https://onlyencodes.cc/announce/customannounceurl",
             # "anon" : False
+        },
+        "RTF": {
+            "api_key": 'get_it_by_running_/api/ login command from https://retroflix.club/api/doc',
+            "announce_url": "get from upload page",
+            # "tag": "RetroFlix, nd",
+            "anon": True
         },
         "RF" : {
             "api_key" : "RF api key",
@@ -284,3 +298,4 @@ config = {
         }
     }
 }
+

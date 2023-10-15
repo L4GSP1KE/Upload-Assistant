@@ -12,7 +12,6 @@ import distutils.util
 from pathlib import Path
 from src.trackers.COMMON import COMMON
 
-
 class MTV():
     """
     Edit for Tracker:
@@ -504,9 +503,16 @@ class MTV():
 
             # handle 2fa
             if resp.url.endswith('twofactor/login'):
+                otp_uri = self.config['TRACKERS'][self.tracker].get('otp_uri')
+                if otp_uri:
+                    import pyotp
+                    mfa_code = pyotp.parse_uri(otp_uri).now()
+                else:
+                    mfa_code = console.input('[yellow]MTV 2FA Code: ')
+                    
                 two_factor_payload = {
                     'token' : resp.text.rsplit('name="token" value="', 1)[1][:48],
-                    'code' : console.input('[yellow]MTV 2FA Code: '),
+                    'code' : mfa_code,
                     'submit' : 'login'
                 }
                 resp = session.post(url="https://www.morethantv.me/twofactor/login", data=two_factor_payload)

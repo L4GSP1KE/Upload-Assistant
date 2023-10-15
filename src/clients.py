@@ -29,6 +29,10 @@ class Clients():
 
     async def add_to_client(self, meta, tracker):
         torrent_path = f"{meta['base_dir']}/tmp/{meta['uuid']}/[{tracker}]{meta['clean_name']}.torrent"
+        if meta.get('no_seed', False) == True:
+            console.print(f"[bold red]--no-seed was passed, so the torrent will not be added to the client")
+            console.print(f"[bold yellow]Add torrent manually to the client")
+            return
         if os.path.exists(torrent_path):
             torrent = Torrent.read(torrent_path)
         else:
