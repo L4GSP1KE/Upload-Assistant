@@ -340,7 +340,7 @@ class MTV():
     async def get_tags(self, meta):
         tags = []
         # Genres
-        tags.extend([x.strip(', ').lower().replace(' ', '.') for x in meta['genres'].split()])
+        tags.extend([x.strip(', ').lower().replace(' ', '.') for x in meta['genres'].split(',')])
         # Resolution
         tags.append(meta['resolution'].lower())
         if meta['sd'] == 1:
