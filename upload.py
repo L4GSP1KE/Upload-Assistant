@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import requests
 from src.args import Args
 from src.clients import Clients
