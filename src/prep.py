@@ -1999,7 +1999,7 @@ class Prep():
             torrent.piece_size = 2**piece_size
             torrent.piece_size_max = 16777216
             torrent.generate(callback=self.torf_cb, interval=5)
-            torrent.write(f"{meta['base_dir']}/tmp/{meta['uuid']}/BASE.torrent", overwrite=True)
+            torrent.write(f"{meta['base_dir']}/tmp/{meta['uuid']}/{output_filename}.torrent", overwrite=True)
             torrent.verify_filesize(path)
         console.print("[bold green].torrent created", end="\r")
         return torrent
