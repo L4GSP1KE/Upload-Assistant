@@ -178,6 +178,8 @@ config = {
             # "anon" : False
         },
         "RTF": {
+	    "username" : "username",
+            "password" : "password",
             "api_key": 'get_it_by_running_/api/ login command from https://retroflix.club/api/doc',
             "announce_url": "get from upload page",
             # "tag": "RetroFlix, nd",
