@@ -173,7 +173,7 @@ class HDT():
                 data['season'] = 'false'
             
             # Anonymous check
-            if meta['anon'] == 0 and bool(distutils.util.strtobool(self.config['TRACKERS']['HDT'].get('anon', "False"))) == False:
+            if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS']['HDT'].get('anon', "False")))) == False:
                 data['anonymous'] = 'false'
             else:
                 data['anonymous'] = 'true'
