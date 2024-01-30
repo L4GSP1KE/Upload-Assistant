@@ -27,8 +27,8 @@ class TFM():
 
     def __init__(self, config):
         self.config = config
-        self.tracker = 'Abbreviated'
-        self.source_flag = 'Source flag for .torrent'
+        self.tracker = 'TFM'
+        self.source_flag = 'TFM'
         self.upload_url = 'https://toonsfor.me/api/torrents/upload'
         self.search_url = 'https://toonsfor.me/api/torrents/filter'
         self.signature = f"\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by L4G's Upload Assistant[/url][/center]"
