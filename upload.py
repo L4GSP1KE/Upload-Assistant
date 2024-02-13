@@ -272,6 +272,8 @@ async def do_the_thing(base_dir):
                     console.print(f"Uploading to {tracker_class.tracker}")
                     if check_banned_group(tracker_class.tracker, tracker_class.banned_groups, meta):
                         continue
+                    if tracker == "RTF":
+                        await tracker_class.api_test(meta)
                     dupes = await tracker_class.search_existing(meta)
                     dupes = await common.filter_dupes(dupes, meta)
                     # note BHDTV does not have search implemented.

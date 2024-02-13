@@ -5,6 +5,7 @@ import requests
 import base64
 import re
 import datetime
+import json
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -86,6 +87,10 @@ class RTF():
             response = requests.post(url=self.upload_url, json=json_data, headers=headers)
             try:
                 console.print(response.json())
+
+                t_id = response.json()['torrent']['id']
+                await common.add_tracker_torrent(meta, self.tracker, self.source_flag, self.config['TRACKERS'][self.tracker].get('announce_url'), "https://retroflix.club/browse/t/" + str(t_id))
+
             except:
                 console.print("It may have uploaded, go check")
                 return
@@ -106,7 +111,6 @@ class RTF():
             'includingDead' : '1'
         }
 
-        # search is intentionally vague and just uses IMDB if available as many releases are not named properly on site.
         if meta['imdb_id'] != "0":
             params['imdbId'] = meta['imdb_id'] if str(meta['imdb_id']).startswith("tt") else "tt" + meta['imdb_id']
         else:
@@ -123,3 +127,38 @@ class RTF():
             await asyncio.sleep(5)
 
         return dupes
+
+    # tests if API key valid site API key expires every week so a new one has to be generated.
+    async def api_test(self, meta):
+        headers = {
+            'accept': 'application/json',
+            'Authorization': self.config['TRACKERS'][self.tracker]['api_key'].strip(),
+        }
+
+        response = requests.get('https://retroflix.club/api/test', headers=headers)
+
+        if response.status_code != 200:
+            console.print('[bold red]Your API key is incorrect SO generating a new one')
+            await self.generate_new_api(meta)
+        else:
+            return
+
+    async def generate_new_api(self, meta):
+        headers = {
+            'accept': 'application/json',
+        }
+
+        json_data = {
+            'username': self.config['TRACKERS'][self.tracker]['username'],
+            'password': self.config['TRACKERS'][self.tracker]['password'],
+        }
+
+        response = requests.post('https://retroflix.club/api/login', headers=headers, json=json_data)
+
+        if response.status_code == 201:
+            console.print('[bold green]Using New API key generated for this upload')
+            console.print(f'[bold green]Please update your L4G config with the below RTF API Key for future uploads')
+            console.print(f'[bold yellow]{response.json()["token"]}')
+            self.config['TRACKERS'][self.tracker]['api_key'] = response.json()["token"]
+        else:
+            console.print(f'[bold red]Error getting new API key got error code {response.status_code}, Please check username and password in config')
