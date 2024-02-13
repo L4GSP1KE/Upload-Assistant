@@ -173,7 +173,7 @@ class HDT():
                 data['season'] = 'false'
             
             # Anonymous check
-            if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS']['HDT'].get('anon', "False")))) == False:
+            if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
                 data['anonymous'] = 'false'
             else:
                 data['anonymous'] = 'true'
@@ -185,9 +185,9 @@ class HDT():
                 console.print(data)
             else:
                 with requests.Session() as session:
-                    cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/HDT.pkl")
-                    with open(cookiefile, 'rb') as cf:
-                        session.cookies.update(pickle.load(cf))
+                    cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/HDT.txt")
+
+                    session.cookies.update(await common.parseCookieFile(cookiefile))
                     up = session.post(url=url, data=data, files=files)
                     torrentFile.close()
 
@@ -207,9 +207,9 @@ class HDT():
     async def search_existing(self, meta):
         dupes = []
         with requests.Session() as session:
-            cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/HDT.pkl")
-            with open(cookiefile, 'rb') as cf:
-                session.cookies.update(pickle.load(cf))
+            common = COMMON(config=self.config)
+            cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/HDT.txt")
+            session.cookies.update(await common.parseCookieFile(cookiefile))
             
             search_url = f"https://hd-torrents.org/torrents.php"
             csrfToken = await self.get_csrfToken(session, search_url)
@@ -241,30 +241,21 @@ class HDT():
 
     
     async def validate_credentials(self, meta):
-        cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/HDT.pkl")
-        if not os.path.exists(cookiefile):
-            await self.login(cookiefile)
+        cookiefile = os.path.abspath(f"{meta['base_dir']}/data/cookies/HDT.txt")
         vcookie = await self.validate_cookies(meta, cookiefile)
         if vcookie != True:
-            console.print('[red]Failed to validate cookies. Please confirm that the site is up and your passkey is valid.')
-            recreate = cli_ui.ask_yes_no("Log in again and create new session?")
-            if recreate == True:
-                if os.path.exists(cookiefile):
-                    os.remove(cookiefile)
-                await self.login(cookiefile)
-                vcookie = await self.validate_cookies(meta, cookiefile)
-                return vcookie
-            else:
-                return False
+            console.print('[red]Failed to validate cookies. Please confirm that the site is up or export a fresh cookie file from the site')
+            return False
         return True
     
     
     async def validate_cookies(self, meta, cookiefile):
+        common = COMMON(config=self.config)
         url = "https://hd-torrents.org/index.php"
+        cookiefile = f"{meta['base_dir']}/data/cookies/HDT.txt"
         if os.path.exists(cookiefile):
             with requests.Session() as session:
-                with open(cookiefile, 'rb') as cf:
-                    session.cookies.update(pickle.load(cf))
+                session.cookies.update(await common.parseCookieFile(cookiefile))
                 res = session.get(url=url)
                 if meta['debug']:
                     console.print('[cyan]Cookies:')
@@ -276,7 +267,13 @@ class HDT():
                     return False
         else:
             return False
-    
+        
+
+        
+    """ 
+    Old login method, disabled because of site's DDOS protection. Better to use exported cookies.
+
+
     async def login(self, cookiefile):
         with requests.Session() as session:
             url = "https://hd-torrents.org/login.php"
@@ -300,17 +297,8 @@ class HDT():
                 await asyncio.sleep(1)
                 console.print(response.url)
         return
-    #  No longer used as torrent is modified instead of downloaded.
-    # async def download_new_torrent(self, session, id, torrent_path):
-    #     download_url = f"https://hd-torrents.org/download.php?id={id}"
-    #     r = session.get(url=download_url)
-    #     if r.status_code == 200:
-    #         with open(torrent_path, "wb") as tor:
-    #             tor.write(r.content)
-    #     else:
-    #         console.print("[red]There was an issue downloading the new .torrent from HDT")
-    #         console.print(r.text)
-    #     return
+    """
+
     
     async def get_csrfToken(self, session, url):
         r = session.get(url)
