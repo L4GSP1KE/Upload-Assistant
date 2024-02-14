@@ -34,7 +34,7 @@ config = {
 
     "TRACKERS" : {
         # Which trackers do you want to upload to?
-        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD, LST, PTER, NBL, ANT, MTV",
+        "default_trackers" : "BLU, BHD, AITHER, STC, STT, SN, THR, R4E, HP, ACM, PTP, LCD, LST, PTER, NBL, ANT, MTV, ULCX",
 
         "BLU" : {
             "useAPI" : False, # Set to True if using BLU
@@ -186,6 +186,11 @@ config = {
         "RF" : {
             "api_key" : "RF api key",
             "announce_url" : "https://reelflix.xyz/announce/customannounceurl",
+            # "anon" : False
+        },
+        "ULCX" : {
+            "api_key" : "upload.cx api key",
+            "announce_url" : "https://upload.cx/announce/customannounceurl",
             # "anon" : False
         },
         "MANUAL" : {
