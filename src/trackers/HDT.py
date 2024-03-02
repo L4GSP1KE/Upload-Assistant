@@ -6,8 +6,8 @@ import json
 import glob
 import cli_ui
 import pickle
-import distutils
 from pathlib import Path
+from str2bool import str2bool
 from bs4 import BeautifulSoup
 from unidecode import unidecode
 from pymediainfo import MediaInfo
@@ -173,7 +173,7 @@ class HDT():
                 data['season'] = 'false'
             
             # Anonymous check
-            if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
+            if meta['anon'] == 0 and bool(str2bool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
                 data['anonymous'] = 'false'
             else:
                 data['anonymous'] = 'true'

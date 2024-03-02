@@ -8,8 +8,8 @@ import os
 import cli_ui
 import pickle
 import re
-import distutils.util
 from pathlib import Path
+from str2bool import str2bool
 from src.trackers.COMMON import COMMON
 
 class MTV():
@@ -77,7 +77,7 @@ class MTV():
         mtv_name = await self.edit_name(meta)
 
         # anon
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
+        if meta['anon'] == 0 and bool(str2bool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
             anon = 0
         else:
             anon = 1
