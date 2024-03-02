@@ -2,9 +2,9 @@
 # import discord
 import asyncio
 import requests
-import distutils.util
 import os
 import platform
+from str2bool import str2bool
 
 from src.trackers.COMMON import COMMON
 from src.console import console
@@ -26,7 +26,7 @@ class BLU():
         self.upload_url = 'https://blutopia.cc/api/torrents/upload' 
         self.signature = f"\n[center][url=https://blutopia.cc/forums/topics/3087]Created by L4G's Upload Assistant[/url][/center]"
         self.banned_groups = [
-            '[Oj]', '3LTON', '4yEo', 'AFG', 'AniHLS', 'AnimeRG', 'AniURL', 'AROMA', 'aXXo', 'Brrip', 'CM8', 'CrEwSaDe', 'd3g', 'DeadFish', 'DNL', 'ELiTE', 'eSc', 'FaNGDiNG0', 'FGT', 'Flights', 
+            '[Oj]', '3LTON', '4yEo', 'AFG', 'AniHLS', 'AnimeRG', 'AniURL', 'AROMA', 'aXXo', 'Brrip', 'CHD', 'CM8', 'CrEwSaDe', 'd3g', 'DeadFish', 'DNL', 'ELiTE', 'eSc', 'FaNGDiNG0', 'FGT', 'Flights', 
             'FRDS', 'FUM', 'HAiKU', 'HD2DVD', 'HDS', 'HDTime', 'Hi10', 'ION10', 'iPlanet', 'JIVE', 'KiNGDOM', 'Leffe', 'LEGi0N', 'LOAD', 'MeGusta', 'mHD', 'mSD', 'NhaNc3', 'nHD', 'nikt0', 'NOIVTC', 
             'nSD', 'PiRaTeS', 'playBD', 'PlaySD', 'playXD', 'PRODJi', 'RAPiDCOWS', 'RARBG', 'RDN', 'REsuRRecTioN', 'RMTeam', 'SANTi', 'SicFoI', 'SPASM', 'STUTTERSHIT', 'Telly', 'TM', 'TRiToN', 'UPiNSMOKE', 
             'URANiME', 'WAF', 'x0r', 'xRed', 'XS', 'YIFY', 'ZKBL', 'ZmN', 'ZMNT',
@@ -49,7 +49,7 @@ class BLU():
         resolution_id = await self.get_res_id(meta['resolution'])
         region_id = await common.unit3d_region_ids(meta.get('region'))
         distributor_id = await common.unit3d_distributor_ids(meta.get('distributor'))
-        if meta['anon'] == 0 and bool(distutils.util.strtobool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
+        if meta['anon'] == 0 and bool(str2bool(str(self.config['TRACKERS'][self.tracker].get('anon', "False")))) == False:
             anon = 0
         else:
             anon = 1
