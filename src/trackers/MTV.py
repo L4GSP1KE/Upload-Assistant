@@ -223,7 +223,7 @@ class MTV():
         if meta['tag'] == "":
             mtv_name = f"{mtv_name}-NoGrp"
         mtv_name = ' '.join(mtv_name.split())
-        mtv_name = re.sub("[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", mtv_name)
+        mtv_name = re.sub(r"[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", mtv_name)
         mtv_name = mtv_name.replace(' ', '.').replace('..', '.')
         return mtv_name
     

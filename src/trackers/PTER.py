@@ -187,7 +187,7 @@ class PTER():
             desc = bbcode.convert_spoiler_to_hide(desc)
             desc = bbcode.convert_comparison_to_centered(desc, 1000)
             desc = desc.replace('[img]', '[img]')
-            desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
+            desc = re.sub(r"(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
             descfile.write(desc)
             
             if self.rehost_images == True:

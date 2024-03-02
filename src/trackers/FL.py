@@ -98,7 +98,7 @@ class FL():
         fl_name = fl_name.replace('DTS7.1', 'DTS').replace('DTS5.1', 'DTS').replace('DTS2.0', 'DTS').replace('DTS1.0', 'DTS')
         fl_name = fl_name.replace('Dubbed', '').replace('Dual-Audio', '')
         fl_name = ' '.join(fl_name.split())
-        fl_name = re.sub("[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", fl_name)
+        fl_name = re.sub(r"[^0-9a-zA-ZÀ-ÿ. &+'\-\[\]]+", "", fl_name)
         fl_name = fl_name.replace(' ', '.').replace('..', '.')
         return fl_name 
 
@@ -319,7 +319,7 @@ class FL():
             desc = bbcode.convert_code_to_quote(desc)
             desc = bbcode.convert_comparison_to_centered(desc, 900)
             desc = desc.replace('[img]', '[img]').replace('[/img]', '[/img]')
-            desc = re.sub("(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
+            desc = re.sub(r"(\[img=\d+)]", "[img]", desc, flags=re.IGNORECASE)
             if meta['is_disc'] != 'BDMV':
                 url = "https://up.img4k.net/api/description"
                 data = {
