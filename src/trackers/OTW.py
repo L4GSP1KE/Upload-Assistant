@@ -10,7 +10,7 @@ from src.trackers.COMMON import COMMON
 from src.console import console
 
 
-class TFM():
+class OTW():
     """
     Edit for Tracker:
         Edit BASE.torrent with announce and source
@@ -27,10 +27,10 @@ class TFM():
 
     def __init__(self, config):
         self.config = config
-        self.tracker = 'TFM'
-        self.source_flag = 'TFM'
-        self.upload_url = 'https://toonsfor.me/api/torrents/upload'
-        self.search_url = 'https://toonsfor.me/api/torrents/filter'
+        self.tracker = 'OTW'
+        self.source_flag = 'OTW'
+        self.upload_url = 'https://oldtoons.world/api/torrents/upload'
+        self.search_url = 'https://oldtoons.world/api/torrents/filter'
         self.signature = f"\n[center][url=https://github.com/L4GSP1KE/Upload-Assistant]Created by L4G's Upload Assistant[/url][/center]"
         self.banned_groups = [""]
         pass

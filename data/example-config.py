@@ -188,9 +188,9 @@ config = {
             "announce_url" : "https://reelflix.xyz/announce/customannounceurl",
             # "anon" : False
         },
-        "TFM" : {
-            "api_key" : "TFM api key",
-            "announce_url" : "https://toonsfor.me/announce/customannounceurl",
+        "OTW" : {
+            "api_key" : "OTW api key",
+            "announce_url" : "https://oldtoons.world/announce/customannounceurl",
             # "anon" : False
         },
         "MANUAL" : {
