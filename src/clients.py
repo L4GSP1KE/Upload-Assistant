@@ -309,18 +309,7 @@ class Clients():
 
         content_layout = client.get('content_layout', 'Original')
         
-        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, content_layout=content_layout, category=qbt_category)
-        # Wait for up to 30 seconds for qbit to actually return the download
-        # there's an async race conditiion within qbt that it will return ok before the torrent is actually added
-        for _ in range(0, 30):
-            if len(qbt_client.torrents_info(torrent_hashes=torrent.infohash)) > 0:
-                break
-            await asyncio.sleep(1)
-        qbt_client.torrents_resume(torrent.infohash)
-        if client.get('qbit_tag', None) != None:
-            qbt_client.torrents_add_tags(tags=client.get('qbit_tag'), torrent_hashes=torrent.infohash)
-        if meta.get('qbit_tag') != None:
-            qbt_client.torrents_add_tags(tags=meta.get('qbit_tag'), torrent_hashes=torrent.infohash)
+        qbt_client.torrents_add(torrent_files=torrent.dump(), save_path=path, use_auto_torrent_management=auto_management, is_skip_checking=True, is_paused=False, content_layout=content_layout, category=qbt_category, tags=client.get('qbit_tag'))
         console.print(f"Added to: {path}")
         
 
