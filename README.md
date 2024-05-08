@@ -32,12 +32,14 @@ A simple tool to take the work out of uploading.
    - Also needs MediaInfo and ffmpeg installed on your system
       - On Windows systems, ffmpeg must be added to PATH (https://windowsloop.com/install-ffmpeg-windows-10/)
       - On linux systems, get it from your favorite package manager
-   - Clone the repo to your system `git clone https://github.com/L4GSP1KE/Upload-Assistant.git`
+   - Clone the repo to your system `git clone https://github.com/Lusephur/Upload-Assistant.git`
    - Copy and Rename `data/example-config.py` to `data/config.py`
    - Edit `config.py` to use your information (more detailed information in the [wiki](https://github.com/L4GSP1KE/Upload-Assistant/wiki))
       - tmdb_api (v3) key can be obtained from https://developers.themoviedb.org/3/getting-started/introduction
       - image host api keys can be obtained from their respective sites
-   - Install necessary python modules `pip3 install --user -U -r requirements.txt`
+   - Set up Virtualenvironment `python3 -m venv --prompt 3.11 env`
+   - Prime the env `source env/bin/activate.fish`
+   - Install necessary python modules `python3 -m pip install -r requirements.txt`
      
    
 
