@@ -10,13 +10,15 @@ config = {
         "imgbb_api" : "imgbb api key",
         "ptpimg_api" : "ptpimg api key",
         "lensdump_api" : "lensdump api key",
+	"ptscreens_api" : "ptscreens api key",
 
         # Order of image hosts, and backup image hosts
         "img_host_1": "imgbb",
         "img_host_2": "ptpimg",
         "img_host_3": "imgbox",
-	    "img_host_4": "pixhost",
+	"img_host_4": "pixhost",
         "img_host_5": "lensdump",
+	"img_host_6": "ptscreens",
 
 
         "screens" : "6",
